@@ -1,0 +1,1853 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Métronome — Formation Musicale</title>
+
+<!-- Polices du portail -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  /* ============ CONTRAT DE THÈME PORTAIL FM ============ */
+  :root {
+    /* défauts = thème clair du portail */
+    --fm-bg:         #efe7d8;
+    --fm-panel:      #f7f1e6;
+    --fm-panel-2:    #f0e7d6;
+    --fm-ink:        #2a221b;
+    --fm-sub:        #6b5d4c;
+    --fm-line:       rgba(107,74,46,.16);
+    --fm-accent:     #b3763b;
+    --fm-accent-2:   #6b4a2e;
+    --fm-accent-ink: #f7f1e6;
+    --fm-staff:      rgba(107,74,46,.06);
+    --fm-font-display: 'Cormorant Garamond', Georgia, serif;
+    --fm-font-ui:      'Work Sans', system-ui, sans-serif;
+  }
+  html[data-fm-theme="clair"] {
+    --fm-bg:#efe7d8; --fm-panel:#f7f1e6; --fm-panel-2:#f0e7d6;
+    --fm-ink:#2a221b; --fm-sub:#6b5d4c; --fm-line:rgba(107,74,46,.16);
+    --fm-accent:#b3763b; --fm-accent-2:#6b4a2e; --fm-accent-ink:#f7f1e6;
+    --fm-staff:rgba(107,74,46,.06);
+  }
+  html[data-fm-theme="sombre"] {
+    --fm-bg:#0e0e10; --fm-panel:#17151a; --fm-panel-2:#1c1a1f;
+    --fm-ink:#f5f0e6; --fm-sub:#b5aea2; --fm-line:rgba(201,162,75,.18);
+    --fm-accent:#c9a24b; --fm-accent-2:#7a6a3a; --fm-accent-ink:#0e0e10;
+    --fm-staff:rgba(201,162,75,.05);
+  }
+
+  /* ============ BASE ============ */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: var(--fm-font-ui);
+    background: var(--fm-bg);
+    color: var(--fm-ink);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 28px 14px 40px;
+    transition: background-color .5s ease, color .5s ease;
+  }
+  .app { width: 100%; max-width: 860px; }
+
+  /* ============ EN-TÊTE ============ */
+  header { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
+  .brand h1 {
+    font-family: var(--fm-font-display);
+    font-weight: 600;
+    font-size: 2.1rem;
+    line-height: 1.05;
+  }
+  .kicker {
+    font-size: .68rem; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--fm-accent); font-weight: 600; margin-top: 4px;
+  }
+  .header-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .seg { display: flex; border: 1px solid var(--fm-line); border-radius: 7px; overflow: hidden; background: var(--fm-panel); }
+  .seg button {
+    background: transparent; border: none; color: var(--fm-sub);
+    padding: 8px 16px; font-family: var(--fm-font-ui); font-size: .8rem;
+    letter-spacing: .08em; text-transform: uppercase; cursor: pointer; font-weight: 500;
+  }
+  .seg button.sel { background: var(--fm-accent); color: var(--fm-accent-ink); }
+  .btn-ghost {
+    background: var(--fm-panel); border: 1px solid var(--fm-line); color: var(--fm-ink);
+    padding: 8px 14px; border-radius: 7px; cursor: pointer;
+    font-family: var(--fm-font-ui); font-size: .8rem; letter-spacing: .04em;
+  }
+  .btn-ghost:hover { border-color: var(--fm-accent); }
+
+  /* ============ CARTES ============ */
+  .top { display: grid; grid-template-columns: 1fr 350px; gap: 16px; margin-bottom: 16px; }
+  @media (max-width: 740px) { .top { grid-template-columns: 1fr; } }
+  .card {
+    background: var(--fm-panel);
+    border: 1px solid var(--fm-line);
+    border-radius: 12px;
+    padding: 22px;
+    transition: background-color .5s ease, border-color .5s ease;
+  }
+  .card.staff {
+    background-image: repeating-linear-gradient(transparent 0 12px, var(--fm-staff) 12px 13px);
+  }
+
+  /* ---- transport ---- */
+  .tempo-value {
+    font-family: var(--fm-font-display); font-weight: 700;
+    font-size: 4.2rem; line-height: 1; text-align: center; font-variant-numeric: tabular-nums;
+  }
+  .tempo-label {
+    text-align: center; color: var(--fm-sub); font-size: .72rem;
+    letter-spacing: .14em; text-transform: uppercase; margin: 6px 0 10px;
+  }
+  .tempo-label em { font-family: var(--fm-font-display); font-style: italic; font-size: 1.05rem; letter-spacing: 0; text-transform: none; color: var(--fm-accent); }
+  .slider-row { display: flex; align-items: center; gap: 10px; margin: 10px 0; }
+  .slider-row button {
+    background: var(--fm-panel-2); border: 1px solid var(--fm-line); color: var(--fm-ink);
+    width: 38px; height: 38px; border-radius: 50%; font-size: 1.25rem; cursor: pointer; flex-shrink: 0;
+  }
+  .slider-row button:hover { border-color: var(--fm-accent); }
+  input[type=range] { flex: 1; -webkit-appearance: none; height: 4px; border-radius: 2px; background: var(--fm-line); outline: none; }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
+    background: var(--fm-accent); border: 2px solid var(--fm-panel); cursor: pointer;
+  }
+  input[type=range]::-moz-range-thumb {
+    width: 18px; height: 18px; border-radius: 50%; background: var(--fm-accent);
+    border: 2px solid var(--fm-panel); cursor: pointer;
+  }
+  .main-buttons { display: flex; gap: 10px; margin-top: 12px; }
+  .btn-start {
+    flex: 2; background: var(--fm-accent); border: none; color: var(--fm-accent-ink);
+    padding: 14px; border-radius: 7px; font-family: var(--fm-font-ui);
+    font-size: .95rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; cursor: pointer;
+  }
+  .btn-start:hover { filter: brightness(1.06); }
+  .btn-start.playing { background: var(--fm-accent-2); color: var(--fm-accent-ink); }
+  .btn-tap {
+    flex: 1; background: var(--fm-panel-2); border: 1px solid var(--fm-line); color: var(--fm-ink);
+    padding: 14px; border-radius: 7px; font-size: .9rem; letter-spacing: .1em; cursor: pointer;
+  }
+  .btn-tap:active { background: var(--fm-accent); color: var(--fm-accent-ink); }
+  .mini-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+  label.small {
+    display: block; color: var(--fm-sub); font-size: .64rem;
+    text-transform: uppercase; letter-spacing: .14em; margin-bottom: 4px; font-weight: 600;
+  }
+  select, input[type=number], input[type=text], textarea {
+    width: 100%; background: var(--fm-panel-2); color: var(--fm-ink);
+    border: 1px solid var(--fm-line); border-radius: 7px; padding: 8px;
+    font-family: var(--fm-font-ui); font-size: .9rem;
+  }
+
+  /* ---- cercle ---- */
+  .circle-wrap { display: flex; flex-direction: column; align-items: center; }
+  canvas { max-width: 100%; }
+  .status-line { color: var(--fm-sub); font-size: .8rem; margin-top: 6px; min-height: 1.2em; text-align: center; }
+  .status-line .mute { color: var(--fm-accent); font-weight: 600; letter-spacing: .08em; }
+
+  /* ============ SECTIONS EXPERT ============ */
+  details.section {
+    background: var(--fm-panel); border: 1px solid var(--fm-line);
+    border-radius: 12px; margin-bottom: 12px; overflow: hidden;
+    transition: background-color .5s ease, border-color .5s ease;
+  }
+  details.section summary {
+    cursor: pointer; padding: 14px 22px; list-style: none;
+    display: flex; align-items: baseline; gap: 12px; user-select: none;
+  }
+  details.section summary::-webkit-details-marker { display: none; }
+  details.section summary::before { content: '◆'; font-size: .6rem; color: var(--fm-accent); }
+  .sec-title { font-family: var(--fm-font-display); font-weight: 600; font-size: 1.25rem; }
+  .sec-sub { color: var(--fm-sub); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; }
+  .section-body { padding: 2px 22px 20px; }
+  body.mode-simple details.section { display: none; }
+  body.mode-simple .kbd-hint { display: none; }
+
+  .row { display: flex; align-items: center; gap: 12px; margin: 10px 0; flex-wrap: wrap; }
+  .row > label:first-child { min-width: 195px; color: var(--fm-sub); font-size: .86rem; }
+  .val { min-width: 64px; text-align: right; font-variant-numeric: tabular-nums; font-size: .88rem; color: var(--fm-accent); font-weight: 600; }
+  .check { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: .88rem; }
+  .check input { accent-color: var(--fm-accent); width: 16px; height: 16px; }
+  .hint { color: var(--fm-sub); font-size: .78rem; line-height: 1.55; margin-top: 6px; }
+  code { background: var(--fm-panel-2); border: 1px solid var(--fm-line); padding: 1px 5px; border-radius: 4px; font-size: .85em; }
+
+  /* ---- séquenceur ---- */
+  .steps { display: flex; flex-wrap: wrap; gap: 5px; margin: 12px 0; }
+  .step {
+    width: 34px; height: 44px; border-radius: 7px; border: 1px solid var(--fm-line);
+    background: var(--fm-panel-2); cursor: pointer; position: relative; flex-shrink: 0;
+  }
+  .step.on  { background: var(--fm-accent); border-color: var(--fm-accent); }
+  .step.acc { background: var(--fm-accent-2); border-color: var(--fm-accent-2); }
+  .step.beatmark::after {
+    content: ''; position: absolute; top: -7px; left: 50%; transform: translateX(-50%);
+    width: 4px; height: 4px; border-radius: 50%; background: var(--fm-sub);
+  }
+  .step.cur { outline: 2px solid var(--fm-ink); }
+  .preset-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .preset-row select { width: auto; flex: 1; min-width: 160px; }
+  .btn-sm {
+    background: var(--fm-panel-2); border: 1px solid var(--fm-line); color: var(--fm-ink);
+    padding: 8px 14px; border-radius: 7px; cursor: pointer; font-family: var(--fm-font-ui); font-size: .82rem;
+  }
+  .btn-sm:hover { border-color: var(--fm-accent); }
+  .btn-sm.primary { background: var(--fm-accent); border-color: var(--fm-accent); color: var(--fm-accent-ink); font-weight: 600; }
+
+  textarea { min-height: 150px; font-family: 'Consolas', 'Menlo', monospace; font-size: .85rem; line-height: 1.6; resize: vertical; }
+  .script-status { font-size: .84rem; color: var(--fm-accent); margin-top: 8px; min-height: 1.2em; }
+  .kbd-hint { text-align: center; color: var(--fm-sub); font-size: .74rem; margin-top: 14px; }
+
+  /* ============ ARCHET PLEIN ÉCRAN ============ */
+  .bowfs {
+    position: fixed; inset: 0; background: var(--fm-bg);
+    display: none; flex-direction: column; z-index: 70;
+  }
+  .bowfs.open { display: flex; }
+  .bowfs-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 22px; gap: 12px;
+  }
+  .bowfs-title { font-family: var(--fm-font-display); font-size: 1.4rem; font-weight: 600; }
+  .bowfs-bar .kicker { margin: 0; }
+  .bowfs-controls { display: flex; gap: 10px; align-items: center; }
+  .bowfs-tempo { font-variant-numeric: tabular-nums; color: var(--fm-sub); font-size: .9rem; letter-spacing: .08em; }
+  .bowfs-controls button {
+    background: var(--fm-panel); border: 1px solid var(--fm-line); color: var(--fm-ink);
+    padding: 10px 18px; border-radius: 7px; cursor: pointer; font-size: 1rem;
+  }
+  .bowfs-controls button.play { background: var(--fm-accent); border-color: var(--fm-accent); color: var(--fm-accent-ink); font-weight: 600; min-width: 64px; }
+  .bowfs canvas { flex: 1; width: 100%; height: 100%; display: block; }
+
+  /* ============ WIZARD ============ */
+  .wiz-overlay {
+    position: fixed; inset: 0; background: rgba(20,15,8,.55);
+    display: none; align-items: center; justify-content: center; padding: 16px; z-index: 50;
+  }
+  .wiz-overlay.open { display: flex; }
+  .wiz {
+    background: var(--fm-panel); border: 1px solid var(--fm-line);
+    border-radius: 16px; width: 100%; max-width: 560px; max-height: 92vh; overflow-y: auto;
+    padding: 28px;
+    background-image: repeating-linear-gradient(transparent 0 12px, var(--fm-staff) 12px 13px);
+  }
+  .wiz .kicker { margin-bottom: 4px; }
+  .wiz h2 { font-family: var(--fm-font-display); font-weight: 600; font-size: 1.7rem; margin-bottom: 4px; }
+  .wiz-sub { color: var(--fm-sub); font-size: .88rem; margin-bottom: 18px; }
+  .wiz-dots { display: flex; gap: 6px; margin-bottom: 18px; }
+  .wiz-dots span { width: 26px; height: 4px; border-radius: 2px; background: var(--fm-line); }
+  .wiz-dots span.done { background: var(--fm-accent); }
+  .wiz-options { display: grid; gap: 8px; }
+  .wiz-opt {
+    text-align: left; background: var(--fm-panel-2); border: 1px solid var(--fm-line);
+    border-radius: 10px; padding: 12px 14px; cursor: pointer; font-family: var(--fm-font-ui);
+    color: var(--fm-ink);
+  }
+  .wiz-opt:hover { border-color: var(--fm-accent); }
+  .wiz-opt.sel { border-color: var(--fm-accent); box-shadow: inset 0 0 0 1px var(--fm-accent); }
+  .wiz-opt b { display: block; font-size: .95rem; font-weight: 600; }
+  .wiz-opt small { color: var(--fm-sub); font-size: .8rem; }
+  .wiz-nav { display: flex; justify-content: space-between; gap: 10px; margin-top: 22px; }
+  .wiz-recap { background: var(--fm-panel-2); border: 1px solid var(--fm-line); border-radius: 10px; padding: 14px 16px; font-size: .9rem; line-height: 1.7; }
+  .wiz-recap b { color: var(--fm-accent); }
+</style>
+
+<script>
+  /* Chargeur de thème du portail : ?theme= → localStorage → défaut */
+  (function () {
+    try {
+      var q = new URLSearchParams(location.search);
+      var t = q.get('theme');
+      if (t) { localStorage.setItem('fm-theme', t); }
+      else   { t = localStorage.getItem('fm-theme'); }
+      if (t === 'clair' || t === 'sombre') {
+        document.documentElement.setAttribute('data-fm-theme', t);
+      }
+      var href = q.get('themeUrl');
+      if (href) {
+        var link = document.createElement('link');
+        link.rel = 'stylesheet'; link.href = href;
+        document.head.appendChild(link);
+      }
+    } catch (e) { /* silencieux */ }
+  })();
+</script>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">
+      <h1>Métronome</h1>
+      <div class="kicker">Formation musicale · Groove &amp; horloge interne</div>
+    </div>
+    <div class="header-actions">
+      <div class="seg" role="group" aria-label="Mode">
+        <button id="modeSimpleBtn" class="sel">Simple</button>
+        <button id="modeExpertBtn">Expert</button>
+      </div>
+      <button class="btn-ghost" id="wizardBtn">✦ Assistant</button>
+      <button class="btn-ghost" id="themeBtn">◐ Mode sombre</button>
+    </div>
+  </header>
+
+  <div class="top">
+    <!-- Transport -->
+    <div class="card">
+      <div class="tempo-value" id="tempoValue">92</div>
+      <div class="tempo-label">BPM · <em id="tempoName">Moderato</em></div>
+      <div class="slider-row">
+        <button id="minusBtn" aria-label="Tempo -1">−</button>
+        <input type="range" id="tempoSlider" min="30" max="260" value="92">
+        <button id="plusBtn" aria-label="Tempo +1">+</button>
+      </div>
+      <div class="main-buttons">
+        <button class="btn-start" id="startBtn">▶ Démarrer</button>
+        <button class="btn-tap" id="tapBtn">Tap</button>
+      </div>
+      <div class="mini-grid">
+        <div>
+          <label class="small" for="beatsSel">Temps / cycle</label>
+          <select id="beatsSel">
+            <option>2</option><option>3</option><option selected>4</option>
+            <option>5</option><option>6</option><option>7</option>
+          </select>
+        </div>
+        <div>
+          <label class="small" for="subdivSel">Subdivision</label>
+          <select id="subdivSel">
+            <option value="1" selected>Noires</option>
+            <option value="2">Croches</option>
+            <option value="3">Triolets</option>
+            <option value="4">Doubles</option>
+          </select>
+        </div>
+        <div>
+          <label class="small">Volume</label>
+          <input type="range" id="volSlider" min="0" max="100" value="80" style="width:100%">
+        </div>
+        <div style="display:flex;align-items:flex-end;">
+          <label class="check"><input type="checkbox" id="accentCheck" checked> Accent 1er temps</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cercle -->
+    <div class="card staff circle-wrap">
+      <canvas id="wheel" width="320" height="320"></canvas>
+      <div class="status-line" id="statusLine">Prêt</div>
+    </div>
+  </div>
+
+  <!-- 1. Groove -->
+  <details class="section" id="secGroove">
+    <summary><span class="sec-title">Micro-timing &amp; groove</span><span class="sec-sub">swing · placement</span></summary>
+    <div class="section-body">
+      <div class="row">
+        <label>Swing (asymétrique, libre)</label>
+        <input type="range" id="swingSlider" min="50" max="85" value="50">
+        <span class="val" id="swingVal">50 %</span>
+      </div>
+      <div class="hint">50 % = binaire droit · 66 % = ternaire parfait · valeurs intermédiaires = swing « humain ».
+      S'applique aux croches et aux doubles-croches (par paires) — ex. ~58–62 % pour le placement samba/choro.</div>
+      <div class="row" style="margin-top:16px;">
+        <label class="check"><input type="checkbox" id="shiftCheck"> Clic de placement (behind/ahead the beat)</label>
+      </div>
+      <div class="row">
+        <label>Décalage</label>
+        <input type="range" id="shiftSlider" min="-80" max="80" value="25">
+        <span class="val" id="shiftVal">+25 ms</span>
+      </div>
+      <div class="row">
+        <label>Fréquence du clic décalé</label>
+        <input type="range" id="shiftFreq" min="80" max="800" value="220">
+        <span class="val" id="shiftFreqVal">220 Hz</span>
+      </div>
+      <div class="hint">Un second clic grave, décalé du clic de référence. Décalage positif = au fond du temps
+      (contrebasse, surdo, dundun) · négatif = en avant du temps.</div>
+    </div>
+  </details>
+
+  <!-- 2. Claves -->
+  <details class="section" id="secClave">
+    <summary><span class="sec-title">Claves &amp; cellules rythmiques</span><span class="sec-sub">séquenceur · polyrythmie</span></summary>
+    <div class="section-body">
+      <div class="preset-row">
+        <select id="clavePreset">
+          <option value="">— Presets —</option>
+          <option value="son32">Son clave 3-2 (16)</option>
+          <option value="son23">Son clave 2-3 (16)</option>
+          <option value="rumba32">Rumba clave 3-2 (16)</option>
+          <option value="bossa">Bossa (16)</option>
+          <option value="partido">Partido alto (variante, 16)</option>
+          <option value="tresillo">Tresillo (8)</option>
+          <option value="cinquillo">Cinquillo (8)</option>
+        </select>
+        <select id="claveCount" title="Nombre de pas du cycle">
+          <option value="8">8 pas</option>
+          <option value="12">12 pas</option>
+          <option value="16" selected>16 pas</option>
+        </select>
+        <button class="btn-sm" id="claveClear">Effacer</button>
+      </div>
+      <div class="steps" id="claveSteps"></div>
+      <div class="hint">Clic sur un pas : silence → frappe → accent. Les points au-dessus marquent les temps.
+      Le cercle montre comment la cellule se résout sur le 1 du cycle suivant.</div>
+      <div class="row" style="margin-top:14px;">
+        <label>Fréquence clave</label>
+        <input type="range" id="claveFreq" min="300" max="3000" value="1800">
+        <span class="val" id="claveFreqVal">1800 Hz</span>
+      </div>
+      <div class="row">
+        <label>Polyrythmie superposée</label>
+        <select id="polySel" style="width:auto;">
+          <option value="0" selected>Aucune</option>
+          <option value="2">2 par cycle</option>
+          <option value="3">3 par cycle</option>
+          <option value="4">4 par cycle</option>
+          <option value="5">5 par cycle</option>
+          <option value="7">7 par cycle</option>
+        </select>
+        <span class="hint" style="margin:0;">n frappes également réparties (ex. 3 sur 4 temps)</span>
+      </div>
+    </div>
+  </details>
+
+  <!-- 3. Archet -->
+  <details class="section" id="secArchet">
+    <summary><span class="sec-title">Archet</span><span class="sec-sub">tirer · pousser · dérive</span></summary>
+    <div class="section-body">
+      <div class="row">
+        <label>Instrument</label>
+        <select id="bowInstr" style="width:auto;">
+          <option value="violon" selected>Violon / Alto</option>
+          <option value="cello">Violoncelle</option>
+          <option value="cbfr">Contrebasse — archet français</option>
+          <option value="cbde">Contrebasse — archet allemand</option>
+        </select>
+        <label style="min-width:auto;">Coup d'archet</label>
+        <select id="bowTech" style="width:auto;">
+          <option value="detache" selected>Détaché (vitesse constante)</option>
+          <option value="legato">Legato / liaisons (souple)</option>
+          <option value="martele">Martelé (mordant, arrêt net)</option>
+          <option value="spiccato">Spiccato (rebond)</option>
+        </select>
+      </div>
+      <div class="row">
+        <label>Exercice</label>
+        <select id="bowPreset" style="flex:1;min-width:220px;">
+          <option value="debutant" selected>Débutant — chaque noire = archet complet</option>
+          <option value="det_noires">Détaché — noires (moitié d'archet)</option>
+          <option value="grand_det">Grand détaché — blanches (tout l'archet)</option>
+          <option value="det_croches">Détaché — croches au milieu</option>
+          <option value="liaison4">Liaisons — 4 croches par archet</option>
+          <option value="asym">Asymétrie — dérive vers la pointe (démo)</option>
+          <option value="asym_fix">Asymétrie corrigée — avec reprise</option>
+          <option value="martele_x">Martelé — noires</option>
+          <option value="spiccato_x">Spiccato — croches au point d'équilibre</option>
+        </select>
+      </div>
+      <div class="row">
+        <label>Séquence (éditable)</label>
+        <input type="text" id="bowSeqInput" value="T92x1, P92x1" style="flex:1;min-width:220px;font-family:Consolas,Menlo,monospace;">
+        <button class="btn-sm" id="bowApply">Appliquer</button>
+        <button class="btn-sm primary" id="bowFsBtn">⛶ Plein écran</button>
+      </div>
+      <canvas id="bowCv" width="760" height="150"></canvas>
+      <div class="script-status" id="bowStatus"></div>
+      <div class="hint" id="bowNote">Archet léger et agile — les coups rapides (spiccato, sautillé) vivent autour du point d'équilibre ◆.</div>
+      <div class="hint">Syntaxe : <code>T50x1</code> = tirer 50 % d'archet sur 1 temps · <code>P20x0.5</code> = pousser 20 % sur une croche ·
+      <code>Rx1</code> = reprise (retour au talon, archet levé) · <code>n4</code> = 4 notes liées sur l'archet (<code>T80x2n4</code>).
+      Jauge : talon à gauche, pointe à droite. Si le curseur vire au rouge, la séquence te fait « manquer d'archet ».</div>
+    </div>
+  </details>
+
+  <!-- 4. Gap clicks -->
+  <details class="section" id="secGap">
+    <summary><span class="sec-title">Horloge interne</span><span class="sec-sub">gap clicks</span></summary>
+    <div class="section-body">
+      <div class="row">
+        <label>Mode</label>
+        <select id="gapMode" style="width:auto;">
+          <option value="off" selected>Désactivé</option>
+          <option value="fixed">Fixe (jouer N, couper M)</option>
+          <option value="prog">Progressif (coupures 1, 2, 4, 8…)</option>
+          <option value="rand">Aléatoire</option>
+        </select>
+      </div>
+      <div class="row">
+        <label>Mesures jouées (N)</label>
+        <input type="number" id="gapPlay" min="1" max="64" value="4" style="width:80px;">
+        <label style="min-width:auto;">Mesures coupées (M)</label>
+        <input type="number" id="gapMute" min="1" max="32" value="1" style="width:80px;">
+      </div>
+      <div class="row">
+        <label>Probabilité de coupure (aléatoire)</label>
+        <input type="range" id="gapProb" min="5" max="80" value="25">
+        <span class="val" id="gapProbVal">25 %</span>
+      </div>
+      <div class="hint">Le son se coupe, l'aiguille continue de tourner. En mode progressif, la durée des
+      coupures double à chaque cycle (1, 2, 4, 8 mesures, plafonné à 16) : aucun filet de sécurité.</div>
+    </div>
+  </details>
+
+  <!-- 4. Son -->
+  <details class="section" id="secSon">
+    <summary><span class="sec-title">Son du clic</span><span class="sec-sub">fréquence · caractère</span></summary>
+    <div class="section-body">
+      <div class="row">
+        <label>Fréquence pulsation</label>
+        <input type="range" id="pulseFreq" min="100" max="3000" value="1000">
+        <span class="val" id="pulseFreqVal">1000 Hz</span>
+      </div>
+      <div class="row">
+        <label>Caractère</label>
+        <select id="clickType" style="width:auto;">
+          <option value="ton" selected>Tonal (ping)</option>
+          <option value="sec">Sec (bruit, type rimshot)</option>
+        </select>
+      </div>
+      <div class="hint">Clic grave et sourd pour trancher avec un agogô · clic sec et brillant pour percer
+      face à une contrebasse ou des dunduns.</div>
+    </div>
+  </details>
+
+  <!-- 5. Script -->
+  <details class="section" id="secScript">
+    <summary><span class="sec-title">Routine programmée</span><span class="sec-sub">script</span></summary>
+    <div class="section-body">
+      <textarea id="scriptArea" spellcheck="false"># Exemple de routine
+# 5 min à 80 BPM
+80bpm 5min
+# accelerando : 80 → 120 en 10 min
+80->120bpm 10min
+# gap : couper 2 mesures toutes les 16
+gap 2/16
+120bpm 32mes
+gap off
+swing 62
+100bpm 16mes</textarea>
+      <div class="row" style="margin-top:10px;">
+        <button class="btn-sm primary" id="scriptRun">▶ Lancer la routine</button>
+        <button class="btn-sm" id="scriptStop">■ Arrêter la routine</button>
+      </div>
+      <div class="script-status" id="scriptStatus"></div>
+      <div class="hint">Syntaxe : <code>80bpm 5min</code> · <code>80->120bpm 10min</code> (rampe) ·
+      <code>100bpm 16mes</code> · <code>gap 2/16</code> · <code>gap off</code> · <code>swing 62</code> ·
+      lignes <code>#</code> = commentaires. Les changements s'appliquent à la mesure suivante.</div>
+    </div>
+  </details>
+
+  <div class="kbd-hint">Espace : lecture · ↑↓ : tempo ±1 · T : tap tempo</div>
+</div>
+
+<!-- ============ ARCHET PLEIN ÉCRAN ============ -->
+<div class="bowfs" id="bowFs">
+  <div class="bowfs-bar">
+    <div>
+      <div class="bowfs-title">Archet</div>
+      <div class="kicker" id="bowFsInstr">Violon / Alto</div>
+    </div>
+    <div class="bowfs-controls">
+      <span class="bowfs-tempo" id="bowFsTempo">92 BPM</span>
+      <button class="play" id="bowFsPlay">▶</button>
+      <button id="bowFsClose">✕ Fermer</button>
+    </div>
+  </div>
+  <canvas id="bowFsCv"></canvas>
+</div>
+
+<!-- ============ WIZARD ============ -->
+<div class="wiz-overlay" id="wizOverlay">
+  <div class="wiz">
+    <div class="kicker">Assistant de réglage</div>
+    <h2 id="wizTitle">Que veux-tu travailler ?</h2>
+    <div class="wiz-sub" id="wizSub">L'assistant règle le métronome pour toi — tu pourras tout ajuster ensuite.</div>
+    <div class="wiz-dots" id="wizDots"></div>
+    <div id="wizBody"></div>
+    <div class="wiz-nav">
+      <button class="btn-sm" id="wizBack">← Retour</button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-sm" id="wizSkip">Passer l'assistant</button>
+        <button class="btn-sm primary" id="wizNext">Continuer →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  // ============ ÉTAT ============
+  const S = {
+    tempo: 92,
+    beats: 4,
+    subdiv: 1,
+    accentFirst: true,
+    swing: 50,
+    shift: { on: false, ms: 25, freq: 220 },
+    clave: { count: 16, steps: new Array(16).fill(0), freq: 1800 },
+    poly: 0,
+    gap: { mode: 'off', playN: 4, muteM: 1, prob: 25 },
+    sound: { pulseFreq: 1000, type: 'ton' },
+    volume: 0.8
+  };
+
+  let audioCtx = null, masterGain = null, noiseBuf = null;
+  let isPlaying = false;
+  let schedulerTimer = null;
+  const LOOKAHEAD_MS = 25, AHEAD = 0.12;
+
+  let cycleStart = 0, cycleDur = 1, events = [], evIdx = 0, totalBeats = 0;
+  let measureCount = 0, mutedThisCycle = false;
+  let gapRemainPlay = 0, gapRemainMute = 0, gapProgSize = 1;
+  let script = null;
+  let tapTimes = [];
+
+  const $ = id => document.getElementById(id);
+  const store = {
+    get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  };
+
+  // ============ THÈME ============
+  function currentTheme() {
+    return document.documentElement.getAttribute('data-fm-theme') || 'clair';
+  }
+  function setTheme(t) {
+    document.documentElement.setAttribute('data-fm-theme', t);
+    store.set('fm-theme', t);
+    $('themeBtn').textContent = t === 'sombre' ? '◐ Mode clair' : '◐ Mode sombre';
+    refreshPalette();
+    if (!isPlaying) drawStatic();
+  }
+  $('themeBtn').addEventListener('click', () => setTheme(currentTheme() === 'sombre' ? 'clair' : 'sombre'));
+
+  // palette canvas dérivée des variables CSS
+  let PAL = {};
+  function refreshPalette() {
+    const cs = getComputedStyle(document.documentElement);
+    const v = n => cs.getPropertyValue(n).trim();
+    PAL = {
+      line: v('--fm-line'), ink: v('--fm-ink'), sub: v('--fm-sub'),
+      accent: v('--fm-accent'), accent2: v('--fm-accent-2'), panel2: v('--fm-panel-2')
+    };
+  }
+
+  // ============ MODE SIMPLE / EXPERT ============
+  function setMode(m) {
+    document.body.classList.toggle('mode-simple', m === 'simple');
+    $('modeSimpleBtn').classList.toggle('sel', m === 'simple');
+    $('modeExpertBtn').classList.toggle('sel', m === 'expert');
+    store.set('fm-metro-mode', m);
+  }
+  $('modeSimpleBtn').addEventListener('click', () => setMode('simple'));
+  $('modeExpertBtn').addEventListener('click', () => setMode('expert'));
+
+  // ============ AUDIO ============
+  function ensureCtx() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      masterGain = audioCtx.createGain();
+      masterGain.gain.value = S.volume;
+      masterGain.connect(audioCtx.destination);
+      const len = audioCtx.sampleRate * 0.05;
+      noiseBuf = audioCtx.createBuffer(1, len, audioCtx.sampleRate);
+      const d = noiseBuf.getChannelData(0);
+      for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }
+
+  function playTone(t, freq, vol, dur) {
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.connect(g); g.connect(masterGain);
+    o.frequency.value = freq;
+    g.gain.setValueAtTime(vol, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    o.start(t); o.stop(t + dur + 0.01);
+  }
+
+  function playNoise(t, freq, vol) {
+    const src = audioCtx.createBufferSource(), g = audioCtx.createGain(), f = audioCtx.createBiquadFilter();
+    src.buffer = noiseBuf;
+    f.type = 'bandpass'; f.frequency.value = freq; f.Q.value = 4;
+    src.connect(f); f.connect(g); g.connect(masterGain);
+    g.gain.setValueAtTime(vol * 1.6, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.045);
+    src.start(t); src.stop(t + 0.05);
+  }
+
+  function playClick(t, layer, accent) {
+    if (mutedThisCycle) return;
+    const st = S.sound;
+    switch (layer) {
+      case 'beat': {
+        const f = accent ? st.pulseFreq * 1.5 : st.pulseFreq;
+        const v = accent ? 1.0 : 0.75;
+        st.type === 'sec' ? playNoise(t, f, v) : playTone(t, f, v, 0.05);
+        break;
+      }
+      case 'sub':
+        st.type === 'sec' ? playNoise(t, st.pulseFreq * 0.7, 0.3) : playTone(t, st.pulseFreq * 0.7, 0.3, 0.04);
+        break;
+      case 'clave': {
+        const v = accent === 2 ? 0.95 : 0.6;
+        playNoise(t, S.clave.freq, v);
+        playTone(t, S.clave.freq, v * 0.5, 0.03);
+        break;
+      }
+      case 'poly':
+        playTone(t, 480, 0.55, 0.06);
+        break;
+      case 'shift':
+        playTone(t, S.shift.freq, 0.85, 0.08);
+        break;
+    }
+  }
+
+  // ============ CALCUL DU CYCLE ============
+  function subPositions() {
+    const n = S.subdiv, sw = S.swing / 100;
+    if (n === 1) return [0];
+    if (n === 3) return [0, 1/3, 2/3];
+    const pos = [];
+    const pairDur = 2 / n;
+    for (let p = 0; p < n / 2; p++) {
+      pos.push(p * pairDur);
+      pos.push(p * pairDur + pairDur * sw);
+    }
+    return pos;
+  }
+
+  function computeCycle() {
+    cycleDur = S.beats * 60 / S.tempo;
+    events = [];
+    const subs = subPositions();
+    for (let b = 0; b < S.beats; b++) {
+      for (let s = 0; s < subs.length; s++) {
+        const frac = (b + subs[s]) / S.beats;
+        if (s === 0) {
+          events.push({ frac, layer: 'beat', accent: (b === 0 && S.accentFirst) ? 1 : 0 });
+          if (S.shift.on) events.push({ frac, layer: 'shift', offMs: S.shift.ms });
+        } else {
+          events.push({ frac, layer: 'sub' });
+        }
+      }
+    }
+    const c = S.clave;
+    for (let i = 0; i < c.count; i++) {
+      if (c.steps[i] > 0) events.push({ frac: i / c.count, layer: 'clave', accent: c.steps[i] });
+    }
+    for (let k = 0; k < S.poly; k++) {
+      events.push({ frac: k / S.poly, layer: 'poly' });
+    }
+    events.sort((a, b) => a.frac - b.frac);
+    evIdx = 0;
+  }
+
+  // ============ GAP ============
+  function resetGap() { gapProgSize = 1; gapRemainPlay = S.gap.playN; gapRemainMute = 0; }
+
+  function updateGapForNewMeasure() {
+    const g = S.gap;
+    if (g.mode === 'off') { mutedThisCycle = false; return; }
+    if (g.mode === 'rand') { mutedThisCycle = Math.random() * 100 < g.prob; return; }
+    if (gapRemainPlay > 0) {
+      mutedThisCycle = false; gapRemainPlay--;
+    } else if (gapRemainMute > 0) {
+      mutedThisCycle = true; gapRemainMute--;
+      if (gapRemainMute === 0) gapRemainPlay = g.playN;
+    } else {
+      const m = g.mode === 'prog' ? gapProgSize : g.muteM;
+      if (g.mode === 'prog') gapProgSize = Math.min(16, gapProgSize * 2);
+      gapRemainMute = m - 1;
+      mutedThisCycle = true;
+      if (gapRemainMute === 0) gapRemainPlay = g.playN;
+    }
+  }
+
+  // ============ SCRIPT ============
+  function parseScript(text) {
+    const segs = [];
+    for (let raw of text.split('\n')) {
+      const line = raw.trim().toLowerCase();
+      if (!line || line.startsWith('#')) continue;
+      let m;
+      if ((m = line.match(/^(\d+)(?:\s*->\s*(\d+))?\s*bpm\s+(\d+(?:[.,]\d+)?)\s*(min|s|sec|mes)$/))) {
+        segs.push({
+          type: 'play', t0: +m[1], t1: m[2] ? +m[2] : +m[1],
+          dur: parseFloat(m[3].replace(',', '.')),
+          unit: m[4] === 'mes' ? 'mes' : (m[4] === 'min' ? 'min' : 's'),
+          src: raw.trim()
+        });
+      } else if (line.match(/^gap\s+off$/)) {
+        segs.push({ type: 'gapoff', src: raw.trim() });
+      } else if ((m = line.match(/^gap\s+(\d+)\s*\/\s*(\d+)$/))) {
+        segs.push({ type: 'gap', mute: +m[1], play: +m[2] - +m[1] > 0 ? +m[2] - +m[1] : +m[2], src: raw.trim() });
+      } else if ((m = line.match(/^swing\s+(\d+)\s*%?$/))) {
+        segs.push({ type: 'swing', val: +m[1], src: raw.trim() });
+      } else {
+        return { error: 'Ligne non reconnue : « ' + raw.trim() + ' »' };
+      }
+    }
+    if (!segs.length) return { error: 'Script vide.' };
+    return { segs };
+  }
+
+  function scriptAdvanceDirectives() {
+    while (script && script.idx < script.segs.length) {
+      const seg = script.segs[script.idx];
+      if (seg.type === 'gap') {
+        S.gap.mode = 'fixed'; S.gap.muteM = seg.mute; S.gap.playN = seg.play;
+        $('gapMode').value = 'fixed'; $('gapPlay').value = seg.play; $('gapMute').value = seg.mute;
+        resetGap(); script.idx++;
+      } else if (seg.type === 'gapoff') {
+        S.gap.mode = 'off'; $('gapMode').value = 'off'; script.idx++;
+      } else if (seg.type === 'swing') {
+        setSwing(Math.min(85, Math.max(50, seg.val))); script.idx++;
+      } else break;
+    }
+    if (script && script.idx >= script.segs.length) {
+      $('scriptStatus').textContent = '✔ Routine terminée — le métronome continue au dernier tempo.';
+      script = null;
+      return;
+    }
+    if (script) {
+      script.segStartTime = audioCtx ? audioCtx.currentTime : 0;
+      script.segMeasures = 0;
+    }
+  }
+
+  function scriptOnNewMeasure() {
+    if (!script) return;
+    const seg = script.segs[script.idx];
+    if (!seg || seg.type !== 'play') return;
+    script.segMeasures++;
+    let done = false, frac = 0;
+    if (seg.unit === 'mes') {
+      frac = script.segMeasures / seg.dur;
+      done = script.segMeasures >= seg.dur;
+    } else {
+      const durS = seg.unit === 'min' ? seg.dur * 60 : seg.dur;
+      const el = audioCtx.currentTime - script.segStartTime;
+      frac = el / durS;
+      done = el >= durS;
+    }
+    frac = Math.min(1, frac);
+    setTempo(Math.round(seg.t0 + (seg.t1 - seg.t0) * frac), true);
+    const rest = seg.unit === 'mes'
+      ? Math.max(0, seg.dur - script.segMeasures) + ' mes'
+      : fmtTime(Math.max(0, (seg.unit === 'min' ? seg.dur * 60 : seg.dur) - (audioCtx.currentTime - script.segStartTime)));
+    $('scriptStatus').textContent =
+      'Segment ' + (script.idx + 1) + '/' + script.segs.length + ' — ' + seg.src + ' — reste ' + rest;
+    if (done) { script.idx++; scriptAdvanceDirectives(); }
+  }
+
+  function fmtTime(s) {
+    s = Math.round(s);
+    return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+  }
+
+  // ============ ORDONNANCEUR ============
+  function startNewCycle(t) {
+    measureCount++;
+    totalBeats += S.beats;
+    scriptOnNewMeasure();
+    updateGapForNewMeasure();
+    computeCycle();
+    cycleStart = t;
+  }
+
+  function scheduler() {
+    const now = audioCtx.currentTime;
+    while (true) {
+      if (evIdx < events.length) {
+        const ev = events[evIdx];
+        const t = cycleStart + ev.frac * cycleDur + (ev.offMs ? ev.offMs / 1000 : 0);
+        if (t < now + AHEAD) {
+          playClick(Math.max(t, now + 0.005), ev.layer, ev.accent || 0);
+          evIdx++;
+          continue;
+        }
+      } else {
+        const nextStart = cycleStart + cycleDur;
+        if (nextStart < now + AHEAD) { startNewCycle(nextStart); continue; }
+      }
+      break;
+    }
+  }
+
+  function start() {
+    ensureCtx();
+    isPlaying = true;
+    measureCount = 0;
+    totalBeats = 0;
+    bowReset();
+    resetGap();
+    mutedThisCycle = false;
+    computeCycle();
+    cycleStart = audioCtx.currentTime + 0.1;
+    schedulerTimer = setInterval(scheduler, LOOKAHEAD_MS);
+    $('startBtn').textContent = '■ Arrêter';
+    $('startBtn').classList.add('playing');
+    requestAnimationFrame(draw);
+  }
+
+  function stop() {
+    isPlaying = false;
+    clearInterval(schedulerTimer);
+    $('startBtn').textContent = '▶ Démarrer';
+    $('startBtn').classList.remove('playing');
+    $('statusLine').textContent = 'Arrêté';
+    drawStatic();
+  }
+
+  function toggle() { isPlaying ? stop() : start(); }
+
+  // ============ VISUALISATION ============
+  const cv = $('wheel'), ctx2d = cv.getContext('2d');
+  const DPR = window.devicePixelRatio || 1;
+  cv.width = 320 * DPR; cv.height = 320 * DPR;
+  cv.style.width = '320px'; cv.style.height = '320px';
+  ctx2d.scale(DPR, DPR);
+  const CX = 160, CY = 160;
+
+  function pt(frac, r) {
+    const a = frac * Math.PI * 2 - Math.PI / 2;
+    return [CX + r * Math.cos(a), CY + r * Math.sin(a)];
+  }
+
+  function drawBase(phase) {
+    const c = ctx2d;
+    c.clearRect(0, 0, 320, 320);
+    for (const r of [130, 95, 60]) {
+      c.beginPath(); c.arc(CX, CY, r, 0, Math.PI * 2);
+      c.strokeStyle = PAL.line; c.lineWidth = 1; c.stroke();
+    }
+    // pulsation
+    for (let b = 0; b < S.beats; b++) {
+      const [x, y] = pt(b / S.beats, 130);
+      const active = phase !== null && ((phase * S.beats) % S.beats | 0) === b;
+      c.beginPath(); c.arc(x, y, b === 0 ? 8 : 6, 0, Math.PI * 2);
+      c.fillStyle = active ? PAL.accent : PAL.panel2;
+      c.fill();
+      c.strokeStyle = b === 0 ? PAL.accent : PAL.sub;
+      c.lineWidth = b === 0 ? 2 : 1;
+      c.stroke();
+    }
+    // subdivisions
+    if (S.subdiv > 1) {
+      const subs = subPositions();
+      for (let b = 0; b < S.beats; b++) {
+        for (let s = 1; s < subs.length; s++) {
+          const [x, y] = pt((b + subs[s]) / S.beats, 130);
+          c.beginPath(); c.arc(x, y, 2.5, 0, Math.PI * 2);
+          c.fillStyle = PAL.sub; c.fill();
+        }
+      }
+    }
+    // clave
+    const cl = S.clave;
+    for (let i = 0; i < cl.count; i++) {
+      const [x, y] = pt(i / cl.count, 95);
+      if (cl.steps[i] > 0) {
+        c.beginPath(); c.arc(x, y, cl.steps[i] === 2 ? 7 : 5.5, 0, Math.PI * 2);
+        c.fillStyle = cl.steps[i] === 2 ? PAL.accent2 : PAL.accent;
+        c.fill();
+      } else {
+        c.beginPath(); c.arc(x, y, 1.8, 0, Math.PI * 2);
+        c.fillStyle = PAL.line; c.fill();
+      }
+    }
+    // polyrythmie
+    for (let k = 0; k < S.poly; k++) {
+      const [x, y] = pt(k / S.poly, 60);
+      c.beginPath(); c.arc(x, y, 5, 0, Math.PI * 2);
+      c.fillStyle = PAL.sub; c.fill();
+    }
+    // aiguille
+    if (phase !== null) {
+      const [x, y] = pt(phase, 142);
+      c.beginPath(); c.moveTo(CX, CY); c.lineTo(x, y);
+      c.strokeStyle = mutedThisCycle ? PAL.accent : PAL.ink;
+      c.lineWidth = 2; c.stroke();
+      c.beginPath(); c.arc(CX, CY, 4, 0, Math.PI * 2); c.fillStyle = PAL.ink; c.fill();
+    }
+    // centre
+    c.textAlign = 'center'; c.textBaseline = 'middle';
+    if (phase !== null && mutedThisCycle) {
+      c.fillStyle = PAL.accent; c.font = '600 14px "Work Sans", sans-serif';
+      c.fillText('MUTE', CX, CY + 22);
+    } else if (phase !== null) {
+      c.fillStyle = PAL.sub; c.font = '12px "Work Sans", sans-serif';
+      c.fillText('mes. ' + measureCount, CX, CY + 22);
+    }
+  }
+
+  function draw() {
+    if (!isPlaying) return;
+    const phase = ((audioCtx.currentTime - cycleStart) / cycleDur) % 1;
+    drawBase(phase < 0 ? 0 : phase);
+    const cur = Math.floor((phase < 0 ? 0 : phase) * S.clave.count) % S.clave.count;
+    const kids = $('claveSteps').children;
+    for (let i = 0; i < kids.length; i++) kids[i].classList.toggle('cur', i === cur);
+    $('statusLine').innerHTML = mutedThisCycle
+      ? '<span class="mute">● COUPÉ — tiens le tempo !</span>'
+      : 'Mesure ' + measureCount + (S.gap.mode !== 'off' ? ' · gap actif' : '');
+    if ($('secArchet').open) {
+      const beatsNow = totalBeats + Math.max(0, audioCtx.currentTime - cycleStart) * S.tempo / 60;
+      drawBow(beatsNow);
+    }
+    requestAnimationFrame(draw);
+  }
+
+  function drawStatic() {
+    drawBase(null);
+    const kids = $('claveSteps').children;
+    for (let i = 0; i < kids.length; i++) kids[i].classList.remove('cur');
+    drawBowStatic();
+  }
+
+  // ============ SÉQUENCEUR UI ============
+  function buildStepGrid() {
+    const wrap = $('claveSteps');
+    wrap.innerHTML = '';
+    const perBeat = S.clave.count / S.beats;
+    for (let i = 0; i < S.clave.count; i++) {
+      const b = document.createElement('button');
+      b.className = 'step';
+      if (Number.isInteger(perBeat) && i % perBeat === 0) b.classList.add('beatmark');
+      b.addEventListener('click', () => {
+        S.clave.steps[i] = (S.clave.steps[i] + 1) % 3;
+        refreshStepGrid();
+        if (!isPlaying) drawStatic();
+      });
+      wrap.appendChild(b);
+    }
+    refreshStepGrid();
+  }
+
+  function refreshStepGrid() {
+    const kids = $('claveSteps').children;
+    for (let i = 0; i < kids.length; i++) {
+      kids[i].classList.toggle('on', S.clave.steps[i] === 1);
+      kids[i].classList.toggle('acc', S.clave.steps[i] === 2);
+    }
+  }
+
+  const PRESETS = {
+    son32:    { count: 16, hits: [0, 3, 6, 10, 12] },
+    son23:    { count: 16, hits: [2, 4, 8, 11, 14] },
+    rumba32:  { count: 16, hits: [0, 3, 7, 10, 12] },
+    bossa:    { count: 16, hits: [0, 3, 6, 10, 13] },
+    partido:  { count: 16, hits: [2, 4, 7, 10, 12] },
+    tresillo: { count: 8,  hits: [0, 3, 6] },
+    cinquillo:{ count: 8,  hits: [0, 2, 3, 5, 6] }
+  };
+
+  function applyPreset(name) {
+    const p = PRESETS[name];
+    if (!p) return;
+    S.clave.count = p.count;
+    $('claveCount').value = p.count;
+    S.clave.steps = new Array(p.count).fill(0);
+    p.hits.forEach(h => S.clave.steps[h] = 1);
+    S.clave.steps[p.hits[0]] = 2;
+    buildStepGrid();
+    if (!isPlaying) drawStatic();
+  }
+
+  // ============ TEMPO ============
+  function nameOf(bpm) {
+    if (bpm < 40) return 'Grave'; if (bpm < 60) return 'Largo';
+    if (bpm < 66) return 'Larghetto'; if (bpm < 76) return 'Adagio';
+    if (bpm < 108) return 'Moderato'; if (bpm < 120) return 'Allegretto';
+    if (bpm < 156) return 'Allegro'; if (bpm < 176) return 'Vivace';
+    if (bpm < 200) return 'Presto'; return 'Prestissimo';
+  }
+
+  function setTempo(bpm, fromScript) {
+    S.tempo = Math.min(260, Math.max(30, bpm));
+    $('tempoValue').textContent = S.tempo;
+    $('tempoName').textContent = nameOf(S.tempo);
+    $('tempoSlider').value = S.tempo;
+    if (!fromScript && script) { script = null; $('scriptStatus').textContent = 'Routine interrompue (tempo modifié à la main).'; }
+  }
+
+  function setSwing(v) {
+    S.swing = v;
+    $('swingSlider').value = v;
+    $('swingVal').textContent = v + ' %';
+  }
+
+  function tap() {
+    const now = performance.now();
+    tapTimes = tapTimes.filter(t => now - t < 3000);
+    tapTimes.push(now);
+    if (tapTimes.length >= 2) {
+      const iv = [];
+      for (let i = 1; i < tapTimes.length; i++) iv.push(tapTimes[i] - tapTimes[i - 1]);
+      setTempo(Math.round(60000 / (iv.reduce((a, b) => a + b) / iv.length)));
+    }
+  }
+
+  // ============ ÉVÉNEMENTS UI ============
+  $('tempoSlider').addEventListener('input', e => setTempo(+e.target.value));
+  $('minusBtn').addEventListener('click', () => setTempo(S.tempo - 1));
+  $('plusBtn').addEventListener('click', () => setTempo(S.tempo + 1));
+  $('startBtn').addEventListener('click', toggle);
+  $('tapBtn').addEventListener('click', tap);
+  $('volSlider').addEventListener('input', e => {
+    S.volume = e.target.value / 100;
+    if (masterGain) masterGain.gain.value = S.volume;
+  });
+  $('beatsSel').addEventListener('change', e => { S.beats = +e.target.value; buildStepGrid(); if (!isPlaying) drawStatic(); });
+  $('subdivSel').addEventListener('change', e => { S.subdiv = +e.target.value; if (!isPlaying) drawStatic(); });
+  $('accentCheck').addEventListener('change', e => S.accentFirst = e.target.checked);
+
+  $('swingSlider').addEventListener('input', e => setSwing(+e.target.value));
+  $('shiftCheck').addEventListener('change', e => S.shift.on = e.target.checked);
+  $('shiftSlider').addEventListener('input', e => {
+    S.shift.ms = +e.target.value;
+    $('shiftVal').textContent = (S.shift.ms >= 0 ? '+' : '') + S.shift.ms + ' ms';
+  });
+  $('shiftFreq').addEventListener('input', e => {
+    S.shift.freq = +e.target.value;
+    $('shiftFreqVal').textContent = S.shift.freq + ' Hz';
+  });
+
+  $('clavePreset').addEventListener('change', e => { applyPreset(e.target.value); e.target.value = ''; });
+  $('claveCount').addEventListener('change', e => {
+    const n = +e.target.value, old = S.clave.steps;
+    S.clave.count = n;
+    S.clave.steps = new Array(n).fill(0).map((_, i) => old[i] || 0);
+    buildStepGrid();
+    if (!isPlaying) drawStatic();
+  });
+  $('claveClear').addEventListener('click', () => {
+    S.clave.steps.fill(0); refreshStepGrid(); if (!isPlaying) drawStatic();
+  });
+  $('claveFreq').addEventListener('input', e => {
+    S.clave.freq = +e.target.value; $('claveFreqVal').textContent = S.clave.freq + ' Hz';
+  });
+  $('polySel').addEventListener('change', e => { S.poly = +e.target.value; if (!isPlaying) drawStatic(); });
+
+  $('gapMode').addEventListener('change', e => { S.gap.mode = e.target.value; resetGap(); });
+  $('gapPlay').addEventListener('change', e => { S.gap.playN = Math.max(1, +e.target.value); resetGap(); });
+  $('gapMute').addEventListener('change', e => { S.gap.muteM = Math.max(1, +e.target.value); resetGap(); });
+  $('gapProb').addEventListener('input', e => {
+    S.gap.prob = +e.target.value; $('gapProbVal').textContent = S.gap.prob + ' %';
+  });
+
+  $('pulseFreq').addEventListener('input', e => {
+    S.sound.pulseFreq = +e.target.value; $('pulseFreqVal').textContent = S.sound.pulseFreq + ' Hz';
+  });
+  $('clickType').addEventListener('change', e => S.sound.type = e.target.value);
+
+  $('scriptRun').addEventListener('click', () => {
+    const res = parseScript($('scriptArea').value);
+    if (res.error) { $('scriptStatus').textContent = '✖ ' + res.error; return; }
+    script = { segs: res.segs, idx: 0, segStartTime: 0, segMeasures: 0 };
+    ensureCtx();
+    scriptAdvanceDirectives();
+    if (script) {
+      const seg = script.segs[script.idx];
+      if (seg && seg.type === 'play') setTempo(seg.t0, true);
+      script.segStartTime = audioCtx.currentTime;
+      $('scriptStatus').textContent = 'Routine lancée : ' + script.segs.length + ' instruction(s).';
+    }
+    if (!isPlaying) start();
+  });
+  $('scriptStop').addEventListener('click', () => {
+    script = null; $('scriptStatus').textContent = 'Routine arrêtée.';
+  });
+
+  document.addEventListener('keydown', e => {
+    const tag = e.target.tagName;
+    if (tag === 'TEXTAREA' || tag === 'INPUT' || tag === 'SELECT') return;
+    if (e.key === 'Escape' && fsOpen) { closeBowFs(); return; }
+    if (e.code === 'Space') { e.preventDefault(); toggle(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); setTempo(S.tempo + 1); }
+    else if (e.key === 'ArrowDown') { e.preventDefault(); setTempo(S.tempo - 1); }
+    else if (e.key === 't' || e.key === 'T') tap();
+  });
+
+  // ============ ARCHET ============
+  const INSTR = {
+    violon: { label: 'Violon / Alto', bal: 0.34, power: 0,
+      note: 'Archet léger et agile — les coups rapides (spiccato, sautillé) vivent autour du point d\'équilibre ◆.' },
+    cello:  { label: 'Violoncelle', bal: 0.32, power: 0.25,
+      note: 'Plus de poids nécessaire, inertie de la corde plus grande au démarrage : soigne l\'accroche au début de chaque tiré.' },
+    cbfr:   { label: 'Contrebasse — archet français', bal: 0.30, power: 0.33,
+      note: 'Poids et engagement de l\'épaule ; l\'accroche de la corde est cruciale. Zone de puissance au talon (ombrée).' },
+    cbde:   { label: 'Contrebasse — archet allemand', bal: 0.28, power: 0.33,
+      note: 'Tenue par en dessous : grande puissance au talon (zone ombrée), gestion de la pointe plus exigeante.' }
+  };
+
+  const BOW_PRESETS = {
+    debutant:   { label: 'Débutant — chaque noire = archet complet', seq: 'T92x1, P92x1', tech: 'detache' },
+    det_noires: { label: 'Détaché — noires (moitié d\'archet)', seq: 'T50x1, P50x1', tech: 'detache' },
+    grand_det:  { label: 'Grand détaché — blanches (tout l\'archet)', seq: 'T90x2, P90x2', tech: 'detache' },
+    det_croches:{ label: 'Détaché — croches au milieu', seq: 'T25x0.5, P25x0.5', tech: 'detache' },
+    liaison4:   { label: 'Liaisons — 4 croches par archet', seq: 'T80x2n4, P80x2n4', tech: 'legato' },
+    asym:       { label: 'Asymétrie — dérive (démo)', seq: 'T50x1.5, P20x0.5', tech: 'detache' },
+    asym_fix:   { label: 'Asymétrie corrigée — reprise', seq: 'T50x1.5, P20x0.5, T45x1.5, Rx0.5', tech: 'detache' },
+    martele_x:  { label: 'Martelé — noires', seq: 'T40x1, P40x1', tech: 'martele' },
+    spiccato_x: { label: 'Spiccato — croches au point d\'équilibre', seq: 'T10x0.5, P10x0.5', tech: 'spiccato' }
+  };
+
+  let bowSeq = [], bowTech = 'detache', bowInstr = 'violon';
+  let bowIdx = 0, bowStepStart = 0, bowPos0 = 0;
+
+  function parseBowSeq(text) {
+    const seq = [];
+    for (const tok of text.split(/[,\n]+/)) {
+      const t = tok.trim();
+      if (!t) continue;
+      const m = t.match(/^([tpr])\s*(\d+)?\s*x\s*(\d+(?:[.,]\d+)?)\s*(?:n\s*(\d+))?$/i);
+      if (!m) return { error: 'Élément non reconnu : « ' + t + ' »' };
+      const kind = m[1].toLowerCase();
+      seq.push({
+        retake: kind === 'r',
+        dir: kind === 't' ? 1 : (kind === 'p' ? -1 : 0),
+        len: (m[2] ? +m[2] : 0) / 100,
+        beats: parseFloat(m[3].replace(',', '.')),
+        notes: m[4] ? Math.max(1, +m[4]) : 1
+      });
+    }
+    if (!seq.length) return { error: 'Séquence vide.' };
+    return { seq };
+  }
+
+  function bowReset() {
+    bowIdx = 0; bowStepStart = 0;
+    bowPos0 = (bowTech === 'spiccato' && bowSeq.length) ? INSTR[bowInstr].bal : 0;
+  }
+
+  function bowCompile(showOk) {
+    const res = parseBowSeq($('bowSeqInput').value);
+    if (res.error) { $('bowStatus').textContent = '✖ ' + res.error; return false; }
+    bowSeq = res.seq;
+    bowReset();
+    if (showOk) $('bowStatus').textContent = '✔ Séquence chargée (' + bowSeq.length + ' pas).';
+    if (!isPlaying) drawBowStatic();
+    return true;
+  }
+
+  function applyBowPreset(name) {
+    const p = BOW_PRESETS[name];
+    if (!p) return;
+    $('bowSeqInput').value = p.seq;
+    bowTech = p.tech;
+    $('bowTech').value = p.tech;
+    $('bowPreset').value = name;
+    bowCompile(false);
+  }
+
+  // avance la machine à états jusqu'au temps « beats » et calcule la position
+  function bowStateAt(beats) {
+    if (!bowSeq.length) return null;
+    let guard = 0;
+    while (guard++ < 128) {
+      const st = bowSeq[bowIdx];
+      if (beats < bowStepStart + st.beats) break;
+      if (st.retake) bowPos0 = 0.05;
+      else if (bowTech === 'spiccato') bowPos0 = INSTR[bowInstr].bal;
+      else bowPos0 = Math.min(1, Math.max(0, bowPos0 + st.dir * st.len));
+      bowStepStart += st.beats;
+      bowIdx = (bowIdx + 1) % bowSeq.length;
+    }
+    const st = bowSeq[bowIdx];
+    const p = Math.min(1, Math.max(0, (beats - bowStepStart) / st.beats));
+    let target, blocked = false, lifted = false, hop = 0, pos;
+    if (st.retake) {
+      target = 0.05; lifted = true;
+      const e = p * p * (3 - 2 * p);
+      pos = bowPos0 + (target - bowPos0) * e;
+      hop = Math.sin(p * Math.PI);
+    } else if (bowTech === 'spiccato') {
+      const bal = INSTR[bowInstr].bal;
+      pos = bal + st.dir * st.len * (p - 0.5);
+      hop = Math.abs(Math.sin(p * Math.PI));
+      target = pos;
+    } else {
+      const raw = bowPos0 + st.dir * st.len;
+      target = Math.min(1, Math.max(0, raw));
+      blocked = raw > 1.001 || raw < -0.001;
+      let e;
+      if (bowTech === 'legato') e = p * p * (3 - 2 * p);
+      else if (bowTech === 'martele') { const q = Math.min(1, p / 0.65); e = 1 - Math.pow(1 - q, 4); }
+      else e = p;
+      pos = bowPos0 + (target - bowPos0) * e;
+    }
+    return { st, p, pos, target, blocked, lifted, hop, from: bowPos0 };
+  }
+
+  // ---- rendu de la jauge d'archet ----
+  const bcv = $('bowCv'), bctx = bcv.getContext('2d');
+  bcv.width = 760 * DPR; bcv.height = 150 * DPR;
+  bcv.style.width = '100%'; bcv.style.maxWidth = '760px';
+  bctx.scale(DPR, DPR);
+
+  function renderBow(r) {
+    const c = bctx, W = 760, H = 150, x0 = 56, x1 = W - 40, tw = x1 - x0, y = 88;
+    const ins = INSTR[bowInstr];
+    c.clearRect(0, 0, W, H);
+    // zone de puissance (talon) pour les graves
+    if (ins.power > 0) {
+      c.globalAlpha = 0.12;
+      c.fillStyle = PAL.accent;
+      c.fillRect(x0, y - 16, tw * ins.power, 32);
+      c.globalAlpha = 1;
+    }
+    // mèche
+    c.fillStyle = PAL.panel2;
+    c.fillRect(x0, y - 5, tw, 10);
+    c.strokeStyle = PAL.line; c.lineWidth = 1;
+    c.strokeRect(x0, y - 5, tw, 10);
+    // baguette (courbe au-dessus)
+    c.beginPath();
+    c.moveTo(x0, y - 14);
+    c.quadraticCurveTo(x0 + tw / 2, y - 28, x1, y - 12);
+    c.strokeStyle = PAL.sub; c.lineWidth = 2; c.stroke();
+    // hausse (talon)
+    c.fillStyle = PAL.accent2;
+    c.fillRect(x0 - 13, y - 14, 11, 26);
+    // séparations des tiers + libellés
+    c.font = '600 9px "Work Sans", sans-serif';
+    c.fillStyle = PAL.sub;
+    c.textAlign = 'center'; c.textBaseline = 'top';
+    for (const f of [1/3, 2/3]) {
+      c.beginPath();
+      c.moveTo(x0 + tw * f, y - 8); c.lineTo(x0 + tw * f, y + 8);
+      c.strokeStyle = PAL.line; c.lineWidth = 1; c.stroke();
+    }
+    c.fillText('T A L O N', x0 + tw / 6, y + 14);
+    c.fillText('M I L I E U', x0 + tw / 2, y + 14);
+    c.fillText('P O I N T E', x0 + tw * 5 / 6, y + 14);
+    // point d'équilibre ◆
+    const bx = x0 + tw * ins.bal;
+    c.save();
+    c.translate(bx, y - 34);
+    c.rotate(Math.PI / 4);
+    c.fillStyle = PAL.accent;
+    c.fillRect(-4, -4, 8, 8);
+    c.restore();
+    c.fillStyle = PAL.sub;
+    c.fillText('équilibre', bx, y - 62);
+
+    if (!r) {
+      // état statique : curseur au talon
+      c.beginPath(); c.arc(x0, y, 9, 0, Math.PI * 2);
+      c.fillStyle = PAL.accent; c.fill();
+      c.strokeStyle = PAL.ink; c.lineWidth = 1.5; c.stroke();
+      c.fillStyle = PAL.sub; c.font = '12px "Work Sans", sans-serif';
+      c.fillText('Choisis un exercice, puis ▶ Démarrer', W / 2, y + 34);
+      return;
+    }
+
+    // trajet prévu du coup courant + notes liées
+    const fx = x0 + tw * r.from, tx = x0 + tw * r.target;
+    c.globalAlpha = 0.45;
+    c.beginPath(); c.moveTo(fx, y + 24); c.lineTo(tx, y + 24);
+    c.strokeStyle = PAL.accent; c.lineWidth = 3; c.stroke();
+    c.globalAlpha = 1;
+    if (r.st.notes > 1) {
+      for (let k = 0; k <= r.st.notes; k++) {
+        const nx = fx + (tx - fx) * k / r.st.notes;
+        c.beginPath(); c.arc(nx, y + 24, 2.5, 0, Math.PI * 2);
+        c.fillStyle = (k <= r.p * r.st.notes) ? PAL.accent2 : PAL.line;
+        c.fill();
+      }
+    }
+    // curseur (point de contact)
+    const cx = x0 + tw * Math.min(1, Math.max(0, r.pos));
+    const cy = y - r.hop * 26;
+    if (r.hop > 0.02) { // archet levé : lien pointillé vers la corde
+      c.setLineDash([3, 4]);
+      c.beginPath(); c.moveTo(cx, cy + 9); c.lineTo(cx, y);
+      c.strokeStyle = PAL.sub; c.lineWidth = 1; c.stroke();
+      c.setLineDash([]);
+    }
+    c.beginPath(); c.arc(cx, cy, 9, 0, Math.PI * 2);
+    c.fillStyle = r.blocked ? '#c0392b' : PAL.accent;
+    c.fill();
+    c.strokeStyle = PAL.ink; c.lineWidth = 1.5; c.stroke();
+    // direction + consommation
+    c.font = '600 12px "Work Sans", sans-serif';
+    c.fillStyle = r.blocked ? '#c0392b' : PAL.ink;
+    c.textBaseline = 'bottom';
+    const lbl = r.st.retake ? '↺ REPRISE'
+      : (r.st.dir === 1 ? '⊓ TIRÉ · ' + Math.round(r.st.len * 100) + ' %'
+                        : 'V POUSSÉ · ' + Math.round(r.st.len * 100) + ' %');
+    c.fillText(lbl, Math.min(Math.max(cx, x0 + 45), x1 - 45), cy - 14);
+    c.textBaseline = 'top';
+  }
+
+  function drawBow(beats) {
+    const r = bowStateAt(beats);
+    renderBow(r);
+    if (r) {
+      $('bowStatus').innerHTML = 'Pas ' + (bowIdx + 1) + '/' + bowSeq.length +
+        (r.blocked ? ' — <b style="color:#c0392b;">⚠ plus d\'archet ! Répartis autrement ou ajoute une reprise (Rx…)</b>' : '');
+    }
+  }
+
+  function drawBowStatic() { renderBow(null); }
+
+  $('bowInstr').addEventListener('change', e => {
+    bowInstr = e.target.value;
+    $('bowNote').textContent = INSTR[bowInstr].note;
+    if (bowTech === 'spiccato') bowReset();
+    if (!isPlaying) drawBowStatic();
+  });
+  $('bowTech').addEventListener('change', e => {
+    bowTech = e.target.value;
+    bowReset();
+    if (!isPlaying) drawBowStatic();
+  });
+  $('bowPreset').addEventListener('change', e => applyBowPreset(e.target.value));
+  $('bowApply').addEventListener('click', () => bowCompile(true));
+  $('bowSeqInput').addEventListener('change', () => bowCompile(true));
+  $('secArchet').addEventListener('toggle', () => {
+    if ($('secArchet').open && !isPlaying) drawBowStatic();
+  });
+
+  // ---- plein écran ----
+  const fsEl = $('bowFs'), fcv = $('bowFsCv'), fctx = fcv.getContext('2d');
+  let fsOpen = false, fsRaf = 0, fsW = 0, fsH = 0;
+
+  function sizeFs() {
+    fsW = fcv.clientWidth || window.innerWidth;
+    fsH = fcv.clientHeight || (window.innerHeight - 80);
+    fcv.width = fsW * DPR; fcv.height = fsH * DPR;
+    fctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+
+  // dessin réaliste de l'archet, grand format
+  function renderBowBig(r) {
+    const c = fctx, W = fsW, H = fsH;
+    c.clearRect(0, 0, W, H);
+    const ins = INSTR[bowInstr];
+    const x0 = W * 0.09, x1 = W * 0.91, tw = x1 - x0, y = H * 0.5;
+    const mh = Math.max(14, H * 0.035);          // épaisseur de la mèche
+    const lift = H * 0.16;                        // hauteur de levée (reprise/spiccato)
+
+    // zone de puissance (graves)
+    if (ins.power > 0) {
+      c.globalAlpha = 0.10;
+      c.fillStyle = PAL.accent;
+      c.fillRect(x0, y - mh * 2.4, tw * ins.power, mh * 4.8);
+      c.globalAlpha = 1;
+    }
+    // mèche (crins)
+    c.fillStyle = currentTheme() === 'sombre' ? '#e9e2d0' : '#fbf7ee';
+    c.fillRect(x0, y - mh / 2, tw, mh);
+    c.strokeStyle = PAL.line; c.lineWidth = 1;
+    c.strokeRect(x0, y - mh / 2, tw, mh);
+    // baguette galbée (bois), épaisse au talon, fine à la pointe
+    c.beginPath();
+    c.moveTo(x0 - 4, y - mh / 2 - mh * 0.9);
+    c.quadraticCurveTo(x0 + tw * 0.5, y - mh / 2 - mh * 2.4, x1, y - mh / 2 - mh * 0.55);
+    c.quadraticCurveTo(x0 + tw * 0.5, y - mh / 2 - mh * 1.9, x0 - 4, y - mh / 2 - mh * 0.35);
+    c.closePath();
+    c.fillStyle = PAL.accent2; c.fill();
+    // pointe (tête)
+    c.beginPath();
+    c.moveTo(x1, y - mh / 2 - mh * 0.55);
+    c.quadraticCurveTo(x1 + mh * 0.9, y - mh / 2 - mh * 0.4, x1 + mh * 0.5, y + mh / 2);
+    c.lineTo(x1, y - mh / 2);
+    c.closePath();
+    c.fillStyle = PAL.accent2; c.fill();
+    // hausse (talon) + bouton
+    c.fillStyle = PAL.ink;
+    c.fillRect(x0 - mh * 1.4, y - mh / 2 - mh * 0.5, mh * 1.2, mh * 1.9);
+    c.fillStyle = PAL.accent;
+    c.beginPath(); c.arc(x0 - mh * 0.8, y + mh * 0.35, mh * 0.22, 0, Math.PI * 2); c.fill();
+    // repères des tiers + libellés
+    const fz = Math.max(12, Math.round(H * 0.026));
+    c.font = '600 ' + fz + 'px "Work Sans", sans-serif';
+    c.textAlign = 'center'; c.textBaseline = 'top';
+    c.fillStyle = PAL.sub;
+    for (const f of [1/3, 2/3]) {
+      c.beginPath();
+      c.moveTo(x0 + tw * f, y - mh); c.lineTo(x0 + tw * f, y + mh);
+      c.strokeStyle = PAL.line; c.lineWidth = 1; c.stroke();
+    }
+    c.fillText('T A L O N', x0 + tw / 6, y + mh * 1.6);
+    c.fillText('M I L I E U', x0 + tw / 2, y + mh * 1.6);
+    c.fillText('P O I N T E', x0 + tw * 5 / 6, y + mh * 1.6);
+    // point d'équilibre
+    const bx = x0 + tw * ins.bal;
+    c.save(); c.translate(bx, y - mh * 3.4); c.rotate(Math.PI / 4);
+    c.fillStyle = PAL.accent; c.fillRect(-5, -5, 10, 10); c.restore();
+
+    if (!r) {
+      c.fillStyle = PAL.sub;
+      c.font = '500 ' + Math.round(fz * 1.3) + 'px "Work Sans", sans-serif';
+      c.fillText('Appuie sur ▶ pour démarrer', W / 2, y + mh * 4);
+      return;
+    }
+
+    const now = performance.now() / 1000;
+    const fx = x0 + tw * r.from, tx = x0 + tw * r.target;
+
+    // ---- LE REPÈRE DE RETOUR : « le retour commence là » ----
+    if (!r.st.retake) {
+      const approaching = r.p > 0.7;
+      const pulse = approaching ? 0.55 + 0.45 * Math.abs(Math.sin(now * 7)) : 0.5;
+      c.globalAlpha = pulse;
+      c.strokeStyle = r.blocked ? '#c0392b' : PAL.accent;
+      c.lineWidth = approaching ? 4 : 2;
+      c.setLineDash([8, 7]);
+      c.beginPath();
+      c.moveTo(tx, y - H * 0.20); c.lineTo(tx, y + H * 0.14);
+      c.stroke();
+      c.setLineDash([]);
+      c.globalAlpha = 1;
+      c.fillStyle = r.blocked ? '#c0392b' : PAL.accent;
+      c.font = '600 ' + fz + 'px "Work Sans", sans-serif';
+      c.textBaseline = 'bottom';
+      c.fillText('↩ le retour commence là', Math.min(Math.max(tx, x0 + W * 0.09), x1 - W * 0.09), y - H * 0.21);
+      c.textBaseline = 'top';
+    }
+
+    // trajet du coup courant + notes liées
+    c.globalAlpha = 0.35;
+    c.beginPath(); c.moveTo(fx, y + mh * 2.6); c.lineTo(tx, y + mh * 2.6);
+    c.strokeStyle = PAL.accent; c.lineWidth = 5; c.stroke();
+    c.globalAlpha = 1;
+    if (r.st.notes > 1) {
+      for (let k = 0; k <= r.st.notes; k++) {
+        const nx = fx + (tx - fx) * k / r.st.notes;
+        c.beginPath(); c.arc(nx, y + mh * 2.6, 5, 0, Math.PI * 2);
+        c.fillStyle = (k <= r.p * r.st.notes) ? PAL.accent2 : PAL.line;
+        c.fill();
+      }
+    }
+
+    // curseur : barre de contact verticale avec halo
+    const cx = x0 + tw * Math.min(1, Math.max(0, r.pos));
+    const cy = y - r.hop * lift;
+    if (r.hop > 0.02) {
+      c.setLineDash([4, 6]);
+      c.beginPath(); c.moveTo(cx, cy + mh); c.lineTo(cx, y);
+      c.strokeStyle = PAL.sub; c.lineWidth = 1.5; c.stroke();
+      c.setLineDash([]);
+    }
+    c.save();
+    c.shadowColor = r.blocked ? '#c0392b' : PAL.accent;
+    c.shadowBlur = 22;
+    c.fillStyle = r.blocked ? '#c0392b' : PAL.accent;
+    const bw = Math.max(7, W * 0.007);
+    c.fillRect(cx - bw / 2, cy - mh * 1.7, bw, mh * 3.4);
+    c.restore();
+
+    // direction, en grand
+    c.font = '600 ' + Math.round(H * 0.085) + 'px "Cormorant Garamond", Georgia, serif';
+    c.fillStyle = r.blocked ? '#c0392b' : PAL.ink;
+    const dLbl = r.st.retake ? '↺ reprise' : (r.st.dir === 1 ? '⟶ tiré' : '⟵ poussé');
+    c.fillText(dLbl, W / 2, H * 0.07);
+    // sous-titre : consommation + alerte
+    c.font = '500 ' + fz + 'px "Work Sans", sans-serif';
+    c.fillStyle = PAL.sub;
+    const sub = r.st.retake ? 'archet levé — retour au talon'
+      : Math.round(r.st.len * 100) + ' % d\'archet' + (r.blocked ? '   ⚠ PLUS D\'ARCHET !' : '');
+    c.fillText(sub, W / 2, H * 0.07 + H * 0.1);
+  }
+
+  function fsLoop() {
+    if (!fsOpen) return;
+    let r = null;
+    if (isPlaying && audioCtx) {
+      const beats = totalBeats + Math.max(0, audioCtx.currentTime - cycleStart) * S.tempo / 60;
+      r = bowStateAt(beats);
+    }
+    renderBowBig(r);
+    $('bowFsPlay').textContent = isPlaying ? '■' : '▶';
+    $('bowFsTempo').textContent = S.tempo + ' BPM' + (isPlaying ? ' · mes. ' + measureCount : '');
+    fsRaf = requestAnimationFrame(fsLoop);
+  }
+
+  function openBowFs() {
+    fsOpen = true;
+    fsEl.classList.add('open');
+    $('bowFsInstr').textContent = INSTR[bowInstr].label;
+    if (fsEl.requestFullscreen) fsEl.requestFullscreen().catch(() => {});
+    requestAnimationFrame(() => { sizeFs(); fsLoop(); });
+  }
+
+  function closeBowFs() {
+    fsOpen = false;
+    cancelAnimationFrame(fsRaf);
+    fsEl.classList.remove('open');
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    if (!isPlaying) drawStatic();
+  }
+
+  $('bowFsBtn').addEventListener('click', openBowFs);
+  $('bowFsClose').addEventListener('click', closeBowFs);
+  $('bowFsPlay').addEventListener('click', toggle);
+  document.addEventListener('fullscreenchange', () => {
+    if (document.fullscreenElement && fsOpen) requestAnimationFrame(sizeFs);
+    else if (!document.fullscreenElement && fsOpen) closeBowFs();
+  });
+  window.addEventListener('resize', () => { if (fsOpen) sizeFs(); });
+
+  // ============ WIZARD ============
+  const wiz = {
+    step: 0,
+    goal: null,          // 'simple' | 'groove' | 'clave' | 'gap' | 'routine'
+    tempo: 92, beats: 4, subdiv: 1,
+    extra: {}            // choix de l'étape 3
+  };
+
+  const GOALS = [
+    { id: 'simple',  t: 'Un tempo, un clic',            d: 'Métronome classique, réglages essentiels — mode simple.' },
+    { id: 'groove',  t: 'Groove & swing',               d: 'Swing asymétrique, placement behind/ahead the beat.' },
+    { id: 'clave',   t: 'Claves & polyrythmie',         d: 'Cellules rythmiques en boucle, visualisation circulaire.' },
+    { id: 'archet',  t: 'Coups d\'archet',              d: 'Tirer/pousser, liaisons, reprises — du violon à la contrebasse.' },
+    { id: 'gap',     t: 'Horloge interne (gap clicks)', d: 'Le clic se coupe : ton tempo intérieur prend le relais.' },
+    { id: 'routine', t: 'Routine programmée',           d: 'Endurance, accelerando, coupures — session scriptée.' }
+  ];
+
+  const wizOverlay = $('wizOverlay');
+
+  function openWizard() {
+    wiz.step = 0; wiz.goal = null;
+    wiz.tempo = S.tempo; wiz.beats = S.beats; wiz.subdiv = S.subdiv; wiz.extra = {};
+    wizOverlay.classList.add('open');
+    renderWizard();
+  }
+  function closeWizard() {
+    wizOverlay.classList.remove('open');
+    store.set('fm-metro-wizard-done', '1');
+  }
+
+  function wizSteps() { return wiz.goal === 'simple' || wiz.goal === null ? 3 : 4; }
+
+  function renderWizard() {
+    const body = $('wizBody'), dots = $('wizDots');
+    const total = wizSteps();
+    dots.innerHTML = '';
+    for (let i = 0; i < total; i++) {
+      const s = document.createElement('span');
+      if (i <= wiz.step) s.className = 'done';
+      dots.appendChild(s);
+    }
+    $('wizBack').style.visibility = wiz.step === 0 ? 'hidden' : 'visible';
+    $('wizNext').textContent = wiz.step === total - 1 ? '✓ C\'est parti' : 'Continuer →';
+
+    if (wiz.step === 0) {
+      $('wizTitle').textContent = 'Que veux-tu travailler ?';
+      $('wizSub').textContent = 'L\'assistant règle le métronome pour toi — tu pourras tout ajuster ensuite.';
+      body.innerHTML = '<div class="wiz-options">' + GOALS.map(g =>
+        '<button class="wiz-opt' + (wiz.goal === g.id ? ' sel' : '') + '" data-goal="' + g.id + '"><b>' + g.t + '</b><small>' + g.d + '</small></button>'
+      ).join('') + '</div>';
+      body.querySelectorAll('.wiz-opt').forEach(b => b.addEventListener('click', () => {
+        wiz.goal = b.dataset.goal; renderWizard();
+      }));
+    }
+    else if (wiz.step === 1) {
+      $('wizTitle').textContent = 'Tempo et mesure';
+      $('wizSub').textContent = 'Le point de départ de ta session.';
+      body.innerHTML =
+        '<div class="row"><label>Tempo</label><input type="range" id="wTempo" min="30" max="260" value="' + wiz.tempo + '"><span class="val" id="wTempoVal">' + wiz.tempo + ' BPM</span></div>' +
+        '<div class="row"><label>Temps par cycle</label><select id="wBeats" style="width:auto;">' +
+          [2,3,4,5,6,7].map(n => '<option' + (n === wiz.beats ? ' selected' : '') + '>' + n + '</option>').join('') +
+        '</select><label style="min-width:auto;">Subdivision</label><select id="wSubdiv" style="width:auto;">' +
+          '<option value="1"' + (wiz.subdiv===1?' selected':'') + '>Noires</option>' +
+          '<option value="2"' + (wiz.subdiv===2?' selected':'') + '>Croches</option>' +
+          '<option value="3"' + (wiz.subdiv===3?' selected':'') + '>Triolets</option>' +
+          '<option value="4"' + (wiz.subdiv===4?' selected':'') + '>Doubles</option>' +
+        '</select></div>';
+      $('wTempo').addEventListener('input', e => {
+        wiz.tempo = +e.target.value; $('wTempoVal').textContent = wiz.tempo + ' BPM';
+      });
+      $('wBeats').addEventListener('change', e => wiz.beats = +e.target.value);
+      $('wSubdiv').addEventListener('change', e => wiz.subdiv = +e.target.value);
+    }
+    else if (wiz.step === 2 && wizSteps() === 4) {
+      renderWizStep3(body);
+    }
+    else {
+      // récapitulatif
+      $('wizTitle').textContent = 'Récapitulatif';
+      $('wizSub').textContent = 'Vérifie, puis lance-toi.';
+      const g = GOALS.find(x => x.id === wiz.goal) || GOALS[0];
+      let extra = '';
+      if (wiz.goal === 'groove') extra = 'Swing <b>' + (wiz.extra.swing || 50) + ' %</b>' + (wiz.extra.shift ? ' · clic de placement <b>' + (wiz.extra.shiftMs >= 0 ? '+' : '') + wiz.extra.shiftMs + ' ms</b>' : '');
+      if (wiz.goal === 'clave') extra = 'Preset : <b>' + (wiz.extra.presetLabel || 'aucun (grille vide)') + '</b>';
+      if (wiz.goal === 'archet') extra = 'Instrument : <b>' + INSTR[wiz.extra.instr || 'violon'].label + '</b> · exercice : <b>' + BOW_PRESETS[wiz.extra.bowPreset || 'debutant'].label + '</b>';
+      if (wiz.goal === 'gap') extra = 'Gap <b>' + ({fixed:'fixe',prog:'progressif',rand:'aléatoire'}[wiz.extra.gapMode] || 'fixe') + '</b> · jouer <b>' + (wiz.extra.gapPlay || 4) + '</b>, couper <b>' + (wiz.extra.gapMute || 1) + '</b>';
+      if (wiz.goal === 'routine') extra = 'Une routine d\'exemple sera préremplie dans la section Script.';
+      body.innerHTML = '<div class="wiz-recap">' +
+        'Objectif : <b>' + g.t + '</b><br>' +
+        'Tempo : <b>' + wiz.tempo + ' BPM</b> · ' + wiz.beats + ' temps · ' +
+        ({1:'noires',2:'croches',3:'triolets',4:'doubles'}[wiz.subdiv]) +
+        (extra ? '<br>' + extra : '') +
+        '<br>Mode : <b>' + (wiz.goal === 'simple' ? 'Simple' : 'Expert') + '</b></div>';
+    }
+  }
+
+  function renderWizStep3(body) {
+    if (wiz.goal === 'groove') {
+      $('wizTitle').textContent = 'Réglage du groove';
+      $('wizSub').textContent = 'Swing asymétrique et placement dans le temps.';
+      const sw = wiz.extra.swing || 58;
+      body.innerHTML =
+        '<div class="row"><label>Swing</label><input type="range" id="wSwing" min="50" max="85" value="' + sw + '"><span class="val" id="wSwingVal">' + sw + ' %</span></div>' +
+        '<div class="hint">Repères : 50 % droit · ~58–62 % samba/choro · 66 % ternaire.</div>' +
+        '<div class="row" style="margin-top:12px;"><label class="check"><input type="checkbox" id="wShift"' + (wiz.extra.shift ? ' checked' : '') + '> Clic de placement</label></div>' +
+        '<div class="row"><label>Décalage</label><input type="range" id="wShiftMs" min="-80" max="80" value="' + (wiz.extra.shiftMs || 25) + '"><span class="val" id="wShiftMsVal">' + (wiz.extra.shiftMs >= 0 || wiz.extra.shiftMs === undefined ? '+' : '') + (wiz.extra.shiftMs || 25) + ' ms</span></div>';
+      wiz.extra.swing = sw;
+      wiz.extra.shiftMs = wiz.extra.shiftMs || 25;
+      $('wSwing').addEventListener('input', e => { wiz.extra.swing = +e.target.value; $('wSwingVal').textContent = wiz.extra.swing + ' %'; });
+      $('wShift').addEventListener('change', e => wiz.extra.shift = e.target.checked);
+      $('wShiftMs').addEventListener('input', e => {
+        wiz.extra.shiftMs = +e.target.value;
+        $('wShiftMsVal').textContent = (wiz.extra.shiftMs >= 0 ? '+' : '') + wiz.extra.shiftMs + ' ms';
+      });
+    }
+    else if (wiz.goal === 'clave') {
+      $('wizTitle').textContent = 'Choisis une clave';
+      $('wizSub').textContent = 'Tu pourras l\'éditer pas à pas ensuite.';
+      const opts = [
+        ['son32', 'Son clave 3-2'], ['son23', 'Son clave 2-3'], ['rumba32', 'Rumba 3-2'],
+        ['bossa', 'Bossa'], ['partido', 'Partido alto (variante)'], ['tresillo', 'Tresillo'], ['cinquillo', 'Cinquillo']
+      ];
+      body.innerHTML = '<div class="wiz-options">' + opts.map(o =>
+        '<button class="wiz-opt' + (wiz.extra.preset === o[0] ? ' sel' : '') + '" data-p="' + o[0] + '"><b>' + o[1] + '</b></button>'
+      ).join('') + '</div>';
+      body.querySelectorAll('.wiz-opt').forEach(b => b.addEventListener('click', () => {
+        wiz.extra.preset = b.dataset.p;
+        wiz.extra.presetLabel = b.textContent;
+        renderWizard();
+      }));
+    }
+    else if (wiz.goal === 'archet') {
+      $('wizTitle').textContent = 'Ton instrument, ton archet';
+      $('wizSub').textContent = 'La jauge s\'adapte : point d\'équilibre, zone de puissance au talon.';
+      body.innerHTML = '<div class="wiz-options">' + Object.keys(INSTR).map(k =>
+        '<button class="wiz-opt' + ((wiz.extra.instr || 'violon') === k ? ' sel' : '') + '" data-i="' + k + '"><b>' + INSTR[k].label + '</b></button>'
+      ).join('') + '</div>' +
+      '<div class="row" style="margin-top:14px;"><label>Exercice</label><select id="wBowPreset" style="flex:1;">' +
+        Object.keys(BOW_PRESETS).map(k =>
+          '<option value="' + k + '"' + ((wiz.extra.bowPreset || 'debutant') === k ? ' selected' : '') + '>' + BOW_PRESETS[k].label + '</option>'
+        ).join('') + '</select></div>';
+      wiz.extra.instr = wiz.extra.instr || 'violon';
+      wiz.extra.bowPreset = wiz.extra.bowPreset || 'debutant';
+      body.querySelectorAll('.wiz-opt').forEach(b => b.addEventListener('click', () => {
+        wiz.extra.instr = b.dataset.i; renderWizard();
+      }));
+      $('wBowPreset').addEventListener('change', e => wiz.extra.bowPreset = e.target.value);
+    }
+    else if (wiz.goal === 'gap') {
+      $('wizTitle').textContent = 'Réglage des coupures';
+      $('wizSub').textContent = 'Le métronome se tait, ton horloge interne continue.';
+      const gm = wiz.extra.gapMode || 'fixed';
+      body.innerHTML =
+        '<div class="row"><label>Mode</label><select id="wGapMode" style="width:auto;">' +
+          '<option value="fixed"' + (gm==='fixed'?' selected':'') + '>Fixe (N jouées / M coupées)</option>' +
+          '<option value="prog"' + (gm==='prog'?' selected':'') + '>Progressif (1, 2, 4, 8…)</option>' +
+          '<option value="rand"' + (gm==='rand'?' selected':'') + '>Aléatoire</option>' +
+        '</select></div>' +
+        '<div class="row"><label>Mesures jouées</label><input type="number" id="wGapPlay" min="1" max="64" value="' + (wiz.extra.gapPlay || 4) + '" style="width:80px;">' +
+        '<label style="min-width:auto;">coupées</label><input type="number" id="wGapMute" min="1" max="32" value="' + (wiz.extra.gapMute || 1) + '" style="width:80px;"></div>';
+      wiz.extra.gapMode = gm; wiz.extra.gapPlay = wiz.extra.gapPlay || 4; wiz.extra.gapMute = wiz.extra.gapMute || 1;
+      $('wGapMode').addEventListener('change', e => wiz.extra.gapMode = e.target.value);
+      $('wGapPlay').addEventListener('change', e => wiz.extra.gapPlay = Math.max(1, +e.target.value));
+      $('wGapMute').addEventListener('change', e => wiz.extra.gapMute = Math.max(1, +e.target.value));
+    }
+    else if (wiz.goal === 'routine') {
+      $('wizTitle').textContent = 'Routine programmée';
+      $('wizSub').textContent = 'Un exemple sera prérempli — modifie-le librement.';
+      body.innerHTML = '<div class="wiz-recap">La section <b>Routine programmée</b> s\'ouvrira avec un exemple :<br>' +
+        '<code>80bpm 5min</code> puis <code>80->120bpm 10min</code> puis <code>gap 2/16</code>…<br>' +
+        'Clique « Lancer la routine » quand tu es prêt.</div>';
+    }
+  }
+
+  function applyWizard() {
+    setTempo(wiz.tempo);
+    S.beats = wiz.beats; $('beatsSel').value = wiz.beats;
+    S.subdiv = wiz.subdiv; $('subdivSel').value = wiz.subdiv;
+
+    if (wiz.goal === 'simple') {
+      setMode('simple');
+    } else {
+      setMode('expert');
+      document.querySelectorAll('details.section').forEach(d => d.open = false);
+      if (wiz.goal === 'groove') {
+        setSwing(wiz.extra.swing || 58);
+        S.shift.on = !!wiz.extra.shift;
+        $('shiftCheck').checked = S.shift.on;
+        S.shift.ms = wiz.extra.shiftMs || 25;
+        $('shiftSlider').value = S.shift.ms;
+        $('shiftVal').textContent = (S.shift.ms >= 0 ? '+' : '') + S.shift.ms + ' ms';
+        if (wiz.subdiv === 1) { S.subdiv = 2; $('subdivSel').value = 2; } // le swing a besoin d'une subdivision
+        $('secGroove').open = true;
+      }
+      if (wiz.goal === 'clave') {
+        if (wiz.extra.preset) applyPreset(wiz.extra.preset);
+        $('secClave').open = true;
+      }
+      if (wiz.goal === 'archet') {
+        bowInstr = wiz.extra.instr || 'violon';
+        $('bowInstr').value = bowInstr;
+        $('bowNote').textContent = INSTR[bowInstr].note;
+        applyBowPreset(wiz.extra.bowPreset || 'debutant');
+        $('secArchet').open = true;
+      }
+      if (wiz.goal === 'gap') {
+        S.gap.mode = wiz.extra.gapMode || 'fixed';
+        S.gap.playN = wiz.extra.gapPlay || 4;
+        S.gap.muteM = wiz.extra.gapMute || 1;
+        $('gapMode').value = S.gap.mode;
+        $('gapPlay').value = S.gap.playN;
+        $('gapMute').value = S.gap.muteM;
+        resetGap();
+        $('secGap').open = true;
+      }
+      if (wiz.goal === 'routine') {
+        $('secScript').open = true;
+        $('secScript').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+    buildStepGrid();
+    drawStatic();
+    closeWizard();
+    if (wiz.goal !== 'routine' && !isPlaying) start();
+  }
+
+  $('wizardBtn').addEventListener('click', openWizard);
+  $('wizSkip').addEventListener('click', closeWizard);
+  $('wizBack').addEventListener('click', () => { if (wiz.step > 0) { wiz.step--; renderWizard(); } });
+  $('wizNext').addEventListener('click', () => {
+    if (wiz.step === 0 && !wiz.goal) return; // il faut choisir un objectif
+    if (wiz.step >= wizSteps() - 1) { applyWizard(); return; }
+    wiz.step++;
+    renderWizard();
+  });
+  wizOverlay.addEventListener('click', e => { if (e.target === wizOverlay) closeWizard(); });
+
+  // ============ INIT ============
+  refreshPalette();
+  $('themeBtn').textContent = currentTheme() === 'sombre' ? '◐ Mode clair' : '◐ Mode sombre';
+  setMode(store.get('fm-metro-mode') === 'expert' ? 'expert' : 'simple');
+  setTempo(92);
+  setSwing(50);
+  buildStepGrid();
+  bowCompile(false);
+  drawStatic();
+  // premier lancement : ouvrir l'assistant
+  if (!store.get('fm-metro-wizard-done')) openWizard();
+})();
+</script>
+</body>
+</html>
