@@ -198,6 +198,45 @@
   .btn-sm:hover { border-color: var(--fm-accent); }
   .btn-sm.primary { background: var(--fm-accent); border-color: var(--fm-accent); color: var(--fm-accent-ink); font-weight: 600; }
 
+  /* ---- percussion ---- */
+  .perc-voice { display: flex; align-items: center; gap: 10px; margin: 8px 0; flex-wrap: wrap; }
+  .perc-voice .pv-label { min-width: 92px; color: var(--fm-sub); font-size: .82rem; }
+  .perc-voice .steps { margin: 0; flex: 1; }
+  .steps.mini .step { width: 26px; height: 34px; }
+  .pv-mute { font-size: .78rem; color: var(--fm-sub); }
+  .step.var { box-shadow: 0 0 0 2px var(--fm-accent-2); }
+  #percVoices .step, #percFsVoices .step {
+    font-family: var(--fm-font-ui); font-size: .6rem; font-weight: 600;
+    color: var(--fm-sub); padding: 0; line-height: 1;
+    touch-action: none;
+  }
+  #percVoices .step.on, #percVoices .step.acc,
+  #percFsVoices .step.on, #percFsVoices .step.acc { color: var(--fm-accent-ink); }
+  .percfs .step { font-size: 1.1rem; }
+
+  /* ---- percussion plein écran ---- */
+  .percfs {
+    position: fixed; inset: 0; background: var(--fm-bg);
+    display: none; flex-direction: column; z-index: 70;
+  }
+  .percfs.open { display: flex; }
+  .percfs-body {
+    flex: 1; overflow-y: auto; padding: 16px 30px 24px;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .percfs .perc-voice { gap: 16px; margin: 12px 0; flex-wrap: nowrap; }
+  .percfs .pv-label {
+    min-width: 120px; font-family: var(--fm-font-display);
+    font-weight: 600; font-size: 1.15rem; color: var(--fm-ink);
+  }
+  .percfs .steps { gap: 7px; flex: 1; flex-wrap: nowrap; margin: 0; }
+  .percfs .step { flex: 1 1 0; width: auto; height: clamp(44px, 9vh, 90px); }
+  .percfs .pv-mute { display: none; }
+  .percfs-status {
+    text-align: center; font-size: 1.2rem; font-weight: 600;
+    color: var(--fm-accent); min-height: 1.5em; margin-top: 18px;
+  }
+
   textarea { min-height: 150px; font-family: 'Consolas', 'Menlo', monospace; font-size: .85rem; line-height: 1.6; resize: vertical; }
   .script-status { font-size: .84rem; color: var(--fm-accent); margin-top: 8px; min-height: 1.2em; }
   .kbd-hint { text-align: center; color: var(--fm-sub); font-size: .74rem; margin-top: 14px; }
@@ -416,6 +455,106 @@
     </div>
   </details>
 
+  <!-- 2b. Percussion & indépendance -->
+  <details class="section" id="secPerc">
+    <summary><span class="sec-title">Percussion &amp; indépendance</span><span class="sec-sub">groove · variations · appel-réponse</span></summary>
+    <div class="section-body">
+      <div class="row">
+        <label class="check"><input type="checkbox" id="percOn"> Activer</label>
+        <label style="min-width:auto;">Instrument</label>
+        <select id="percInstr" style="width:auto;">
+          <option value="djembe" selected>Djembé (basse · tone · slap)</option>
+          <option value="cajon">Cajón (grave · aigu)</option>
+          <option value="dunduns">Dunduns &amp; cloche</option>
+        </select>
+        <select id="percCount" style="width:auto;" title="Pas du cycle">
+          <option value="12">12 pas (ternaire)</option>
+          <option value="16" selected>16 pas (binaire)</option>
+        </select>
+        <button class="btn-sm" id="percReset">Groove de base</button>
+        <button class="btn-sm primary" id="percFsBtn">⛶ Plein écran</button>
+      </div>
+      <div class="row">
+        <label>Style</label>
+        <select id="percStyle" style="flex:1;min-width:200px;"></select>
+      </div>
+      <div id="percVoices"></div>
+      <div class="row" style="margin-top:14px;">
+        <label>Exercice</label>
+        <select id="percMode" style="width:auto;">
+          <option value="off" selected>Libre (groove seul)</option>
+          <option value="add">Ajout progressif (une frappe à la fois)</option>
+          <option value="sub">Soustraction (le groove s'allège)</option>
+          <option value="call">Appel-réponse (1 mesure app · 1 mesure toi)</option>
+          <option value="guide">Progression guidée (mains expliquées)</option>
+          <option value="break">Break programmé (toutes les N mesures)</option>
+        </select>
+        <label style="min-width:auto;">Voix travaillée</label>
+        <select id="percWork" style="width:auto;"></select>
+      </div>
+      <div class="row">
+        <label>Mains</label>
+        <select id="percHandRule" style="width:auto;">
+          <option value="alt" selected>Alternance stricte D-G</option>
+          <option value="lead">Main directrice sur les temps</option>
+        </select>
+        <label class="check"><input type="checkbox" id="percLefty"> gaucher (inverser)</label>
+        <button class="btn-sm" id="percGuidePrev">← Étape</button>
+        <button class="btn-sm" id="percGuideNext">Étape →</button>
+      </div>
+      <div class="row">
+        <label>Break / phrase</label>
+        <select id="percBreakSel" style="flex:1;min-width:180px;"></select>
+        <label style="min-width:auto;">Niveau</label>
+        <select id="percBreakLvl" style="width:auto;">
+          <option value="1">1 (début de phrase)</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4" selected>4 (phrase complète)</option>
+        </select>
+        <label class="check"><input type="checkbox" id="percBreakAuto"> progression auto</label>
+        <label class="check"><input type="checkbox" id="percBreakEcho"> réponse après</label>
+      </div>
+      <div class="row">
+        <label>Variation toutes les</label>
+        <input type="number" id="percPeriod" min="1" max="16" value="2" style="width:70px;">
+        <span class="hint" style="margin:0;">mesures (paires en appel-réponse)</span>
+      </div>
+      <div class="row" style="margin-top:12px;">
+        <label>Gap par couche</label>
+        <select id="percGapLayer" style="width:auto;"></select>
+        <label style="min-width:auto;">jouer</label>
+        <input type="number" id="percGapPlay" min="1" max="32" value="4" style="width:70px;">
+        <label style="min-width:auto;">couper</label>
+        <input type="number" id="percGapMute" min="1" max="16" value="2" style="width:70px;">
+      </div>
+      <div class="row" style="margin-top:12px;">
+        <label>Mes séquences</label>
+        <input type="text" id="percSaveName" placeholder="nom de la séquence…" style="width:150px;">
+        <button class="btn-sm" id="percSaveBtn">💾 Sauver</button>
+        <select id="percSavedSel" style="flex:1;min-width:140px;"></select>
+        <button class="btn-sm" id="percLoadBtn">Charger</button>
+        <button class="btn-sm" id="percDelBtn" title="Supprimer la séquence sélectionnée">✕</button>
+      </div>
+      <div class="script-status" id="percStatus"></div>
+      <div class="hint">Clic sur un pas : silence → frappe → accent.
+      <b>Micro-timing</b> : glisse une case active vers la droite (en retard, laid back) ou la gauche (en avance)
+      pour visualiser et entendre le swing de cette frappe — double-clic pour la recentrer.
+      <b>Mes séquences</b> : sauvegarde tes grooves (grilles, accents, micro-décalages) et recharge-les plus tard. <b>Ajout progressif</b> : la voix travaillée gagne
+      une frappe à la fois — contretemps d'abord, jamais sur les temps. <b>Soustraction</b> : le groove s'allège,
+      les ancres (frappes sur les temps) restent. <b>Appel-réponse</b> : l'app joue la variation une mesure,
+      tu la répètes la mesure suivante pendant que la voix se tait. <b>Break programmé</b> : toutes les N mesures,
+      le groove s'interrompt et l'app joue le break au niveau choisi — la phrase s'étoffe du niveau 1 au niveau 4
+      (« progression auto » monte d'un niveau à chaque break, « réponse après » te laisse une mesure pour le rejouer).
+      <b>Gap par couche</b> : une seule couche se coupe, les autres continuent — teste la solidité de chaque voix.
+      <b>Mains</b> : chaque frappe affiche sa main (D/G). <b>Progression guidée</b> : tu démarres par le squelette
+      du groove — qui dépend du style : alternance sur les temps pour le passeport, backbeat 2-4 pour le funk,
+      kick/caisse claire pour le rock, la basse pour le Kuku — puis l'app ajoute une frappe à la fois, toutes les
+      N mesures ou avec les boutons ← →, en t'expliquant à chaque étape quelle main va où, jusqu'au groove complet.
+      Les patterns marqués <i>adaptation</i> sont des approximations pédagogiques : édite-les selon ta référence.</div>
+    </div>
+  </details>
+
   <!-- 3. Archet -->
   <details class="section" id="secArchet">
     <summary><span class="sec-title">Archet</span><span class="sec-sub">tirer · pousser · dérive</span></summary>
@@ -560,6 +699,25 @@ swing 62
   <canvas id="bowFsCv"></canvas>
 </div>
 
+<!-- ============ PERCUSSION PLEIN ÉCRAN ============ -->
+<div class="percfs" id="percFs">
+  <div class="bowfs-bar">
+    <div>
+      <div class="bowfs-title">Percussion</div>
+      <div class="kicker" id="percFsInstr">Djembé</div>
+    </div>
+    <div class="bowfs-controls">
+      <span class="bowfs-tempo" id="percFsTempo">92 BPM</span>
+      <button class="play" id="percFsPlay">▶</button>
+      <button id="percFsClose">✕ Fermer</button>
+    </div>
+  </div>
+  <div class="percfs-body">
+    <div id="percFsVoices"></div>
+    <div class="percfs-status" id="percFsStatus"></div>
+  </div>
+</div>
+
 <!-- ============ WIZARD ============ -->
 <div class="wiz-overlay" id="wizOverlay">
   <div class="wiz">
@@ -594,6 +752,10 @@ swing 62
     poly: 0,
     gap: { mode: 'off', playN: 4, muteM: 1, prob: 25 },
     sound: { pulseFreq: 1000, type: 'ton' },
+    perc: { on: false, instr: 'djembe', count: 16, mode: 'off', period: 2,
+            breakId: '', breakLevel: 4, breakAuto: false, breakEcho: false,
+            handRule: 'alt', lefty: false,
+            gap: { layer: 'none', playN: 4, muteM: 2 } },
     volume: 0.8
   };
 
@@ -682,8 +844,76 @@ swing 62
     src.start(t); src.stop(t + 0.05);
   }
 
-  function playClick(t, layer, accent) {
+  /* ---- timbres percussifs ---- */
+  // fût : sinus à chute de hauteur (basse de djembé, dunduns, grave de cajón)
+  function percDrum(t, f0, f1, dur, vol) {
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(f0, t);
+    o.frequency.exponentialRampToValueAtTime(f1, t + dur * 0.7);
+    o.connect(g); g.connect(masterGain);
+    g.gain.setValueAtTime(vol, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    o.start(t); o.stop(t + dur + 0.02);
+  }
+  // claqué : bruit filtré très bref (slap, aigu de cajón)
+  function percSnap(t, freq, q, vol) {
+    const src = audioCtx.createBufferSource(), g = audioCtx.createGain(), f = audioCtx.createBiquadFilter();
+    src.buffer = noiseBuf;
+    f.type = 'bandpass'; f.frequency.value = freq; f.Q.value = q;
+    src.connect(f); f.connect(g); g.connect(masterGain);
+    g.gain.setValueAtTime(vol * 1.5, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.045);
+    src.start(t); src.stop(t + 0.05);
+  }
+  // cloche : deux partiels carrés inharmoniques, décroissance rapide
+  function percBell(t, vol) {
+    for (const [f, v] of [[835, vol], [1245, vol * 0.55]]) {
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain(), bp = audioCtx.createBiquadFilter();
+      o.type = 'square'; o.frequency.value = f;
+      bp.type = 'bandpass'; bp.frequency.value = f * 1.05; bp.Q.value = 3;
+      o.connect(bp); bp.connect(g); g.connect(masterGain);
+      g.gain.setValueAtTime(v, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.11);
+      o.start(t); o.stop(t + 0.13);
+    }
+  }
+
+  function playPerc(t, voice, accent) {
+    const v = (accent === 2 ? 1.0 : 0.8) * 0.9;
+    switch (S.perc.instr + '.' + voice) {
+      case 'djembe.basse':     percDrum(t, 95, 52, 0.30, v); break;
+      case 'djembe.tone':      percDrum(t, 230, 165, 0.13, v * 0.85); break;
+      case 'djembe.slap':      percSnap(t, 2400, 1.2, v); percDrum(t, 420, 300, 0.05, v * 0.25); break;
+      case 'cajon.grave':      percDrum(t, 115, 68, 0.17, v); break;
+      case 'cajon.aigu':       percSnap(t, 1700, 0.9, v); percSnap(t, 3400, 2, v * 0.5); break;
+      case 'dunduns.dundunba': percDrum(t, 72, 48, 0.42, v * 1.1); break;
+      case 'dunduns.sangban':  percDrum(t, 112, 78, 0.30, v); break;
+      case 'dunduns.kenkeni':  percDrum(t, 175, 132, 0.20, v * 0.8); break;
+      case 'dunduns.cloche':   percBell(t, v * 0.6); break;
+    }
+  }
+
+  // gap par couche : une seule couche se coupe, les autres continuent
+  function percLayerMuted(layer, voice) {
+    if (!S.perc.on) return false;
+    if (layer === 'perc') {
+      if (percMuted[voice]) return true;
+      if (percCallSilent && voice === percWork) return true;
+    }
+    if (percGapMutedNow) {
+      const tgt = S.perc.gap.layer;
+      if (tgt === 'pulse' && (layer === 'beat' || layer === 'sub')) return true;
+      if (tgt === 'clave' && layer === 'clave') return true;
+      if (layer === 'perc' && voice === tgt) return true;
+    }
+    return false;
+  }
+
+  function playClick(t, layer, accent, voice) {
     if (mutedThisCycle) return;
+    if (percLayerMuted(layer, voice)) return;
+    if (layer === 'perc') { playPerc(t, voice, accent); return; }
     const st = S.sound;
     switch (layer) {
       case 'beat': {
@@ -745,6 +975,24 @@ swing 62
     }
     for (let k = 0; k < S.poly; k++) {
       events.push({ frac: k / S.poly, layer: 'poly' });
+    }
+    if (S.perc.on) {
+      if (percBreakEchoNow) {
+        /* mesure de réponse : silence percussif, l'élève rejoue le break */
+      } else if (percBreakActive) {
+        for (const e of percBreakEvents()) events.push(e);
+      } else {
+        const n = S.perc.count;
+        for (const vid in percGrids) {
+          const g = percGrids[vid];
+          for (let i = 0; i < n; i++) {
+            if (g[i] > 0) {
+              const off = (percOffsets[vid] && percOffsets[vid][i]) || 0;
+              events.push({ frac: (((i + off) / n) % 1 + 1) % 1, layer: 'perc', voice: vid, accent: g[i] });
+            }
+          }
+        }
+      }
     }
     events.sort((a, b) => a.frac - b.frac);
     evIdx = 0;
@@ -859,6 +1107,7 @@ swing 62
     totalBeats += S.beats;
     scriptOnNewMeasure();
     updateGapForNewMeasure();
+    percOnNewMeasure();
     computeCycle();
     cycleStart = t;
   }
@@ -870,7 +1119,7 @@ swing 62
         const ev = events[evIdx];
         const t = cycleStart + ev.frac * cycleDur + (ev.offMs ? ev.offMs / 1000 : 0);
         if (t < now + AHEAD) {
-          playClick(Math.max(t, now + 0.005), ev.layer, ev.accent || 0);
+          playClick(Math.max(t, now + 0.005), ev.layer, ev.accent || 0, ev.voice);
           evIdx++;
           continue;
         }
@@ -889,6 +1138,9 @@ swing 62
     totalBeats = 0;
     bowReset();
     resetGap();
+    resetPercGap();
+    percResetBreakState();
+    percMeasures = 0; percCallSilent = false;
     mutedThisCycle = false;
     computeCycle();
     cycleStart = audioCtx.currentTime + 0.1;
@@ -903,6 +1155,7 @@ swing 62
     clearInterval(schedulerTimer);
     $('startBtn').textContent = '▶ Démarrer';
     $('startBtn').classList.remove('playing');
+    $('percFsPlay').textContent = '▶';
     $('statusLine').textContent = 'Arrêté';
     drawStatic();
   }
@@ -996,6 +1249,17 @@ swing 62
     const cur = Math.floor((phase < 0 ? 0 : phase) * S.clave.count) % S.clave.count;
     const kids = $('claveSteps').children;
     for (let i = 0; i < kids.length; i++) kids[i].classList.toggle('cur', i === cur);
+    if (S.perc.on && ($('secPerc').open || percFsOpen)) {
+      const nP = (percBreakActive && percCurrentBreak()) ? percCurrentBreak().count : S.perc.count;
+      const curP = Math.floor((phase < 0 ? 0 : phase) * nP) % nP;
+      document.querySelectorAll('#percVoices .steps, #percFsVoices .steps').forEach(row => {
+        for (let i = 0; i < row.children.length; i++) row.children[i].classList.toggle('cur', i === curP);
+      });
+    }
+    if (percFsOpen) {
+      $('percFsTempo').textContent = S.tempo + ' BPM · mes. ' + measureCount;
+      $('percFsPlay').textContent = '■';
+    }
     $('statusLine').innerHTML = mutedThisCycle
       ? '<span class="mute">● COUPÉ — tiens le tempo !</span>'
       : 'Mesure ' + measureCount + (S.gap.mode !== 'off' ? ' · gap actif' : '');
@@ -1010,6 +1274,7 @@ swing 62
     drawBase(null);
     const kids = $('claveSteps').children;
     for (let i = 0; i < kids.length; i++) kids[i].classList.remove('cur');
+    document.querySelectorAll('#percVoices .step.cur, #percFsVoices .step.cur').forEach(el => el.classList.remove('cur'));
     drawBowStatic();
   }
 
@@ -1061,6 +1326,726 @@ swing 62
     buildStepGrid();
     if (!isPlaying) drawStatic();
   }
+
+  // ============ PERCUSSION & INDÉPENDANCE ============
+  const PERC_INSTR = {
+    djembe: {
+      label: 'Djembé', work: 'slap',
+      voices: [
+        { id: 'basse', label: 'Basse' },
+        { id: 'tone',  label: 'Tone' },
+        { id: 'slap',  label: 'Slap' }
+      ],
+      base: {
+        16: { basse: [0, 8], tone: [4, 5, 12, 13], slap: [10] },
+        12: { basse: [0, 6], tone: [4, 5, 10, 11], slap: [2] }
+      }
+    },
+    cajon: {
+      label: 'Cajón', work: 'aigu',
+      voices: [
+        { id: 'grave', label: 'Grave' },
+        { id: 'aigu',  label: 'Aigu' }
+      ],
+      base: {
+        16: { grave: [0, 3, 8, 10], aigu: [4, 12] },
+        12: { grave: [0, 5, 6], aigu: [3, 9] }
+      }
+    },
+    dunduns: {
+      label: 'Dunduns & cloche', work: 'sangban',
+      voices: [
+        { id: 'dundunba', label: 'Dundunba' },
+        { id: 'sangban',  label: 'Sangban' },
+        { id: 'kenkeni',  label: 'Kenkeni' },
+        { id: 'cloche',   label: 'Cloche' }
+      ],
+      base: {
+        16: { dundunba: [0, 8], sangban: [4, 12], kenkeni: [2, 6, 10, 14], cloche: [0, 2, 4, 6, 8, 10, 12, 14] },
+        12: { dundunba: [0, 6], sangban: [3, 9], kenkeni: [2, 5, 8, 11], cloche: [0, 2, 4, 5, 7, 9, 11] }
+      }
+    }
+  };
+
+  /* Styles : « documenté » = transcription sourcée (Kuku : G–gd––P–, appel standard,
+     cloche 12/8…) · « adaptation » = approximation pédagogique à éditer. */
+  const PERC_STYLES = {
+    djembe: [
+      { id: 'passeport', label: 'Passeport — base 4/4 (documenté)', count: 16,
+        base: { basse: [], tone: [2, 6, 10, 14], slap: [0, 4, 8, 12] },
+        startNote: 'pose la base du passeport : les slaps sur les quatre temps, en alternant les mains.',
+        note: 'Le « passeport » : slaps sur les quatre temps, tones sur les contretemps — l\'entrée de la plupart des 4/4.' },
+      { id: 'kuku', label: 'Kuku — accompagnement 1 (documenté)', count: 16,
+        base: { basse: [0, 8], tone: [2, 3, 10, 11], slap: [6, 14] },
+        startNote: 'pose l\'ancre du Kuku : la basse sur les temps 1 et 3, main droite.',
+        note: '« G – g d – – P – » : basse sur le temps, double tone, slap en l\'air. Même archétype que le tumbao.' },
+      { id: 'kassa', label: 'Kassa (adaptation)', count: 16,
+        base: { basse: [0, 8], tone: [4, 6, 12, 14], slap: [2, 10] },
+        note: 'Adaptation pédagogique — ajuste selon ta référence.' },
+      { id: 'djole', label: 'Djolé (adaptation)', count: 16,
+        base: { basse: [0], tone: [2, 4, 10, 12], slap: [6, 8, 14] },
+        note: 'Adaptation pédagogique — ajuste selon ta référence.' },
+      { id: 'ternaire', label: 'Ternaire 12/8 — Soli/Soko (adaptation)', count: 12,
+        base: { basse: [0, 6], tone: [2, 4, 8, 10], slap: [5, 11] },
+        note: 'Base ternaire — adaptation pédagogique.' }
+    ],
+    cajon: [
+      { id: 'pop', label: 'Pop / rock (documenté)', count: 16,
+        base: { grave: [0, 8], aigu: [2, 4, 6, 10, 12, 14] }, acc: { aigu: [4, 12] },
+        note: 'Basse sur 1 et 3, claqués accentués sur 2 et 4, ghosts légers sur les « et ».' },
+      { id: 'rumba', label: 'Rumba flamenca (adaptation)', count: 16,
+        base: { grave: [0, 3, 6, 8, 11, 14], aigu: [4, 12] }, acc: { aigu: [4, 12] },
+        note: 'Basse en tresillo doublé, claqués en contre — adaptation.' },
+      { id: 'bossa', label: 'Bossa (adaptation)', count: 16,
+        base: { grave: [0, 4, 8, 12], aigu: [3, 6, 10, 13] },
+        note: 'Pulsation souple à la basse, clave bossa au claqué.' },
+      { id: 'rock', label: 'Rock (documenté)', count: 16,
+        base: { grave: [0, 8, 10], aigu: [4, 12] }, acc: { aigu: [4, 12] },
+        anchors: { grave: [0, 8], aigu: [4, 12] },
+        startNote: 'pose le squelette rock : grave (kick) sur 1 et 3 main droite, claqué (caisse claire) sur 2 et 4 main gauche.',
+        note: 'Kick sur 1 et 3 (+ relance avant le 4), backbeat claqué sur 2 et 4.' },
+      { id: 'funk', label: 'Funk (adaptation)', count: 16,
+        base: { grave: [0, 3, 6, 10], aigu: [2, 4, 7, 11, 12, 14] }, acc: { aigu: [4, 12] },
+        anchors: { grave: [0], aigu: [4, 12] },
+        startNote: 'démarre par le backbeat funk : claqués accentués sur 2 et 4, basse sur le 1 — le reste viendra se syncoper autour.',
+        note: 'Basse syncopée, backbeat 2-4, ghosts en doubles — adaptation.' }
+    ],
+    dunduns: [
+      { id: 'base44', label: 'Base 4/4', count: 16,
+        base: { dundunba: [0, 8], sangban: [4, 12], kenkeni: [2, 6, 10, 14], cloche: [0, 2, 4, 6, 8, 10, 12, 14] },
+        note: 'Assise binaire : dundunba sur 1 et 3, sangban sur 2 et 4, kenkeni en contretemps.' },
+      { id: 'bell128', label: 'Cloche 12/8 standard (documenté)', count: 12,
+        base: { dundunba: [0, 6], sangban: [3, 9], kenkeni: [2, 5, 8, 11], cloche: [0, 2, 4, 5, 7, 9, 11] },
+        note: 'La cloche standard ouest-africaine en 12/8 porte tout l\'ensemble.' },
+      { id: 'kuku', label: 'Kuku ensemble (adaptation)', count: 16,
+        base: { dundunba: [8, 10], sangban: [0, 4], kenkeni: [2, 6, 10, 14], cloche: [0, 2, 4, 6, 8, 10, 12, 14] },
+        note: 'Adaptation pédagogique de l\'ensemble Kuku.' }
+    ]
+  };
+
+  /* Breaks : phrases d'une mesure, apprises progressivement (niveaux 1→4). */
+  const PERC_BREAKS = {
+    djembe: [
+      { id: 'appel44', label: 'Appel standard 4/4 (documenté)', count: 16,
+        hits: { slap: [0, 4, 8], tone: [2, 3, 6, 7] },
+        note: '« Pa tata Pa tata Pa » — le signal universel.' },
+      { id: 'appel128', label: 'Appel ternaire 12/8 (documenté)', count: 12,
+        hits: { slap: [0, 3, 6], tone: [1, 2, 4, 5] } },
+      { id: 'echauf', label: 'Échauffement — roulement (adaptation)', count: 16,
+        hits: { basse: [0, 4, 8, 12], tone: [1, 2, 3, 5, 6, 7, 9, 10, 11, 13, 14, 15] },
+        note: 'Roulement continu de tones sur ancres de basse.' },
+      { id: 'dununba', label: 'Break dununba « sstsss » 12/8 (documenté)', count: 12,
+        hits: { slap: [0, 2, 6, 8, 10], tone: [4] } }
+    ],
+    cajon: [
+      { id: 'remate', label: 'Remate — coupure flamenca (adaptation)', count: 16,
+        hits: { aigu: [0, 2, 4, 6, 8], grave: [12] } },
+      { id: 'fillpop', label: 'Fill pop (adaptation)', count: 16,
+        hits: { grave: [0, 8], aigu: [10, 12, 14, 15] } }
+    ],
+    dunduns: [
+      { id: 'unisson', label: 'Break unisson (adaptation)', count: 16,
+        hits: { dundunba: [0, 4, 8, 12, 14], sangban: [0, 4, 8, 12, 14], cloche: [0, 4, 8, 12, 14] } },
+      { id: 'chauffe', label: 'Échauffement dundunba (adaptation)', count: 12,
+        hits: { dundunba: [0, 2, 4, 6, 8, 10], cloche: [0, 3, 6, 9] } }
+    ]
+  };
+
+  let percGrids = {};          // voix -> tableau de pas (0/1/2)
+  let percOffsets = {};        // voix -> micro-décalage par pas (−0.45 … +0.45 pas)
+  let percMuted = {};          // voix -> muet (checkbox)
+  let percWork = '';           // voix travaillée par le générateur
+  let percAdded = [];          // pas ajoutés par le générateur (voix travaillée)
+  let percMeasures = 0;        // mesures écoulées depuis le début de l'exercice
+  let percCallSilent = false;  // appel-réponse : mesure « réponse » (voix muette)
+  let percGapPlayLeft = 0, percGapMuteLeft = 0, percGapMutedNow = false;
+  let percBreakActive = false, percBreakEchoNow = false, percBreakEchoPending = false;
+  let percBreaksPlayed = 0;
+
+  function percStatusSet(t) {
+    $('percStatus').textContent = t;
+    $('percFsStatus').textContent = t;
+  }
+
+  function percCurrentBreak() {
+    return (PERC_BREAKS[S.perc.instr] || []).find(b => b.id === S.perc.breakId) || null;
+  }
+
+  // hits du break triés dans le temps, tronqués selon le niveau (1 = quart de phrase, 4 = tout)
+  function percBreakEvents() {
+    const br = percCurrentBreak();
+    if (!br) return [];
+    const flat = [];
+    for (const vid in br.hits) for (const s of br.hits[vid]) flat.push({ s, vid });
+    flat.sort((a, b) => a.s - b.s);
+    const keep = Math.max(1, Math.ceil(flat.length * S.perc.breakLevel / 4));
+    return flat.slice(0, keep).map(h => ({ frac: h.s / br.count, layer: 'perc', voice: h.vid, accent: 2 }));
+  }
+
+  function percResetBreakState() {
+    percBreakActive = false; percBreakEchoNow = false; percBreakEchoPending = false;
+    percBreaksPlayed = 0;
+  }
+
+  // ---- guide des mains ----
+  // 'alt'  : les frappes alternent D-G dans l'ordre du pattern (règle djembé usuelle)
+  // 'lead' : temps = main directrice, contretemps = l'autre, doubles en alternance
+  function percHandsFor(grid) {
+    const hands = new Array(grid.length).fill('');
+    if (S.perc.handRule === 'lead') {
+      const pb = S.perc.count / S.beats;
+      for (let i = 0; i < grid.length; i++) {
+        if (grid[i] === 0) continue;
+        if (Number.isInteger(pb) && i % pb === 0) hands[i] = 'D';
+        else if (Number.isInteger(pb) && pb % 2 === 0 && i % pb === pb / 2) hands[i] = 'G';
+        else hands[i] = (i % 2 === 0) ? 'D' : 'G';
+      }
+    } else {
+      let k = 0;
+      for (let i = 0; i < grid.length; i++) if (grid[i] > 0) { hands[i] = (k % 2 === 0) ? 'D' : 'G'; k++; }
+    }
+    if (S.perc.lefty) for (let i = 0; i < hands.length; i++) {
+      hands[i] = hands[i] === 'D' ? 'G' : (hands[i] === 'G' ? 'D' : '');
+    }
+    return hands;
+  }
+
+  function percStepName(i) {
+    const pb = S.perc.count / S.beats;
+    if (Number.isInteger(pb)) {
+      const b = Math.floor(i / pb) + 1, r = i % pb;
+      if (r === 0) return 'le temps ' + b;
+      if (pb % 2 === 0 && r === pb / 2) return 'le contretemps du temps ' + b;
+      if (pb === 3) return 'la ' + (r + 1) + 'e croche du temps ' + b;
+      return 'la double n°' + (r + 1) + ' du temps ' + b;
+    }
+    return 'le pas ' + (i + 1);
+  }
+
+  // ---- progression guidée (multi-voix, base dépendante du groove) ----
+  // La base n'est PAS toujours « les temps » : chaque style peut définir ses ancres
+  // (backbeat funk, kick/caisse claire rock, basse du Kuku…) via `anchors` + `startNote`.
+  let percGuide = null;    // { targets: {voix: pas[]}, stages: [[{vid, step}]], idx, startNote }
+  let percStyleCur = null; // style actuellement appliqué (pour ancres et texte de départ)
+
+  function percGuideBuild() {
+    const def = PERC_INSTR[S.perc.instr];
+    const targets = {};
+    def.voices.forEach(v => targets[v.id] = (percGrids[v.id] || []).slice());
+    const all = [];
+    def.voices.forEach(v => {
+      const g = targets[v.id];
+      for (let i = 0; i < g.length; i++) if (g[i] > 0) all.push({ vid: v.id, step: i });
+    });
+    if (!all.length) {
+      percGuide = null;
+      percStatusSet('Groove vide — choisis un style ou ajoute des frappes, puis relance le mode guidé.');
+      return;
+    }
+    all.sort((a, b) => a.step - b.step);
+    // base : ancres du style si définies, sinon les frappes sur les temps, sinon la première frappe
+    let base = [];
+    if (percStyleCur && percStyleCur.anchors) {
+      for (const vid in percStyleCur.anchors) {
+        for (const s of percStyleCur.anchors[vid]) {
+          if (targets[vid] && targets[vid][s] > 0) base.push({ vid, step: s });
+        }
+      }
+      base.sort((a, b) => a.step - b.step);
+    }
+    if (!base.length) base = all.filter(h => percIsOnBeat(h.step));
+    if (!base.length) base = [all[0]];
+    const inBase = h => base.some(b => b.vid === h.vid && b.step === h.step);
+    const rest = all.filter(h => !inBase(h));
+    const stages = [base.slice()];
+    const cur = base.slice();
+    for (const h of rest) { cur.push(h); stages.push(cur.slice()); }
+    percGuide = {
+      targets, stages, idx: 0,
+      startNote: percStyleCur && percStyleCur.startNote ? percStyleCur.startNote : ''
+    };
+    percGuideApply();
+  }
+
+  function percGuideBaseSummary(gd) {
+    const parts = [];
+    PERC_INSTR[S.perc.instr].voices.forEach(v => {
+      const names = gd.stages[0].filter(h => h.vid === v.id).map(h => percStepName(h.step));
+      if (names.length) parts.push(v.label + ' sur ' + names.join(', '));
+    });
+    return parts.join(' · ');
+  }
+
+  function percGuideText() {
+    const gd = percGuide;
+    if (!gd) return '';
+    const K = gd.stages.length;
+    if (gd.idx === 0) {
+      const desc = gd.startNote || ('pose le squelette du groove — ' + percGuideBaseSummary(gd) + ' (mains D/G sur la grille).');
+      return 'Étape 1/' + K + ' : ' + desc;
+    }
+    const st = gd.stages[gd.idx];
+    const added = st[st.length - 1];
+    const hands = percHandsFor(percGrids[added.vid] || []);
+    const main = hands[added.step] === 'G' ? 'gauche' : 'droite';
+    const fin = gd.idx === K - 1 ? ' Dernière étape : groove complet !' : '';
+    return 'Étape ' + (gd.idx + 1) + '/' + K + ' : ajoute la main ' + main + ' sur ' +
+      percStepName(added.step) + ' (' + percVoiceLabel(added.vid) + ').' + fin;
+  }
+
+  function percGuideApply() {
+    const gd = percGuide;
+    if (!gd) return;
+    for (const vid in gd.targets) {
+      percGrids[vid] = new Array(gd.targets[vid].length).fill(0);
+    }
+    for (const h of gd.stages[gd.idx]) {
+      percGrids[h.vid][h.step] = gd.targets[h.vid][h.step];
+    }
+    refreshPercGrids();
+    percStatusSet(percGuideText());
+    if (!isPlaying) drawStatic();
+  }
+
+  function percGuideRestore() {
+    if (percGuide) {
+      for (const vid in percGuide.targets) {
+        if (percGrids[vid]) percGrids[vid] = percGuide.targets[vid].slice();
+      }
+    }
+    percGuide = null;
+  }
+
+  function percGuideStep(d) {
+    if (!percGuide) { percGuideBuild(); if (!percGuide) return; }
+    percGuide.idx = Math.min(percGuide.stages.length - 1, Math.max(0, percGuide.idx + d));
+    percGuideApply();
+  }
+
+  function resetPercGap() {
+    percGapPlayLeft = S.perc.gap.playN; percGapMuteLeft = 0; percGapMutedNow = false;
+  }
+
+  // ancres = frappes sur les temps ; contretemps = demi-temps
+  function percIsOnBeat(i)  { return (i * S.beats) % S.perc.count === 0; }
+  function percIsOffbeat(i) { return !percIsOnBeat(i) && (i * S.beats * 2) % S.perc.count === 0; }
+
+  function percBaseFor(vid) {
+    const d = PERC_INSTR[S.perc.instr];
+    return ((d.base[S.perc.count] || d.base[16])[vid]) || [];
+  }
+  function percVoiceLabel(vid) {
+    const v = PERC_INSTR[S.perc.instr].voices.find(x => x.id === vid);
+    return v ? v.label : vid;
+  }
+
+  function percResetWorkToBase() {
+    if (!percWork || !percGrids[percWork]) return;
+    percGrids[percWork] = new Array(S.perc.count).fill(0);
+    percBaseFor(percWork).forEach(s => percGrids[percWork][s] = 1);
+    percAdded = [];
+  }
+
+  function percAddHit() {
+    const grid = percGrids[percWork];
+    if (!grid) return;
+    const empty = [];
+    for (let i = 0; i < grid.length; i++) if (grid[i] === 0 && !percIsOnBeat(i)) empty.push(i);
+    if (!empty.length) {
+      percResetWorkToBase();
+      percStatusSet('Voix « ' + percVoiceLabel(percWork) + ' » pleine — retour au groove de base.');
+      return;
+    }
+    const offs = empty.filter(percIsOffbeat);
+    const pool = offs.length ? offs : empty;
+    const pick = pool[Math.floor(Math.random() * pool.length)];
+    grid[pick] = 1;
+    percAdded.push(pick);
+    percStatusSet('+ frappe ajoutée : ' + percVoiceLabel(percWork) + ', pas ' + (pick + 1) +
+      ' (' + percAdded.length + ' ajout' + (percAdded.length > 1 ? 's' : '') + ')');
+  }
+
+  function percRemoveHit() {
+    const grid = percGrids[percWork];
+    if (!grid) return;
+    const pool = [];
+    for (let i = 0; i < grid.length; i++) if (grid[i] > 0 && !percIsOnBeat(i)) pool.push(i);
+    if (!pool.length) {
+      percResetWorkToBase();
+      percStatusSet('Il ne restait que les ancres — groove de base restauré.');
+      return;
+    }
+    const pick = pool[Math.floor(Math.random() * pool.length)];
+    grid[pick] = 0;
+    percStatusSet('− frappe retirée : ' + percVoiceLabel(percWork) + ', pas ' + (pick + 1) + '. Continue à la jouer dans ta tête !');
+  }
+
+  // appel-réponse : une seule variation active à la fois
+  function percNewCallVariation() {
+    const grid = percGrids[percWork];
+    if (!grid) return;
+    const base = percBaseFor(percWork);
+    for (const s of percAdded) if (!base.includes(s)) grid[s] = 0;
+    percAdded = [];
+    percAddHit();
+    percStatusSet('Appel : écoute la variation (' + percVoiceLabel(percWork) + ')…');
+  }
+
+  function percOnNewMeasure() {
+    if (!S.perc.on) { percGapMutedNow = false; percCallSilent = false; return; }
+    // gap par couche
+    const g = S.perc.gap;
+    if (g.layer === 'none') percGapMutedNow = false;
+    else if (percGapPlayLeft > 0) {
+      percGapMutedNow = false; percGapPlayLeft--;
+      if (percGapPlayLeft === 0) percGapMuteLeft = g.muteM;
+    } else if (percGapMuteLeft > 0) {
+      percGapMutedNow = true; percGapMuteLeft--;
+      if (percGapMuteLeft === 0) percGapPlayLeft = g.playN;
+    } else resetPercGap();
+    // exercice
+    if (S.perc.mode !== 'break') { percBreakActive = false; percBreakEchoNow = false; percBreakEchoPending = false; }
+    if (S.perc.mode === 'off' || (!percWork && S.perc.mode !== 'break' && S.perc.mode !== 'guide')) {
+      percCallSilent = false; refreshPercGrids(); return;
+    }
+    if (S.perc.mode === 'break') {
+      percCallSilent = false;
+      if (percBreakEchoPending) {
+        percBreakEchoPending = false; percBreakActive = false; percBreakEchoNow = true;
+        percStatusSet('À toi : rejoue le break !');
+      } else {
+        percBreakEchoNow = false;
+        percMeasures++;
+        if (percMeasures % S.perc.period === 0 && percCurrentBreak()) {
+          if (S.perc.breakAuto) {
+            S.perc.breakLevel = Math.min(4, percBreaksPlayed + 1);
+            $('percBreakLvl').value = String(S.perc.breakLevel);
+          }
+          percBreakActive = true;
+          percBreaksPlayed++;
+          percStatusSet('BREAK — niveau ' + S.perc.breakLevel + '/4 · ' + percCurrentBreak().label);
+          if (S.perc.breakEcho) percBreakEchoPending = true;
+        } else {
+          percBreakActive = false;
+          const reste = S.perc.period - (percMeasures % S.perc.period);
+          percStatusSet('Groove — break dans ' + reste + ' mesure' + (reste > 1 ? 's' : ''));
+        }
+      }
+      refreshPercGrids();
+      return;
+    }
+    if (S.perc.mode === 'guide') {
+      percCallSilent = false;
+      percMeasures++;
+      if (percGuide && percGuide.idx < percGuide.stages.length - 1 && percMeasures % S.perc.period === 0) {
+        percGuide.idx++;
+        percGuideApply();
+      }
+      refreshPercGrids();
+      return;
+    }
+    percMeasures++;
+    if (S.perc.mode === 'call') {
+      const phase = (percMeasures - 1) % 2;
+      if (phase === 0) {
+        percCallSilent = false;
+        const pair = (percMeasures - 1) / 2;
+        if (pair % S.perc.period === 0) percNewCallVariation();
+        else percStatusSet('Appel : écoute…');
+      } else {
+        percCallSilent = true;
+        percStatusSet('Réponse : à toi ! La voix « ' + percVoiceLabel(percWork) + ' » se tait.');
+      }
+    } else {
+      percCallSilent = false;
+      if (percMeasures % S.perc.period === 0) {
+        if (S.perc.mode === 'add') percAddHit(); else percRemoveHit();
+      }
+    }
+    refreshPercGrids();
+  }
+
+  // ---- UI percussion ----
+  function buildPercRowsInto(wrap) {
+    wrap.innerHTML = '';
+    const def = PERC_INSTR[S.perc.instr];
+    const n = S.perc.count;
+    def.voices.forEach(v => {
+      const row = document.createElement('div'); row.className = 'perc-voice';
+      const lab = document.createElement('span'); lab.className = 'pv-label'; lab.textContent = v.label;
+      const steps = document.createElement('div'); steps.className = 'steps mini'; steps.dataset.voice = v.id;
+      for (let i = 0; i < n; i++) {
+        const b = document.createElement('button'); b.className = 'step';
+        if (percIsOnBeat(i)) b.classList.add('beatmark');
+        b.addEventListener('click', () => {
+          if (b.dataset.dragged) { delete b.dataset.dragged; return; }
+          percGrids[v.id][i] = (percGrids[v.id][i] + 1) % 3;
+          if (percGrids[v.id][i] === 0 && percOffsets[v.id]) percOffsets[v.id][i] = 0;
+          refreshPercGrids();
+        });
+        b.addEventListener('dblclick', () => {
+          if (percOffsets[v.id] && percOffsets[v.id][i]) {
+            percOffsets[v.id][i] = 0;
+            refreshPercGrids();
+            percStatusSet('Micro-décalage remis à zéro (pas ' + (i + 1) + ').');
+          }
+        });
+        // glisser la case à gauche/droite = avancer/retarder la frappe (micro-timing)
+        b.addEventListener('pointerdown', e => {
+          if (!percGrids[v.id] || percGrids[v.id][i] === 0) return;
+          if (!percOffsets[v.id]) percOffsets[v.id] = new Array(n).fill(0);
+          const startX = e.clientX, w = b.offsetWidth || 26;
+          const startOff = percOffsets[v.id][i] || 0;
+          let moved = false;
+          const onMove = ev => {
+            const dx = ev.clientX - startX;
+            if (Math.abs(dx) > 3) moved = true;
+            if (!moved) return;
+            const off = Math.max(-0.45, Math.min(0.45, startOff + dx / w));
+            percOffsets[v.id][i] = off;
+            const stepMs = (60000 / S.tempo) / (S.perc.count / S.beats);
+            percStatusSet('Micro-timing ' + percVoiceLabel(v.id) + ', pas ' + (i + 1) + ' : ' +
+              (off >= 0 ? '+' : '') + Math.round(off * 100) + ' % du pas (' +
+              (off >= 0 ? '+' : '') + Math.round(off * stepMs) + ' ms) — droite = laid back, gauche = en avance');
+            refreshPercGrids();
+          };
+          const onUp = () => {
+            window.removeEventListener('pointermove', onMove);
+            window.removeEventListener('pointerup', onUp);
+            if (moved) b.dataset.dragged = '1';
+          };
+          window.addEventListener('pointermove', onMove);
+          window.addEventListener('pointerup', onUp);
+        });
+        steps.appendChild(b);
+      }
+      const mute = document.createElement('label'); mute.className = 'check pv-mute';
+      const mi = document.createElement('input'); mi.type = 'checkbox'; mi.checked = !!percMuted[v.id];
+      mi.addEventListener('change', () => percMuted[v.id] = mi.checked);
+      mute.appendChild(mi); mute.append(' muet');
+      row.append(lab, steps, mute);
+      wrap.appendChild(row);
+    });
+  }
+
+  function buildPercGrids() {
+    buildPercRowsInto($('percVoices'));
+    buildPercRowsInto($('percFsVoices'));
+    refreshPercGrids();
+  }
+
+  function refreshPercGrids() {
+    document.querySelectorAll('#percVoices .steps, #percFsVoices .steps').forEach(row => {
+      const g = percGrids[row.dataset.voice];
+      if (!g) return;
+      const isWork = row.dataset.voice === percWork;
+      const hands = percHandsFor(g);
+      const offs = percOffsets[row.dataset.voice];
+      for (let i = 0; i < row.children.length; i++) {
+        row.children[i].classList.toggle('on', g[i] === 1);
+        row.children[i].classList.toggle('acc', g[i] === 2);
+        row.children[i].classList.toggle('var', isWork && percAdded.includes(i));
+        row.children[i].textContent = g[i] > 0 ? hands[i] : '';
+        const off = (offs && offs[i]) || 0;
+        row.children[i].style.transform = off ? 'translateX(' + (off * 100) + '%)' : '';
+      }
+    });
+  }
+
+  function percSetInstr(instr) {
+    S.perc.instr = instr;
+    const def = PERC_INSTR[instr];
+    if (!def.base[S.perc.count]) { S.perc.count = 16; $('percCount').value = '16'; }
+    const base = def.base[S.perc.count];
+    percGrids = {}; percMuted = {}; percOffsets = {};
+    def.voices.forEach(v => {
+      percGrids[v.id] = new Array(S.perc.count).fill(0);
+      percOffsets[v.id] = new Array(S.perc.count).fill(0);
+      (base[v.id] || []).forEach(s => percGrids[v.id][s] = 1);
+    });
+    percAdded = []; percMeasures = 0; percCallSilent = false;
+    percWork = def.work;
+    $('percWork').innerHTML = def.voices.map(v =>
+      '<option value="' + v.id + '"' + (v.id === percWork ? ' selected' : '') + '>' + v.label + '</option>').join('');
+    $('percGapLayer').innerHTML =
+      '<option value="none" selected>Aucune</option>' +
+      '<option value="pulse">Pulsation (clic)</option>' +
+      '<option value="clave">Clave</option>' +
+      def.voices.map(v => '<option value="' + v.id + '">' + v.label + '</option>').join('');
+    S.perc.gap.layer = 'none';
+    // styles et breaks disponibles pour cet instrument
+    $('percStyle').innerHTML = '<option value="">— Styles —</option>' +
+      (PERC_STYLES[instr] || []).map(s => '<option value="' + s.id + '">' + s.label + '</option>').join('');
+    const brs = PERC_BREAKS[instr] || [];
+    $('percBreakSel').innerHTML = brs.map(b => '<option value="' + b.id + '">' + b.label + '</option>').join('');
+    S.perc.breakId = brs.length ? brs[0].id : '';
+    percGuide = null;
+    percStyleCur = null;
+    percResetBreakState();
+    resetPercGap();
+    buildPercGrids();
+    percStatusSet('');
+    if (S.perc.mode === 'guide') percGuideBuild();
+    if (!isPlaying) drawStatic();
+  }
+
+  function applyPercStyle(id) {
+    const st = (PERC_STYLES[S.perc.instr] || []).find(s => s.id === id);
+    if (!st) return;
+    percStyleCur = st;
+    S.perc.count = st.count;
+    $('percCount').value = String(st.count);
+    const def = PERC_INSTR[S.perc.instr];
+    percGrids = {}; percOffsets = {};
+    def.voices.forEach(v => {
+      percGrids[v.id] = new Array(st.count).fill(0);
+      percOffsets[v.id] = new Array(st.count).fill(0);
+      ((st.base && st.base[v.id]) || []).forEach(s => percGrids[v.id][s] = 1);
+      ((st.acc && st.acc[v.id]) || []).forEach(s => percGrids[v.id][s] = 2);
+    });
+    percAdded = []; percMeasures = 0; percCallSilent = false;
+    percGuide = null;
+    percResetBreakState();
+    buildPercGrids();
+    percStatusSet(st.note || '');
+    if (S.perc.mode === 'guide') percGuideBuild();
+    if (!isPlaying) drawStatic();
+  }
+
+  $('percOn').addEventListener('change', e => { S.perc.on = e.target.checked; if (!isPlaying) drawStatic(); });
+  $('percInstr').addEventListener('change', e => percSetInstr(e.target.value));
+  $('percCount').addEventListener('change', e => { S.perc.count = +e.target.value; percSetInstr(S.perc.instr); });
+  $('percReset').addEventListener('click', () => percSetInstr(S.perc.instr));
+  $('percMode').addEventListener('change', e => {
+    S.perc.mode = e.target.value;
+    percMeasures = 0; percCallSilent = false;
+    percGuideRestore();
+    if (S.perc.mode === 'guide') {
+      percGuideBuild();
+    } else if (percStyleCur) {
+      applyPercStyle(percStyleCur.id);
+    } else {
+      percResetWorkToBase();
+      percStatusSet('');
+    }
+    refreshPercGrids();
+  });
+  $('percWork').addEventListener('change', e => {
+    percGuideRestore();
+    percWork = e.target.value;
+    percAdded = []; percMeasures = 0; percCallSilent = false;
+    if (S.perc.mode === 'guide') percGuideBuild();
+    refreshPercGrids();
+  });
+  $('percHandRule').addEventListener('change', e => {
+    S.perc.handRule = e.target.value;
+    refreshPercGrids();
+    if (percGuide) percStatusSet(percGuideText());
+  });
+  $('percLefty').addEventListener('change', e => {
+    S.perc.lefty = e.target.checked;
+    refreshPercGrids();
+    if (percGuide) percStatusSet(percGuideText());
+  });
+  $('percGuidePrev').addEventListener('click', () => percGuideStep(-1));
+  $('percGuideNext').addEventListener('click', () => percGuideStep(1));
+
+  // ---- mes séquences (localStorage) ----
+  function percPresetsAll() {
+    try { return JSON.parse(store.get('fm-metro-perc-presets') || '{}'); } catch (e) { return {}; }
+  }
+  function percPresetsWrite(all) { store.set('fm-metro-perc-presets', JSON.stringify(all)); }
+  function percSavedRefresh() {
+    const all = percPresetsAll();
+    const names = Object.keys(all).sort((a, b) => a.localeCompare(b, 'fr'));
+    $('percSavedSel').innerHTML = names.length
+      ? names.map(n => '<option value="' + n.replace(/"/g, '&quot;') + '">' + n + ' · ' + (PERC_INSTR[all[n].instr] ? PERC_INSTR[all[n].instr].label : all[n].instr) + '</option>').join('')
+      : '<option value="">— aucune séquence sauvée —</option>';
+  }
+  function percLoadPreset(name) {
+    const p = percPresetsAll()[name];
+    if (!p || !PERC_INSTR[p.instr]) return;
+    S.perc.count = p.count;
+    $('percInstr').value = p.instr;
+    percSetInstr(p.instr);
+    S.perc.count = p.count;
+    $('percCount').value = String(p.count);
+    percGrids = {}; percOffsets = {};
+    PERC_INSTR[p.instr].voices.forEach(v => {
+      percGrids[v.id] = ((p.grids && p.grids[v.id]) || new Array(p.count).fill(0)).slice(0, p.count);
+      while (percGrids[v.id].length < p.count) percGrids[v.id].push(0);
+      percOffsets[v.id] = ((p.offsets && p.offsets[v.id]) || new Array(p.count).fill(0)).slice(0, p.count);
+      while (percOffsets[v.id].length < p.count) percOffsets[v.id].push(0);
+    });
+    percMuted = Object.assign({}, p.muted || {});
+    percGuide = null; percStyleCur = null;
+    S.perc.on = true; $('percOn').checked = true;
+    buildPercGrids();
+    percStatusSet('Séquence « ' + name + ' » chargée.');
+    if (!isPlaying) drawStatic();
+  }
+  $('percSaveBtn').addEventListener('click', () => {
+    const name = ($('percSaveName').value || '').trim() ||
+      ('séquence du ' + new Date().toLocaleDateString('fr-BE'));
+    const all = percPresetsAll();
+    const grids = {}, offs = {};
+    for (const vid in percGrids) grids[vid] = percGrids[vid].slice();
+    for (const vid in percOffsets) offs[vid] = percOffsets[vid].slice();
+    all[name] = { instr: S.perc.instr, count: S.perc.count, grids, offsets: offs, muted: Object.assign({}, percMuted) };
+    percPresetsWrite(all);
+    percSavedRefresh();
+    $('percSavedSel').value = name;
+    percStatusSet('Séquence « ' + name + ' » sauvegardée.');
+  });
+  $('percLoadBtn').addEventListener('click', () => {
+    const n = $('percSavedSel').value;
+    if (n) percLoadPreset(n);
+  });
+  $('percDelBtn').addEventListener('click', () => {
+    const n = $('percSavedSel').value;
+    if (!n) return;
+    const all = percPresetsAll();
+    delete all[n];
+    percPresetsWrite(all);
+    percSavedRefresh();
+    percStatusSet('Séquence « ' + n + ' » supprimée.');
+  });
+  percSavedRefresh();
+  $('percPeriod').addEventListener('change', e => S.perc.period = Math.max(1, +e.target.value));
+  $('percGapLayer').addEventListener('change', e => { S.perc.gap.layer = e.target.value; resetPercGap(); });
+  $('percGapPlay').addEventListener('change', e => { S.perc.gap.playN = Math.max(1, +e.target.value); resetPercGap(); });
+  $('percGapMute').addEventListener('change', e => { S.perc.gap.muteM = Math.max(1, +e.target.value); resetPercGap(); });
+  $('percStyle').addEventListener('change', e => { if (e.target.value) applyPercStyle(e.target.value); });
+  $('percBreakSel').addEventListener('change', e => { S.perc.breakId = e.target.value; percResetBreakState(); });
+  $('percBreakLvl').addEventListener('change', e => S.perc.breakLevel = +e.target.value);
+  $('percBreakAuto').addEventListener('change', e => {
+    S.perc.breakAuto = e.target.checked;
+    percBreaksPlayed = 0;
+    if (S.perc.breakAuto) { S.perc.breakLevel = 1; $('percBreakLvl').value = '1'; }
+  });
+  $('percBreakEcho').addEventListener('change', e => S.perc.breakEcho = e.target.checked);
+
+  // ---- plein écran percussion ----
+  let percFsOpen = false;
+  function openPercFs() {
+    percFsOpen = true;
+    $('percFs').classList.add('open');
+    $('percFsInstr').textContent = PERC_INSTR[S.perc.instr].label;
+    $('percFsTempo').textContent = S.tempo + ' BPM';
+    $('percFsPlay').textContent = isPlaying ? '■' : '▶';
+    if (!S.perc.on) { S.perc.on = true; $('percOn').checked = true; }
+    if ($('percFs').requestFullscreen) $('percFs').requestFullscreen().catch(() => {});
+    refreshPercGrids();
+  }
+  function closePercFs() {
+    percFsOpen = false;
+    $('percFs').classList.remove('open');
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    if (!isPlaying) drawStatic();
+  }
+  $('percFsBtn').addEventListener('click', openPercFs);
+  $('percFsClose').addEventListener('click', closePercFs);
+  $('percFsPlay').addEventListener('click', toggle);
 
   // ============ TEMPO ============
   function nameOf(bpm) {
@@ -1171,6 +2156,7 @@ swing 62
     const tag = e.target.tagName;
     if (tag === 'TEXTAREA' || tag === 'INPUT' || tag === 'SELECT') return;
     if (e.key === 'Escape' && fsOpen) { closeBowFs(); return; }
+    if (e.key === 'Escape' && percFsOpen) { closePercFs(); return; }
     if (e.code === 'Space') { e.preventDefault(); toggle(); }
     else if (e.key === 'ArrowUp') { e.preventDefault(); setTempo(S.tempo + 1); }
     else if (e.key === 'ArrowDown') { e.preventDefault(); setTempo(S.tempo - 1); }
@@ -1596,6 +2582,7 @@ swing 62
   document.addEventListener('fullscreenchange', () => {
     if (document.fullscreenElement && fsOpen) requestAnimationFrame(sizeFs);
     else if (!document.fullscreenElement && fsOpen) closeBowFs();
+    else if (!document.fullscreenElement && percFsOpen) closePercFs();
   });
   window.addEventListener('resize', () => { if (fsOpen) sizeFs(); });
 
@@ -1611,6 +2598,7 @@ swing 62
     { id: 'simple',  t: 'Un tempo, un clic',            d: 'Métronome classique, réglages essentiels — mode simple.' },
     { id: 'groove',  t: 'Groove & swing',               d: 'Swing asymétrique, placement behind/ahead the beat.' },
     { id: 'clave',   t: 'Claves & polyrythmie',         d: 'Cellules rythmiques en boucle, visualisation circulaire.' },
+    { id: 'perc',    t: 'Percussion & indépendance',    d: 'Djembé, cajón, dunduns — variations et appel-réponse.' },
     { id: 'archet',  t: 'Coups d\'archet',              d: 'Tirer/pousser, liaisons, reprises — du violon à la contrebasse.' },
     { id: 'gap',     t: 'Horloge interne (gap clicks)', d: 'Le clic se coupe : ton tempo intérieur prend le relais.' },
     { id: 'routine', t: 'Routine programmée',           d: 'Endurance, accelerando, coupures — session scriptée.' }
@@ -1683,6 +2671,8 @@ swing 62
       let extra = '';
       if (wiz.goal === 'groove') extra = 'Swing <b>' + (wiz.extra.swing || 50) + ' %</b>' + (wiz.extra.shift ? ' · clic de placement <b>' + (wiz.extra.shiftMs >= 0 ? '+' : '') + wiz.extra.shiftMs + ' ms</b>' : '');
       if (wiz.goal === 'clave') extra = 'Preset : <b>' + (wiz.extra.presetLabel || 'aucun (grille vide)') + '</b>';
+      if (wiz.goal === 'perc') extra = 'Instrument : <b>' + PERC_INSTR[wiz.extra.percInstr || 'djembe'].label + '</b> · exercice : <b>' +
+        ({ off: 'libre', add: 'ajout progressif', sub: 'soustraction', call: 'appel-réponse', guide: 'progression guidée' }[wiz.extra.percMode || 'add']) + '</b>';
       if (wiz.goal === 'archet') extra = 'Instrument : <b>' + INSTR[wiz.extra.instr || 'violon'].label + '</b> · exercice : <b>' + BOW_PRESETS[wiz.extra.bowPreset || 'debutant'].label + '</b>';
       if (wiz.goal === 'gap') extra = 'Gap <b>' + ({fixed:'fixe',prog:'progressif',rand:'aléatoire'}[wiz.extra.gapMode] || 'fixe') + '</b> · jouer <b>' + (wiz.extra.gapPlay || 4) + '</b>, couper <b>' + (wiz.extra.gapMute || 1) + '</b>';
       if (wiz.goal === 'routine') extra = 'Une routine d\'exemple sera préremplie dans la section Script.';
@@ -1729,6 +2719,23 @@ swing 62
         wiz.extra.presetLabel = b.textContent;
         renderWizard();
       }));
+    }
+    else if (wiz.goal === 'perc') {
+      $('wizTitle').textContent = 'Percussion & indépendance';
+      $('wizSub').textContent = 'Choisis l\'instrument et l\'exercice — le groove de base se met en place tout seul.';
+      body.innerHTML = '<div class="wiz-options">' + Object.keys(PERC_INSTR).map(k =>
+        '<button class="wiz-opt' + ((wiz.extra.percInstr || 'djembe') === k ? ' sel' : '') + '" data-pi="' + k + '"><b>' + PERC_INSTR[k].label + '</b></button>'
+      ).join('') + '</div>' +
+      '<div class="row" style="margin-top:14px;"><label>Exercice</label><select id="wPercMode" style="flex:1;">' +
+        [['off', 'Libre (groove seul)'], ['add', 'Ajout progressif'], ['sub', 'Soustraction'], ['call', 'Appel-réponse'], ['guide', 'Progression guidée (mains)']].map(o =>
+          '<option value="' + o[0] + '"' + ((wiz.extra.percMode || 'add') === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'
+        ).join('') + '</select></div>';
+      wiz.extra.percInstr = wiz.extra.percInstr || 'djembe';
+      wiz.extra.percMode = wiz.extra.percMode || 'add';
+      body.querySelectorAll('.wiz-opt').forEach(b => b.addEventListener('click', () => {
+        wiz.extra.percInstr = b.dataset.pi; renderWizard();
+      }));
+      $('wPercMode').addEventListener('change', e => wiz.extra.percMode = e.target.value);
     }
     else if (wiz.goal === 'archet') {
       $('wizTitle').textContent = 'Ton instrument, ton archet';
@@ -1797,6 +2804,15 @@ swing 62
         if (wiz.extra.preset) applyPreset(wiz.extra.preset);
         $('secClave').open = true;
       }
+      if (wiz.goal === 'perc') {
+        percSetInstr(wiz.extra.percInstr || 'djembe');
+        $('percInstr').value = S.perc.instr;
+        S.perc.mode = wiz.extra.percMode || 'add';
+        $('percMode').value = S.perc.mode;
+        S.perc.on = true;
+        $('percOn').checked = true;
+        $('secPerc').open = true;
+      }
       if (wiz.goal === 'archet') {
         bowInstr = wiz.extra.instr || 'violon';
         $('bowInstr').value = bowInstr;
@@ -1844,6 +2860,7 @@ swing 62
   setSwing(50);
   buildStepGrid();
   bowCompile(false);
+  percSetInstr('djembe');
   drawStatic();
   // premier lancement : ouvrir l'assistant
   if (!store.get('fm-metro-wizard-done')) openWizard();
