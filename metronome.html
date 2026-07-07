@@ -278,6 +278,21 @@
   #percFsVoices .step.on, #percFsVoices .step.acc { color: var(--fm-accent-ink); }
   .percfs .step { font-size: 1.1rem; }
 
+  /* ---- team spirit (passe 3 étape 4) ---- */
+  .t-hide { display: none !important; }
+  .pv-uncertain { color: var(--fm-accent-2); font-weight: 700; cursor: help; }
+  .pv-part { width: auto; font-size: .78rem; padding: 3px 6px; }
+  .percfs .pv-part { display: none; }
+  #teamPanel { flex-wrap: wrap; gap: 10px; background: var(--fm-panel, rgba(127,127,127,.08));
+    border-radius: 8px; padding: 10px; }
+  #teamParts { display: flex; flex-direction: column; gap: 6px; }
+  .team-part { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .team-swatch { width: 14px; height: 14px; border-radius: 3px; flex: 0 0 auto; }
+  .team-name { width: 150px; font-size: .82rem; padding: 4px 6px; }
+  .team-count { font-size: .72rem; color: var(--fm-sub); min-width: 46px; }
+  .btn-sm.on { background: var(--fm-accent); border-color: var(--fm-accent); color: var(--fm-accent-ink); font-weight: 600; }
+  .btn-sm.team-mute.on { background: var(--fm-sub); border-color: var(--fm-sub); }
+
   /* ---- percussion plein écran ---- */
   .percfs {
     position: fixed; inset: 0; background: var(--fm-bg);
@@ -550,17 +565,49 @@
         </select>
         <button class="btn-sm" id="percReset">Groove de base</button>
         <button class="btn-sm primary" id="percFsBtn">⛶ Plein écran</button>
+        <label class="check" title="Jouer un groove à plusieurs : voix assignées à des participants (accumulation / distribution)"><input type="checkbox" id="teamToggle"> 🎭 Team spirit</label>
       </div>
-      <div class="row">
+      <div class="row" id="percStyleRow">
         <label>Style</label>
         <select id="percStyle" style="flex:1;min-width:200px;"></select>
+      </div>
+      <!-- passe 3 étape 4 : surface d'édition team spirit (distincte du générateur focal, §4.3) -->
+      <div class="row hide" id="teamPanel">
+        <div class="row" style="width:100%;margin:0;">
+          <label>Groove</label>
+          <select id="teamGroove" style="flex:1;min-width:180px;"></select>
+          <button class="btn-sm primary" id="teamLoad">Charger</button>
+          <span class="seg" style="display:inline-flex;gap:4px;">
+            <button class="btn-sm" id="teamModeDist">Distribution</button>
+            <button class="btn-sm" id="teamModeAccum">Accumulation</button>
+          </span>
+        </div>
+        <div class="row hide" id="teamDistBtns" style="width:100%;margin:0;">
+          <button class="btn-sm primary" id="teamAuto">⇋ Répartir par tessiture</button>
+          <span class="hint" style="margin:0;">un groove complet partagé entre les participants — union des parts = le groove</span>
+        </div>
+        <div class="row hide" id="teamAccumBtns" style="width:100%;margin:0;">
+          <button class="btn-sm primary" id="teamNext">▸ Faire entrer la voix suivante</button>
+          <button class="btn-sm" id="teamAccumReset">↺ Vider (personne n'a joué)</button>
+          <span class="hint" style="margin:0;">les voix entrent une à une, dans l'ordre d'entrée en jam</span>
+        </div>
+        <div class="row" style="width:100%;margin:0;">
+          <label>Participants</label>
+          <button class="btn-sm" id="teamAddPart">+ Ajouter un participant</button>
+        </div>
+        <div id="teamParts" style="width:100%;"></div>
+        <div class="hint" style="width:100%;margin:0;">
+          <b>Team spirit</b> : chaque voix est assignée à un participant (ou reste « commune », toujours audible).
+          <b>Solo</b> d'un participant = n'entendre que sa part ; <b>Muet</b> = le faire taire ; ni l'un ni l'autre = l'ensemble.
+          Choisis le participant de chaque voix dans la liste ci-dessous. La couleur de la ligne de réduction suit le participant.
+        </div>
       </div>
       <div class="perc-line-wrap">
         <div class="perc-line" id="percLine"></div>
         <div class="perc-line-legend" id="percLineLegend"></div>
       </div>
       <div id="percVoices"></div>
-      <div class="row" style="margin-top:14px;">
+      <div class="row" style="margin-top:14px;" id="percModeRow">
         <label>Exercice</label>
         <select id="percMode" style="width:auto;">
           <option value="off" selected>Libre (groove seul)</option>
@@ -575,7 +622,7 @@
           <select id="percWork" style="width:auto;"></select>
         </span>
       </div>
-      <div class="row">
+      <div class="row" id="percHandRow">
         <label>Mains</label>
         <select id="percHandRule" style="width:auto;">
           <option value="alt" selected>Alternance stricte D-G</option>
@@ -605,7 +652,7 @@
         <input type="number" id="percPeriod" min="1" max="16" value="2" style="width:70px;">
         <span class="hint" style="margin:0;">mesures (paires en appel-réponse)</span>
       </div>
-      <div class="row" style="margin-top:12px;">
+      <div class="row" style="margin-top:12px;" id="percSaveRow">
         <label>Mes séquences</label>
         <input type="text" id="percSaveName" placeholder="nom de la séquence…" style="width:150px;">
         <button class="btn-sm" id="percSaveBtn">💾 Sauver</button>
@@ -840,6 +887,15 @@ swing 62
     perc: { on: false, instr: 'djembe', count: 16, mode: 'off', period: 2,
             breakId: '', breakLevel: 4, breakAuto: false, breakEcho: false,
             handRule: 'alt', lefty: false },
+    /* passe 3 (étape 4) : mode team spirit — une dimension « participant » sur la
+       liste de voix existante, deux flux de lecture (accumulation / distribution).
+       on : surface d'édition team spirit active (distincte du générateur focal, §4.3)
+       mode : 'accumulation' (voix entrant une à une, ordre d'entrée) | 'distribution'
+              (un groove total partitionné entre N participants)
+       grooveId : groove de la bibliothèque chargé, ou null
+       participants : [{ id, label, solo, muted }] */
+    team: { on: false, mode: 'distribution', grooveId: null,
+            participants: [], nextPid: 1, entered: 0 },
     volume: 0.8
   };
 
@@ -1074,6 +1130,24 @@ swing 62
     if (!brk && percMuted[voice]) return true;
     if (S.perc.on && percCallSilent && !claveData[voice] &&
         (percWork === 'all' || voice === percWork)) return true;
+    // team spirit (étape 4) : solo/mute PAR PARTICIPANT, en conjonction — comme le gap
+    // ciblé, purement une décision booléenne, sans toucher au calcul de t (parade jitter).
+    if (S.team.on && !claveData[voice] && teamVoiceMuted(voice)) return true;
+    return false;
+  }
+
+  // audibilité team spirit d'une voix : muette si son participant est muet, ou si un
+  // participant est en solo et que ce n'est pas le sien. Voix sans participant (null) =
+  // voix COMMUNE, toujours audible (ex. un timekeeper de référence). §4.1
+  function teamVoiceMuted(voice) {
+    const parts = S.team.participants;
+    const soloed = parts.some(p => p.solo);
+    const pid = percPart[voice] || null;
+    if (pid === null) return false;
+    const p = parts.find(x => x.id === pid);
+    if (!p) return false;
+    if (p.muted) return true;
+    if (soloed && !p.solo) return true;
     return false;
   }
 
@@ -1174,20 +1248,24 @@ swing 62
     const cv = CLAVE_VOICES.find(v => v.id === S.gap.target);
     if (cv) return cv.label.toLowerCase();
     const iv = PERC_INSTR[S.perc.instr].voices.find(v => v.id === S.gap.target);
-    return iv ? iv.label.toLowerCase() : S.gap.target;
+    if (iv) return iv.label.toLowerCase();
+    // team spirit : la voix ciblée peut appartenir à un groove multi-instruments
+    const tv = S.team.on && teamVoiceList().find(v => v.id === S.gap.target);
+    return tv ? tv.label.toLowerCase() : S.gap.target;
   }
 
-  // cibles proposées : tout / pulsation / chaque voix de la liste unique (clave + instrument).
+  // cibles proposées : tout / pulsation / chaque voix de la liste unique (clave + instrument
+  // focal, OU voix vivantes du groove en team spirit).
   // Conserve la cible courante si elle existe encore, sinon retombe sur 'all'.
   function gapTargetRefresh() {
-    const def = PERC_INSTR[S.perc.instr];
+    const instrVoices = S.team.on ? teamVoiceList() : PERC_INSTR[S.perc.instr].voices;
     $('gapTarget').innerHTML =
       '<option value="all">Tout (comportement classique)</option>' +
       '<option value="pulse">Pulsation (clic)</option>' +
       CLAVE_VOICES.map(v => '<option value="' + v.id + '">' + v.label + '</option>').join('') +
-      def.voices.map(v => '<option value="' + v.id + '">' + v.label + '</option>').join('');
+      instrVoices.map(v => '<option value="' + v.id + '">' + esc(v.label) + '</option>').join('');
     if (S.gap.target !== 'all' && S.gap.target !== 'pulse' &&
-        !claveData[S.gap.target] && !def.voices.some(v => v.id === S.gap.target)) {
+        !claveData[S.gap.target] && !instrVoices.some(v => v.id === S.gap.target)) {
       S.gap.target = 'all';
     }
     $('gapTarget').value = S.gap.target;
@@ -4324,6 +4402,7 @@ swing 62
   let percMeta = {};           // voix -> { instr, voiceKind, freq? } — identité de timbre PAR VOIX
                                // (passe 3 étape 1 : le routage audio lit l'instr de la voix,
                                //  plus le global S.perc.instr → plusieurs instruments simultanés)
+  let percPart = {};           // voix -> id du participant assigné, ou null (voix commune) — team spirit (étape 4)
   let percWork = '';           // voix travaillée par le générateur
   let percAdded = [];          // pas ajoutés par le générateur (voix travaillée)
   let percMeasures = 0;        // mesures écoulées depuis le début de l'exercice
@@ -4637,11 +4716,15 @@ swing 62
   // ---- UI percussion ----
   function buildPercRowsInto(wrap) {
     wrap.innerHTML = '';
-    const def = PERC_INSTR[S.perc.instr];
     const n = S.perc.count;
-    def.voices.forEach(v => {
+    // team spirit : on édite le jeu de voix VIVANT (potentiellement multi-instruments,
+    // issu d'un groove de la bibliothèque), pas les seules voix de l'instrument focal.
+    const voices = S.team.on ? teamVoiceList() : PERC_INSTR[S.perc.instr].voices;
+    voices.forEach(v => {
       const row = document.createElement('div'); row.className = 'perc-voice';
-      const lab = document.createElement('span'); lab.className = 'pv-label'; lab.textContent = v.label;
+      const lab = document.createElement('span'); lab.className = 'pv-label';
+      lab.textContent = v.label;
+      if (S.team.on && v.uncertain) { lab.append(' '); const u = document.createElement('span'); u.className = 'pv-uncertain'; u.title = 'grille reconstruite (INCERTAIN) — à valider à l\'oreille'; u.textContent = '≈'; lab.appendChild(u); }
       const steps = document.createElement('div'); steps.className = 'steps mini'; steps.dataset.voice = v.id;
       for (let i = 0; i < n; i++) {
         const b = document.createElement('button'); b.className = 'step';
@@ -4693,9 +4776,45 @@ swing 62
       mi.addEventListener('change', () => { percMuted[v.id] = mi.checked; percLineRender(); });
       mute.appendChild(mi); mute.append(' muet');
       row.append(lab, steps, mute);
+      // team spirit : sélecteur d'assignation « quel participant joue cette voix »
+      if (S.team.on) {
+        const psel = document.createElement('select'); psel.className = 'pv-part';
+        psel.innerHTML = '<option value="">— commune —</option>' +
+          S.team.participants.map(p => '<option value="' + p.id + '">' + esc(p.label) + '</option>').join('');
+        psel.value = percPart[v.id] || '';
+        psel.addEventListener('change', () => { percPart[v.id] = psel.value || null; teamRenderParticipants(); percLineRender(); });
+        row.appendChild(psel);
+      }
       wrap.appendChild(row);
     });
   }
+
+  // liste des voix VIVANTES d'un groove team spirit (hors clave), avec métadonnées
+  // (label, rôle, ordre d'entrée, incertitude) reprises de la fiche groove si chargée.
+  function teamVoiceList() {
+    const gr = GROOVES.find(g => g.id === S.team.grooveId);
+    const meta = {};
+    if (gr) gr.voices.forEach(v => meta[v.id] = v);
+    return Object.keys(percGrids)
+      .filter(id => !claveData[id])
+      .map(id => {
+        const m = meta[id], pm = percMeta[id];
+        return {
+          id,
+          label: m ? m.label : (pm ? (pm.instr + ' · ' + pm.voiceKind) : id),
+          role: m ? m.role : '',
+          uncertain: m ? !!m.uncertain : false,
+          enterOrder: m && m.enterOrder != null ? m.enterOrder : null
+        };
+      })
+      .sort((a, b) => {
+        const ao = a.enterOrder == null ? 1e9 : a.enterOrder;
+        const bo = b.enterOrder == null ? 1e9 : b.enterOrder;
+        return ao - bo;
+      });
+  }
+
+  function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
 
   // registre d'identité de timbre par voix (passe 3 étape 1). Reconstruit à chaque
   // changement du JEU de voix — toutes les reconstructions de percGrids passent par
@@ -4761,8 +4880,20 @@ swing 62
       line.appendChild(d);
     }
     const def = PERC_INSTR[S.perc.instr];
-    const voices = def.voices.map((v, k) => ({ id: v.id, label: v.label, color: 'var(--fm-voice-' + (k % 4 + 1) + ')' }))
-      .concat(CLAVE_VOICES.map((v, k) => ({ id: v.id, label: v.label, color: 'var(--fm-voice-' + (k + 5) + ')' })));
+    let voices;
+    if (S.team.on) {
+      // team spirit : la couleur suit le PARTICIPANT (les parts d'un même joueur se lisent
+      // d'un coup d'œil) ; voix commune (non assignée) = teinte neutre.
+      const partIdx = {}; S.team.participants.forEach((p, i) => partIdx[p.id] = i % 6 + 1);
+      voices = teamVoiceList().map((v, k) => {
+        const pid = percPart[v.id] || null;
+        const color = (pid != null && partIdx[pid]) ? 'var(--fm-voice-' + partIdx[pid] + ')' : 'var(--fm-muted, #888)';
+        return { id: v.id, label: v.label, color };
+      }).concat(CLAVE_VOICES.map((v, k) => ({ id: v.id, label: v.label, color: 'var(--fm-voice-' + (k + 5) + ')' })));
+    } else {
+      voices = def.voices.map((v, k) => ({ id: v.id, label: v.label, color: 'var(--fm-voice-' + (k % 4 + 1) + ')' }))
+        .concat(CLAVE_VOICES.map((v, k) => ({ id: v.id, label: v.label, color: 'var(--fm-voice-' + (k + 5) + ')' })));
+    }
     const groups = {};   // clé = fraction du cycle (précision 1/4800) → briques coïncidentes
     voices.forEach(v => {
       const g = percGrids[v.id];
@@ -5111,6 +5242,215 @@ swing 62
     percStatusSet('Kit généré : ' + profile.label + '.');
     if (!isPlaying) drawStatic();
   }
+
+  // ============ MODE TEAM SPIRIT (passe 3 étape 4) ============
+  // Deux sens du même objet (voix hétérogènes assignées à des participants) :
+  //   distribution — un groove total partitionné entre N participants (union des parts = le groove) ;
+  //   accumulation — les voix entrent une à une (ordre d'entrée en jam des fiches grooves).
+  // Surface d'édition DISTINCTE du générateur focal (§4.3) : l'activer masque les modes
+  // add/sub/call/guide/break et opère sur le jeu de voix VIVANT (multi-instruments, issu
+  // d'un groove de la bibliothèque §5). Le moteur n'a qu'un hook : la conjonction
+  // solo/mute par participant dans percLayerMuted (aucun toucher au calcul de t).
+
+  const TEAM_FAM_LABEL = { bresil: 'Brésil', 'ouest-africain': 'Ouest-africain',
+    funk: 'Funk', reggae: 'Reggae', hiphop: 'Hip-hop', rock: 'Rock' };
+
+  function teamPartLabel(pid) {
+    const p = S.team.participants.find(x => x.id === pid);
+    return p ? p.label : pid;
+  }
+
+  function teamGrooveRefresh() {
+    const fams = {};
+    GROOVES.forEach(g => { (fams[g.family] = fams[g.family] || []).push(g); });
+    $('teamGroove').innerHTML = '<option value="">— choisir un groove —</option>' +
+      Object.keys(fams).map(f =>
+        '<optgroup label="' + esc(TEAM_FAM_LABEL[f] || f) + '">' +
+        fams[f].map(g => '<option value="' + g.id + '">' + esc(g.label) +
+          (g.reliability ? ' · ' + esc(g.reliability) : '') + '</option>').join('') +
+        '</optgroup>').join('');
+    if (S.team.grooveId) $('teamGroove').value = S.team.grooveId;
+  }
+
+  function teamModeUI() {
+    const acc = S.team.mode === 'accumulation';
+    $('teamAccumBtns').classList.toggle('hide', !acc);
+    $('teamDistBtns').classList.toggle('hide', acc);
+    $('teamModeAccum').classList.toggle('sel', acc);
+    $('teamModeDist').classList.toggle('sel', !acc);
+  }
+
+  // masque les surfaces focales (générateur, style, mains, séquences) en team spirit,
+  // via une classe dédiée qui ne se dispute pas avec le .hide de percModeUI.
+  function teamUI() {
+    const on = S.team.on;
+    $('teamToggle').checked = on;
+    $('teamPanel').classList.toggle('hide', !on);
+    ['percStyleRow', 'percModeRow', 'percHandRow', 'percBreakRow', 'percPeriodRow', 'percSaveRow']
+      .forEach(id => { const el = $(id); if (el) el.classList.toggle('t-hide', on); });
+  }
+
+  function teamRenderParticipants() {
+    const wrap = $('teamParts');
+    if (!wrap) return;
+    wrap.innerHTML = '';
+    if (!S.team.participants.length) {
+      const d = document.createElement('div'); d.className = 'hint'; d.style.margin = '0';
+      d.textContent = 'Aucun participant — ajoute-en, puis assigne les voix (ou « Répartir par tessiture »).';
+      wrap.appendChild(d);
+      return;
+    }
+    S.team.participants.forEach((p, i) => {
+      const row = document.createElement('div'); row.className = 'team-part';
+      const sw = document.createElement('span'); sw.className = 'team-swatch';
+      sw.style.background = 'var(--fm-voice-' + (i % 6 + 1) + ')';
+      const inp = document.createElement('input'); inp.type = 'text'; inp.className = 'team-name'; inp.value = p.label;
+      inp.addEventListener('change', () => { p.label = inp.value.trim() || p.label; buildPercGrids(); teamRenderParticipants(); });
+      const cnt = Object.keys(percPart).filter(v => percPart[v] === p.id && percGrids[v] && !claveData[v]).length;
+      const badge = document.createElement('span'); badge.className = 'team-count'; badge.textContent = cnt + ' voix';
+      const solo = document.createElement('button'); solo.className = 'btn-sm team-solo' + (p.solo ? ' on' : ''); solo.textContent = 'Solo';
+      solo.addEventListener('click', () => { p.solo = !p.solo; teamRenderParticipants(); });
+      const mute = document.createElement('button'); mute.className = 'btn-sm team-mute' + (p.muted ? ' on' : ''); mute.textContent = 'Muet';
+      mute.addEventListener('click', () => { p.muted = !p.muted; teamRenderParticipants(); });
+      const del = document.createElement('button'); del.className = 'btn-sm'; del.textContent = '✕'; del.title = 'Retirer ce participant';
+      del.addEventListener('click', () => teamRemoveParticipant(p.id));
+      row.append(sw, inp, badge, solo, mute, del);
+      wrap.appendChild(row);
+    });
+  }
+
+  function teamAddParticipant(label) {
+    const pid = 'p' + (S.team.nextPid++);
+    S.team.participants.push({ id: pid, label: label || ('Joueur ' + (S.team.participants.length + 1)), solo: false, muted: false });
+    return pid;
+  }
+
+  function teamRemoveParticipant(pid) {
+    S.team.participants = S.team.participants.filter(p => p.id !== pid);
+    for (const v in percPart) if (percPart[v] === pid) percPart[v] = null;   // ses voix redeviennent communes
+    buildPercGrids(); teamRenderParticipants(); percLineRender();
+  }
+
+  // charge un groove de la bibliothèque : arbitrage F — le groove IMPOSE sa famille/count.
+  function teamLoadGroove(gid) {
+    const gr = GROOVES.find(g => g.id === gid);
+    if (!gr) { percStatusSet('Choisis un groove dans la liste.'); return; }
+    S.team.grooveId = gid;
+    percGrids = {}; percOffsets = {}; percMuted = {}; percPart = {}; percMeta = {};
+    setFamily(gr.family_meter === 'tern' ? 'tern' : 'bin', false);   // pose les drapeaux famille sans rebâtir le focal
+    S.perc.count = gr.count; $('percCount').value = String(gr.count);
+    claveSetCount(gr.count);                                          // aligne la clave (grilles vides conservées)
+    gr.voices.forEach(v => {
+      percGrids[v.id] = v.grid.slice();
+      percOffsets[v.id] = new Array(gr.count).fill(0);
+      percMuted[v.id] = false;
+      percPart[v.id] = null;
+      percMeta[v.id] = { instr: v.instr, voiceKind: v.voiceKind };    // identité de timbre par voix (préservée par rebuildPercMeta via prev)
+      if (v.freq != null) percMeta[v.id].freq = v.freq;
+    });
+    S.perc.on = true; $('percOn').checked = true;
+    S.team.entered = 0;
+    if (S.team.mode === 'accumulation') teamAccumApplyEntry();
+    else if (S.team.participants.length) teamAutoPartition(true);
+    buildPercGrids();          // construit les rangées team + préserve percMeta (branche prev)
+    gapTargetRefresh();        // les voix du groove deviennent ciblables par le gap
+    teamRenderParticipants();
+    teamModeUI();
+    const tip = gr.reliability === 'faible' ? ' — grilles reconstruites (≈), à valider à l\'oreille' : '';
+    percStatusSet('Groove chargé : ' + gr.label + ' (' + gr.voices.length + ' voix, ' + esc(gr.origin || '') + ')' + tip + '.');
+    if (!isPlaying) drawStatic();
+  }
+
+  // accumulation : au départ, tout est muet ; « entrer la voix suivante » démute dans l'ordre.
+  function teamAccumApplyEntry() {
+    Object.keys(percGrids).forEach(id => { if (!claveData[id]) percMuted[id] = true; });
+    S.team.entered = 0;
+  }
+
+  function teamAccumNext() {
+    if (!S.team.on) return;
+    const next = teamVoiceList().find(v => percMuted[v.id]);
+    if (!next) { percStatusSet('Tout le monde est entré — ensemble complet.'); return; }
+    percMuted[next.id] = false;
+    if (S.team.participants.length) {
+      percPart[next.id] = S.team.participants[S.team.entered % S.team.participants.length].id;
+    }
+    S.team.entered++;
+    buildPercGrids(); teamRenderParticipants();
+    percStatusSet('Entrée : ' + next.label + (percPart[next.id] ? ' → ' + teamPartLabel(percPart[next.id]) : '') + '.');
+    if (!isPlaying) drawStatic();
+  }
+
+  function teamAccumReset() {
+    teamAccumApplyEntry();
+    buildPercGrids(); teamRenderParticipants();
+    percStatusSet('Remis à zéro : personne n\'a encore joué. « Faire entrer la voix suivante » les ajoute une à une.');
+    if (!isPlaying) drawStatic();
+  }
+
+  // distribution : répartit les voix vivantes entre les participants, équilibré par tessiture
+  // (tri par rôle puis round-robin → aucun joueur n'hérite de toutes les basses).
+  function teamAutoPartition(silent) {
+    const parts = S.team.participants;
+    if (!parts.length) { if (!silent) percStatusSet('Ajoute au moins un participant avant de répartir.'); return; }
+    const roleRank = { basse: 0, medium: 1, aigu: 2, timekeeper: 3 };
+    const list = teamVoiceList().slice().sort((a, b) => {
+      const ra = roleRank[a.role] === undefined ? 9 : roleRank[a.role];
+      const rb = roleRank[b.role] === undefined ? 9 : roleRank[b.role];
+      return ra - rb;
+    });
+    list.forEach((v, i) => { percPart[v.id] = parts[i % parts.length].id; percMuted[v.id] = false; });
+    if (!silent) {
+      buildPercGrids(); teamRenderParticipants();
+      percStatusSet('Réparti : ' + list.length + ' voix sur ' + parts.length + ' participant(s). Solo d\'un participant = sa part ; tutti = le groove.');
+      if (!isPlaying) drawStatic();
+    }
+  }
+
+  function teamSetOn(on) {
+    S.team.on = on;
+    if (on) {
+      if (S.team.participants.length === 0) { teamAddParticipant('Joueur 1'); teamAddParticipant('Joueur 2'); }
+      S.perc.on = true; $('percOn').checked = true;
+      S.perc.mode = 'off'; $('percMode').value = 'off';
+      teamUI(); percModeUI(); teamModeUI(); teamGrooveRefresh();
+      buildPercGrids();          // rangées avec sélecteurs de participant
+      teamRenderParticipants();
+      percStatusSet('Team spirit activé. Charge un groove, ajoute des participants, assigne les voix.');
+    } else {
+      S.team.on = false;
+      teamUI();
+      percSetInstr(S.perc.instr);   // retour à la surface focale passe 2 (groove de base de l'instrument courant)
+      percStatusSet('Team spirit désactivé — retour au groove d\'un seul instrument.');
+    }
+    if (!isPlaying) drawStatic();
+  }
+
+  $('teamToggle').addEventListener('change', e => teamSetOn(e.target.checked));
+  $('teamLoad').addEventListener('click', () => teamLoadGroove($('teamGroove').value));
+  $('teamGroove').addEventListener('change', e => { if (e.target.value) teamLoadGroove(e.target.value); });
+  $('teamModeAccum').addEventListener('click', () => {
+    S.team.mode = 'accumulation'; teamModeUI();
+    if (S.team.grooveId) { teamAccumApplyEntry(); buildPercGrids(); teamRenderParticipants(); }
+    percStatusSet('Mode accumulation : les voix entrent une à une (ordre d\'entrée en jam).');
+    if (!isPlaying) drawStatic();
+  });
+  $('teamModeDist').addEventListener('click', () => {
+    S.team.mode = 'distribution'; teamModeUI();
+    Object.keys(percGrids).forEach(id => { if (!claveData[id]) percMuted[id] = false; });
+    if (S.team.participants.length) teamAutoPartition(true);
+    buildPercGrids(); teamRenderParticipants();
+    percStatusSet('Mode distribution : un groove complet partagé entre les participants.');
+    if (!isPlaying) drawStatic();
+  });
+  $('teamNext').addEventListener('click', teamAccumNext);
+  $('teamAccumReset').addEventListener('click', teamAccumReset);
+  $('teamAuto').addEventListener('click', () => teamAutoPartition(false));
+  $('teamAddPart').addEventListener('click', () => {
+    teamAddParticipant();
+    buildPercGrids();      // rafraîchit les sélecteurs d'assignation des rangées
+    teamRenderParticipants();
+  });
 
   // ---- plein écran percussion ----
   let percFsOpen = false;
