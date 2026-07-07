@@ -123,6 +123,22 @@ de partage.
 
 ## Journal de développement
 
+### 2026-07-07 — Mains d'ENSEMBLE + répartition auto jouable + mini-grilles une ligne
+- **Mains par ensemble** (`tsHandsForSet`) : les D/G d'un participant sont calculés sur
+  l'ensemble des voix qu'il tient — deux voix qui frappent au même instant se **partagent**
+  les deux mains (la plus chargée garde sa main naturelle, l'autre prend l'opposée).
+  Corrige le faux « D+D sur le temps 1 » produit par le calcul voix-par-voix avec la règle
+  « main directrice sur les temps ». Cartes participants et exports JSON utilisent ces mains.
+- **Jouabilité assouplie** (`tsPlayableSet`, `tsFingerConflicts`) : seul « > 2 frappes
+  simultanées » est impossible ; deux frappes simultanées sont toujours tenables (mains
+  réparties). S'applique à « Qui joue quoi ? » et à la répartition auto.
+- **Répartir auto sans incompatibilité muette** (`tsAutoDistribute`) : la jouabilité prime
+  sur l'équilibre — une voix ne va que chez un participant qui peut encore la tenir ; à
+  défaut, repli sur le moins chargé et conflit **signalé** (badge « ⚠ injouable seul·e »
+  sur la carte + statut). Samba à 2 joueurs → 1 conflit signalé ; à 4 joueurs → zéro.
+- **Mini-grilles des cartes** : la mesure tient sur **une seule ligne** (cases fluides,
+  même principe que le plein écran) — plus de repli 12 + 4 qui cassait la lecture du cycle.
+
 ### 2026-07-07 — Fusion : le groove du répertoire DEVIENT le jeu focal (+ habillage)
 - **Fusion (proposition A)** : « Charger » déverse le groove dans `percGrids`/`percVoices` via
   `percActiveVoices()` ; grilles **partagées par référence** entre séquenceur, exercices, cartes

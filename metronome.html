@@ -454,7 +454,16 @@
   .ts-part .ts-line { color: var(--fm-sub); font-size: .78rem; margin-top: 5px; line-height: 1.5; }
   .ts-pline { margin-top: 7px; }
   .ts-pline .ts-pline-label { color: var(--fm-sub); font-size: .78rem; }
-  .ts-pline .steps { margin: 3px 0 0; }
+  /* la mini-grille d'une carte participant tient la MESURE sur une seule ligne :
+     cases fluides (même principe que le plein écran) — jamais de repli 12 + 4
+     qui casserait la lecture du cycle */
+  .ts-pline .steps { margin: 3px 0 0; flex-wrap: nowrap; gap: 3px; }
+  .ts-pline .steps .step {
+    flex: 1 1 0; width: auto; min-width: 0; height: 32px; padding: 0;
+    overflow: hidden; font-size: .55rem; font-weight: 600; line-height: 1;
+    color: var(--fm-sub);
+  }
+  .ts-pline .steps .step.on, .ts-pline .steps .step.acc { color: var(--fm-accent-ink); }
   /* chips : tessitures teintées par la palette de voix (fond translucide → texte lisible
      dans les deux thèmes), états « adapté / backing / incertain » sur l'accent secondaire */
   .ts-chip {
@@ -485,6 +494,10 @@
   .ts-chip.adapte { color: var(--fm-accent-2); border-color: var(--fm-accent-2); background: transparent; }
   .ts-chip.backing { color: var(--fm-accent-2); border-color: var(--fm-accent-2); }
   .ts-chip.incertain { border-style: dashed; }
+  .ts-chip.tswarn {
+    background: color-mix(in srgb, var(--fm-voice-5) 22%, transparent);
+    border-color: var(--fm-voice-5); color: var(--fm-ink); font-weight: 600;
+  }
   /* chips de tessiture/instrument à même les rangées du séquenceur (groove chargé) */
   .pv-chips { display: inline-flex; gap: 4px; flex-wrap: wrap; margin-top: 3px; }
   .perc-voice .pv-label { line-height: 1.5; }
@@ -835,7 +848,7 @@
       <div class="row">
         <label class="check"><input type="checkbox" id="tsOn"> Mode team spirit (répartir entre participants)</label>
         <button class="btn-sm" id="tsAddPart">+ Participant</button>
-        <button class="btn-sm" id="tsAuto" title="Répartir les voix en équilibrant la charge de jeu (frappes) et les tessitures">Répartir auto</button>
+        <button class="btn-sm" id="tsAuto" title="Répartir les voix en équilibrant la charge de jeu (frappes) et les tessitures, sans créer de combinaison injouable quand c'est possible">Répartir auto</button>
         <label class="check"><input type="checkbox" id="tsFinger"> Vérifier les doigtés</label>
       </div>
       <div id="tsParticipants" class="ts-parts"></div>
@@ -849,7 +862,8 @@
         </div>
         <div class="hint" style="margin-top:4px;">Classe les lignes par priorité — glisse la poignée ⠿ pour
         réordonner. Les premières sont garanties : chaque ligne est attribuée <b>entière ou pas du tout</b>,
-        deux mains par joueur (jamais plus de 2 frappes ni deux fois la même main au même instant). Cumuler des
+        deux mains par joueur (jamais plus de 2 frappes simultanées ; quand deux voix tombent ensemble,
+        les mains se répartissent — les D/G des cartes sont recalculés pour l'ensemble). Cumuler des
         instruments différents n'arrive qu'en dernier recours. Avec <b>1 joueur</b> : la combinaison de lignes
         que tu peux tenir seul. Les lignes écartées passent en <b>backing track</b> si la case est cochée,
         en sourdine sinon.</div>
@@ -862,11 +876,13 @@
       </div>
       <div class="hint">Charge d'abord un groove dans la section <b>Répertoire de grooves</b>, puis assigne
       chaque ligne à un participant — menu sur chaque ligne du classement ci-dessus (mode team spirit
-      activé), ou <b>Répartir auto</b> qui équilibre la charge de jeu (nombre de frappes) en mélangeant
-      les tessitures. La carte de chacun affiche <b>sa ligne rythmique</b> ; écoute la part de chacun
-      (<b>solo</b>/<b>muet</b>) et exporte sa <b>ligne en JSON</b> pour la travailler chez soi.
-      <b>Vérifier les doigtés</b> signale quand une même main est demandée deux fois au même instant
-      pour un même participant (physiquement impossible).</div>
+      activé), ou <b>Répartir auto</b> qui équilibre la charge de jeu (nombre de frappes) <b>sans créer
+      de combinaison injouable</b> quand c'est possible — sinon la carte porte un badge ⚠. La carte de
+      chacun affiche <b>sa ligne rythmique</b>, mains D/G recalculées pour l'ensemble qu'il tient :
+      deux voix qui tombent au même instant se partagent les deux mains, même avec « main directrice
+      sur les temps ». Écoute la part de chacun (<b>solo</b>/<b>muet</b>) et exporte sa <b>ligne en
+      JSON</b> pour la travailler chez soi. <b>Vérifier les doigtés</b> détaille les pas où plus de
+      deux frappes simultanées dépassent les deux mains (physiquement impossible).</div>
     </div>
   </details>
 
@@ -5672,19 +5688,27 @@ swing 62
   }
   // répartition auto équilibrée en CHARGE DE JEU : les voix, triées par nombre de frappes
   // décroissant, vont chacune au participant le moins chargé (glouton / bin-packing).
+  // Rév. 2026-07-07 : la JOUABILITÉ prime sur l'équilibre — une voix ne va que chez un
+  // participant qui peut encore la tenir à deux mains (oracle tsPlayableSet, même règle
+  // que « Qui joue quoi ? ») ; à défaut, repli sur le moins chargé et le conflit est
+  // SIGNALÉ (badge « injouable » sur la carte + statut), plus d'incompatibilité muette.
   // Critères de départage à charge égale : d'abord la diversité de tessiture (un rôle
   // pas encore attribué à ce participant), puis le nombre de voix.
   function tsAutoDistribute() {
     if (!TS.participants.length) tsAddParticipant();
     if (!TS.participants.length) return;
     const hitsOf = g => g.reduce((a, x) => a + (x > 0 ? 1 : 0), 0);
-    const load = {}, nVoices = {}, roles = {};
-    TS.participants.forEach(p => { load[p.id] = 0; nVoices[p.id] = 0; roles[p.id] = {}; });
+    const load = {}, nVoices = {}, roles = {}, mine = {};
+    TS.participants.forEach(p => { load[p.id] = 0; nVoices[p.id] = 0; roles[p.id] = {}; mine[p.id] = []; });
+    let conflicts = 0;
     TS.voices.slice()
       .sort((a, b) => hitsOf(b.grid) - hitsOf(a.grid))
       .forEach(v => {
+        const playable = TS.participants.filter(p => tsPlayableSet(mine[p.id].concat([v])));
+        const pool = playable.length ? playable : TS.participants;
+        if (!playable.length) conflicts++;
         let best = null;
-        TS.participants.forEach(p => {
+        pool.forEach(p => {
           if (!best) { best = p; return; }
           const lb = load[best.id], lp = load[p.id];
           if (lp < lb) { best = p; return; }
@@ -5695,31 +5719,61 @@ swing 62
           if (nVoices[p.id] < nVoices[best.id]) best = p;
         });
         v.participant = best.id;
+        mine[best.id].push(v);
         load[best.id] += hitsOf(v.grid);
         nVoices[best.id]++;
         roles[best.id][v.role] = (roles[best.id][v.role] || 0) + 1;
       });
     tsRefresh();
+    $('tsStatus').textContent = conflicts
+      ? '⚠ ' + conflicts + (conflicts > 1 ? ' voix ne tiennent pas' : ' voix ne tient pas') +
+        ' à deux mains — ajoute un participant, ou passe par « Qui joue quoi ? » qui écarte ' +
+        'les lignes en trop (backing track).'
+      : 'Répartition équilibrée — chaque ligne tient à deux mains.';
     if (!isPlaying) drawStatic();
   }
 
   // ---- « Qui joue quoi ? » : priorités classées + lignes entières + deux mains ----
   function tsHits(g) { return g.reduce((a, x) => a + (x > 0 ? 1 : 0), 0); }
 
-  // Oracle de jouabilité pour UN joueur : même règle que tsFingerConflicts —
-  // à chaque pas, au plus 2 frappes, jamais deux fois la main D ni deux fois la main G.
+  // Oracle de jouabilité pour UN joueur : à chaque pas, au plus 2 frappes simultanées.
+  // Rév. 2026-07-07 : deux frappes simultanées sont TOUJOURS tenables — le joueur
+  // répartit ses deux mains (tsHandsForSet réassigne D/G). L'ancienne règle « jamais
+  // deux fois la même main » sur-contraignait : avec « main directrice sur les temps »,
+  // deux voix frappant le temps 1 donnaient D+D par calcul voix-par-voix, et la
+  // combinaison était déclarée injouable à tort.
   function tsPlayableSet(voices) {
     if (voices.length < 2) return true;
-    const hands = voices.map(v => ({ v, h: percHandsFor(v.grid) }));
     const n = voices[0].grid.length;
     for (let i = 0; i < n; i++) {
-      let total = 0, d = 0, g = 0;
-      hands.forEach(x => {
-        if (x.v.grid[i] > 0) { total++; if (x.h[i] === 'D') d++; else if (x.h[i] === 'G') g++; }
-      });
-      if (total > 2 || d > 1 || g > 1) return false;
+      let total = 0;
+      voices.forEach(v => { if (v.grid[i] > 0) total++; });
+      if (total > 2) return false;
     }
     return true;
+  }
+
+  // Mains pour un ENSEMBLE de voix tenues par un même joueur : quand deux voix
+  // frappent au même instant, elles se PARTAGENT les deux mains — la voix la plus
+  // chargée garde sa main naturelle (percHandsFor, règle courante), l'autre prend
+  // l'opposée. Une frappe isolée garde sa main naturelle ; > 2 frappes = conflit
+  // (signalé par tsFingerConflicts), les mains naturelles sont laissées telles quelles.
+  function tsHandsForSet(voices) {
+    const out = {};
+    voices.forEach(v => { out[v.gid] = percHandsFor(v.grid); });
+    if (voices.length < 2) return out;
+    const n = voices[0].grid.length;
+    const weight = {};
+    voices.forEach(v => { weight[v.gid] = tsHits(v.grid); });
+    for (let i = 0; i < n; i++) {
+      const hits = voices.filter(v => v.grid[i] > 0);
+      if (hits.length !== 2) continue;
+      const [a, b] = hits.slice().sort((x, y) => weight[y.gid] - weight[x.gid]);
+      if (out[a.gid][i] === out[b.gid][i]) {
+        out[b.gid][i] = out[a.gid][i] === 'D' ? 'G' : 'D';
+      }
+    }
+    return out;
   }
 
   // classement par glisser-déposer (pointer events, compatible tactile)
@@ -5832,10 +5886,11 @@ swing 62
     if (!isPlaying) drawStatic();
   }
 
-  // ---- détection des doigtés impossibles (2 mains identiques au même instant) ----
-  // Pour un même participant (ou tout le groove si aucun participant), on regarde chaque
-  // pas : deux frappes exigeant la MÊME main, ou plus de deux frappes simultanées, sont
-  // physiquement injouables par un·e seul·e percussionniste.
+  // ---- détection des doigtés impossibles (> 2 frappes simultanées) ----
+  // Pour un même participant (ou tout le groove si aucun participant) : plus de deux
+  // frappes au même pas dépassent les deux mains. Deux frappes simultanées ne sont
+  // PLUS un conflit — les mains se répartissent (tsHandsForSet), même quand la règle
+  // « main directrice sur les temps » leur donnait D+D voix par voix.
   function tsFingerConflicts() {
     if (!TS.loaded) return [];
     const groups = {};   // participantId|'tous' → voix
@@ -5846,20 +5901,13 @@ swing 62
     const out = [];
     Object.keys(groups).forEach(key => {
       const vs = groups[key];
-      const hands = vs.map(v => ({ v, h: percHandsFor(v.grid) }));
       const n = TS.voices.length ? TS.voices[0].grid.length : 0;
       for (let i = 0; i < n; i++) {
-        const hits = [];
-        hands.forEach(x => { if (x.v.grid[i] > 0) hits.push({ label: x.v.label, hand: x.h[i] }); });
-        if (hits.length < 2) continue;
-        const dCount = hits.filter(x => x.hand === 'D').length;
-        const gCount = hits.filter(x => x.hand === 'G').length;
-        if (hits.length > 2 || dCount > 1 || gCount > 1) {
-          const who = (key === 'tous') ? '' : ((TS.participants.find(p => p.id === key) || {}).label + ' — ');
-          const which = dCount > 1 ? 'main D' : (gCount > 1 ? 'main G' : (hits.length + ' frappes'));
-          out.push(who + percStepName(i) + ' : ' + which + ' demandée par ' +
-            hits.map(x => x.label).join(' + ') + ' → impossible');
-        }
+        const hits = vs.filter(v => v.grid[i] > 0);
+        if (hits.length <= 2) continue;
+        const who = (key === 'tous') ? '' : ((TS.participants.find(p => p.id === key) || {}).label + ' — ');
+        out.push(who + percStepName(i) + ' : ' + hits.length + ' frappes simultanées (' +
+          hits.map(v => v.label).join(' + ') + ') → deux mains dépassées');
       }
     });
     return out;
@@ -5870,9 +5918,10 @@ swing 62
     const g = GROOVES.find(x => x.id === TS.grooveId) || {};
     return { id: g.id, label: g.label, family: g.family, count: g.count, tempo: g.tempo };
   }
-  function tsVoiceExport(v) {
+  function tsVoiceExport(v, hands) {
     return { label: v.label, role: v.role, instr: v.instr, voiceKind: v.voiceKind,
-             authentique: !v.approx, grid: v.grid, mains: percHandsFor(v.grid) };
+             authentique: !v.approx, grid: v.grid,
+             mains: hands || percHandsFor(v.grid) };   // mains d'ensemble si fournies
   }
   function tsDownload(obj, name) {
     const blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' });
@@ -5885,24 +5934,33 @@ swing 62
     const p = TS.participants.find(x => x.id === id); if (!p) return;
     const mine = TS.voices.filter(v => v.participant === id);
     if (!mine.length) { $('tsStatus').textContent = 'Aucune voix assignée à ' + p.label + '.'; return; }
+    const setHands = tsHandsForSet(mine);   // mains d'ensemble : D/G répartis sur les simultanées
     tsDownload({ type: 'fm-metro-ligne', version: 1, participant: p.label,
-      groove: tsGrooveMeta(), voix: mine.map(tsVoiceExport) },
+      groove: tsGrooveMeta(), voix: mine.map(v => tsVoiceExport(v, setHands[v.gid])) },
       'ma-ligne-' + p.label.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '.json');
     $('tsStatus').textContent = 'Ligne de ' + p.label + ' exportée (' + mine.length + ' voix).';
   }
   function tsExportAll() {
     if (!TS.loaded) { $('tsStatus').textContent = 'Charge d\'abord un groove.'; return; }
+    // mains d'ensemble par participant ; voix communes = mains voix seule
+    const handsAll = {};
+    const byPart = {};
+    TS.voices.forEach(v => {
+      if (v.participant != null) (byPart[v.participant] = byPart[v.participant] || []).push(v);
+    });
+    Object.keys(byPart).forEach(k => Object.assign(handsAll, tsHandsForSet(byPart[k])));
     tsDownload({ type: 'fm-metro-groove', version: 1, groove: tsGrooveMeta(),
       participants: TS.participants.map(p => p.label),
       voix: TS.voices.map(v => Object.assign({ participant:
-        (TS.participants.find(p => p.id === v.participant) || {}).label || null }, tsVoiceExport(v))) },
+        (TS.participants.find(p => p.id === v.participant) || {}).label || null },
+        tsVoiceExport(v, handsAll[v.gid]))) },
       'groove-' + (TS.grooveId || 'export') + '.json');
     $('tsStatus').textContent = 'Groove complet exporté.';
   }
 
   // ---- rendu du panneau ----
-  function tsMiniGrid(v) {
-    const hands = percHandsFor(v.grid);
+  function tsMiniGrid(v, hands) {
+    hands = hands || percHandsFor(v.grid);   // défaut : mains voix seule
     let h = '<div class="steps mini" style="pointer-events:none;">';
     for (let i = 0; i < v.grid.length; i++) {
       const cls = 'step' + (v.grid[i] === 1 ? ' on' : v.grid[i] === 2 ? ' acc' : '');
@@ -5951,6 +6009,10 @@ swing 62
     const parts = $('tsParticipants');
     parts.innerHTML = TS.participants.map(p => {
       const mine = TS.voices.filter(v => v.participant === p.id);
+      // mains calculées sur l'ENSEMBLE tenu par ce joueur : deux frappes simultanées
+      // se partagent D/G (imiter deux instruments emploie forcément les deux mains)
+      const setHands = tsHandsForSet(mine);
+      const playable = tsPlayableSet(mine);
       // la ligne de chacun = libellé + mini-grille de chaque voix assignée (pas seulement les noms)
       const line = mine.length
         ? mine.map(v =>
@@ -5959,12 +6021,14 @@ swing 62
                 ' <span class="ts-chip ' + v.role + '">' + v.role + '</span>' +
                 ' <span class="ts-chip' + (v.approx ? ' adapte' : '') + '">' + tsEsc(tsPlayedLabel(v)) + '</span>' +
               '</div>' +
-              tsMiniGrid(v) +
+              tsMiniGrid(v, setHands[v.gid]) +
             '</div>').join('')
         : '<i>aucune voix</i>';
       return '<div class="ts-part' + (p.solo ? ' solo' : '') + '" data-p="' + p.id + '">' +
         '<div class="ts-part-head">' +
           '<input class="ts-name" data-p="' + p.id + '" value="' + tsEsc(p.label) + '">' +
+          (playable ? '' : '<span class="ts-chip tswarn" title="plus de deux frappes simultanées ' +
+            'sur cette combinaison — répartis autrement ou passe par « Qui joue quoi ? »">⚠ injouable seul·e</span>') +
           '<label class="check"><input type="checkbox" class="ts-solo" data-p="' + p.id + '"' + (p.solo ? ' checked' : '') + '> solo</label>' +
           '<label class="check"><input type="checkbox" class="ts-mute" data-p="' + p.id + '"' + (p.mute ? ' checked' : '') + '> muet</label>' +
         '</div>' +
