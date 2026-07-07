@@ -540,6 +540,9 @@
           <option value="djembe" selected>Djembé (basse · tone · slap)</option>
           <option value="cajon">Cajón (grave · aigu)</option>
           <option value="dunduns">Dunduns &amp; cloche</option>
+          <option value="agogo">Agogô (grave · aigu)</option>
+          <option value="surdo">Surdo (grave · marcante)</option>
+          <option value="recoreco">Reco-reco (raclement)</option>
         </select>
         <select id="percCount" style="width:auto;" title="Pas du cycle — asservi à la famille : bascule clave + percussion ensemble">
           <option value="12">12 pas (ternaire)</option>
@@ -985,9 +988,12 @@ swing 62
     g.gain.exponentialRampToValueAtTime(0.001, t + 0.045);
     src.start(t); src.stop(t + 0.05);
   }
-  // cloche : deux partiels carrés inharmoniques, décroissance rapide
-  function percBell(t, vol) {
-    for (const [f, v] of [[835, vol], [1245, vol * 0.55]]) {
+  // cloche : deux partiels carrés inharmoniques, décroissance rapide.
+  // base = fondamentale (défaut 835 = cloche dunduns) ; l'agogô rappelle percBell
+  // à deux hauteurs distantes d'une tierce pour ses deux tons (spec passe 3 §3.2).
+  function percBell(t, vol, base) {
+    const b = base || 835;
+    for (const [f, v] of [[b, vol], [b * 1.49, vol * 0.55]]) {
       const o = audioCtx.createOscillator(), g = audioCtx.createGain(), bp = audioCtx.createBiquadFilter();
       o.type = 'square'; o.frequency.value = f;
       bp.type = 'bandpass'; bp.frequency.value = f * 1.05; bp.Q.value = 3;
@@ -995,6 +1001,29 @@ swing 62
       g.gain.setValueAtTime(v, t);
       g.gain.exponentialRampToValueAtTime(0.001, t + 0.11);
       o.start(t); o.stop(t + 0.13);
+    }
+  }
+  // raclement (reco-reco) : train de grains de bruit filtrés en peigne — le racle
+  // métallique. Timbre le plus dur du corpus (spec passe 3 §3.2, arbitrage C) : prototype
+  // à ajuster à l'oreille. Un accent = coup long (aller-retour ample) ; sinon coup bref.
+  function percScrape(t, vol, accent) {
+    const grains = accent ? 11 : 7;        // densité du peigne = longueur perçue du raclement
+    const span = accent ? 0.13 : 0.075;    // durée totale de la racle
+    const f0 = 2100, f1 = 3300;            // le grain monte légèrement le long de la course
+    const step = span / grains;
+    for (let i = 0; i < grains; i++) {
+      const frac = grains > 1 ? i / (grains - 1) : 0;
+      const gt = t + frac * span;
+      const src = audioCtx.createBufferSource(), g = audioCtx.createGain(), f = audioCtx.createBiquadFilter();
+      src.buffer = noiseBuf;
+      f.type = 'bandpass'; f.frequency.value = f0 + (f1 - f0) * frac; f.Q.value = 6;
+      src.connect(f); f.connect(g); g.connect(masterGain);
+      const gv = vol * (0.42 + 0.22 * (i % 2));   // dents/creux alternés → grain de raclement
+      g.gain.setValueAtTime(0.0001, gt);
+      g.gain.linearRampToValueAtTime(gv, gt + 0.0015);
+      g.gain.exponentialRampToValueAtTime(0.0001, gt + step * 0.9);
+      src.start(gt, (i * 0.006) % 0.04);          // lecture décalée dans le buffer → grains décorrélés
+      src.stop(gt + step + 0.005);
     }
   }
 
@@ -1025,6 +1054,13 @@ swing 62
       case 'dunduns.sangban':  percDrum(t, 112, 78, 0.30, v); break;
       case 'dunduns.kenkeni':  percDrum(t, 175, 132, 0.20, v * 0.8); break;
       case 'dunduns.cloche':   percBell(t, v * 0.6); break;
+      // passe 3 étape 2 — nouveaux timbres (§3.2) : agogô/surdo re-paramètrent
+      // percBell/percDrum ; reco-reco appelle le prototype granulaire dédié.
+      case 'agogo.grave':      percBell(t, v * 0.7, 720); break;   // les deux tons de l'agogô
+      case 'agogo.aigu':       percBell(t, v * 0.7, 900); break;   // sont distants d'une tierce
+      case 'surdo.grave':      percDrum(t, 60, 38, 0.55, v * 1.15); break;   // fût grave à chute lente
+      case 'surdo.marcante':   percDrum(t, 92, 60, 0.38, v); break;         // surdo aigu (marcante)
+      case 'recoreco.raclement': percScrape(t, v, accent === 2); break;
     }
   }
 
@@ -1603,6 +1639,43 @@ swing 62
         16: { dundunba: [0, 8], sangban: [4, 12], kenkeni: [2, 6, 10, 14], cloche: [0, 2, 4, 6, 8, 10, 12, 14] },
         12: { dundunba: [0, 6], sangban: [3, 9], kenkeni: [2, 5, 8, 11], cloche: [0, 2, 4, 5, 7, 9, 11] }
       }
+    },
+    // passe 3 étape 2 — nouveaux timbres du corpus brésilien/afro (spec §3.2).
+    // Timbres portés par playPerc ; ces entrées les rendent sélectionnables et audibles.
+    agogo: {
+      label: 'Agogô (2 tons)', work: 'aigu',
+      voices: [
+        { id: 'grave', label: 'Grave' },
+        { id: 'aigu',  label: 'Aigu' }
+      ],
+      base: {
+        // interlock des deux cloches (Ijexá) : le grave ancre, l'aigu syncope
+        16: { grave: [0, 4, 12], aigu: [2, 6, 8, 14] },
+        12: { grave: [0, 6], aigu: [2, 4, 8, 10] }
+      }
+    },
+    surdo: {
+      label: 'Surdo (grave · marcante)', work: 'grave',
+      voices: [
+        { id: 'grave',    label: 'Grave (fundo)' },
+        { id: 'marcante', label: 'Marcante' }
+      ],
+      base: {
+        // samba : surdo de primeira sur le temps 2, réponse (marcante) sur le temps 1
+        16: { grave: [4, 12], marcante: [0, 8] },
+        12: { grave: [3, 9], marcante: [0, 6] }
+      }
+    },
+    recoreco: {
+      label: 'Reco-reco (raclement)', work: 'raclement',
+      voices: [
+        { id: 'raclement', label: 'Raclement' }
+      ],
+      base: {
+        // aller-retour continu en croches (« ida e volta »)
+        16: { raclement: [0, 2, 4, 6, 8, 10, 12, 14] },
+        12: { raclement: [0, 2, 4, 6, 8, 10] }
+      }
     }
   };
 
@@ -1659,6 +1732,32 @@ swing 62
       { id: 'kuku', label: 'Kuku ensemble (adaptation)', count: 16,
         base: { dundunba: [8, 10], sangban: [0, 4], kenkeni: [2, 6, 10, 14], cloche: [0, 2, 4, 6, 8, 10, 12, 14] },
         note: 'Adaptation pédagogique de l\'ensemble Kuku.' }
+    ],
+    agogo: [
+      { id: 'ijexa', label: 'Ijexá — 2 tons (documenté)', count: 16,
+        base: { grave: [0, 4, 12], aigu: [2, 6, 8, 14] }, acc: { grave: [0, 12] },
+        startNote: 'pose la timeline ijexá : la cloche grave sur les accents structurants, l\'aiguë comble entre.',
+        note: 'L\'interlock grave/aigu EST le groove afoxé — le grave renforce, l\'aigu syncope.' },
+      { id: 'afoxe', label: 'Afoxé « débutant » 1 ligne (adaptation)', count: 16,
+        base: { aigu: [0, 4, 8, 12], grave: [2, 10] },
+        note: 'Timeline unifiée sur l\'aiguë, quelques graves d\'appui — avant l\'interlock complet.' }
+    ],
+    surdo: [
+      { id: 'samba', label: 'Samba — primeira/segunda (documenté)', count: 16,
+        base: { grave: [4, 12], marcante: [0, 8] }, acc: { grave: [4, 12] },
+        startNote: 'pose la respiration du samba : surdo grave sur le temps 2, réponse marcante sur le temps 1.',
+        note: 'Surdo de primeira (grave, temps 2) répond au surdo de segunda (marcante, temps 1) — la signature du samba.' },
+      { id: 'sambareggae', label: 'Samba-reggae (adaptation)', count: 16,
+        base: { grave: [4, 12], marcante: [0, 6, 8, 14] },
+        note: 'Fond grave sur 2/4, marcante plus dense façon blocos afro de Salvador.' }
+    ],
+    recoreco: [
+      { id: 'idavolta', label: 'Ida e volta — croches (adaptation)', count: 16,
+        base: { raclement: [0, 2, 4, 6, 8, 10, 12, 14] }, acc: { raclement: [0, 4, 8, 12] },
+        note: 'Aller-retour régulier en croches, accents sur les temps.' },
+      { id: 'doubles', label: 'Doubles-croches continues (adaptation)', count: 16,
+        base: { raclement: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] }, acc: { raclement: [0, 4, 8, 12] },
+        note: 'Flux dense de raclements — tapis continu sous l\'ensemble.' }
     ]
   };
 
@@ -1687,6 +1786,21 @@ swing 62
         hits: { dundunba: [0, 4, 8, 12, 14], sangban: [0, 4, 8, 12, 14], cloche: [0, 4, 8, 12, 14] } },
       { id: 'chauffe', label: 'Échauffement dundunba (adaptation)', count: 12,
         hits: { dundunba: [0, 2, 4, 6, 8, 10], cloche: [0, 3, 6, 9] } }
+    ],
+    agogo: [
+      { id: 'chamada', label: 'Chamada — appel agogô (adaptation)', count: 16,
+        hits: { grave: [0, 8], aigu: [2, 4, 6, 10, 12, 14] },
+        note: 'Appel des deux cloches pour lancer/couper l\'ensemble.' }
+    ],
+    surdo: [
+      { id: 'virada', label: 'Virada — coupure surdos (adaptation)', count: 16,
+        hits: { grave: [0, 4, 8, 12, 14], marcante: [0, 4, 8, 12, 14] },
+        note: 'Retournement à l\'unisson des surdos.' }
+    ],
+    recoreco: [
+      { id: 'racle', label: 'Racle continue (adaptation)', count: 16,
+        hits: { raclement: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] },
+        note: 'Roulement de raclements sur toute la mesure.' }
     ]
   };
 
