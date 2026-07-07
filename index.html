@@ -26,18 +26,26 @@
     --fm-staff:      rgba(107,74,46,.06);
     --fm-font-display: 'Cormorant Garamond', Georgia, serif;
     --fm-font-ui:      'Work Sans', system-ui, sans-serif;
+    /* couleurs des voix (ligne de réduction) : 1-4 = instrument (1 = la plus grave),
+       5-6 = clave grave / clave aiguë */
+    --fm-voice-1:#6b4a2e; --fm-voice-2:#b3763b; --fm-voice-3:#7a8b4a; --fm-voice-4:#4a6b8b;
+    --fm-voice-5:#a04a4a; --fm-voice-6:#8b6ba0;
   }
   html[data-fm-theme="clair"] {
     --fm-bg:#efe7d8; --fm-panel:#f7f1e6; --fm-panel-2:#f0e7d6;
     --fm-ink:#2a221b; --fm-sub:#6b5d4c; --fm-line:rgba(107,74,46,.16);
     --fm-accent:#b3763b; --fm-accent-2:#6b4a2e; --fm-accent-ink:#f7f1e6;
     --fm-staff:rgba(107,74,46,.06);
+    --fm-voice-1:#6b4a2e; --fm-voice-2:#b3763b; --fm-voice-3:#7a8b4a; --fm-voice-4:#4a6b8b;
+    --fm-voice-5:#a04a4a; --fm-voice-6:#8b6ba0;
   }
   html[data-fm-theme="sombre"] {
     --fm-bg:#0e0e10; --fm-panel:#17151a; --fm-panel-2:#1c1a1f;
     --fm-ink:#f5f0e6; --fm-sub:#b5aea2; --fm-line:rgba(201,162,75,.18);
     --fm-accent:#c9a24b; --fm-accent-2:#7a6a3a; --fm-accent-ink:#0e0e10;
     --fm-staff:rgba(201,162,75,.05);
+    --fm-voice-1:#a5824a; --fm-voice-2:#c9a24b; --fm-voice-3:#9bab6a; --fm-voice-4:#6a9bbb;
+    --fm-voice-5:#c06a6a; --fm-voice-6:#a58bc0;
   }
 
   /* ============ BASE ============ */
@@ -168,6 +176,30 @@
   body.mode-simple details.section { display: none; }
   body.mode-simple .kbd-hint { display: none; }
 
+  /* ---- masquage piloté par CONTEXTE (strates) ----
+     Le contexte choisit une tâche ; les couches et surcouches restent visibles.
+     socle (Groove, Son) + enveloppe (Gap, Routine) ne sont JAMAIS masqués par le contexte. */
+  /* Contexte « pile rythmique » : on masque le mode Archet */
+  body.ctx-pile details.section[data-strate="archet"] { display: none; }
+  /* Contexte « archet » : on masque les couches rythmiques (clave, perc) */
+  body.ctx-archet details.section[data-strate="couche"] { display: none; }
+  /* mode simple prime : tout replié (règle ci-dessus) */
+
+  /* ---- sélecteur de famille (bin/tern) en tête de la strate couches ---- */
+  .family-bar {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    background: var(--fm-panel); border: 1px solid var(--fm-line);
+    border-radius: 12px; padding: 12px 18px; margin-bottom: 12px;
+    transition: background-color .5s ease, border-color .5s ease;
+  }
+  .family-bar .fb-label {
+    font-family: var(--fm-font-display); font-weight: 600; font-size: 1.05rem;
+    color: var(--fm-ink);
+  }
+  .family-bar .fb-hint { color: var(--fm-sub); font-size: .78rem; flex: 1; min-width: 160px; }
+  body.mode-simple .family-bar { display: none; }
+  body.ctx-archet .family-bar { display: none; }
+
   .row { display: flex; align-items: center; gap: 12px; margin: 10px 0; flex-wrap: wrap; }
   .row > label:first-child { min-width: 195px; color: var(--fm-sub); font-size: .86rem; }
   .val { min-width: 64px; text-align: right; font-variant-numeric: tabular-nums; font-size: .88rem; color: var(--fm-accent); font-weight: 600; }
@@ -198,6 +230,38 @@
   .btn-sm:hover { border-color: var(--fm-accent); }
   .btn-sm.primary { background: var(--fm-accent); border-color: var(--fm-accent); color: var(--fm-accent-ink); font-weight: 600; }
 
+  /* ---- masquage par mode d'exercice (divulgation progressive) ---- */
+  .hide { display: none !important; }
+
+  /* ---- ligne de réduction (solfège) : le groove sur une seule ligne ----
+     Une ligne de base ; chaque frappe = une brique colorée par voix ;
+     frappes simultanées = briques empilées. Voix muettes exclues (la ligne
+     représente ce qui SONNE). */
+  .perc-line-wrap { margin: 14px 0 4px; }
+  .perc-line {
+    position: relative; height: 64px; border-radius: 6px; overflow: visible;
+  }
+  .perc-line::before {
+    content: ''; position: absolute; left: 0; right: 0; bottom: 10px; height: 2px;
+    background: var(--fm-line); border-radius: 1px;
+  }
+  .perc-line.break-now { box-shadow: 0 0 0 2px var(--fm-accent-2); }
+  .pl-brick { position: absolute; height: 9px; border-radius: 2px; }
+  .pl-brick.acc { box-shadow: 0 0 0 1.5px var(--fm-ink); }
+  .pl-beat {
+    position: absolute; bottom: 1px; width: 5px; height: 5px; border-radius: 50%;
+    background: var(--fm-sub); transform: translateX(-50%);
+  }
+  .pl-cursor {
+    position: absolute; top: 0; bottom: 0; width: 2px;
+    background: var(--fm-ink); opacity: .65; transform: translateX(-50%); display: none;
+  }
+  .perc-line-legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 8px; font-size: .74rem; color: var(--fm-sub); }
+  .perc-line-legend .chip {
+    display: inline-block; width: 10px; height: 10px; border-radius: 2px;
+    margin-right: 5px; vertical-align: -1px;
+  }
+
   /* ---- percussion ---- */
   .perc-voice { display: flex; align-items: center; gap: 10px; margin: 8px 0; flex-wrap: wrap; }
   .perc-voice .pv-label { min-width: 92px; color: var(--fm-sub); font-size: .82rem; }
@@ -213,6 +277,21 @@
   #percVoices .step.on, #percVoices .step.acc,
   #percFsVoices .step.on, #percFsVoices .step.acc { color: var(--fm-accent-ink); }
   .percfs .step { font-size: 1.1rem; }
+
+  /* ---- team spirit (passe 3 étape 4) ---- */
+  .t-hide { display: none !important; }
+  .pv-uncertain { color: var(--fm-accent-2); font-weight: 700; cursor: help; }
+  .pv-part { width: auto; font-size: .78rem; padding: 3px 6px; }
+  .percfs .pv-part { display: none; }
+  #teamPanel { flex-wrap: wrap; gap: 10px; background: var(--fm-panel, rgba(127,127,127,.08));
+    border-radius: 8px; padding: 10px; }
+  #teamParts { display: flex; flex-direction: column; gap: 6px; }
+  .team-part { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .team-swatch { width: 14px; height: 14px; border-radius: 3px; flex: 0 0 auto; }
+  .team-name { width: 150px; font-size: .82rem; padding: 4px 6px; }
+  .team-count { font-size: .72rem; color: var(--fm-sub); min-width: 46px; }
+  .btn-sm.on { background: var(--fm-accent); border-color: var(--fm-accent); color: var(--fm-accent-ink); font-weight: 600; }
+  .btn-sm.team-mute.on { background: var(--fm-sub); border-color: var(--fm-sub); }
 
   /* ---- percussion plein écran ---- */
   .percfs {
@@ -368,8 +447,10 @@
           <label class="small">Volume</label>
           <input type="range" id="volSlider" min="0" max="100" value="80" style="width:100%">
         </div>
-        <div style="display:flex;align-items:flex-end;">
+        <div style="display:flex;flex-direction:column;justify-content:flex-end;gap:7px;">
           <label class="check"><input type="checkbox" id="accentCheck" checked> Accent 1er temps</label>
+          <label class="check" title="Coupe le clic (pulsation, subdivisions, clic décalé) — clave et percussion continuent">
+            <input type="checkbox" id="pulseMuteCheck"> Clic muet (couches seules)</label>
         </div>
       </div>
     </div>
@@ -382,7 +463,7 @@
   </div>
 
   <!-- 1. Groove -->
-  <details class="section" id="secGroove">
+  <details class="section" id="secGroove" data-strate="socle">
     <summary><span class="sec-title">Micro-timing &amp; groove</span><span class="sec-sub">swing · placement</span></summary>
     <div class="section-body">
       <div class="row">
@@ -410,8 +491,19 @@
     </div>
   </details>
 
+  <!-- Sélecteur de famille : conditionne clave ET percussion ensemble -->
+  <div class="family-bar" id="familyBar">
+    <span class="fb-label">Grille rythmique</span>
+    <div class="seg" role="group" aria-label="Famille">
+      <button id="famBinBtn" class="sel">Binaire · 16</button>
+      <button id="famTernBtn">Ternaire · 12</button>
+    </div>
+    <span class="fb-hint">Clave et percussion partagent cette grille — pour rester carré,
+    on ne mélange pas binaire et ternaire (le mélange volontaire = polyrythmie superposée).</span>
+  </div>
+
   <!-- 2. Claves -->
-  <details class="section" id="secClave">
+  <details class="section" id="secClave" data-strate="couche">
     <summary><span class="sec-title">Claves &amp; cellules rythmiques</span><span class="sec-sub">séquenceur · polyrythmie</span></summary>
     <div class="section-body">
       <div class="preset-row">
@@ -425,22 +517,19 @@
           <option value="tresillo">Tresillo (8)</option>
           <option value="cinquillo">Cinquillo (8)</option>
         </select>
-        <select id="claveCount" title="Nombre de pas du cycle">
+        <select id="claveCount" title="Nombre de pas du cycle — 12 ou 16 bascule la famille (clave + percussion) ; 8 = cellule courte propre à la clave">
           <option value="8">8 pas</option>
           <option value="12">12 pas</option>
           <option value="16" selected>16 pas</option>
         </select>
         <button class="btn-sm" id="claveClear">Effacer</button>
       </div>
-      <div class="steps" id="claveSteps"></div>
+      <div id="claveSteps"></div>
       <div class="hint">Clic sur un pas : silence → frappe → accent. Les points au-dessus marquent les temps.
+      <b>Deux voix</b> — cloche grave et cloche aiguë — comme n'importe quelle voix de percussion :
+      les presets se posent sur la grave, la seconde voix est libre (contre-clave, bombo…).
       Le cercle montre comment la cellule se résout sur le 1 du cycle suivant.</div>
       <div class="row" style="margin-top:14px;">
-        <label>Fréquence clave</label>
-        <input type="range" id="claveFreq" min="300" max="3000" value="1800">
-        <span class="val" id="claveFreqVal">1800 Hz</span>
-      </div>
-      <div class="row">
         <label>Polyrythmie superposée</label>
         <select id="polySel" style="width:auto;">
           <option value="0" selected>Aucune</option>
@@ -456,7 +545,7 @@
   </details>
 
   <!-- 2b. Percussion & indépendance -->
-  <details class="section" id="secPerc">
+  <details class="section" id="secPerc" data-strate="couche">
     <summary><span class="sec-title">Percussion &amp; indépendance</span><span class="sec-sub">groove · variations · appel-réponse</span></summary>
     <div class="section-body">
       <div class="row">
@@ -466,20 +555,59 @@
           <option value="djembe" selected>Djembé (basse · tone · slap)</option>
           <option value="cajon">Cajón (grave · aigu)</option>
           <option value="dunduns">Dunduns &amp; cloche</option>
+          <option value="agogo">Agogô (grave · aigu)</option>
+          <option value="surdo">Surdo (grave · marcante)</option>
+          <option value="recoreco">Reco-reco (raclement)</option>
         </select>
-        <select id="percCount" style="width:auto;" title="Pas du cycle">
+        <select id="percCount" style="width:auto;" title="Pas du cycle — asservi à la famille : bascule clave + percussion ensemble">
           <option value="12">12 pas (ternaire)</option>
           <option value="16" selected>16 pas (binaire)</option>
         </select>
         <button class="btn-sm" id="percReset">Groove de base</button>
         <button class="btn-sm primary" id="percFsBtn">⛶ Plein écran</button>
+        <label class="check" title="Jouer un groove à plusieurs : voix assignées à des participants (accumulation / distribution)"><input type="checkbox" id="teamToggle"> 🎭 Team spirit</label>
       </div>
-      <div class="row">
+      <div class="row" id="percStyleRow">
         <label>Style</label>
         <select id="percStyle" style="flex:1;min-width:200px;"></select>
       </div>
+      <!-- passe 3 étape 4 : surface d'édition team spirit (distincte du générateur focal, §4.3) -->
+      <div class="row hide" id="teamPanel">
+        <div class="row" style="width:100%;margin:0;">
+          <label>Groove</label>
+          <select id="teamGroove" style="flex:1;min-width:180px;"></select>
+          <button class="btn-sm primary" id="teamLoad">Charger</button>
+          <span class="seg" style="display:inline-flex;gap:4px;">
+            <button class="btn-sm" id="teamModeDist">Distribution</button>
+            <button class="btn-sm" id="teamModeAccum">Accumulation</button>
+          </span>
+        </div>
+        <div class="row hide" id="teamDistBtns" style="width:100%;margin:0;">
+          <button class="btn-sm primary" id="teamAuto">⇋ Répartir par tessiture</button>
+          <span class="hint" style="margin:0;">un groove complet partagé entre les participants — union des parts = le groove</span>
+        </div>
+        <div class="row hide" id="teamAccumBtns" style="width:100%;margin:0;">
+          <button class="btn-sm primary" id="teamNext">▸ Faire entrer la voix suivante</button>
+          <button class="btn-sm" id="teamAccumReset">↺ Vider (personne n'a joué)</button>
+          <span class="hint" style="margin:0;">les voix entrent une à une, dans l'ordre d'entrée en jam</span>
+        </div>
+        <div class="row" style="width:100%;margin:0;">
+          <label>Participants</label>
+          <button class="btn-sm" id="teamAddPart">+ Ajouter un participant</button>
+        </div>
+        <div id="teamParts" style="width:100%;"></div>
+        <div class="hint" style="width:100%;margin:0;">
+          <b>Team spirit</b> : chaque voix est assignée à un participant (ou reste « commune », toujours audible).
+          <b>Solo</b> d'un participant = n'entendre que sa part ; <b>Muet</b> = le faire taire ; ni l'un ni l'autre = l'ensemble.
+          Choisis le participant de chaque voix dans la liste ci-dessous. La couleur de la ligne de réduction suit le participant.
+        </div>
+      </div>
+      <div class="perc-line-wrap">
+        <div class="perc-line" id="percLine"></div>
+        <div class="perc-line-legend" id="percLineLegend"></div>
+      </div>
       <div id="percVoices"></div>
-      <div class="row" style="margin-top:14px;">
+      <div class="row" style="margin-top:14px;" id="percModeRow">
         <label>Exercice</label>
         <select id="percMode" style="width:auto;">
           <option value="off" selected>Libre (groove seul)</option>
@@ -489,20 +617,24 @@
           <option value="guide">Progression guidée (mains expliquées)</option>
           <option value="break">Break programmé (toutes les N mesures)</option>
         </select>
-        <label style="min-width:auto;">Voix travaillée</label>
-        <select id="percWork" style="width:auto;"></select>
+        <span id="percWorkWrap" style="display:flex;align-items:center;gap:12px;">
+          <label style="min-width:auto;">Voix travaillée</label>
+          <select id="percWork" style="width:auto;"></select>
+        </span>
       </div>
-      <div class="row">
+      <div class="row" id="percHandRow">
         <label>Mains</label>
         <select id="percHandRule" style="width:auto;">
           <option value="alt" selected>Alternance stricte D-G</option>
           <option value="lead">Main directrice sur les temps</option>
         </select>
         <label class="check"><input type="checkbox" id="percLefty"> gaucher (inverser)</label>
-        <button class="btn-sm" id="percGuidePrev">← Étape</button>
-        <button class="btn-sm" id="percGuideNext">Étape →</button>
+        <span id="percGuideBtns" style="display:flex;gap:8px;">
+          <button class="btn-sm" id="percGuidePrev">← Étape</button>
+          <button class="btn-sm" id="percGuideNext">Étape →</button>
+        </span>
       </div>
-      <div class="row">
+      <div class="row" id="percBreakRow">
         <label>Break / phrase</label>
         <select id="percBreakSel" style="flex:1;min-width:180px;"></select>
         <label style="min-width:auto;">Niveau</label>
@@ -515,20 +647,12 @@
         <label class="check"><input type="checkbox" id="percBreakAuto"> progression auto</label>
         <label class="check"><input type="checkbox" id="percBreakEcho"> réponse après</label>
       </div>
-      <div class="row">
+      <div class="row" id="percPeriodRow">
         <label>Variation toutes les</label>
         <input type="number" id="percPeriod" min="1" max="16" value="2" style="width:70px;">
         <span class="hint" style="margin:0;">mesures (paires en appel-réponse)</span>
       </div>
-      <div class="row" style="margin-top:12px;">
-        <label>Gap par couche</label>
-        <select id="percGapLayer" style="width:auto;"></select>
-        <label style="min-width:auto;">jouer</label>
-        <input type="number" id="percGapPlay" min="1" max="32" value="4" style="width:70px;">
-        <label style="min-width:auto;">couper</label>
-        <input type="number" id="percGapMute" min="1" max="16" value="2" style="width:70px;">
-      </div>
-      <div class="row" style="margin-top:12px;">
+      <div class="row" style="margin-top:12px;" id="percSaveRow">
         <label>Mes séquences</label>
         <input type="text" id="percSaveName" placeholder="nom de la séquence…" style="width:150px;">
         <button class="btn-sm" id="percSaveBtn">💾 Sauver</button>
@@ -546,7 +670,7 @@
       tu la répètes la mesure suivante pendant que la voix se tait. <b>Break programmé</b> : toutes les N mesures,
       le groove s'interrompt et l'app joue le break au niveau choisi — la phrase s'étoffe du niveau 1 au niveau 4
       (« progression auto » monte d'un niveau à chaque break, « réponse après » te laisse une mesure pour le rejouer).
-      <b>Gap par couche</b> : une seule couche se coupe, les autres continuent — teste la solidité de chaque voix.
+      <b>Couper une seule voix</b> : section Horloge interne, cible sur la voix — les autres continuent.
       <b>Mains</b> : chaque frappe affiche sa main (D/G). <b>Progression guidée</b> : tu démarres par le squelette
       du groove — qui dépend du style : alternance sur les temps pour le passeport, backbeat 2-4 pour le funk,
       kick/caisse claire pour le rock, la basse pour le Kuku — puis l'app ajoute une frappe à la fois, toutes les
@@ -556,7 +680,7 @@
   </details>
 
   <!-- 3. Archet -->
-  <details class="section" id="secArchet">
+  <details class="section" id="secArchet" data-strate="archet">
     <summary><span class="sec-title">Archet</span><span class="sec-sub">tirer · pousser · dérive</span></summary>
     <div class="section-body">
       <div class="row">
@@ -605,7 +729,7 @@
   </details>
 
   <!-- 4. Gap clicks -->
-  <details class="section" id="secGap">
+  <details class="section" id="secGap" data-strate="enveloppe">
     <summary><span class="sec-title">Horloge interne</span><span class="sec-sub">gap clicks</span></summary>
     <div class="section-body">
       <div class="row">
@@ -616,6 +740,8 @@
           <option value="prog">Progressif (coupures 1, 2, 4, 8…)</option>
           <option value="rand">Aléatoire</option>
         </select>
+        <label style="min-width:auto;">Cible</label>
+        <select id="gapTarget" style="width:auto;"></select>
       </div>
       <div class="row">
         <label>Mesures jouées (N)</label>
@@ -628,13 +754,15 @@
         <input type="range" id="gapProb" min="5" max="80" value="25">
         <span class="val" id="gapProbVal">25 %</span>
       </div>
-      <div class="hint">Le son se coupe, l'aiguille continue de tourner. En mode progressif, la durée des
+      <div class="hint">La cible se coupe, l'aiguille continue de tourner. <b>Cible</b> : tout le son
+      (gap classique), la pulsation seule, ou une seule voix (clave ou percussion) — les autres continuent,
+      pour tester la solidité de chaque voix. En mode progressif, la durée des
       coupures double à chaque cycle (1, 2, 4, 8 mesures, plafonné à 16) : aucun filet de sécurité.</div>
     </div>
   </details>
 
   <!-- 4. Son -->
-  <details class="section" id="secSon">
+  <details class="section" id="secSon" data-strate="socle">
     <summary><span class="sec-title">Son du clic</span><span class="sec-sub">fréquence · caractère</span></summary>
     <div class="section-body">
       <div class="row">
@@ -655,7 +783,7 @@
   </details>
 
   <!-- 5. Script -->
-  <details class="section" id="secScript">
+  <details class="section" id="secScript" data-strate="enveloppe">
     <summary><span class="sec-title">Routine programmée</span><span class="sec-sub">script</span></summary>
     <div class="section-body">
       <textarea id="scriptArea" spellcheck="false"># Exemple de routine
@@ -746,16 +874,28 @@ swing 62
     beats: 4,
     subdiv: 1,
     accentFirst: true,
+    family: 'bin',   // 'bin' (16) | 'tern' (12) — grille commune clave + perc
     swing: 50,
     shift: { on: false, ms: 25, freq: 220 },
-    clave: { count: 16, steps: new Array(16).fill(0), freq: 1800 },
+    /* passe 2 (étape 3) : plus de racine clave — la clave = deux voix de la liste
+       unique (CLAVE_VOICES/claveData), grilles dans percGrids comme toute voix */
     poly: 0,
-    gap: { mode: 'off', playN: 4, muteM: 1, prob: 25 },
-    sound: { pulseFreq: 1000, type: 'ton' },
+    /* passe 2 (étape 4) : gap unifié — une seule machine à états, un ciblage.
+       target : 'all' (tout, comportement classique) | 'pulse' (clic seul) | <voiceId> */
+    gap: { mode: 'off', target: 'all', playN: 4, muteM: 1, prob: 25 },
+    sound: { pulseFreq: 1000, type: 'ton', pulseMuted: false },
     perc: { on: false, instr: 'djembe', count: 16, mode: 'off', period: 2,
             breakId: '', breakLevel: 4, breakAuto: false, breakEcho: false,
-            handRule: 'alt', lefty: false,
-            gap: { layer: 'none', playN: 4, muteM: 2 } },
+            handRule: 'alt', lefty: false },
+    /* passe 3 (étape 4) : mode team spirit — une dimension « participant » sur la
+       liste de voix existante, deux flux de lecture (accumulation / distribution).
+       on : surface d'édition team spirit active (distincte du générateur focal, §4.3)
+       mode : 'accumulation' (voix entrant une à une, ordre d'entrée) | 'distribution'
+              (un groove total partitionné entre N participants)
+       grooveId : groove de la bibliothèque chargé, ou null
+       participants : [{ id, label, solo, muted }] */
+    team: { on: false, mode: 'distribution', grooveId: null,
+            participants: [], nextPid: 1, entered: 0 },
     volume: 0.8
   };
 
@@ -809,6 +949,44 @@ swing 62
   }
   $('modeSimpleBtn').addEventListener('click', () => setMode('simple'));
   $('modeExpertBtn').addEventListener('click', () => setMode('expert'));
+
+  // ============ CONTEXTE (masquage par strate) ============
+  // 'pile'  : pile rythmique — couches (clave, perc) visibles, Archet masqué
+  // 'archet': mode archet isolé — couches masquées
+  // socle (Groove, Son) et enveloppe (Gap, Routine) ne sont jamais masqués par le contexte.
+  function setContext(ctx) {
+    document.body.classList.toggle('ctx-pile', ctx === 'pile');
+    document.body.classList.toggle('ctx-archet', ctx === 'archet');
+    store.set('fm-metro-context', ctx);
+  }
+  function currentContext() {
+    if (document.body.classList.contains('ctx-archet')) return 'archet';
+    if (document.body.classList.contains('ctx-pile')) return 'pile';
+    return '';
+  }
+
+  // ============ FAMILLE (binaire 16 / ternaire 12) ============
+  // Réglage global de la strate couches : conditionne clave ET percussion ensemble.
+  // Inerte sur le mode Archet (qui ne lit aucun count).
+  function setFamily(fam, rebuild) {
+    const bin = fam !== 'tern';
+    const count = bin ? 16 : 12;
+    S.family = bin ? 'bin' : 'tern';
+    $('famBinBtn').classList.toggle('sel', bin);
+    $('famTernBtn').classList.toggle('sel', !bin);
+    store.set('fm-metro-family', S.family);
+    if (rebuild === false) return;
+    // clave : recompose les grilles des deux voix sur le nouveau count
+    $('claveCount').value = String(count);
+    claveSetCount(count);
+    // percussion : réaligne le count et rebâtit le groove de base de l'instrument courant
+    S.perc.count = count;
+    $('percCount').value = String(count);
+    percSetInstr(S.perc.instr);
+    if (!isPlaying) drawStatic();
+  }
+  $('famBinBtn').addEventListener('click', () => setFamily('bin'));
+  $('famTernBtn').addEventListener('click', () => setFamily('tern'));
 
   // ============ AUDIO ============
   function ensureCtx() {
@@ -866,9 +1044,12 @@ swing 62
     g.gain.exponentialRampToValueAtTime(0.001, t + 0.045);
     src.start(t); src.stop(t + 0.05);
   }
-  // cloche : deux partiels carrés inharmoniques, décroissance rapide
-  function percBell(t, vol) {
-    for (const [f, v] of [[835, vol], [1245, vol * 0.55]]) {
+  // cloche : deux partiels carrés inharmoniques, décroissance rapide.
+  // base = fondamentale (défaut 835 = cloche dunduns) ; l'agogô rappelle percBell
+  // à deux hauteurs distantes d'une tierce pour ses deux tons (spec passe 3 §3.2).
+  function percBell(t, vol, base) {
+    const b = base || 835;
+    for (const [f, v] of [[b, vol], [b * 1.49, vol * 0.55]]) {
       const o = audioCtx.createOscillator(), g = audioCtx.createGain(), bp = audioCtx.createBiquadFilter();
       o.type = 'square'; o.frequency.value = f;
       bp.type = 'bandpass'; bp.frequency.value = f * 1.05; bp.Q.value = 3;
@@ -878,10 +1059,48 @@ swing 62
       o.start(t); o.stop(t + 0.13);
     }
   }
+  // raclement (reco-reco) : train de grains de bruit filtrés en peigne — le racle
+  // métallique. Timbre le plus dur du corpus (spec passe 3 §3.2, arbitrage C) : prototype
+  // à ajuster à l'oreille. Un accent = coup long (aller-retour ample) ; sinon coup bref.
+  function percScrape(t, vol, accent) {
+    const grains = accent ? 11 : 7;        // densité du peigne = longueur perçue du raclement
+    const span = accent ? 0.13 : 0.075;    // durée totale de la racle
+    const f0 = 2100, f1 = 3300;            // le grain monte légèrement le long de la course
+    const step = span / grains;
+    for (let i = 0; i < grains; i++) {
+      const frac = grains > 1 ? i / (grains - 1) : 0;
+      const gt = t + frac * span;
+      const src = audioCtx.createBufferSource(), g = audioCtx.createGain(), f = audioCtx.createBiquadFilter();
+      src.buffer = noiseBuf;
+      f.type = 'bandpass'; f.frequency.value = f0 + (f1 - f0) * frac; f.Q.value = 6;
+      src.connect(f); f.connect(g); g.connect(masterGain);
+      const gv = vol * (0.42 + 0.22 * (i % 2));   // dents/creux alternés → grain de raclement
+      g.gain.setValueAtTime(0.0001, gt);
+      g.gain.linearRampToValueAtTime(gv, gt + 0.0015);
+      g.gain.exponentialRampToValueAtTime(0.0001, gt + step * 0.9);
+      src.start(gt, (i * 0.006) % 0.04);          // lecture décalée dans le buffer → grains décorrélés
+      src.stop(gt + step + 0.005);
+    }
+  }
 
   function playPerc(t, voice, accent) {
+    // passe 3 étape 1 : l'identité de timbre est portée par la VOIX (percMeta), plus par le
+    // global S.perc.instr — plusieurs instruments peuvent sonner en même temps. Repli sur le
+    // focal si une voix n'a pas (encore) de méta → comportement passe 2 strictement inchangé.
+    const meta = percMeta[voice];
+    const instr = meta ? meta.instr : S.perc.instr;
+    // voix clave : timbre cloche — rendu identique à l'ancienne couche clave,
+    // la hauteur (grave/aiguë) est portée par la voix (spec passe 2 §4)
+    if (instr === 'clave') {
+      const freq = meta ? meta.freq : ((CLAVE_VOICES.find(x => x.id === voice) || {}).freq || 1800);
+      const vc = accent === 2 ? 0.95 : 0.6;
+      playNoise(t, freq, vc);
+      playTone(t, freq, vc * 0.5, 0.03);
+      return;
+    }
+    const kind = meta ? meta.voiceKind : voice;
     const v = (accent === 2 ? 1.0 : 0.8) * 0.9;
-    switch (S.perc.instr + '.' + voice) {
+    switch (instr + '.' + kind) {
       case 'djembe.basse':     percDrum(t, 95, 52, 0.30, v); break;
       case 'djembe.tone':      percDrum(t, 230, 165, 0.13, v * 0.85); break;
       case 'djembe.slap':      percSnap(t, 2400, 1.2, v); percDrum(t, 420, 300, 0.05, v * 0.25); break;
@@ -891,28 +1110,53 @@ swing 62
       case 'dunduns.sangban':  percDrum(t, 112, 78, 0.30, v); break;
       case 'dunduns.kenkeni':  percDrum(t, 175, 132, 0.20, v * 0.8); break;
       case 'dunduns.cloche':   percBell(t, v * 0.6); break;
+      // passe 3 étape 2 — nouveaux timbres (§3.2) : agogô/surdo re-paramètrent
+      // percBell/percDrum ; reco-reco appelle le prototype granulaire dédié.
+      case 'agogo.grave':      percBell(t, v * 0.7, 720); break;   // les deux tons de l'agogô
+      case 'agogo.aigu':       percBell(t, v * 0.7, 900); break;   // sont distants d'une tierce
+      case 'surdo.grave':      percDrum(t, 60, 38, 0.55, v * 1.15); break;   // fût grave à chute lente
+      case 'surdo.marcante':   percDrum(t, 92, 60, 0.38, v); break;         // surdo aigu (marcante)
+      case 'recoreco.raclement': percScrape(t, v, accent === 2); break;
     }
   }
 
-  // gap par couche : une seule couche se coupe, les autres continuent
-  function percLayerMuted(layer, voice) {
-    if (!S.perc.on) return false;
-    if (layer === 'perc') {
-      if (percMuted[voice]) return true;
-      if (percCallSilent && voice === percWork) return true;
-    }
-    if (percGapMutedNow) {
-      const tgt = S.perc.gap.layer;
-      if (tgt === 'pulse' && (layer === 'beat' || layer === 'sub')) return true;
-      if (tgt === 'clave' && layer === 'clave') return true;
-      if (layer === 'perc' && voice === tgt) return true;
-    }
+  // mutes métier hors-gap : mutes de voix (checkbox) et appel-réponse.
+  // Le gap — global ou ciblé — vit dans updateGapForNewMeasure/gapTargets (étape 4).
+  // brk : les frappes de break traversent les mutes de voix (le break = tout le kit)
+  // Les voix clave vivent dans la même liste : leur mute vaut même percussion désactivée ;
+  // l'appel-réponse ne concerne que les voix d'instrument.
+  function percLayerMuted(layer, voice, brk) {
+    if (layer !== 'perc') return false;
+    if (!brk && percMuted[voice]) return true;
+    if (S.perc.on && percCallSilent && !claveData[voice] &&
+        (percWork === 'all' || voice === percWork)) return true;
+    // team spirit (étape 4) : solo/mute PAR PARTICIPANT, en conjonction — comme le gap
+    // ciblé, purement une décision booléenne, sans toucher au calcul de t (parade jitter).
+    if (S.team.on && !claveData[voice] && teamVoiceMuted(voice)) return true;
     return false;
   }
 
-  function playClick(t, layer, accent, voice) {
-    if (mutedThisCycle) return;
-    if (percLayerMuted(layer, voice)) return;
+  // audibilité team spirit d'une voix : muette si son participant est muet, ou si un
+  // participant est en solo et que ce n'est pas le sien. Voix sans participant (null) =
+  // voix COMMUNE, toujours audible (ex. un timekeeper de référence). §4.1
+  function teamVoiceMuted(voice) {
+    const parts = S.team.participants;
+    const soloed = parts.some(p => p.solo);
+    const pid = percPart[voice] || null;
+    if (pid === null) return false;
+    const p = parts.find(x => x.id === pid);
+    if (!p) return false;
+    if (p.muted) return true;
+    if (soloed && !p.solo) return true;
+    return false;
+  }
+
+  function playClick(t, layer, accent, voice, brk) {
+    if (mutedThisCycle && gapTargets(layer, voice)) return;
+    // clic muet : le métronome se tait (pulsation, subdivisions, clic décalé),
+    // les couches à grille (clave, percussion) et la polyrythmie continuent
+    if (S.sound.pulseMuted && (layer === 'beat' || layer === 'sub' || layer === 'shift')) return;
+    if (percLayerMuted(layer, voice, brk)) return;
     if (layer === 'perc') { playPerc(t, voice, accent); return; }
     const st = S.sound;
     switch (layer) {
@@ -925,12 +1169,6 @@ swing 62
       case 'sub':
         st.type === 'sec' ? playNoise(t, st.pulseFreq * 0.7, 0.3) : playTone(t, st.pulseFreq * 0.7, 0.3, 0.04);
         break;
-      case 'clave': {
-        const v = accent === 2 ? 0.95 : 0.6;
-        playNoise(t, S.clave.freq, v);
-        playTone(t, S.clave.freq, v * 0.5, 0.03);
-        break;
-      }
       case 'poly':
         playTone(t, 480, 0.55, 0.06);
         break;
@@ -969,36 +1207,70 @@ swing 62
         }
       }
     }
-    const c = S.clave;
-    for (let i = 0; i < c.count; i++) {
-      if (c.steps[i] > 0) events.push({ frac: i / c.count, layer: 'clave', accent: c.steps[i] });
-    }
     for (let k = 0; k < S.poly; k++) {
       events.push({ frac: k / S.poly, layer: 'poly' });
     }
-    if (S.perc.on) {
-      if (percBreakEchoNow) {
-        /* mesure de réponse : silence percussif, l'élève rejoue le break */
-      } else if (percBreakActive) {
-        for (const e of percBreakEvents()) events.push(e);
-      } else {
-        const n = S.perc.count;
-        for (const vid in percGrids) {
-          const g = percGrids[vid];
-          for (let i = 0; i < n; i++) {
-            if (g[i] > 0) {
-              const off = (percOffsets[vid] && percOffsets[vid][i]) || 0;
-              events.push({ frac: (((i + off) / n) % 1 + 1) % 1, layer: 'perc', voice: vid, accent: g[i] });
-            }
-          }
+    // couches à grille — UN SEUL chemin de génération pour un seul concept
+    // « voix rythmique à grille et accent » (spec passe 2 §4). Les voix clave
+    // sont toujours actives ; les voix d'instrument exigent S.perc.on et
+    // s'effacent pendant le break (remplacées) ou la mesure de réponse (silence).
+    for (const vid in percGrids) {
+      const isClave = !!claveData[vid];
+      if (!isClave && (!S.perc.on || percBreakActive || percBreakEchoNow)) continue;
+      const g = percGrids[vid];
+      const n = g.length;
+      for (let i = 0; i < n; i++) {
+        if (g[i] > 0) {
+          const off = (percOffsets[vid] && percOffsets[vid][i]) || 0;
+          events.push({ frac: (((i + off) / n) % 1 + 1) % 1, layer: 'perc', voice: vid, accent: g[i] });
         }
       }
+    }
+    if (S.perc.on && percBreakActive) {
+      for (const e of percBreakEvents()) events.push(e);
     }
     events.sort((a, b) => a.frac - b.frac);
     evIdx = 0;
   }
 
-  // ============ GAP ============
+  // ============ GAP (unifié, passe 2 étape 4) ============
+  // Une seule machine à états (updateGapForNewMeasure → mutedThisCycle) ; le ciblage
+  // est une décision booléenne prise dans playClick, sans toucher au calcul de t.
+  function gapTargets(layer, voice) {
+    const tgt = S.gap.target;
+    if (tgt === 'all') return true;
+    if (tgt === 'pulse') return layer === 'beat' || layer === 'sub';
+    return layer === 'perc' && voice === tgt;
+  }
+
+  function gapTargetLabel() {
+    if (S.gap.target === 'pulse') return 'pulsation';
+    const cv = CLAVE_VOICES.find(v => v.id === S.gap.target);
+    if (cv) return cv.label.toLowerCase();
+    const iv = PERC_INSTR[S.perc.instr].voices.find(v => v.id === S.gap.target);
+    if (iv) return iv.label.toLowerCase();
+    // team spirit : la voix ciblée peut appartenir à un groove multi-instruments
+    const tv = S.team.on && teamVoiceList().find(v => v.id === S.gap.target);
+    return tv ? tv.label.toLowerCase() : S.gap.target;
+  }
+
+  // cibles proposées : tout / pulsation / chaque voix de la liste unique (clave + instrument
+  // focal, OU voix vivantes du groove en team spirit).
+  // Conserve la cible courante si elle existe encore, sinon retombe sur 'all'.
+  function gapTargetRefresh() {
+    const instrVoices = S.team.on ? teamVoiceList() : PERC_INSTR[S.perc.instr].voices;
+    $('gapTarget').innerHTML =
+      '<option value="all">Tout (comportement classique)</option>' +
+      '<option value="pulse">Pulsation (clic)</option>' +
+      CLAVE_VOICES.map(v => '<option value="' + v.id + '">' + v.label + '</option>').join('') +
+      instrVoices.map(v => '<option value="' + v.id + '">' + esc(v.label) + '</option>').join('');
+    if (S.gap.target !== 'all' && S.gap.target !== 'pulse' &&
+        !claveData[S.gap.target] && !instrVoices.some(v => v.id === S.gap.target)) {
+      S.gap.target = 'all';
+    }
+    $('gapTarget').value = S.gap.target;
+  }
+
   function resetGap() { gapProgSize = 1; gapRemainPlay = S.gap.playN; gapRemainMute = 0; }
 
   function updateGapForNewMeasure() {
@@ -1051,8 +1323,10 @@ swing 62
     while (script && script.idx < script.segs.length) {
       const seg = script.segs[script.idx];
       if (seg.type === 'gap') {
-        S.gap.mode = 'fixed'; S.gap.muteM = seg.mute; S.gap.playN = seg.play;
-        $('gapMode').value = 'fixed'; $('gapPlay').value = seg.play; $('gapMute').value = seg.mute;
+        // la routine reste cantonnée à target:'all' : sémantique historique des scripts
+        S.gap.mode = 'fixed'; S.gap.target = 'all'; S.gap.muteM = seg.mute; S.gap.playN = seg.play;
+        $('gapMode').value = 'fixed'; $('gapTarget').value = 'all';
+        $('gapPlay').value = seg.play; $('gapMute').value = seg.mute;
         resetGap(); script.idx++;
       } else if (seg.type === 'gapoff') {
         S.gap.mode = 'off'; $('gapMode').value = 'off'; script.idx++;
@@ -1119,7 +1393,7 @@ swing 62
         const ev = events[evIdx];
         const t = cycleStart + ev.frac * cycleDur + (ev.offMs ? ev.offMs / 1000 : 0);
         if (t < now + AHEAD) {
-          playClick(Math.max(t, now + 0.005), ev.layer, ev.accent || 0, ev.voice);
+          playClick(Math.max(t, now + 0.005), ev.layer, ev.accent || 0, ev.voice, ev.brk);
           evIdx++;
           continue;
         }
@@ -1138,7 +1412,6 @@ swing 62
     totalBeats = 0;
     bowReset();
     resetGap();
-    resetPercGap();
     percResetBreakState();
     percMeasures = 0; percCallSilent = false;
     mutedThisCycle = false;
@@ -1204,15 +1477,19 @@ swing 62
         }
       }
     }
-    // clave
-    const cl = S.clave;
-    for (let i = 0; i < cl.count; i++) {
-      const [x, y] = pt(i / cl.count, 95);
-      if (cl.steps[i] > 0) {
-        c.beginPath(); c.arc(x, y, cl.steps[i] === 2 ? 7 : 5.5, 0, Math.PI * 2);
-        c.fillStyle = cl.steps[i] === 2 ? PAL.accent2 : PAL.accent;
-        c.fill();
-      } else {
+    // clave — deux voix sur l'anneau médian : grave (accent-2) et aiguë (accent)
+    const cg = claveData.claveGrave.grid, ca = claveData.claveAigue.grid;
+    for (let i = 0; i < cg.length; i++) {
+      const [x, y] = pt(i / cg.length, 95);
+      if (cg[i] > 0) {
+        c.beginPath(); c.arc(x, y, cg[i] === 2 ? 7 : 5.5, 0, Math.PI * 2);
+        c.fillStyle = PAL.accent2; c.fill();
+      }
+      if ((ca[i] || 0) > 0) {
+        c.beginPath(); c.arc(x, y, ca[i] === 2 ? 5 : 3.5, 0, Math.PI * 2);
+        c.fillStyle = PAL.accent; c.fill();
+      }
+      if (!cg[i] && !(ca[i] || 0)) {
         c.beginPath(); c.arc(x, y, 1.8, 0, Math.PI * 2);
         c.fillStyle = PAL.line; c.fill();
       }
@@ -1235,7 +1512,13 @@ swing 62
     c.textAlign = 'center'; c.textBaseline = 'middle';
     if (phase !== null && mutedThisCycle) {
       c.fillStyle = PAL.accent; c.font = '600 14px "Work Sans", sans-serif';
-      c.fillText('MUTE', CX, CY + 22);
+      c.fillText(S.gap.target === 'all' ? 'MUTE' : 'GAP', CX, CY + 22);
+    } else if (phase !== null && S.perc.on && percBreakActive) {
+      c.fillStyle = PAL.accent2; c.font = '600 14px "Work Sans", sans-serif';
+      c.fillText('BREAK', CX, CY + 22);
+    } else if (phase !== null && S.perc.on && percBreakEchoNow) {
+      c.fillStyle = PAL.accent; c.font = '600 13px "Work Sans", sans-serif';
+      c.fillText('À TOI', CX, CY + 22);
     } else if (phase !== null) {
       c.fillStyle = PAL.sub; c.font = '12px "Work Sans", sans-serif';
       c.fillText('mes. ' + measureCount, CX, CY + 22);
@@ -1246,9 +1529,12 @@ swing 62
     if (!isPlaying) return;
     const phase = ((audioCtx.currentTime - cycleStart) / cycleDur) % 1;
     drawBase(phase < 0 ? 0 : phase);
-    const cur = Math.floor((phase < 0 ? 0 : phase) * S.clave.count) % S.clave.count;
-    const kids = $('claveSteps').children;
-    for (let i = 0; i < kids.length; i++) kids[i].classList.toggle('cur', i === cur);
+    document.querySelectorAll('#claveSteps .steps').forEach(row => {
+      const n = row.children.length;
+      if (!n) return;
+      const cur = Math.floor((phase < 0 ? 0 : phase) * n) % n;
+      for (let i = 0; i < n; i++) row.children[i].classList.toggle('cur', i === cur);
+    });
     if (S.perc.on && ($('secPerc').open || percFsOpen)) {
       const nP = (percBreakActive && percCurrentBreak()) ? percCurrentBreak().count : S.perc.count;
       const curP = Math.floor((phase < 0 ? 0 : phase) * nP) % nP;
@@ -1260,9 +1546,21 @@ swing 62
       $('percFsTempo').textContent = S.tempo + ' BPM · mes. ' + measureCount;
       $('percFsPlay').textContent = '■';
     }
+    // curseur et signal de break sur la ligne de réduction
+    if ($('secPerc').open || percFsOpen) {
+      const lc = $('percLine').querySelector('.pl-cursor');
+      if (lc) { lc.style.display = 'block'; lc.style.left = ((phase < 0 ? 0 : phase) * 100) + '%'; }
+      $('percLine').classList.toggle('break-now', S.perc.on && percBreakActive);
+    }
     $('statusLine').innerHTML = mutedThisCycle
-      ? '<span class="mute">● COUPÉ — tiens le tempo !</span>'
-      : 'Mesure ' + measureCount + (S.gap.mode !== 'off' ? ' · gap actif' : '');
+      ? '<span class="mute">' + (S.gap.target === 'all'
+          ? '● COUPÉ — tiens le tempo !'
+          : '● GAP — ' + gapTargetLabel() + ' en silence, le reste continue') + '</span>'
+      : (S.perc.on && percBreakActive
+        ? '<span class="mute">◆ BREAK — niveau ' + S.perc.breakLevel + '/4</span>'
+        : (S.perc.on && percBreakEchoNow
+          ? '<span class="mute">◆ À toi — rejoue le break !</span>'
+          : 'Mesure ' + measureCount + (S.gap.mode !== 'off' ? ' · gap actif' : '')));
     if ($('secArchet').open) {
       const beatsNow = totalBeats + Math.max(0, audioCtx.currentTime - cycleStart) * S.tempo / 60;
       drawBow(beatsNow);
@@ -1272,37 +1570,88 @@ swing 62
 
   function drawStatic() {
     drawBase(null);
-    const kids = $('claveSteps').children;
-    for (let i = 0; i < kids.length; i++) kids[i].classList.remove('cur');
-    document.querySelectorAll('#percVoices .step.cur, #percFsVoices .step.cur').forEach(el => el.classList.remove('cur'));
+    document.querySelectorAll('#claveSteps .step.cur, #percVoices .step.cur, #percFsVoices .step.cur').forEach(el => el.classList.remove('cur'));
+    const lc = $('percLine') && $('percLine').querySelector('.pl-cursor');
+    if (lc) lc.style.display = 'none';
+    if ($('percLine')) $('percLine').classList.remove('break-now');
     drawBowStatic();
   }
 
-  // ============ SÉQUENCEUR UI ============
+  // ============ CLAVE MULTI-VOIX (passe 2, étape 3) ============
+  // La clave = deux voix cloche de la liste unique. Ids préfixés « clave » :
+  // « grave »/« aigu » collisionnent avec les voix du cajón dans percGrids.
+  const CLAVE_VOICES = [
+    { id: 'claveGrave', label: 'Clave grave', timbre: 'cloche', freq: 1400 },
+    { id: 'claveAigue', label: 'Clave aiguë', timbre: 'cloche', freq: 2200 }
+  ];
+  // source de vérité des grilles clave — survit aux reconstructions de percGrids
+  // déclenchées par percSetInstr / applyPercStyle / percLoadPreset / applyKitProfile
+  const claveData = {};
+  CLAVE_VOICES.forEach(v => claveData[v.id] = {
+    grid: new Array(16).fill(0), offsets: new Array(16).fill(0), muted: false
+  });
+  // ré-ancre les références clave dans percGrids/percOffsets/percMuted (mêmes tableaux)
+  function claveAttach() {
+    CLAVE_VOICES.forEach(v => {
+      percGrids[v.id] = claveData[v.id].grid;
+      percOffsets[v.id] = claveData[v.id].offsets;
+      percMuted[v.id] = claveData[v.id].muted;
+    });
+  }
+  function claveSetCount(count) {
+    CLAVE_VOICES.forEach(v => {
+      const d = claveData[v.id];
+      d.grid = new Array(count).fill(0).map((_, i) => d.grid[i] || 0);
+      d.offsets = new Array(count).fill(0).map((_, i) => d.offsets[i] || 0);
+    });
+    claveAttach();
+    buildStepGrid();
+  }
+
+  // ============ SÉQUENCEUR UI (deux rangées, modèle percVoices) ============
   function buildStepGrid() {
     const wrap = $('claveSteps');
     wrap.innerHTML = '';
-    const perBeat = S.clave.count / S.beats;
-    for (let i = 0; i < S.clave.count; i++) {
-      const b = document.createElement('button');
-      b.className = 'step';
-      if (Number.isInteger(perBeat) && i % perBeat === 0) b.classList.add('beatmark');
-      b.addEventListener('click', () => {
-        S.clave.steps[i] = (S.clave.steps[i] + 1) % 3;
-        refreshStepGrid();
-        if (!isPlaying) drawStatic();
+    CLAVE_VOICES.forEach(v => {
+      const d = claveData[v.id];
+      const row = document.createElement('div'); row.className = 'perc-voice';
+      const lab = document.createElement('span'); lab.className = 'pv-label'; lab.textContent = v.label;
+      const steps = document.createElement('div'); steps.className = 'steps mini'; steps.dataset.voice = v.id;
+      const n = d.grid.length;
+      const perBeat = n / S.beats;
+      for (let i = 0; i < n; i++) {
+        const b = document.createElement('button');
+        b.className = 'step';
+        if (Number.isInteger(perBeat) && i % perBeat === 0) b.classList.add('beatmark');
+        b.addEventListener('click', () => {
+          d.grid[i] = (d.grid[i] + 1) % 3;
+          refreshStepGrid();
+          percLineRender();
+          if (!isPlaying) drawStatic();
+        });
+        steps.appendChild(b);
+      }
+      const mute = document.createElement('label'); mute.className = 'check pv-mute';
+      const mi = document.createElement('input'); mi.type = 'checkbox'; mi.checked = !!d.muted;
+      mi.addEventListener('change', () => {
+        d.muted = mi.checked; percMuted[v.id] = mi.checked; percLineRender();
       });
-      wrap.appendChild(b);
-    }
+      mute.appendChild(mi); mute.append(' muet');
+      row.append(lab, steps, mute);
+      wrap.appendChild(row);
+    });
     refreshStepGrid();
+    percLineRender();
   }
 
   function refreshStepGrid() {
-    const kids = $('claveSteps').children;
-    for (let i = 0; i < kids.length; i++) {
-      kids[i].classList.toggle('on', S.clave.steps[i] === 1);
-      kids[i].classList.toggle('acc', S.clave.steps[i] === 2);
-    }
+    document.querySelectorAll('#claveSteps .steps').forEach(row => {
+      const g = (claveData[row.dataset.voice] || {}).grid || [];
+      for (let i = 0; i < row.children.length; i++) {
+        row.children[i].classList.toggle('on', g[i] === 1);
+        row.children[i].classList.toggle('acc', g[i] === 2);
+      }
+    });
   }
 
   const PRESETS = {
@@ -1318,12 +1667,16 @@ swing 62
   function applyPreset(name) {
     const p = PRESETS[name];
     if (!p) return;
-    S.clave.count = p.count;
-    $('claveCount').value = p.count;
-    S.clave.steps = new Array(p.count).fill(0);
-    p.hits.forEach(h => S.clave.steps[h] = 1);
-    S.clave.steps[p.hits[0]] = 2;
-    buildStepGrid();
+    $('claveCount').value = String(p.count);
+    claveSetCount(p.count);
+    // migration des presets : frappes sur la voix grave, l'aiguë reste libre (spec §4)
+    const g = claveData.claveGrave.grid;
+    g.fill(0);
+    p.hits.forEach(h => g[h] = 1);
+    g[p.hits[0]] = 2;
+    claveData.claveAigue.grid.fill(0);
+    refreshStepGrid();
+    percLineRender();
     if (!isPlaying) drawStatic();
   }
 
@@ -1363,6 +1716,43 @@ swing 62
       base: {
         16: { dundunba: [0, 8], sangban: [4, 12], kenkeni: [2, 6, 10, 14], cloche: [0, 2, 4, 6, 8, 10, 12, 14] },
         12: { dundunba: [0, 6], sangban: [3, 9], kenkeni: [2, 5, 8, 11], cloche: [0, 2, 4, 5, 7, 9, 11] }
+      }
+    },
+    // passe 3 étape 2 — nouveaux timbres du corpus brésilien/afro (spec §3.2).
+    // Timbres portés par playPerc ; ces entrées les rendent sélectionnables et audibles.
+    agogo: {
+      label: 'Agogô (2 tons)', work: 'aigu',
+      voices: [
+        { id: 'grave', label: 'Grave' },
+        { id: 'aigu',  label: 'Aigu' }
+      ],
+      base: {
+        // interlock des deux cloches (Ijexá) : le grave ancre, l'aigu syncope
+        16: { grave: [0, 4, 12], aigu: [2, 6, 8, 14] },
+        12: { grave: [0, 6], aigu: [2, 4, 8, 10] }
+      }
+    },
+    surdo: {
+      label: 'Surdo (grave · marcante)', work: 'grave',
+      voices: [
+        { id: 'grave',    label: 'Grave (fundo)' },
+        { id: 'marcante', label: 'Marcante' }
+      ],
+      base: {
+        // samba : surdo de primeira sur le temps 2, réponse (marcante) sur le temps 1
+        16: { grave: [4, 12], marcante: [0, 8] },
+        12: { grave: [3, 9], marcante: [0, 6] }
+      }
+    },
+    recoreco: {
+      label: 'Reco-reco (raclement)', work: 'raclement',
+      voices: [
+        { id: 'raclement', label: 'Raclement' }
+      ],
+      base: {
+        // aller-retour continu en croches (« ida e volta »)
+        16: { raclement: [0, 2, 4, 6, 8, 10, 12, 14] },
+        12: { raclement: [0, 2, 4, 6, 8, 10] }
       }
     }
   };
@@ -1420,6 +1810,32 @@ swing 62
       { id: 'kuku', label: 'Kuku ensemble (adaptation)', count: 16,
         base: { dundunba: [8, 10], sangban: [0, 4], kenkeni: [2, 6, 10, 14], cloche: [0, 2, 4, 6, 8, 10, 12, 14] },
         note: 'Adaptation pédagogique de l\'ensemble Kuku.' }
+    ],
+    agogo: [
+      { id: 'ijexa', label: 'Ijexá — 2 tons (documenté)', count: 16,
+        base: { grave: [0, 4, 12], aigu: [2, 6, 8, 14] }, acc: { grave: [0, 12] },
+        startNote: 'pose la timeline ijexá : la cloche grave sur les accents structurants, l\'aiguë comble entre.',
+        note: 'L\'interlock grave/aigu EST le groove afoxé — le grave renforce, l\'aigu syncope.' },
+      { id: 'afoxe', label: 'Afoxé « débutant » 1 ligne (adaptation)', count: 16,
+        base: { aigu: [0, 4, 8, 12], grave: [2, 10] },
+        note: 'Timeline unifiée sur l\'aiguë, quelques graves d\'appui — avant l\'interlock complet.' }
+    ],
+    surdo: [
+      { id: 'samba', label: 'Samba — primeira/segunda (documenté)', count: 16,
+        base: { grave: [4, 12], marcante: [0, 8] }, acc: { grave: [4, 12] },
+        startNote: 'pose la respiration du samba : surdo grave sur le temps 2, réponse marcante sur le temps 1.',
+        note: 'Surdo de primeira (grave, temps 2) répond au surdo de segunda (marcante, temps 1) — la signature du samba.' },
+      { id: 'sambareggae', label: 'Samba-reggae (adaptation)', count: 16,
+        base: { grave: [4, 12], marcante: [0, 6, 8, 14] },
+        note: 'Fond grave sur 2/4, marcante plus dense façon blocos afro de Salvador.' }
+    ],
+    recoreco: [
+      { id: 'idavolta', label: 'Ida e volta — croches (adaptation)', count: 16,
+        base: { raclement: [0, 2, 4, 6, 8, 10, 12, 14] }, acc: { raclement: [0, 4, 8, 12] },
+        note: 'Aller-retour régulier en croches, accents sur les temps.' },
+      { id: 'doubles', label: 'Doubles-croches continues (adaptation)', count: 16,
+        base: { raclement: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] }, acc: { raclement: [0, 4, 8, 12] },
+        note: 'Flux dense de raclements — tapis continu sous l\'ensemble.' }
     ]
   };
 
@@ -1448,17 +1864,2549 @@ swing 62
         hits: { dundunba: [0, 4, 8, 12, 14], sangban: [0, 4, 8, 12, 14], cloche: [0, 4, 8, 12, 14] } },
       { id: 'chauffe', label: 'Échauffement dundunba (adaptation)', count: 12,
         hits: { dundunba: [0, 2, 4, 6, 8, 10], cloche: [0, 3, 6, 9] } }
+    ],
+    agogo: [
+      { id: 'chamada', label: 'Chamada — appel agogô (adaptation)', count: 16,
+        hits: { grave: [0, 8], aigu: [2, 4, 6, 10, 12, 14] },
+        note: 'Appel des deux cloches pour lancer/couper l\'ensemble.' }
+    ],
+    surdo: [
+      { id: 'virada', label: 'Virada — coupure surdos (adaptation)', count: 16,
+        hits: { grave: [0, 4, 8, 12, 14], marcante: [0, 4, 8, 12, 14] },
+        note: 'Retournement à l\'unisson des surdos.' }
+    ],
+    recoreco: [
+      { id: 'racle', label: 'Racle continue (adaptation)', count: 16,
+        hits: { raclement: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] },
+        note: 'Roulement de raclements sur toute la mesure.' }
     ]
   };
+
+  /* ============ BIBLIOTHÈQUE DE GROOVES (passe 3 étape 3 — DONNÉES) ============
+     Corpus des 6 fichiers grooves-*.md converti en table JS (spec passe 3 §5).
+     Conversion DÉTERMINISTE : X->2 (accent) · x->1 (frappe) · .->0 (silence),
+     grid.length === count (16 bin / 12 tern). Chaque voix porte son identité de
+     timbre (instr + voiceKind, §2) routée par playPerc (étapes 1-2) ; approx:true
+     = substitution par tessiture (arbitrage D, timbre le plus proche du rôle).
+     uncertain:true = grille reconstruite (tout l'ouest-africain, §5.3) — drapeau
+     visible, non bloquant. isBreak:true = cadence à ne pas boucler.
+     Table de correspondance §5.2 figée dans le convertisseur. AUCUNE UI ici : la
+     bibliothèque est consommée par le mode team spirit (étape 4). */
+  const GROOVES = [
+ {
+  "id": "bresil-samba-batucada",
+  "family": "bresil",
+  "label": "Samba Batucada",
+  "origin": "Rio de Janeiro, Brésil",
+  "context": "moteur polyrythmique des escolas de samba au Carnaval de Rio.",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 120,
+   "max": 145,
+   "jam": 105
+  },
+  "reliability": "élevée",
+  "sources": "Ed Uribe *The Essence of Brazilian Percussion & Drum Set* ; Duduka Da Fonseca *Brazilian",
+  "voices": [
+   {
+    "id": "bresil-samba-batucada.surdo-de-primeira",
+    "label": "Surdo de primeira",
+    "instr": "surdo",
+    "voiceKind": "grave",
+    "role": "basse",
+    "grid": [0,0,0,0,2,0,0,0,0,0,0,0,2,0,0,0],
+    "uncertain": false,
+    "description": "fondation, temps 2",
+    "enterOrder": 2,
+    "difficulty": "facile"
+   },
+   {
+    "id": "bresil-samba-batucada.surdo-de-segunda",
+    "label": "Surdo de segunda",
+    "instr": "surdo",
+    "voiceKind": "marcante",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0],
+    "uncertain": false,
+    "description": "réponse, temps 1",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "bresil-samba-batucada.caixa",
+    "label": "Caixa",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "medium",
+    "grid": [1,0,1,2,1,0,1,2,1,0,1,2,1,0,1,2],
+    "uncertain": false,
+    "approx": true,
+    "description": "tapis double-croches",
+    "enterOrder": 4,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "bresil-samba-batucada.tamborim",
+    "label": "Tamborim",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [2,0,0,2,0,0,2,0,0,0,2,0,0,2,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "timeline (teleco-teco)",
+    "enterOrder": 6,
+    "difficulty": "difficile"
+   },
+   {
+    "id": "bresil-samba-batucada.agogo",
+    "label": "Agogô",
+    "instr": "agogo",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [2,0,0,0,2,0,0,0,2,0,0,0,2,0,0,0],
+    "uncertain": false,
+    "description": "appui métallique",
+    "enterOrder": 5,
+    "difficulty": "facile"
+   },
+   {
+    "id": "bresil-samba-batucada.ganza-chocalho",
+    "label": "Ganzá/chocalho",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    "uncertain": false,
+    "approx": true,
+    "description": "flux continu",
+    "enterOrder": 3,
+    "difficulty": "facile"
+   }
+  ],
+  "variations": [
+   {
+    "id": "bresil-samba-batucada.tamborim-carreteiro",
+    "label": "Tamborim « carreteiro",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "isBreak": false
+   },
+   {
+    "id": "bresil-samba-batucada.caixa-em-cima-mocidade",
+    "label": "Caixa « em cima » Mocidade",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "medium",
+    "grid": [2,0,0,1,0,0,2,0,0,0,1,0,2,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "isBreak": false
+   },
+   {
+    "id": "bresil-samba-batucada.surdo-3-cortador",
+    "label": "Surdo 3 / cortador",
+    "instr": "surdo",
+    "voiceKind": "marcante",
+    "role": "medium",
+    "grid": [0,0,2,0,0,0,2,0,0,0,2,0,0,0,2,0],
+    "uncertain": false,
+    "isBreak": false
+   }
+  ]
+ },
+ {
+  "id": "bresil-maracatu-nacao-baque-virado",
+  "family": "bresil",
+  "label": "Maracatu Nação (baque virado)",
+  "origin": "Recife / Olinda, Pernambuco",
+  "context": "percussion des cortèges de couronnement du Rei e Rainha do Congo, aujourd'hui portée par les nations de maracatu (Estrela Brilhante, Leão Coroado).",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 95,
+   "max": 115,
+   "jam": 85
+  },
+  "reliability": "élevée",
+  "sources": "*Massa: Brazilian Music & Culture* podcast (ép. « Maracatu de Baque Virado ») ; page Wikipédia « Maracatu Nação » ; blog Brazilian Percussion (« Maracatu »). Instrumentation (alfaia/gonguê/caixa/agbê/mineiro) très standardisée ; les patterns d'alfaia varient sensiblement d'une nation à l'autre. INCERTAIN : la timeline exacte du gonguê connaît des variantes selon les nations ; celle donnée ici est ",
+  "voices": [
+   {
+    "id": "bresil-maracatu-nacao-baque-virado.gongue",
+    "label": "Gonguê",
+    "instr": "dunduns",
+    "voiceKind": "cloche",
+    "role": "aigu",
+    "grid": [2,0,0,2,0,0,2,0,2,0,0,2,0,0,2,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "timeline de cloche",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "bresil-maracatu-nacao-baque-virado.alfaia-marcante",
+    "label": "Alfaia marcante",
+    "instr": "surdo",
+    "voiceKind": "grave",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "fondation, temps forts",
+    "enterOrder": 2,
+    "difficulty": "facile"
+   },
+   {
+    "id": "bresil-maracatu-nacao-baque-virado.alfaia-meio",
+    "label": "Alfaia meio",
+    "instr": "surdo",
+    "voiceKind": "marcante",
+    "role": "medium",
+    "grid": [0,0,0,0,1,0,1,0,0,0,0,0,1,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "remplissage syncopé",
+    "enterOrder": 6,
+    "difficulty": "difficile"
+   },
+   {
+    "id": "bresil-maracatu-nacao-baque-virado.caixa-tarol",
+    "label": "Caixa/tarol",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    "uncertain": false,
+    "approx": true,
+    "description": "roulé continu (buzz)",
+    "enterOrder": 5,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "bresil-maracatu-nacao-baque-virado.agbe-xequere",
+    "label": "Agbê/xequerê",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "medium",
+    "grid": [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "bruit blanc, texture",
+    "enterOrder": 3,
+    "difficulty": "facile"
+   },
+   {
+    "id": "bresil-maracatu-nacao-baque-virado.mineiro-ganza",
+    "label": "Mineiro/ganzá",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    "uncertain": false,
+    "approx": true,
+    "description": "flux métallique continu",
+    "enterOrder": 4,
+    "difficulty": "facile"
+   }
+  ],
+  "variations": [
+   {
+    "id": "bresil-maracatu-nacao-baque-virado.alfaia-marcante-debutant",
+    "label": "Alfaia marcante « débutant",
+    "instr": "surdo",
+    "voiceKind": "grave",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "isBreak": false
+   },
+   {
+    "id": "bresil-maracatu-nacao-baque-virado.alfaia-meio-resposta",
+    "label": "Alfaia meio « resposta",
+    "instr": "surdo",
+    "voiceKind": "marcante",
+    "role": "medium",
+    "grid": [0,0,0,0,2,0,2,0,0,0,0,0,2,0,2,0],
+    "uncertain": false,
+    "approx": true,
+    "isBreak": true
+   },
+   {
+    "id": "bresil-maracatu-nacao-baque-virado.virada-d-ensemble",
+    "label": "Virada d'ensemble",
+    "instr": "djembe",
+    "voiceKind": "tone",
+    "role": "medium",
+    "grid": [2,0,2,0,2,0,2,0,2,0,2,0,2,0,2,0],
+    "uncertain": false,
+    "approx": true,
+    "isBreak": true
+   }
+  ]
+ },
+ {
+  "id": "bresil-baiao",
+  "family": "bresil",
+  "label": "Baião",
+  "origin": "Nordeste (sertão), Brésil",
+  "context": "rythme rural du Nordeste popularisé nationalement par Luiz Gonzaga dans les années 1940-50, socle du forró pé-de-serra.",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 100,
+   "max": 130,
+   "jam": 95
+  },
+  "reliability": "élevée",
+  "sources": "Larry Crook *Brazilian Music: Northeastern Traditions and the Heartbeat of a Modern Nation* (et travaux sur la zabumba de Caruaru — technique mailloche/peau grave + bâton/peau aiguë, triangle à ~45° en croches) ; page Wikipédia « Baião (music) » ; Encyclopedia.com « Baião ». Le couple zabumba/triangle est très standardisé ; le placement précis du contre-temps aigu varie selon les joueurs. INCERTAI",
+  "voices": [
+   {
+    "id": "bresil-baiao.zabumba-grave",
+    "label": "Zabumba grave",
+    "instr": "surdo",
+    "voiceKind": "grave",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,2,0,0,2,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "accent mailloche, boum",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "bresil-baiao.zabumba-aigu",
+    "label": "Zabumba aigu",
+    "instr": "djembe",
+    "voiceKind": "tone",
+    "role": "medium",
+    "grid": [0,0,0,1,0,0,0,0,0,0,0,1,0,1,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "bâton étouffé, contre",
+    "enterOrder": 3,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "bresil-baiao.triangle-ouvert",
+    "label": "Triangle ouvert",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1],
+    "uncertain": false,
+    "approx": true,
+    "description": "accents résonnants",
+    "enterOrder": 4,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "bresil-baiao.triangle-ferme",
+    "label": "Triangle fermé",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,1,1,0,1,1,0,1,1,0,1,1,0,1,1,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "croches étouffées",
+    "enterOrder": 2,
+    "difficulty": "facile"
+   }
+  ],
+  "variations": [
+   {
+    "id": "bresil-baiao.zabumba-grave-xote",
+    "label": "Zabumba grave « xote",
+    "instr": "surdo",
+    "voiceKind": "grave",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0],
+    "uncertain": true,
+    "approx": true,
+    "isBreak": false
+   },
+   {
+    "id": "bresil-baiao.zabumba-grave-debutant",
+    "label": "Zabumba grave débutant",
+    "instr": "surdo",
+    "voiceKind": "grave",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "isBreak": false
+   },
+   {
+    "id": "bresil-baiao.triangle-galope",
+    "label": "Triangle « galopé",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,1,1,0,1,1,0,1,0,1,1,0,1,1,0],
+    "uncertain": false,
+    "approx": true,
+    "isBreak": false
+   }
+  ]
+ },
+ {
+  "id": "bresil-ijexa-afoxe",
+  "family": "bresil",
+  "label": "Ijexá / Afoxé",
+  "origin": "Salvador, Bahia (candomblé ketu, afoxé Filhos de Gandhy)",
+  "context": "rythme sacré du candomblé nation ketu, sorti du terreiro par les afoxés du carnaval de Salvador (Filhos de Gandhy, fondé 1949).",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 90,
+   "max": 110,
+   "jam": 85
+  },
+  "reliability": "élevée",
+  "sources": "Pulsewave « Rhythm Tip – Afoxé » (agogô : quatre coups aigus, un grave, trois aigus, un grave — le grave renforce un accent principal des tambours ; tierce entre les cloches) ; page Wikipédia « Ijexá » (agogô = timeline/clave asymétrique, ensemble Rum/Rumpi/Lê + agbê + caxixi, syncope sur temps faibles) ; partition Carl Dixon *Ijexa Rhythms* (2020, agogô + Lê/Rumpi/Rum + tamborim « Bahia » + surdo",
+  "voices": [
+   {
+    "id": "bresil-ijexa-afoxe.agogo-grave",
+    "label": "Agogô grave",
+    "instr": "agogo",
+    "voiceKind": "grave",
+    "role": "basse",
+    "grid": [2,0,0,0,2,0,0,0,0,0,0,0,2,0,0,0],
+    "uncertain": false,
+    "description": "cloche basse, accents forts",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "bresil-ijexa-afoxe.agogo-aigu",
+    "label": "Agogô aigu",
+    "instr": "agogo",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,0,2,0,0,0,2,0,2,0,0,0,0,0,2,0],
+    "uncertain": false,
+    "description": "cloche haute, syncope",
+    "enterOrder": 2,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "bresil-ijexa-afoxe.xequere-agbe",
+    "label": "Xequerê/agbê",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "medium",
+    "grid": [0,0,2,0,0,0,2,0,0,0,2,0,0,0,2,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "appui, souligne l'agogô",
+    "enterOrder": 5,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "bresil-ijexa-afoxe.rum",
+    "label": "Rum",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "medium",
+    "grid": [0,0,0,0,2,0,0,0,0,0,0,0,2,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "conversation, temps 2",
+    "enterOrder": 6,
+    "difficulty": "difficile"
+   },
+   {
+    "id": "bresil-ijexa-afoxe.rumpi-le",
+    "label": "Rumpi/Lê",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "medium",
+    "grid": [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "pouls régulier",
+    "enterOrder": 4,
+    "difficulty": "facile"
+   },
+   {
+    "id": "bresil-ijexa-afoxe.ganza-caxixi",
+    "label": "Ganzá/caxixi",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    "uncertain": false,
+    "approx": true,
+    "description": "flux continu",
+    "enterOrder": 3,
+    "difficulty": "facile"
+   }
+  ],
+  "variations": [
+   {
+    "id": "bresil-ijexa-afoxe.agogo-debutant-1-ligne",
+    "label": "Agogô « débutant » 1 ligne",
+    "instr": "agogo",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,0,2,0,0,0,2,0,0,0,2,0,0,0,2,0],
+    "uncertain": false,
+    "isBreak": false
+   },
+   {
+    "id": "bresil-ijexa-afoxe.xequere-resposta",
+    "label": "Xequerê « resposta",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "medium",
+    "grid": [2,0,0,0,2,0,0,0,2,0,0,0,2,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "isBreak": true
+   },
+   {
+    "id": "bresil-ijexa-afoxe.rum-dobrado",
+    "label": "Rum « dobrado",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [0,0,0,0,2,0,0,0,2,0,0,0,2,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "isBreak": true
+   }
+  ]
+ },
+ {
+  "id": "bresil-samba-reggae",
+  "family": "bresil",
+  "label": "Samba-Reggae",
+  "origin": "Salvador, Bahia (blocos afro : Olodum, Ilê Aiyê, Timbalada)",
+  "context": "créé dans les blocos afro de Salvador (le terme apparaît en 1986 avec Olodum), il fusionne la batucada de rue et le backbeat du reggae.",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 90,
+   "max": 120,
+   "jam": 90
+  },
+  "reliability": "élevée",
+  "sources": "Pulsewave « Rhythm Tip – Samba Reggae » ; page Wikipédia « Samba reggae » (surdos en 4-5 voix imbriquées, caixas/repiques en contretemps, tempo medium, feel reggae) ; blog Brazilian Percussion (« Samba reggae », score à 5 voix de surdo : fundo 1, fundo 2, martelo, virada 1/2 + caixa + repinique). La répartition des surdos est très standardisée ; le motif de caixa et les paradas varient selon les b",
+  "voices": [
+   {
+    "id": "bresil-samba-reggae.surdo-1-fundo",
+    "label": "Surdo 1 « fundo",
+    "instr": "surdo",
+    "voiceKind": "grave",
+    "role": "basse",
+    "grid": [0,0,0,0,2,0,0,0,0,0,0,0,2,0,0,0],
+    "uncertain": false,
+    "description": "pouls grave, temps 2/4",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "bresil-samba-reggae.surdo-2-fundo",
+    "label": "Surdo 2 « fundo",
+    "instr": "surdo",
+    "voiceKind": "marcante",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0],
+    "uncertain": false,
+    "description": "réponse, temps 1/3",
+    "enterOrder": 2,
+    "difficulty": "facile"
+   },
+   {
+    "id": "bresil-samba-reggae.surdo-3-dobra",
+    "label": "Surdo 3 « dobra",
+    "instr": "surdo",
+    "voiceKind": "marcante",
+    "role": "medium",
+    "grid": [0,0,2,0,0,0,2,0,0,0,2,0,0,0,2,0],
+    "uncertain": false,
+    "description": "remplissage marqué",
+    "enterOrder": 5,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "bresil-samba-reggae.caixa",
+    "label": "Caixa",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1],
+    "uncertain": false,
+    "approx": true,
+    "description": "tapis double-croches",
+    "enterOrder": 3,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "bresil-samba-reggae.repique",
+    "label": "Repique",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [2,0,0,2,0,0,2,0,2,0,0,2,0,0,2,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "appels/paradas, accent",
+    "enterOrder": 6,
+    "difficulty": "difficile"
+   },
+   {
+    "id": "bresil-samba-reggae.tamborim",
+    "label": "Tamborim",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "medium",
+    "grid": [2,0,0,2,0,0,2,0,0,0,2,0,0,2,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "timeline « teleco »",
+    "enterOrder": 4,
+    "difficulty": "moyen"
+   }
+  ],
+  "variations": [
+   {
+    "id": "bresil-samba-reggae.caixa-skank-debutant",
+    "label": "Caixa « skank » débutant",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "isBreak": false
+   },
+   {
+    "id": "bresil-samba-reggae.surdo-3-virado",
+    "label": "Surdo 3 « virado",
+    "instr": "surdo",
+    "voiceKind": "marcante",
+    "role": "medium",
+    "grid": [0,0,2,0,0,2,0,0,0,0,2,0,0,2,0,0],
+    "uncertain": false,
+    "isBreak": true
+   },
+   {
+    "id": "bresil-samba-reggae.repique-chamada",
+    "label": "Repique « chamada",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [2,0,2,0,2,0,2,0,2,0,2,0,2,0,2,0],
+    "uncertain": false,
+    "approx": true,
+    "isBreak": true
+   }
+  ]
+ },
+ {
+  "id": "ouest-africain-kuku",
+  "family": "ouest-africain",
+  "label": "Kuku",
+  "origin": "Guinée forestière / région de Beyla (aire malinké, aussi jouée en Côte d'Ivoire)",
+  "context": "Rythme de fête très répandu, souvent le premier enseigné aux débutants ; danse de femmes en cercle, à l'origine liée au retour de la pêche (tontinkan, embodiedrhythm).",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 100,
+   "max": 160,
+   "jam": 110
+  },
+  "reliability": "faible",
+  "sources": "tontinkan (contexte), embodiedrhythm (mètre binaire, structure 2+3, tempo), WAP-pages Kuku (existence de la transcription complète), djemberhythms/Oak National (description de l'accompagnement). **",
+  "voices": [
+   {
+    "id": "ouest-africain-kuku.kenkeni-pk",
+    "label": "kenkeni",
+    "instr": "dunduns",
+    "voiceKind": "kenkeni",
+    "role": "basse",
+    "grid": [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],
+    "uncertain": true,
+    "description": "pouls régulier (croches)",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-kuku.sangban-pk",
+    "label": "sangban",
+    "instr": "dunduns",
+    "voiceKind": "sangban",
+    "role": "medium",
+    "grid": [0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0],
+    "uncertain": true,
+    "description": "chant de l'ensemble",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-kuku.dununba-pk",
+    "label": "dununba",
+    "instr": "dunduns",
+    "voiceKind": "dundunba",
+    "role": "basse",
+    "grid": [0,0,0,0,0,0,0,0,0,0,2,0,0,0,2,0],
+    "uncertain": true,
+    "description": "basse syncopée, peu d'appuis",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-kuku.djembe-b",
+    "label": "djembé B",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0],
+    "uncertain": true,
+    "description": "ancre sur les temps 1 et 3",
+    "enterOrder": 5,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "ouest-africain-kuku.djembe-t",
+    "label": "djembé T",
+    "instr": "djembe",
+    "voiceKind": "tone",
+    "role": "medium",
+    "grid": [0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0],
+    "uncertain": true,
+    "description": "double tonique en levée",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-kuku.djembe-s",
+    "label": "djembé S",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "aigu",
+    "grid": [0,0,0,0,0,0,2,0,0,0,0,0,0,0,2,0],
+    "uncertain": true,
+    "description": "claqué en contretemps",
+    "enterOrder": null,
+    "difficulty": ""
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "ouest-africain-djole-djolo-yole",
+  "family": "ouest-africain",
+  "label": "Djolé (Djolo / Yolé)",
+  "origin": "peuple Temné, Sierra Leone ; popularisé en Guinée",
+  "context": "Rythme de danse à masque (le masque représente une femme, porté par un homme), joué lors de grandes fêtes de village : récolte, fin du Ramadan, mariage (tontinkan, Wikipédia).",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": null,
+   "max": null,
+   "jam": 120
+  },
+  "reliability": "faible",
+  "sources": "Wikipédia « Djolé » (origine Temné, sikko, mètre), tontinkan (contexte), recherche djembeloops/Malcolm Smith (rôles, 4/4, >120 bpm), Scribd « Djole Notation ». **",
+  "voices": [
+   {
+    "id": "ouest-africain-djole-djolo-yole.kenkeni-pk",
+    "label": "kenkeni",
+    "instr": "dunduns",
+    "voiceKind": "kenkeni",
+    "role": "basse",
+    "grid": [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0],
+    "uncertain": true,
+    "description": "ponctuation, souvent tons fermés",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-djole-djolo-yole.sangban-pk",
+    "label": "sangban",
+    "instr": "dunduns",
+    "voiceKind": "sangban",
+    "role": "medium",
+    "grid": [1,0,0,1,0,0,1,0,0,0,1,0,0,0,0,0],
+    "uncertain": true,
+    "description": "motif ouvert/fermé signature",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-djole-djolo-yole.dununba-pk",
+    "label": "dununba",
+    "instr": "dunduns",
+    "voiceKind": "dundunba",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0],
+    "uncertain": true,
+    "description": "appuis forts sur 1 et 3",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-djole-djolo-yole.djembe-b",
+    "label": "djembé B",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,2,0,0,0,0,2,0,0,2,0,0,0,0],
+    "uncertain": true,
+    "description": "phrase de basse dansante",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-djole-djolo-yole.djembe-t",
+    "label": "djembé T",
+    "instr": "djembe",
+    "voiceKind": "tone",
+    "role": "medium",
+    "grid": [0,0,0,0,1,0,1,0,0,0,0,0,1,0,1,0],
+    "uncertain": true,
+    "description": "toniques de réponse",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-djole-djolo-yole.djembe-s",
+    "label": "djembé S",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "aigu",
+    "grid": [0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0],
+    "uncertain": true,
+    "description": "claqués de remplissage",
+    "enterOrder": null,
+    "difficulty": ""
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "ouest-africain-kassa",
+  "family": "ouest-africain",
+  "label": "Kassa",
+  "origin": "Malinké de Haute-Guinée (nord-est), rythme de récolte",
+  "context": "« Kassa » = grenier ; rythme de travail joué aux champs pendant la moisson pour soutenir les moissonneurs, clôturé par la fête *Kassalodon* (tontinkan).",
+  "count": 16,
+  "family_meter": "tern",
+  "tempo": {
+   "min": 110,
+   "max": 140,
+   "jam": 120
+  },
+  "reliability": "faible",
+  "sources": "tontinkan (origine, contexte, Kassa Soro), recherche djemberhythms (parenté Soli, feel du sangban binaire/ternaire), WAP-pages Kassa (existence transcription). **",
+  "voices": [
+   {
+    "id": "ouest-africain-kassa.kenkeni-pk",
+    "label": "kenkeni",
+    "instr": "dunduns",
+    "voiceKind": "kenkeni",
+    "role": "basse",
+    "grid": [0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0],
+    "uncertain": true,
+    "description": "contretemps régulier",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-kassa.sangban-pk",
+    "label": "sangban",
+    "instr": "dunduns",
+    "voiceKind": "sangban",
+    "role": "medium",
+    "grid": [1,0,0,0,1,0,0,0,1,0,1,0,0,0,0,0],
+    "uncertain": true,
+    "description": "voix maîtresse (feel mobile)",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-kassa.dununba-pk",
+    "label": "dununba",
+    "instr": "dunduns",
+    "voiceKind": "dundunba",
+    "role": "basse",
+    "grid": [0,0,0,0,0,0,0,0,2,0,0,0,0,0,2,0],
+    "uncertain": true,
+    "description": "ponctuation grave",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-kassa.djembe-b",
+    "label": "djembé B",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,0,2,0,0,0,2,0,0,0,2,0,0,0],
+    "uncertain": true,
+    "description": "pouls de basse sur les temps",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-kassa.djembe-t",
+    "label": "djembé T",
+    "instr": "djembe",
+    "voiceKind": "tone",
+    "role": "medium",
+    "grid": [0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1],
+    "uncertain": true,
+    "description": "tissu de toniques",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-kassa.djembe-s",
+    "label": "djembé S",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "aigu",
+    "grid": [0,0,0,0,2,0,0,0,0,0,0,0,2,0,0,0],
+    "uncertain": true,
+    "description": "claqués d'appui",
+    "enterOrder": null,
+    "difficulty": ""
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "ouest-africain-madan-maraka-foli-djagbe-en-guinee",
+  "family": "ouest-africain",
+  "label": "Madan (Maraka fôli / Djagbé en Guinée)",
+  "origin": "Maninka du Manden, sud de Bamako (Mali)",
+  "context": "Appelé **Madan au Mali**, **Djagbé en Guinée**, **Djagba dans la région de Kouroussa** ; rythme malinké de **Haute-Guinée (région de Siguiri/Kouroussa, aire du Wassolon)**, popularisé par l'album *Wassolon* de Mamady Keïta.",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 120,
+   "max": 150,
+   "jam": 125
+  },
+  "reliability": "faible",
+  "sources": "dimensionsinrhythm (« The Proximate Three in Practice », analyse d'après Billmeier & Keïta 2004 : 4/4, Haute-Guinée/Siguiri, tresillo djembé, quintillo cloches, sangban cascara), tontinkan « Djagbe » (origine malinké, Tabaski, noms régionaux), drummedup (Madan/Djagbé/Tabaski), recherche « Wassolon » de Mamady Keïta (enregistrement de référence). **",
+  "voices": [
+   {
+    "id": "ouest-africain-madan-maraka-foli-djagbe-en-guinee.kenkeni-cl",
+    "label": "kenkeni",
+    "instr": "dunduns",
+    "voiceKind": "kenkeni",
+    "role": "aigu",
+    "grid": [2,0,1,0,2,0,1,0,2,0,1,0,2,0,1,0],
+    "uncertain": true,
+    "description": "cloche « quintillo »",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-madan-maraka-foli-djagbe-en-guinee.sangban-cl",
+    "label": "sangban",
+    "instr": "dunduns",
+    "voiceKind": "sangban",
+    "role": "aigu",
+    "grid": [1,0,0,1,0,0,1,0,1,0,0,1,0,0,1,0],
+    "uncertain": true,
+    "description": "cloche type cascara/palitos",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-madan-maraka-foli-djagbe-en-guinee.dununba-cl",
+    "label": "dununba",
+    "instr": "dunduns",
+    "voiceKind": "dundunba",
+    "role": "aigu",
+    "grid": [2,0,1,0,2,0,1,0,2,0,1,0,2,0,1,0],
+    "uncertain": true,
+    "description": "cloche « quintillo »",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-madan-maraka-foli-djagbe-en-guinee.djembe-b",
+    "label": "djembé B",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,2,0,0,2,0,0,0,0,0,0,0,0,0],
+    "uncertain": true,
+    "description": "1er accompt. : tresillo (3-3-2)",
+    "enterOrder": 4,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "ouest-africain-madan-maraka-foli-djagbe-en-guinee.djembe-t",
+    "label": "djembé T",
+    "instr": "djembe",
+    "voiceKind": "tone",
+    "role": "medium",
+    "grid": [0,0,0,0,0,0,0,0,1,0,1,0,1,0,1,0],
+    "uncertain": true,
+    "description": "toniques de réponse",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-madan-maraka-foli-djagbe-en-guinee.djembe-s",
+    "label": "djembé S",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "aigu",
+    "grid": [0,0,2,0,0,2,0,0,0,0,0,2,0,0,2,0],
+    "uncertain": true,
+    "description": "claqués sur le tresillo",
+    "enterOrder": null,
+    "difficulty": ""
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "ouest-africain-soli-soli-lent",
+  "family": "ouest-africain",
+  "label": "Soli (Soli lent)",
+  "origin": "Malinké de Guinée, rythme d'initiation",
+  "context": "Rythme d'**initiation/circoncision** des garçons et des filles ; malinké, joué dans toute la Guinée (tontinkan, recherche).",
+  "count": 12,
+  "family_meter": "tern",
+  "tempo": {
+   "min": 90,
+   "max": 120,
+   "jam": 100
+  },
+  "reliability": "faible",
+  "sources": "davekobrenski (mètre 12/8, rôles sangban/dununba/kenkeni), tontinkan (origine initiation, Soli lent/rapide/Manian), recherche djemberhythms (parenté Kassa), WAP-pages Soli (existence transcription), Scribd « Soli Lent » / « Soli Rapide ». **",
+  "voices": [
+   {
+    "id": "ouest-africain-soli-soli-lent.kenkeni-pk",
+    "label": "kenkeni",
+    "instr": "dunduns",
+    "voiceKind": "kenkeni",
+    "role": "basse",
+    "grid": [0,0,1,0,0,0,1,0,0,0,1,0],
+    "uncertain": true,
+    "description": "contretemps ternaire (« off-beat »)",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-soli-soli-lent.sangban-pk",
+    "label": "sangban",
+    "instr": "dunduns",
+    "voiceKind": "sangban",
+    "role": "medium",
+    "grid": [1,0,0,1,0,0,1,0,1,0,0,0],
+    "uncertain": true,
+    "description": "motif renforçant le 3-contre-4",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-soli-soli-lent.dununba-pk",
+    "label": "dununba",
+    "instr": "dunduns",
+    "voiceKind": "dundunba",
+    "role": "basse",
+    "grid": [0,0,0,2,0,0,0,0,0,2,0,0],
+    "uncertain": true,
+    "description": "dialogue avec le sangban",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-soli-soli-lent.djembe-b",
+    "label": "djembé B",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,1,0,0,2,0,0,1,0,0],
+    "uncertain": true,
+    "description": "basse ternaire",
+    "enterOrder": 3,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "ouest-africain-soli-soli-lent.djembe-t",
+    "label": "djembé T",
+    "instr": "djembe",
+    "voiceKind": "tone",
+    "role": "medium",
+    "grid": [1,0,1,1,0,1,1,0,1,1,0,1],
+    "uncertain": true,
+    "description": "accompagnement 12/8 « passe-temps »",
+    "enterOrder": 5,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "ouest-africain-soli-soli-lent.djembe-s",
+    "label": "djembé S",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "aigu",
+    "grid": [0,0,2,0,0,0,0,0,2,0,0,0],
+    "uncertain": true,
+    "description": "claqués d'appui",
+    "enterOrder": null,
+    "difficulty": ""
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "funk-funky-drummer",
+  "family": "funk",
+  "label": "Funky Drummer",
+  "origin": "James Brown, batteur Clyde Stubblefield (enregistré le 20 nov. 1969, Cincinnati)",
+  "context": "Le break de batterie le plus samplé de l'histoire ; James Brown baptise le titre d'après son batteur pendant la prise.",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 96,
+   "max": 104,
+   "jam": 96
+  },
+  "reliability": "moyenne",
+  "sources": "DrumsTheWord (eBook p. 59 + leçon), Wills Drum Lessons (PDF), MusicRadar, Ethan Hein, Wikipédia, Modern Drummer (transcription Marc Atkinson, existence vérifiée).",
+  "voices": [
+   {
+    "id": "funk-funky-drummer.kick",
+    "label": "kick",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,1,0,0,0,0,0,0,0,1,0,0,1,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "fondation syncopée",
+    "enterOrder": 2,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "funk-funky-drummer.snare",
+    "label": "snare",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,0,0,0,2,0,0,1,0,1,0,1,2,0,0,1],
+    "uncertain": false,
+    "approx": true,
+    "description": "backbeats + ghosts (l'âme du groove)",
+    "enterOrder": 3,
+    "difficulty": "facile"
+   },
+   {
+    "id": "funk-funky-drummer.charley-f",
+    "label": "charley f.",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1],
+    "uncertain": false,
+    "approx": true,
+    "description": "tapis de doubles-croches",
+    "enterOrder": 1,
+    "difficulty": "difficile"
+   },
+   {
+    "id": "funk-funky-drummer.charley-o",
+    "label": "charley o.",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,0,0,0,0,2,0,0,0,0,0,0,0,2,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "respirations sur les « e »",
+    "enterOrder": 5,
+    "difficulty": "moyen"
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "funk-cold-sweat",
+  "family": "funk",
+  "label": "Cold Sweat",
+  "origin": "James Brown, batteur Clyde Stubblefield (1967)",
+  "context": "Souvent cité comme le morceau fondateur du funk : tout l'orchestre se cale sur la batterie.",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 108,
+   "max": 118,
+   "jam": 112
+  },
+  "reliability": "moyenne",
+  "sources": "DrumsTheWord (eBook p. 39 + leçon), Total Drummer, PDF Escuela Borja Cortés (♩=112), Drumeo (« Cold Sweat, Part 1 » dans le top 10).",
+  "voices": [
+   {
+    "id": "funk-cold-sweat.kick-a",
+    "label": "kick A",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "le « one » puis pousse",
+    "enterOrder": 3,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "funk-cold-sweat.snare-a",
+    "label": "snare A",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,0,0,0,2,0,0,1,0,1,0,0,0,0,2,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "backbeat 2, ghosts, backbeat déplacé sur &4",
+    "enterOrder": 2,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "funk-cold-sweat.charley-a",
+    "label": "charley A",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,1,0,1,0,1,0,1,0,0,0,1,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "croches régulières",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "funk-cold-sweat.charl-o-a",
+    "label": "charl.o. A",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "ouverture avec le kick (&3)",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "funk-cold-sweat.kick-b",
+    "label": "kick B",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "évite le 1 (suspension)",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "funk-cold-sweat.snare-b",
+    "label": "snare B",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,1,0,0,2,0,0,1,0,1,0,0,2,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "ghost e1, backbeats 2 et 4 normaux",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "funk-cold-sweat.charley-b",
+    "label": "charley B",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "croches régulières",
+    "enterOrder": null,
+    "difficulty": ""
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "funk-get-up-i-feel-like-being-a-sex-machine",
+  "family": "funk",
+  "label": "Get Up (I Feel Like Being a) Sex Machine",
+  "origin": "James Brown, batteur John « Jabo » Starks (1970)",
+  "context": "Le groove hypnotique de Jabo Starks (et non Stubblefield) sous la basse de Bootsy Collins : ouvertures de charley sur les « & » de 1 et 3 menant aux backbeats.",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 104,
+   "max": 112,
+   "jam": 108
+  },
+  "reliability": "moyenne",
+  "sources": "DrumsTheWord (eBook p. 60), Drumeo (« A Drummer's Guide To Funk », qui crédite Starks parmi les batteurs du titre), *The Funkmasters* (Slutsky/Silverman — le titre figure au répertoire James Brown 1960-1973 couvert par la méthode). Batteur vérifié : John « Jabo » Starks.",
+  "voices": [
+   {
+    "id": "funk-get-up-i-feel-like-being-a-sex-machine.kick",
+    "label": "kick",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "le « one » + relance &3",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "funk-get-up-i-feel-like-being-a-sex-machine.snare",
+    "label": "snare",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,0,0,0,2,0,1,1,0,1,0,0,2,0,0,1],
+    "uncertain": false,
+    "approx": true,
+    "description": "backbeats 2/4 + ghosts de liaison",
+    "enterOrder": 2,
+    "difficulty": "facile"
+   },
+   {
+    "id": "funk-get-up-i-feel-like-being-a-sex-machine.charley-f",
+    "label": "charley f.",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,0,0,1,0,1,1,1,0,0,0,1,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "croches brisées, resserrées beat 2",
+    "enterOrder": 3,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "funk-get-up-i-feel-like-being-a-sex-machine.charley-o",
+    "label": "charley o.",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,0,2,0,0,0,0,0,0,0,2,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "signature : « & » de 1 et de 3",
+    "enterOrder": null,
+    "difficulty": ""
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "funk-cissy-strut",
+  "family": "funk",
+  "label": "Cissy Strut",
+  "origin": "The Meters, batteur Joseph « Zigaboo » Modeliste (1969)",
+  "context": "Instrumental fondateur du funk de La Nouvelle-Orléans, premier album des Meters.",
+  "count": 16,
+  "family_meter": "tern",
+  "tempo": {
+   "min": 84,
+   "max": 96,
+   "jam": 90
+  },
+  "reliability": "moyenne",
+  "sources": "DrumsTheWord (eBook p. 38 + leçon), Drummer Cafe (88 bpm), Francis Drumming Blog.",
+  "voices": [
+   {
+    "id": "funk-cissy-strut.kick",
+    "label": "kick",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,1,0,0,0,0,1,0,0,1,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "ponctuation second line",
+    "enterOrder": 1,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "funk-cissy-strut.snare",
+    "label": "snare",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,0,0,0,2,1,0,0,0,0,0,0,2,2,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "réponses, doublé final",
+    "enterOrder": 2,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "funk-cissy-strut.charley",
+    "label": "charley",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,1,1,0,0,0,0,2,0,1,2,0,0,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "ligne linéaire, ghost sur e3",
+    "enterOrder": 3,
+    "difficulty": "difficile"
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "funk-what-is-hip",
+  "family": "funk",
+  "label": "What Is Hip?",
+  "origin": "Tower of Power, batteur David Garibaldi (INCERTAIN : 1973, non vérifié en source ouverte)",
+  "context": "Garibaldi a co-écrit le titre : il « a ajouté de la syncope à un pattern qu'il jouait souvent et suggéré la ligne de basse en doubles-croches » (Wikipédia).",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 100,
+   "max": 110,
+   "jam": 100
+  },
+  "reliability": "moyenne",
+  "sources": "Wikipédia « David Garibaldi (musician) » (consulté), DrumsTheWord eBook p. 167 (consulté, idiome), *Off the Record* (Garibaldi, Alfred — méthode publiée).",
+  "voices": [
+   {
+    "id": "funk-what-is-hip.kick",
+    "label": "kick",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,1,0,0,1,0,0,0,1,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "syncope avec la basse",
+    "enterOrder": 3,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "funk-what-is-hip.snare",
+    "label": "snare",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,0,0,0,2,0,0,1,0,1,0,0,2,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "backbeats + ghosts (réduits)",
+    "enterOrder": 2,
+    "difficulty": "facile"
+   },
+   {
+    "id": "funk-what-is-hip.charley",
+    "label": "charley",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    "uncertain": false,
+    "approx": true,
+    "description": "doubles-croches (2 mains possibles)",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "funk-funk-on-the-one",
+  "family": "funk",
+  "label": "Funk « on the one »",
+  "origin": "groove générique à la James Brown (pattern pédagogique, pas un titre précis)",
+  "context": "Squelette commun aux grooves James Brown : accent massif sur le 1 (« the One »), backbeats 2/4, kick de relance sur le « & » de 3.",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 90,
+   "max": 110,
+   "jam": 96
+  },
+  "reliability": "moyenne",
+  "sources": "DrumsTheWord eBook p. 39, 60, 110 (consulté), Drumeo « A Drummer's Guide To Funk » (consulté).",
+  "voices": [
+   {
+    "id": "funk-funk-on-the-one.kick",
+    "label": "kick",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "LE « one » + relance",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "funk-funk-on-the-one.snare",
+    "label": "snare",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,0,0,0,2,0,0,0,0,0,0,0,2,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "backbeats 2 et 4",
+    "enterOrder": 2,
+    "difficulty": "facile"
+   },
+   {
+    "id": "funk-funk-on-the-one.charley",
+    "label": "charley",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "croches régulières",
+    "enterOrder": 3,
+    "difficulty": "facile"
+   },
+   {
+    "id": "funk-funk-on-the-one.tambourin",
+    "label": "tambourin",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "double le backbeat (optionnel)",
+    "enterOrder": 4,
+    "difficulty": "facile"
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "reggae-one-drop",
+  "family": "reggae",
+  "label": "One drop",
+  "origin": "Jamaïque, fin des années 1960 (Kingston, studios roots)",
+  "context": "Pattern signature du roots reggae, popularisé par Carlton Barrett (Bob Marley & The Wailers) ; la paternité est disputée entre Barrett, son frère Aston et Winston Grennan (Wikipedia).",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 60,
+   "max": 95,
+   "jam": 75
+  },
+  "reliability": "moyenne",
+  "sources": "- https://en.wikipedia.org/wiki/One_drop_rhythm",
+  "voices": [
+   {
+    "id": "reggae-one-drop.kick",
+    "label": "Kick",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "l'unique appui, temps 3",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "reggae-one-drop.cross-stick",
+    "label": "Cross-stick",
+    "instr": "djembe",
+    "voiceKind": "tone",
+    "role": "medium",
+    "grid": [0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "soudé au kick sur 3",
+    "enterOrder": 3,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "reggae-one-drop.hi-hat",
+    "label": "Hi-hat",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,2,0,1,0,2,0,1,0,2,0,1,0,2,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "croches, accents en levée",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "reggae-one-drop.skank-perc-aigue",
+    "label": "Skank (perc. aiguë)",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "contretemps (guitare/clavier)",
+    "enterOrder": 2,
+    "difficulty": "facile"
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "reggae-rockers",
+  "family": "reggae",
+  "label": "Rockers",
+  "origin": "Jamaïque, milieu des années 1970 (Channel One, Sly Dunbar)",
+  "context": "Style plus dur et plus dansant que le one drop, pionnié par Sly Dunbar (Sly & Robbie) au studio Channel One.",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 75,
+   "max": 80,
+   "jam": 75
+  },
+  "reliability": "moyenne",
+  "sources": "- https://www.dancehallmag.com/2026/01/27/features/sly-dunbar-ten-essential-songs-bearing-the-reggae-legends-mark.html",
+  "voices": [
+   {
+    "id": "reggae-rockers.kick",
+    "label": "Kick",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "ancre les temps 1 et 3",
+    "enterOrder": 2,
+    "difficulty": "facile"
+   },
+   {
+    "id": "reggae-rockers.rimshot-snare",
+    "label": "Rimshot/snare",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "backbeat sur 3",
+    "enterOrder": 3,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "reggae-rockers.hi-hat",
+    "label": "Hi-hat",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "croches régulières",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "reggae-rockers.skank-perc-aigue",
+    "label": "Skank (perc. aiguë)",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "contretemps",
+    "enterOrder": 4,
+    "difficulty": "moyen"
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "reggae-steppers",
+  "family": "reggae",
+  "label": "Steppers",
+  "origin": "Jamaïque, seconde moitié des années 1970 (roots militant)",
+  "context": "Le « four on the floor » du reggae : kick en noires sur les quatre temps — « solid, driving quarter notes on each beat » (Modern Drummer).",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 110,
+   "max": 140,
+   "jam": 120
+  },
+  "reliability": "moyenne",
+  "sources": "- https://www.moderndrummer.com/article/february-2019-reggae-101-the-steppers-beat/ (extrait public)",
+  "voices": [
+   {
+    "id": "reggae-steppers.kick",
+    "label": "Kick",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "quatre noires, moteur",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "reggae-steppers.cross-stick",
+    "label": "Cross-stick",
+    "instr": "djembe",
+    "voiceKind": "tone",
+    "role": "medium",
+    "grid": [0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "ancrage sur 3",
+    "enterOrder": 3,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "reggae-steppers.hi-hat",
+    "label": "Hi-hat",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,2,0,1,0,2,0,1,0,2,0,1,0,2,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "croches, accents en levée",
+    "enterOrder": 2,
+    "difficulty": "facile"
+   },
+   {
+    "id": "reggae-steppers.skank-perc-aigue",
+    "label": "Skank (perc. aiguë)",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "contretemps",
+    "enterOrder": 4,
+    "difficulty": "moyen"
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "reggae-ska",
+  "family": "reggae",
+  "label": "Ska",
+  "origin": "Jamaïque, 1962 (Kingston, The Skatalites)",
+  "context": "Ancêtre uptempo du reggae, né fin 1962 d'un ajustement du jeu de Lloyd Knibb (The Skatalites) — « a slight change in Lloyd Knibb's drum rhythm was the landmark for the birth of ska » (résultat corroboré par la page Ska stroke/Grokipedia via recherche et par Bax Music qui cite Knibb).",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 110,
+   "max": 135,
+   "jam": 120
+  },
+  "reliability": "moyenne",
+  "sources": "- https://studydrums.com/ccrtska.html",
+  "voices": [
+   {
+    "id": "reggae-ska.kick",
+    "label": "Kick",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "temps forts 1 et 3",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "reggae-ska.snare-rimshot",
+    "label": "Snare (rimshot)",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,0,0,0,2,0,0,0,0,0,0,0,2,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "backbeat 2 et 4",
+    "enterOrder": 2,
+    "difficulty": "facile"
+   },
+   {
+    "id": "reggae-ska.hi-hat",
+    "label": "Hi-hat",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "contretemps seulement",
+    "enterOrder": 3,
+    "difficulty": "difficile"
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "reggae-nyabinghi",
+  "family": "reggae",
+  "label": "Nyabinghi",
+  "origin": "Jamaïque, années 1950 (camps rastafari, Count Ossie)",
+  "context": "Rythme cérémoniel rastafari en 4/4, « heartbeat » lent joué sur trois tambours à main — idéal pour un jam multi-participants sans batterie.",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 70,
+   "max": 80,
+   "jam": 70
+  },
+  "reliability": "moyenne",
+  "sources": "- https://en.wikipedia.org/wiki/Nyabinghi_rhythm",
+  "voices": [
+   {
+    "id": "reggae-nyabinghi.basse-thunder",
+    "label": "Basse « thunder",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "pouls : ouvert sur 1, étouffé sur 3",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "reggae-nyabinghi.funde",
+    "label": "Funde",
+    "instr": "djembe",
+    "voiceKind": "tone",
+    "role": "medium",
+    "grid": [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "gardien régulier",
+    "enterOrder": 2,
+    "difficulty": "facile"
+   },
+   {
+    "id": "reggae-nyabinghi.repeater-kete",
+    "label": "Repeater (kete)",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,0,1,0,0,1,0,0,0,0,1,0,0,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "voix soliste, syncopes",
+    "enterOrder": 3,
+    "difficulty": "difficile"
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "hiphop-1-boom-bap-classique",
+  "family": "hiphop",
+  "label": "1. Boom bap classique",
+  "origin": "type « Impeach the President » (The Honey Drippers, 1973)",
+  "context": "Le break d'ouverture d'« Impeach the President » est l'un des plus samplés de l'histoire (Audio Two « Top Billin' », Notorious B.I.G.",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 85,
+   "max": 95,
+   "jam": 90
+  },
+  "reliability": "élevée",
+  "sources": "drum-patterns.com/impeach-the-president/ (grille, 112 BPM) ; ethanhein.com/wp/2010/impeach-the-president/ ; blog.native-instruments.com/drum-patterns/ ; attackmagazine.com/technique/beat-dissected/90s-boom-bap-hip-hop/. **",
+  "voices": [
+   {
+    "id": "hiphop-1-boom-bap-classique.hi-hat-ferme-aigu",
+    "label": "hi-hat fermé (aigu)",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,1,0,1,0,1,1,1,0,0,0,1,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "hiphop-1-boom-bap-classique.hi-hat-ouvert-aigu",
+    "label": "hi-hat ouvert (aigu)",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 4,
+    "difficulty": "facile"
+   },
+   {
+    "id": "hiphop-1-boom-bap-classique.snare-medium",
+    "label": "snare (médium)",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,0,0,0,2,0,0,0,0,0,0,0,2,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 2,
+    "difficulty": "facile"
+   },
+   {
+    "id": "hiphop-1-boom-bap-classique.kick-grave",
+    "label": "kick (grave)",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,1,2,0,0,0,0,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 3,
+    "difficulty": "moyen"
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "hiphop-2-funky-drummer",
+  "family": "hiphop",
+  "label": "2. Funky Drummer",
+  "origin": "break de Clyde Stubblefield (James Brown, 1969)",
+  "context": "Break enregistré à Cincinnati en 1969, samplé par Public Enemy, Run-DMC, N.W.A, LL Cool J, Dr.",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 96,
+   "max": 100,
+   "jam": 96
+  },
+  "reliability": "élevée",
+  "sources": "drumstheword.com (leçon Funky Drummer) ; willsdrumlessons.com — PDF de transcription consulté ; musicradar.com/how-to/how-to-program-a-funky-drummer-style-midi-break-in-your-daw (99 BPM, vélocités) ; ethanhein.com/wp/2023/building-the-funky-drummer-beat/ ; en.wikipedia.org/wiki/Funky_Drummer. **",
+  "voices": [
+   {
+    "id": "hiphop-2-funky-drummer.hi-hat-ferme-aigu",
+    "label": "hi-hat fermé (aigu)",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 3,
+    "difficulty": "difficile"
+   },
+   {
+    "id": "hiphop-2-funky-drummer.hi-hat-ouvert-aigu",
+    "label": "hi-hat ouvert (aigu)",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 4,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "hiphop-2-funky-drummer.snare-medium",
+    "label": "snare (médium)",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,0,0,0,2,0,0,1,0,1,0,1,2,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "hiphop-2-funky-drummer.kick-grave",
+    "label": "kick (grave)",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,1,0,0,0,0,0,0,0,1,0,0,1,0,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 2,
+    "difficulty": "moyen"
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "hiphop-3-amen-break",
+  "family": "hiphop",
+  "label": "3. Amen break",
+  "origin": "« Amen, Brother » (The Winstons, G.C. Coleman, 1969)",
+  "context": "Break de 4 mesures (~6–7 s) à 1:26 d'« Amen, Brother », parmi les enregistrements les plus samplés de l'histoire ; en hip-hop : N.W.A « Straight Outta Compton », Salt-N-Pepa « I Desire », Mantronix « King of the Beats » (Wikipedia).",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 120,
+   "max": 136,
+   "jam": 120
+  },
+  "reliability": "élevée",
+  "sources": "en.wikipedia.org/wiki/Amen_break (structure, 136 BPM, usages hip-hop) ; drum-patterns.com/amen-break/ (grille pas à pas) ; drumstheword.com (leçon Amen Break) ; audiolabs-erlangen.de (Reverse Engineering the Amen Break, ≈140 BPM). **",
+  "voices": [
+   {
+    "id": "hiphop-3-amen-break.ride-charley-aigu",
+    "label": "ride/charley (aigu)",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "hiphop-3-amen-break.snare-medium",
+    "label": "snare (médium)",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,0,0,0,2,0,0,1,0,1,0,0,2,0,0,1],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 3,
+    "difficulty": "facile"
+   },
+   {
+    "id": "hiphop-3-amen-break.kick-grave",
+    "label": "kick (grave)",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 2,
+    "difficulty": "moyen"
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "hiphop-4-trap",
+  "family": "hiphop",
+  "label": "4. Trap",
+  "origin": "kick 808 syncopé, snare sur le 3, hats en doubles-croches",
+  "context": "Style dominant des années 2010 (Lex Luger, Metro Boomin cités comme références par eMastered).",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 130,
+   "max": 160,
+   "jam": 140
+  },
+  "reliability": "élevée",
+  "sources": "studiobrootle.com/trap-drum-patterns/ ; emastered.com/blog/trap-drum-patterns ; kickdrum.io/patterns/808-trap (140 BPM, kick 1 + « et » de 3). **",
+  "voices": [
+   {
+    "id": "hiphop-4-trap.a-hi-hat-ferme-aigu",
+    "label": "A hi-hat fermé (aigu)",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 3,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "hiphop-4-trap.a-hi-hat-ouvert-aigu",
+    "label": "A hi-hat ouvert (aigu)",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 4,
+    "difficulty": "facile"
+   },
+   {
+    "id": "hiphop-4-trap.a-snare-clap-medium",
+    "label": "A snare/clap (médium)",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "hiphop-4-trap.a-kick-808-grave",
+    "label": "A kick 808 (grave)",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 2,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "hiphop-4-trap.b-hi-hat-ferme-aigu",
+    "label": "B hi-hat fermé (aigu)",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "hiphop-4-trap.b-hi-hat-ouvert-aigu",
+    "label": "B hi-hat ouvert (aigu)",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "hiphop-4-trap.b-snare-clap-medium",
+    "label": "B snare/clap (médium)",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "hiphop-4-trap.b-kick-808-grave",
+    "label": "B kick 808 (grave)",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,0,0,0,1,0,0,1,1,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": null,
+    "difficulty": ""
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "hiphop-5-west-coast-g-funk",
+  "family": "hiphop",
+  "label": "5. West Coast / G-funk",
+  "origin": "le « gangsta boogie » (années 90)",
+  "context": "Sous-genre californien (Dr.",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 95,
+   "max": 105,
+   "jam": 95
+  },
+  "reliability": "élevée",
+  "sources": "attackmagazine.com/technique/beat-dissected/west-coast-hip-hop/ (grille, 95–105 BPM, swing 50 %) ; openmusic.academy/docs/GL9DzDbUJtRjSCrPpunKXp (style, shaker, exemples). **",
+  "voices": [
+   {
+    "id": "hiphop-5-west-coast-g-funk.shaker-aigu",
+    "label": "shaker (aigu)",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "hiphop-5-west-coast-g-funk.hi-hat-ouvert-aigu",
+    "label": "hi-hat ouvert (aigu)",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,0,0,1,0,0,0,1,0,0,0,1,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 4,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "hiphop-5-west-coast-g-funk.hi-hat-ferme-aigu",
+    "label": "hi-hat fermé (aigu)",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 5,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "hiphop-5-west-coast-g-funk.clap-snare-medium",
+    "label": "clap/snare (médium)",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,0,0,0,2,0,0,0,0,0,0,0,2,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 2,
+    "difficulty": "facile"
+   },
+   {
+    "id": "hiphop-5-west-coast-g-funk.kick-grave",
+    "label": "kick (grave)",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,0,2,0,0,0,0,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 3,
+    "difficulty": "moyen"
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "rock-backbeat-rock-de-base-money-beat",
+  "family": "rock",
+  "label": "Backbeat rock de base (« money beat »)",
+  "origin": "le groove fondateur du rock, standardisé dès les années 1950-60",
+  "context": "C'est le premier groove enseigné dans quasiment toutes les méthodes de batterie : croches au charleston, caisse claire sur 2 et 4, grosse caisse sur 1 et 3.",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 85,
+   "max": 100,
+   "jam": 85
+  },
+  "reliability": "moyenne",
+  "sources": "- https://dddrums.com/how-to-play-back-in-black-drum-lesson-acdc/ (groove principal : hi-hat croches, kick 1 et 3, snare 2 et 4)",
+  "voices": [
+   {
+    "id": "rock-backbeat-rock-de-base-money-beat.hi-hat",
+    "label": "hi-hat",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "pulsation en croches",
+    "enterOrder": 3,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "rock-backbeat-rock-de-base-money-beat.snare",
+    "label": "snare",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,0,0,0,2,0,0,0,0,0,0,0,2,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "backbeat 2 et 4",
+    "enterOrder": 2,
+    "difficulty": "facile"
+   },
+   {
+    "id": "rock-backbeat-rock-de-base-money-beat.kick",
+    "label": "kick",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "ancrage 1 et 3",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "rock-four-on-the-floor-rock-disco-rock",
+  "family": "rock",
+  "label": "Four-on-the-floor rock / disco-rock",
+  "origin": "kick sur chaque temps, adopté par le rock à l'ère disco (fin 70s)",
+  "context": "Grosse caisse sur les 4 temps, backbeat maintenu sur 2 et 4 : le beat disco absorbé par le rock.",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 100,
+   "max": 115,
+   "jam": null
+  },
+  "reliability": "moyenne",
+  "sources": "- https://drummagazine.com/lesson-four-on-the-floor-disco/ (pattern complet kick/snare/hi-hat + exemples « Miss You », « Another Brick in the Wall »)",
+  "voices": [
+   {
+    "id": "rock-four-on-the-floor-rock-disco-rock.hi-hat",
+    "label": "hi-hat",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,2,0,1,0,2,0,1,0,2,0,1,0,2,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "croches, contretemps marqués",
+    "enterOrder": 3,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "rock-four-on-the-floor-rock-disco-rock.snare",
+    "label": "snare",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,0,0,0,2,0,0,0,0,0,0,0,2,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "backbeat constant",
+    "enterOrder": 2,
+    "difficulty": "facile"
+   },
+   {
+    "id": "rock-four-on-the-floor-rock-disco-rock.kick",
+    "label": "kick",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,0,2,0,0,0,2,0,0,0,2,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "pulsation 4 temps",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "rock-when-the-levee-breaks",
+  "family": "rock",
+  "label": "« When the Levee Breaks »",
+  "origin": "groove lourd à feel half-time (John Bonham, Led Zeppelin, 1971)",
+  "context": "Le break de batterie le plus samplé du rock, enregistré dans la cage d'escalier de Headley Grange avec deux micros en hauteur (Roland Articles).",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 68,
+   "max": 78,
+   "jam": 68
+  },
+  "reliability": "moyenne",
+  "sources": "- https://www.drumeo.com/beat/when-the-levee-breaks-drum-beat/ (hi-hat croches, kick doux après le 1, ghost notes après 2 et 4)",
+  "voices": [
+   {
+    "id": "rock-when-the-levee-breaks.hi-hat",
+    "label": "hi-hat",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "croches appuyées",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "rock-when-the-levee-breaks.snare",
+    "label": "snare",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,0,0,0,2,0,0,0,0,0,0,0,2,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "backbeat 2 et 4",
+    "enterOrder": 2,
+    "difficulty": "facile"
+   },
+   {
+    "id": "rock-when-the-levee-breaks.kick",
+    "label": "kick",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,1,0,0,0,0,0,2,0,0,2,2,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "motif signature",
+    "enterOrder": 3,
+    "difficulty": "difficile"
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "rock-shuffle-blues-rock",
+  "family": "rock",
+  "label": "Shuffle blues-rock",
+  "origin": "la base ternaire du rock, héritée du blues électrique (Texas/Chicago)",
+  "context": "Subdivision en triolets dont on ne joue que la 1re et la 3e note au charleston (« jouer une, sauter une, jouer une », Total Drummer), backbeat sur 2 et 4, kick sur 1 et 3.",
+  "count": 12,
+  "family_meter": "tern",
+  "tempo": {
+   "min": 90,
+   "max": 120,
+   "jam": null
+  },
+  "reliability": "moyenne",
+  "sources": "- https://www.totaldrummer.com/blues-shuffle-drum-beat/ (hi-hat 1re et 3e note du triolet, snare 2 et 4, kick 1 et 3)",
+  "voices": [
+   {
+    "id": "rock-shuffle-blues-rock.hi-hat",
+    "label": "hi-hat",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,1,1,0,1,1,0,1,1,0,1],
+    "uncertain": false,
+    "approx": true,
+    "description": "motif shuffle ternaire",
+    "enterOrder": 3,
+    "difficulty": "difficile"
+   },
+   {
+    "id": "rock-shuffle-blues-rock.snare",
+    "label": "snare",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,0,0,2,0,0,0,0,0,2,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "backbeat 2 et 4",
+    "enterOrder": 2,
+    "difficulty": "facile"
+   },
+   {
+    "id": "rock-shuffle-blues-rock.kick",
+    "label": "kick",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,2,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "ancrage 1 et 3",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "rock-stomp-stomp-clap-we-will-rock-you",
+  "family": "rock",
+  "label": "Stomp-stomp-clap (« We Will Rock You »)",
+  "origin": "percussion corporelle de stade (Queen, 1977)",
+  "context": "Pas un groove de batterie : deux frappes de pieds + un clap, en boucle, enregistrés par le groupe en overdub sur une estrade de studio avec des delays pour simuler une foule (Wikipédia).",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 76,
+   "max": 84,
+   "jam": 76
+  },
+  "reliability": "moyenne",
+  "sources": "- https://en.wikipedia.org/wiki/We_Will_Rock_You (motif stomp-stomp-clap, enregistrement en overdub avec delays, conception participative, hymne de stade)",
+  "voices": [
+   {
+    "id": "rock-stomp-stomp-clap-we-will-rock-you.stomps",
+    "label": "stomps",
+    "instr": "surdo",
+    "voiceKind": "grave",
+    "role": "basse",
+    "grid": [2,0,1,0,0,0,0,0,2,0,1,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "deux appuis « we will »",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "rock-stomp-stomp-clap-we-will-rock-you.claps",
+    "label": "claps",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "aigu",
+    "grid": [0,0,0,0,2,0,0,0,0,0,0,0,2,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "réponse claquée",
+    "enterOrder": 2,
+    "difficulty": "facile"
+   }
+  ],
+  "variations": []
+ }
+];
 
   let percGrids = {};          // voix -> tableau de pas (0/1/2)
   let percOffsets = {};        // voix -> micro-décalage par pas (−0.45 … +0.45 pas)
   let percMuted = {};          // voix -> muet (checkbox)
+  let percMeta = {};           // voix -> { instr, voiceKind, freq? } — identité de timbre PAR VOIX
+                               // (passe 3 étape 1 : le routage audio lit l'instr de la voix,
+                               //  plus le global S.perc.instr → plusieurs instruments simultanés)
+  let percPart = {};           // voix -> id du participant assigné, ou null (voix commune) — team spirit (étape 4)
   let percWork = '';           // voix travaillée par le générateur
   let percAdded = [];          // pas ajoutés par le générateur (voix travaillée)
   let percMeasures = 0;        // mesures écoulées depuis le début de l'exercice
   let percCallSilent = false;  // appel-réponse : mesure « réponse » (voix muette)
-  let percGapPlayLeft = 0, percGapMuteLeft = 0, percGapMutedNow = false;
   let percBreakActive = false, percBreakEchoNow = false, percBreakEchoPending = false;
   let percBreaksPlayed = 0;
 
@@ -1479,7 +4427,8 @@ swing 62
     for (const vid in br.hits) for (const s of br.hits[vid]) flat.push({ s, vid });
     flat.sort((a, b) => a.s - b.s);
     const keep = Math.max(1, Math.ceil(flat.length * S.perc.breakLevel / 4));
-    return flat.slice(0, keep).map(h => ({ frac: h.s / br.count, layer: 'perc', voice: h.vid, accent: 2 }));
+    // brk : le break traverse les mutes de voix (il représente TOUT le kit, décision passe 2)
+    return flat.slice(0, keep).map(h => ({ frac: h.s / br.count, layer: 'perc', voice: h.vid, accent: 2, brk: 1 }));
   }
 
   function percResetBreakState() {
@@ -1622,10 +4571,6 @@ swing 62
     percGuideApply();
   }
 
-  function resetPercGap() {
-    percGapPlayLeft = S.perc.gap.playN; percGapMuteLeft = 0; percGapMutedNow = false;
-  }
-
   // ancres = frappes sur les temps ; contretemps = demi-temps
   function percIsOnBeat(i)  { return (i * S.beats) % S.perc.count === 0; }
   function percIsOffbeat(i) { return !percIsOnBeat(i) && (i * S.beats * 2) % S.perc.count === 0; }
@@ -1635,74 +4580,77 @@ swing 62
     return ((d.base[S.perc.count] || d.base[16])[vid]) || [];
   }
   function percVoiceLabel(vid) {
+    if (vid === 'all') return 'toutes les voix';
     const v = PERC_INSTR[S.perc.instr].voices.find(x => x.id === vid);
     return v ? v.label : vid;
   }
 
+  // voix ciblées par le générateur : 'all' = toutes les voix actives (non muettes)
+  function percWorkVoices() {
+    if (percWork !== 'all') return (percWork && percGrids[percWork]) ? [percWork] : [];
+    return PERC_INSTR[S.perc.instr].voices.map(v => v.id)
+      .filter(vid => percGrids[vid] && !percMuted[vid]);
+  }
+
   function percResetWorkToBase() {
-    if (!percWork || !percGrids[percWork]) return;
-    percGrids[percWork] = new Array(S.perc.count).fill(0);
-    percBaseFor(percWork).forEach(s => percGrids[percWork][s] = 1);
+    for (const vid of percWorkVoices()) {
+      percGrids[vid] = new Array(S.perc.count).fill(0);
+      percBaseFor(vid).forEach(s => percGrids[vid][s] = 1);
+    }
     percAdded = [];
   }
 
   function percAddHit() {
-    const grid = percGrids[percWork];
-    if (!grid) return;
     const empty = [];
-    for (let i = 0; i < grid.length; i++) if (grid[i] === 0 && !percIsOnBeat(i)) empty.push(i);
+    for (const vid of percWorkVoices()) {
+      const grid = percGrids[vid];
+      for (let i = 0; i < grid.length; i++) if (grid[i] === 0 && !percIsOnBeat(i)) empty.push({ vid, step: i });
+    }
     if (!empty.length) {
+      if (!percWorkVoices().length) return;
       percResetWorkToBase();
-      percStatusSet('Voix « ' + percVoiceLabel(percWork) + ' » pleine — retour au groove de base.');
+      percStatusSet((percWork === 'all' ? 'Kit plein' : 'Voix « ' + percVoiceLabel(percWork) + ' » pleine') +
+        ' — retour au groove de base.');
       return;
     }
-    const offs = empty.filter(percIsOffbeat);
+    const offs = empty.filter(h => percIsOffbeat(h.step));
     const pool = offs.length ? offs : empty;
     const pick = pool[Math.floor(Math.random() * pool.length)];
-    grid[pick] = 1;
+    percGrids[pick.vid][pick.step] = 1;
     percAdded.push(pick);
-    percStatusSet('+ frappe ajoutée : ' + percVoiceLabel(percWork) + ', pas ' + (pick + 1) +
+    percStatusSet('+ frappe ajoutée : ' + percVoiceLabel(pick.vid) + ', pas ' + (pick.step + 1) +
       ' (' + percAdded.length + ' ajout' + (percAdded.length > 1 ? 's' : '') + ')');
   }
 
   function percRemoveHit() {
-    const grid = percGrids[percWork];
-    if (!grid) return;
     const pool = [];
-    for (let i = 0; i < grid.length; i++) if (grid[i] > 0 && !percIsOnBeat(i)) pool.push(i);
+    for (const vid of percWorkVoices()) {
+      const grid = percGrids[vid];
+      for (let i = 0; i < grid.length; i++) if (grid[i] > 0 && !percIsOnBeat(i)) pool.push({ vid, step: i });
+    }
     if (!pool.length) {
+      if (!percWorkVoices().length) return;
       percResetWorkToBase();
       percStatusSet('Il ne restait que les ancres — groove de base restauré.');
       return;
     }
     const pick = pool[Math.floor(Math.random() * pool.length)];
-    grid[pick] = 0;
-    percStatusSet('− frappe retirée : ' + percVoiceLabel(percWork) + ', pas ' + (pick + 1) + '. Continue à la jouer dans ta tête !');
+    percGrids[pick.vid][pick.step] = 0;
+    percStatusSet('− frappe retirée : ' + percVoiceLabel(pick.vid) + ', pas ' + (pick.step + 1) + '. Continue à la jouer dans ta tête !');
   }
 
   // appel-réponse : une seule variation active à la fois
   function percNewCallVariation() {
-    const grid = percGrids[percWork];
-    if (!grid) return;
-    const base = percBaseFor(percWork);
-    for (const s of percAdded) if (!base.includes(s)) grid[s] = 0;
+    for (const a of percAdded) {
+      if (percGrids[a.vid] && !percBaseFor(a.vid).includes(a.step)) percGrids[a.vid][a.step] = 0;
+    }
     percAdded = [];
     percAddHit();
     percStatusSet('Appel : écoute la variation (' + percVoiceLabel(percWork) + ')…');
   }
 
   function percOnNewMeasure() {
-    if (!S.perc.on) { percGapMutedNow = false; percCallSilent = false; return; }
-    // gap par couche
-    const g = S.perc.gap;
-    if (g.layer === 'none') percGapMutedNow = false;
-    else if (percGapPlayLeft > 0) {
-      percGapMutedNow = false; percGapPlayLeft--;
-      if (percGapPlayLeft === 0) percGapMuteLeft = g.muteM;
-    } else if (percGapMuteLeft > 0) {
-      percGapMutedNow = true; percGapMuteLeft--;
-      if (percGapMuteLeft === 0) percGapPlayLeft = g.playN;
-    } else resetPercGap();
+    if (!S.perc.on) { percCallSilent = false; return; }
     // exercice
     if (S.perc.mode !== 'break') { percBreakActive = false; percBreakEchoNow = false; percBreakEchoPending = false; }
     if (S.perc.mode === 'off' || (!percWork && S.perc.mode !== 'break' && S.perc.mode !== 'guide')) {
@@ -1768,11 +4716,15 @@ swing 62
   // ---- UI percussion ----
   function buildPercRowsInto(wrap) {
     wrap.innerHTML = '';
-    const def = PERC_INSTR[S.perc.instr];
     const n = S.perc.count;
-    def.voices.forEach(v => {
+    // team spirit : on édite le jeu de voix VIVANT (potentiellement multi-instruments,
+    // issu d'un groove de la bibliothèque), pas les seules voix de l'instrument focal.
+    const voices = S.team.on ? teamVoiceList() : PERC_INSTR[S.perc.instr].voices;
+    voices.forEach(v => {
       const row = document.createElement('div'); row.className = 'perc-voice';
-      const lab = document.createElement('span'); lab.className = 'pv-label'; lab.textContent = v.label;
+      const lab = document.createElement('span'); lab.className = 'pv-label';
+      lab.textContent = v.label;
+      if (S.team.on && v.uncertain) { lab.append(' '); const u = document.createElement('span'); u.className = 'pv-uncertain'; u.title = 'grille reconstruite (INCERTAIN) — à valider à l\'oreille'; u.textContent = '≈'; lab.appendChild(u); }
       const steps = document.createElement('div'); steps.className = 'steps mini'; steps.dataset.voice = v.id;
       for (let i = 0; i < n; i++) {
         const b = document.createElement('button'); b.className = 'step';
@@ -1821,14 +4773,73 @@ swing 62
       }
       const mute = document.createElement('label'); mute.className = 'check pv-mute';
       const mi = document.createElement('input'); mi.type = 'checkbox'; mi.checked = !!percMuted[v.id];
-      mi.addEventListener('change', () => percMuted[v.id] = mi.checked);
+      mi.addEventListener('change', () => { percMuted[v.id] = mi.checked; percLineRender(); });
       mute.appendChild(mi); mute.append(' muet');
       row.append(lab, steps, mute);
+      // team spirit : sélecteur d'assignation « quel participant joue cette voix »
+      if (S.team.on) {
+        const psel = document.createElement('select'); psel.className = 'pv-part';
+        psel.innerHTML = '<option value="">— commune —</option>' +
+          S.team.participants.map(p => '<option value="' + p.id + '">' + esc(p.label) + '</option>').join('');
+        psel.value = percPart[v.id] || '';
+        psel.addEventListener('change', () => { percPart[v.id] = psel.value || null; teamRenderParticipants(); percLineRender(); });
+        row.appendChild(psel);
+      }
       wrap.appendChild(row);
     });
   }
 
+  // liste des voix VIVANTES d'un groove team spirit (hors clave), avec métadonnées
+  // (label, rôle, ordre d'entrée, incertitude) reprises de la fiche groove si chargée.
+  function teamVoiceList() {
+    const gr = GROOVES.find(g => g.id === S.team.grooveId);
+    const meta = {};
+    if (gr) gr.voices.forEach(v => meta[v.id] = v);
+    return Object.keys(percGrids)
+      .filter(id => !claveData[id])
+      .map(id => {
+        const m = meta[id], pm = percMeta[id];
+        return {
+          id,
+          label: m ? m.label : (pm ? (pm.instr + ' · ' + pm.voiceKind) : id),
+          role: m ? m.role : '',
+          uncertain: m ? !!m.uncertain : false,
+          enterOrder: m && m.enterOrder != null ? m.enterOrder : null
+        };
+      })
+      .sort((a, b) => {
+        const ao = a.enterOrder == null ? 1e9 : a.enterOrder;
+        const bo = b.enterOrder == null ? 1e9 : b.enterOrder;
+        return ao - bo;
+      });
+  }
+
+  function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+
+  // registre d'identité de timbre par voix (passe 3 étape 1). Reconstruit à chaque
+  // changement du JEU de voix — toutes les reconstructions de percGrids passent par
+  // buildPercGrids. Une voix hors instrument focal (participants, passe 3 étape 4) déjà
+  // enregistrée est PRÉSERVÉE ; le monde mono-instrument est couvert par les deux premières
+  // branches, ce qui garde le routage byte-for-byte identique à la passe 2.
+  function rebuildPercMeta() {
+    const prev = percMeta; percMeta = {};
+    const claveById = {}; CLAVE_VOICES.forEach(v => claveById[v.id] = v);
+    const def = PERC_INSTR[S.perc.instr];
+    const focalById = {}; if (def) def.voices.forEach(v => focalById[v.id] = v);
+    for (const vid in percGrids) {
+      if (claveById[vid]) {
+        percMeta[vid] = { instr: 'clave', voiceKind: vid, freq: claveById[vid].freq };
+      } else if (focalById[vid]) {
+        percMeta[vid] = { instr: S.perc.instr, voiceKind: vid };
+      } else if (prev[vid]) {
+        percMeta[vid] = prev[vid];   // voix hors instrument focal (étape 4) : conservée
+      }
+    }
+  }
+
   function buildPercGrids() {
+    claveAttach();   // les reconstructions de percGrids ne perdent jamais la clave
+    rebuildPercMeta();   // identité de timbre par voix, alignée sur le jeu de voix courant
     buildPercRowsInto($('percVoices'));
     buildPercRowsInto($('percFsVoices'));
     refreshPercGrids();
@@ -1838,18 +4849,92 @@ swing 62
     document.querySelectorAll('#percVoices .steps, #percFsVoices .steps').forEach(row => {
       const g = percGrids[row.dataset.voice];
       if (!g) return;
-      const isWork = row.dataset.voice === percWork;
       const hands = percHandsFor(g);
       const offs = percOffsets[row.dataset.voice];
       for (let i = 0; i < row.children.length; i++) {
         row.children[i].classList.toggle('on', g[i] === 1);
         row.children[i].classList.toggle('acc', g[i] === 2);
-        row.children[i].classList.toggle('var', isWork && percAdded.includes(i));
+        row.children[i].classList.toggle('var', percAdded.some(a => a.vid === row.dataset.voice && a.step === i));
         row.children[i].textContent = g[i] > 0 ? hands[i] : '';
         const off = (offs && offs[i]) || 0;
         row.children[i].style.transform = off ? 'translateX(' + (off * 100) + '%)' : '';
       }
     });
+    percLineRender();
+  }
+
+  // ---- ligne de réduction (solfège) : le groove qui SONNE, sur une seule ligne ----
+  // Chaque frappe = une brique colorée par voix ; frappes qui coïncident (même
+  // fraction de cycle, même à counts différents) = briques empilées, instrument
+  // en bas, clave au-dessus ; voix muettes exclues.
+  function percLineRender() {
+    const line = $('percLine'), leg = $('percLineLegend');
+    if (!line) return;
+    line.querySelectorAll('.pl-brick, .pl-beat').forEach(e => e.remove());
+    if (!line.querySelector('.pl-cursor')) {
+      const cu = document.createElement('div'); cu.className = 'pl-cursor'; line.appendChild(cu);
+    }
+    for (let b = 0; b < S.beats; b++) {
+      const d = document.createElement('div'); d.className = 'pl-beat';
+      d.style.left = (b / S.beats * 100) + '%';
+      line.appendChild(d);
+    }
+    const def = PERC_INSTR[S.perc.instr];
+    let voices;
+    if (S.team.on) {
+      // team spirit : la couleur suit le PARTICIPANT (les parts d'un même joueur se lisent
+      // d'un coup d'œil) ; voix commune (non assignée) = teinte neutre.
+      const partIdx = {}; S.team.participants.forEach((p, i) => partIdx[p.id] = i % 6 + 1);
+      voices = teamVoiceList().map((v, k) => {
+        const pid = percPart[v.id] || null;
+        const color = (pid != null && partIdx[pid]) ? 'var(--fm-voice-' + partIdx[pid] + ')' : 'var(--fm-muted, #888)';
+        return { id: v.id, label: v.label, color };
+      }).concat(CLAVE_VOICES.map((v, k) => ({ id: v.id, label: v.label, color: 'var(--fm-voice-' + (k + 5) + ')' })));
+    } else {
+      voices = def.voices.map((v, k) => ({ id: v.id, label: v.label, color: 'var(--fm-voice-' + (k % 4 + 1) + ')' }))
+        .concat(CLAVE_VOICES.map((v, k) => ({ id: v.id, label: v.label, color: 'var(--fm-voice-' + (k + 5) + ')' })));
+    }
+    const groups = {};   // clé = fraction du cycle (précision 1/4800) → briques coïncidentes
+    voices.forEach(v => {
+      const g = percGrids[v.id];
+      if (!g || percMuted[v.id]) return;
+      const n = g.length;
+      for (let i = 0; i < n; i++) {
+        if (!g[i]) continue;
+        const key = Math.round(i / n * 4800);
+        (groups[key] = groups[key] || []).push({
+          v, acc: g[i] === 2,
+          off: (percOffsets[v.id] && percOffsets[v.id][i]) || 0,
+          w: 100 / n
+        });
+      }
+    });
+    for (const key in groups) {
+      groups[key].forEach((b, j) => {
+        const el = document.createElement('div');
+        el.className = 'pl-brick' + (b.acc ? ' acc' : '');
+        el.style.left = (key / 48) + '%';
+        el.style.width = 'calc(' + b.w + '% - 2px)';
+        el.style.bottom = (11 + j * 11) + 'px';
+        el.style.background = b.v.color;
+        if (b.off) el.style.transform = 'translateX(' + (b.off * 100) + '%)';
+        line.appendChild(el);
+      });
+    }
+    leg.innerHTML = voices.map(v => {
+      const g = percGrids[v.id];
+      if (!g || percMuted[v.id] || !g.some(x => x > 0)) return '';
+      return '<span><span class="chip" style="background:' + v.color + '"></span>' + v.label + '</span>';
+    }).join('');
+  }
+
+  // ---- divulgation progressive : le mode d'exercice pilote les contrôles visibles ----
+  function percModeUI() {
+    const m = S.perc.mode;
+    $('percWorkWrap').classList.toggle('hide', !(m === 'add' || m === 'sub' || m === 'call'));
+    $('percGuideBtns').classList.toggle('hide', m !== 'guide');
+    $('percBreakRow').classList.toggle('hide', m !== 'break');
+    $('percPeriodRow').classList.toggle('hide', m === 'off');
   }
 
   function percSetInstr(instr) {
@@ -1864,15 +4949,10 @@ swing 62
       (base[v.id] || []).forEach(s => percGrids[v.id][s] = 1);
     });
     percAdded = []; percMeasures = 0; percCallSilent = false;
-    percWork = def.work;
-    $('percWork').innerHTML = def.voices.map(v =>
-      '<option value="' + v.id + '"' + (v.id === percWork ? ' selected' : '') + '>' + v.label + '</option>').join('');
-    $('percGapLayer').innerHTML =
-      '<option value="none" selected>Aucune</option>' +
-      '<option value="pulse">Pulsation (clic)</option>' +
-      '<option value="clave">Clave</option>' +
+    percWork = 'all';   // défaut : le générateur travaille tout le kit (voix actives)
+    $('percWork').innerHTML = '<option value="all" selected>Toutes les voix</option>' +
       def.voices.map(v => '<option value="' + v.id + '">' + v.label + '</option>').join('');
-    S.perc.gap.layer = 'none';
+    gapTargetRefresh();   // les cibles du gap unifié suivent les voix de l'instrument
     // styles et breaks disponibles pour cet instrument
     $('percStyle').innerHTML = '<option value="">— Styles —</option>' +
       (PERC_STYLES[instr] || []).map(s => '<option value="' + s.id + '">' + s.label + '</option>').join('');
@@ -1882,8 +4962,8 @@ swing 62
     percGuide = null;
     percStyleCur = null;
     percResetBreakState();
-    resetPercGap();
     buildPercGrids();
+    percModeUI();
     percStatusSet('');
     if (S.perc.mode === 'guide') percGuideBuild();
     if (!isPlaying) drawStatic();
@@ -1914,10 +4994,12 @@ swing 62
 
   $('percOn').addEventListener('change', e => { S.perc.on = e.target.checked; if (!isPlaying) drawStatic(); });
   $('percInstr').addEventListener('change', e => percSetInstr(e.target.value));
-  $('percCount').addEventListener('change', e => { S.perc.count = +e.target.value; percSetInstr(S.perc.instr); });
+  // 12/16 = choix de famille : asservit percussion ET clave ensemble (§7.7).
+  $('percCount').addEventListener('change', e => { setFamily(+e.target.value === 12 ? 'tern' : 'bin'); });
   $('percReset').addEventListener('click', () => percSetInstr(S.perc.instr));
   $('percMode').addEventListener('change', e => {
     S.perc.mode = e.target.value;
+    percModeUI();
     percMeasures = 0; percCallSilent = false;
     percGuideRestore();
     if (S.perc.mode === 'guide') {
@@ -1989,8 +5071,8 @@ swing 62
       ('séquence du ' + new Date().toLocaleDateString('fr-BE'));
     const all = percPresetsAll();
     const grids = {}, offs = {};
-    for (const vid in percGrids) grids[vid] = percGrids[vid].slice();
-    for (const vid in percOffsets) offs[vid] = percOffsets[vid].slice();
+    for (const vid in percGrids) if (!claveData[vid]) grids[vid] = percGrids[vid].slice();
+    for (const vid in percOffsets) if (!claveData[vid]) offs[vid] = percOffsets[vid].slice();
     all[name] = { instr: S.perc.instr, count: S.perc.count, grids, offsets: offs, muted: Object.assign({}, percMuted) };
     percPresetsWrite(all);
     percSavedRefresh();
@@ -2012,9 +5094,6 @@ swing 62
   });
   percSavedRefresh();
   $('percPeriod').addEventListener('change', e => S.perc.period = Math.max(1, +e.target.value));
-  $('percGapLayer').addEventListener('change', e => { S.perc.gap.layer = e.target.value; resetPercGap(); });
-  $('percGapPlay').addEventListener('change', e => { S.perc.gap.playN = Math.max(1, +e.target.value); resetPercGap(); });
-  $('percGapMute').addEventListener('change', e => { S.perc.gap.muteM = Math.max(1, +e.target.value); resetPercGap(); });
   $('percStyle').addEventListener('change', e => { if (e.target.value) applyPercStyle(e.target.value); });
   $('percBreakSel').addEventListener('change', e => { S.perc.breakId = e.target.value; percResetBreakState(); });
   $('percBreakLvl').addEventListener('change', e => S.perc.breakLevel = +e.target.value);
@@ -2024,6 +5103,354 @@ swing 62
     if (S.perc.breakAuto) { S.perc.breakLevel = 1; $('percBreakLvl').value = '1'; }
   });
   $('percBreakEcho').addEventListener('change', e => S.perc.breakEcho = e.target.checked);
+
+  // ============ DSL PÉDAGOGIQUE — MOTEUR DE RÈGLES (passe 2, étape 2) ============
+  // Générateur embarqué, zéro IA / zéro DOM / zéro réseau. Le questionnaire (wizard)
+  // fournit des réponses ; buildKitProfile() en dérive un profil de kit conforme au
+  // schéma normatif de la spec passe 2 (§2) ; applyKitProfile() le pose sur l'état vivant
+  // par le même chemin que les presets — le moteur audio n'est pas touché à cette étape.
+
+  // objectif de compétence × niveau → paramètres de génération (dynamique déjà en
+  // nomenclature normative : accentuee | progressive — arbitrage spec §7.2).
+  const RULES_TABLE = {
+    separation: {
+      debutant:      { mode: 'guide', period: 4, voiceCount: 2, dynamics: 'accentuee',  handRuleDefault: 'alt' },
+      intermediaire: { mode: 'guide', period: 2, voiceCount: 2, dynamics: 'accentuee',  handRuleDefault: 'alt' },
+      avance:        { mode: 'add',   period: 2, voiceCount: 3, dynamics: 'progressive', handRuleDefault: 'lead' }
+    },
+    independance: {
+      debutant:      { mode: 'guide', period: 4, voiceCount: 2, dynamics: 'accentuee',  handRuleDefault: 'alt' },
+      intermediaire: { mode: 'add',   period: 2, voiceCount: 3, dynamics: 'accentuee',  handRuleDefault: 'alt' },
+      avance:        { mode: 'call',  period: 2, voiceCount: 3, dynamics: 'progressive', handRuleDefault: 'lead' }
+    },
+    dynamique: {
+      debutant:      { mode: 'off',   period: 4, voiceCount: 2, dynamics: 'accentuee',  handRuleDefault: 'alt' },
+      intermediaire: { mode: 'sub',   period: 2, voiceCount: 2, dynamics: 'accentuee',  handRuleDefault: 'alt' },
+      avance:        { mode: 'break', period: 4, voiceCount: 3, dynamics: 'progressive', handRuleDefault: 'lead' }
+    },
+    regularite: {
+      debutant:      { mode: 'off',   period: 8, voiceCount: 1, dynamics: 'accentuee',  handRuleDefault: 'alt' },
+      intermediaire: { mode: 'off',   period: 4, voiceCount: 2, dynamics: 'accentuee',  handRuleDefault: 'alt' },
+      avance:        { mode: 'sub',   period: 2, voiceCount: 3, dynamics: 'progressive', handRuleDefault: 'lead' }
+    }
+  };
+  const SUBDIV_TABLE = { binaire: { count: 16 }, ternaire: { count: 12 } };
+
+  // rôle indicatif (spec §3) : basse→basse, cloche/dundunba→timekeeper, sinon medium.
+  function kitRoleForVoice(vid) {
+    if (vid === 'basse') return 'basse';
+    if (vid === 'cloche' || vid === 'dundunba') return 'timekeeper';
+    return 'medium';
+  }
+
+  // buildKitProfile(answers) — fonction pure et déterministe. Défauts sur toute réponse
+  // manquante/invalide. Sortie = profil de kit normatif (voir spec passe 2 §2).
+  function buildKitProfile(answers) {
+    const a = answers || {};
+    const objectif = RULES_TABLE[a.objectif] ? a.objectif : 'regularite';
+    const niveau = RULES_TABLE[objectif][a.niveau] ? a.niveau : 'debutant';
+    const subdivision = SUBDIV_TABLE[a.subdivision] ? a.subdivision : 'binaire';
+    const instrument = PERC_INSTR[a.instrument] ? a.instrument : 'djembe';
+
+    const rule = RULES_TABLE[objectif][niveau];
+    const count = SUBDIV_TABLE[subdivision].count;
+    const family = count === 12 ? 'tern' : 'bin';
+    const def = PERC_INSTR[instrument];
+    const base = def.base[count] || def.base[16];
+
+    // latéralité : override utilisateur prioritaire sur la valeur par défaut de la règle
+    let handRule = rule.handRuleDefault, lefty = false;
+    if (a.lateralite === 'gaucher') lefty = true;
+    else if (a.lateralite === 'alternance') handRule = 'alt';
+    else if (a.lateralite === 'droitier') lefty = false;
+
+    const period = (Number.isInteger(a.periodOverride) && a.periodOverride > 0)
+      ? Math.min(16, a.periodOverride) : rule.period;
+    const dynamics = (a.dynamicsOverride === 'accentuee' || a.dynamicsOverride === 'progressive')
+      ? a.dynamicsOverride : rule.dynamics;
+
+    const keptN = Math.max(1, Math.min(rule.voiceCount, def.voices.length));
+    const accentStep = Math.max(1, Math.round(count / 4)); // 4 (bin) / 3 (tern) = les temps
+
+    const voices = def.voices.map((v, idx) => {
+      const grid = new Array(count).fill(0);
+      (base[v.id] || []).forEach(s => { if (s >= 0 && s < count) grid[s] = 1; });
+      // dynamique « accentuée » : les frappes sur les temps deviennent des accents.
+      // « progressive » = rampe multi-mesures → différée (pas de rendu statique), grille neutre.
+      if (dynamics === 'accentuee') {
+        for (let i = 0; i < count; i += accentStep) if (grid[i] === 1) grid[i] = 2;
+      }
+      return {
+        id: v.id, label: v.label, timbre: v.id, freq: null,
+        role: kitRoleForVoice(v.id),
+        grid: grid,
+        offsets: new Array(count).fill(0),
+        muted: idx >= keptN
+      };
+    });
+
+    return {
+      kitId: objectif + '-' + niveau + '-' + instrument,
+      label: def.label + ' · ' + objectif,
+      family: family, count: count,
+      voices: voices,
+      handRule: handRule, lefty: lefty,
+      meta: { objectif: objectif, niveau: niveau },
+      gen: {
+        mode: rule.mode, period: period, density: 0.4,
+        targetHandOrVoice: 'all', dynamics: dynamics,
+        regularity: 0.0, anchors: {}, startNote: ''
+      }
+    };
+  }
+
+  // applyKitProfile(profile, instr) — pose le profil sur l'état vivant. Réutilise le
+  // chemin des presets : setFamily aligne clave+perc, percSetInstr bâtit le squelette,
+  // puis les grilles/mutes/paramètres du profil font foi. Ne touche pas au moteur audio.
+  function applyKitProfile(profile, instr) {
+    instr = PERC_INSTR[instr] ? instr : 'djembe';
+    S.perc.instr = instr;
+    $('percInstr').value = instr;
+    setFamily(profile.family);                 // aligne clave + perc, rebâtit les rangées
+    S.perc.count = profile.count;
+    $('percCount').value = String(profile.count);
+
+    percGrids = {}; percOffsets = {}; percMuted = {};
+    profile.voices.forEach(v => {
+      percGrids[v.id] = v.grid.slice();
+      percOffsets[v.id] = (v.offsets && v.offsets.slice()) || new Array(profile.count).fill(0);
+      percMuted[v.id] = !!v.muted;
+    });
+
+    percWork = profile.gen.targetHandOrVoice || 'all';
+    S.perc.mode = profile.gen.mode;       $('percMode').value = profile.gen.mode;
+    S.perc.period = profile.gen.period;   $('percPeriod').value = profile.gen.period;
+    S.perc.handRule = profile.handRule;   $('percHandRule').value = profile.handRule;
+    S.perc.lefty = profile.lefty;         $('percLefty').checked = profile.lefty;
+    S.perc.on = true;                     $('percOn').checked = true;
+
+    percAdded = []; percMeasures = 0; percCallSilent = false;
+    percGuide = null; percStyleCur = null;
+    percResetBreakState();
+    buildPercGrids();                          // reconstruit les rangées (grilles + mutes)
+    percModeUI();
+    $('percWork').value = percWork;
+    if (S.perc.mode === 'guide') percGuideBuild();
+    // paramètres de génération non encore consommés par le moteur (densité, régularité,
+    // ancres, startNote, rampe « progressive ») : conservés pour les passes 3-4, sans invention.
+    S.perc.gen = profile.gen;
+    percStatusSet('Kit généré : ' + profile.label + '.');
+    if (!isPlaying) drawStatic();
+  }
+
+  // ============ MODE TEAM SPIRIT (passe 3 étape 4) ============
+  // Deux sens du même objet (voix hétérogènes assignées à des participants) :
+  //   distribution — un groove total partitionné entre N participants (union des parts = le groove) ;
+  //   accumulation — les voix entrent une à une (ordre d'entrée en jam des fiches grooves).
+  // Surface d'édition DISTINCTE du générateur focal (§4.3) : l'activer masque les modes
+  // add/sub/call/guide/break et opère sur le jeu de voix VIVANT (multi-instruments, issu
+  // d'un groove de la bibliothèque §5). Le moteur n'a qu'un hook : la conjonction
+  // solo/mute par participant dans percLayerMuted (aucun toucher au calcul de t).
+
+  const TEAM_FAM_LABEL = { bresil: 'Brésil', 'ouest-africain': 'Ouest-africain',
+    funk: 'Funk', reggae: 'Reggae', hiphop: 'Hip-hop', rock: 'Rock' };
+
+  function teamPartLabel(pid) {
+    const p = S.team.participants.find(x => x.id === pid);
+    return p ? p.label : pid;
+  }
+
+  function teamGrooveRefresh() {
+    const fams = {};
+    GROOVES.forEach(g => { (fams[g.family] = fams[g.family] || []).push(g); });
+    $('teamGroove').innerHTML = '<option value="">— choisir un groove —</option>' +
+      Object.keys(fams).map(f =>
+        '<optgroup label="' + esc(TEAM_FAM_LABEL[f] || f) + '">' +
+        fams[f].map(g => '<option value="' + g.id + '">' + esc(g.label) +
+          (g.reliability ? ' · ' + esc(g.reliability) : '') + '</option>').join('') +
+        '</optgroup>').join('');
+    if (S.team.grooveId) $('teamGroove').value = S.team.grooveId;
+  }
+
+  function teamModeUI() {
+    const acc = S.team.mode === 'accumulation';
+    $('teamAccumBtns').classList.toggle('hide', !acc);
+    $('teamDistBtns').classList.toggle('hide', acc);
+    $('teamModeAccum').classList.toggle('sel', acc);
+    $('teamModeDist').classList.toggle('sel', !acc);
+  }
+
+  // masque les surfaces focales (générateur, style, mains, séquences) en team spirit,
+  // via une classe dédiée qui ne se dispute pas avec le .hide de percModeUI.
+  function teamUI() {
+    const on = S.team.on;
+    $('teamToggle').checked = on;
+    $('teamPanel').classList.toggle('hide', !on);
+    ['percStyleRow', 'percModeRow', 'percHandRow', 'percBreakRow', 'percPeriodRow', 'percSaveRow']
+      .forEach(id => { const el = $(id); if (el) el.classList.toggle('t-hide', on); });
+  }
+
+  function teamRenderParticipants() {
+    const wrap = $('teamParts');
+    if (!wrap) return;
+    wrap.innerHTML = '';
+    if (!S.team.participants.length) {
+      const d = document.createElement('div'); d.className = 'hint'; d.style.margin = '0';
+      d.textContent = 'Aucun participant — ajoute-en, puis assigne les voix (ou « Répartir par tessiture »).';
+      wrap.appendChild(d);
+      return;
+    }
+    S.team.participants.forEach((p, i) => {
+      const row = document.createElement('div'); row.className = 'team-part';
+      const sw = document.createElement('span'); sw.className = 'team-swatch';
+      sw.style.background = 'var(--fm-voice-' + (i % 6 + 1) + ')';
+      const inp = document.createElement('input'); inp.type = 'text'; inp.className = 'team-name'; inp.value = p.label;
+      inp.addEventListener('change', () => { p.label = inp.value.trim() || p.label; buildPercGrids(); teamRenderParticipants(); });
+      const cnt = Object.keys(percPart).filter(v => percPart[v] === p.id && percGrids[v] && !claveData[v]).length;
+      const badge = document.createElement('span'); badge.className = 'team-count'; badge.textContent = cnt + ' voix';
+      const solo = document.createElement('button'); solo.className = 'btn-sm team-solo' + (p.solo ? ' on' : ''); solo.textContent = 'Solo';
+      solo.addEventListener('click', () => { p.solo = !p.solo; teamRenderParticipants(); });
+      const mute = document.createElement('button'); mute.className = 'btn-sm team-mute' + (p.muted ? ' on' : ''); mute.textContent = 'Muet';
+      mute.addEventListener('click', () => { p.muted = !p.muted; teamRenderParticipants(); });
+      const del = document.createElement('button'); del.className = 'btn-sm'; del.textContent = '✕'; del.title = 'Retirer ce participant';
+      del.addEventListener('click', () => teamRemoveParticipant(p.id));
+      row.append(sw, inp, badge, solo, mute, del);
+      wrap.appendChild(row);
+    });
+  }
+
+  function teamAddParticipant(label) {
+    const pid = 'p' + (S.team.nextPid++);
+    S.team.participants.push({ id: pid, label: label || ('Joueur ' + (S.team.participants.length + 1)), solo: false, muted: false });
+    return pid;
+  }
+
+  function teamRemoveParticipant(pid) {
+    S.team.participants = S.team.participants.filter(p => p.id !== pid);
+    for (const v in percPart) if (percPart[v] === pid) percPart[v] = null;   // ses voix redeviennent communes
+    buildPercGrids(); teamRenderParticipants(); percLineRender();
+  }
+
+  // charge un groove de la bibliothèque : arbitrage F — le groove IMPOSE sa famille/count.
+  function teamLoadGroove(gid) {
+    const gr = GROOVES.find(g => g.id === gid);
+    if (!gr) { percStatusSet('Choisis un groove dans la liste.'); return; }
+    S.team.grooveId = gid;
+    percGrids = {}; percOffsets = {}; percMuted = {}; percPart = {}; percMeta = {};
+    setFamily(gr.family_meter === 'tern' ? 'tern' : 'bin', false);   // pose les drapeaux famille sans rebâtir le focal
+    S.perc.count = gr.count; $('percCount').value = String(gr.count);
+    claveSetCount(gr.count);                                          // aligne la clave (grilles vides conservées)
+    gr.voices.forEach(v => {
+      percGrids[v.id] = v.grid.slice();
+      percOffsets[v.id] = new Array(gr.count).fill(0);
+      percMuted[v.id] = false;
+      percPart[v.id] = null;
+      percMeta[v.id] = { instr: v.instr, voiceKind: v.voiceKind };    // identité de timbre par voix (préservée par rebuildPercMeta via prev)
+      if (v.freq != null) percMeta[v.id].freq = v.freq;
+    });
+    S.perc.on = true; $('percOn').checked = true;
+    S.team.entered = 0;
+    if (S.team.mode === 'accumulation') teamAccumApplyEntry();
+    else if (S.team.participants.length) teamAutoPartition(true);
+    buildPercGrids();          // construit les rangées team + préserve percMeta (branche prev)
+    gapTargetRefresh();        // les voix du groove deviennent ciblables par le gap
+    teamRenderParticipants();
+    teamModeUI();
+    const tip = gr.reliability === 'faible' ? ' — grilles reconstruites (≈), à valider à l\'oreille' : '';
+    percStatusSet('Groove chargé : ' + gr.label + ' (' + gr.voices.length + ' voix, ' + esc(gr.origin || '') + ')' + tip + '.');
+    if (!isPlaying) drawStatic();
+  }
+
+  // accumulation : au départ, tout est muet ; « entrer la voix suivante » démute dans l'ordre.
+  function teamAccumApplyEntry() {
+    Object.keys(percGrids).forEach(id => { if (!claveData[id]) percMuted[id] = true; });
+    S.team.entered = 0;
+  }
+
+  function teamAccumNext() {
+    if (!S.team.on) return;
+    const next = teamVoiceList().find(v => percMuted[v.id]);
+    if (!next) { percStatusSet('Tout le monde est entré — ensemble complet.'); return; }
+    percMuted[next.id] = false;
+    if (S.team.participants.length) {
+      percPart[next.id] = S.team.participants[S.team.entered % S.team.participants.length].id;
+    }
+    S.team.entered++;
+    buildPercGrids(); teamRenderParticipants();
+    percStatusSet('Entrée : ' + next.label + (percPart[next.id] ? ' → ' + teamPartLabel(percPart[next.id]) : '') + '.');
+    if (!isPlaying) drawStatic();
+  }
+
+  function teamAccumReset() {
+    teamAccumApplyEntry();
+    buildPercGrids(); teamRenderParticipants();
+    percStatusSet('Remis à zéro : personne n\'a encore joué. « Faire entrer la voix suivante » les ajoute une à une.');
+    if (!isPlaying) drawStatic();
+  }
+
+  // distribution : répartit les voix vivantes entre les participants, équilibré par tessiture
+  // (tri par rôle puis round-robin → aucun joueur n'hérite de toutes les basses).
+  function teamAutoPartition(silent) {
+    const parts = S.team.participants;
+    if (!parts.length) { if (!silent) percStatusSet('Ajoute au moins un participant avant de répartir.'); return; }
+    const roleRank = { basse: 0, medium: 1, aigu: 2, timekeeper: 3 };
+    const list = teamVoiceList().slice().sort((a, b) => {
+      const ra = roleRank[a.role] === undefined ? 9 : roleRank[a.role];
+      const rb = roleRank[b.role] === undefined ? 9 : roleRank[b.role];
+      return ra - rb;
+    });
+    list.forEach((v, i) => { percPart[v.id] = parts[i % parts.length].id; percMuted[v.id] = false; });
+    if (!silent) {
+      buildPercGrids(); teamRenderParticipants();
+      percStatusSet('Réparti : ' + list.length + ' voix sur ' + parts.length + ' participant(s). Solo d\'un participant = sa part ; tutti = le groove.');
+      if (!isPlaying) drawStatic();
+    }
+  }
+
+  function teamSetOn(on) {
+    S.team.on = on;
+    if (on) {
+      if (S.team.participants.length === 0) { teamAddParticipant('Joueur 1'); teamAddParticipant('Joueur 2'); }
+      S.perc.on = true; $('percOn').checked = true;
+      S.perc.mode = 'off'; $('percMode').value = 'off';
+      teamUI(); percModeUI(); teamModeUI(); teamGrooveRefresh();
+      buildPercGrids();          // rangées avec sélecteurs de participant
+      teamRenderParticipants();
+      percStatusSet('Team spirit activé. Charge un groove, ajoute des participants, assigne les voix.');
+    } else {
+      S.team.on = false;
+      teamUI();
+      percSetInstr(S.perc.instr);   // retour à la surface focale passe 2 (groove de base de l'instrument courant)
+      percStatusSet('Team spirit désactivé — retour au groove d\'un seul instrument.');
+    }
+    if (!isPlaying) drawStatic();
+  }
+
+  $('teamToggle').addEventListener('change', e => teamSetOn(e.target.checked));
+  $('teamLoad').addEventListener('click', () => teamLoadGroove($('teamGroove').value));
+  $('teamGroove').addEventListener('change', e => { if (e.target.value) teamLoadGroove(e.target.value); });
+  $('teamModeAccum').addEventListener('click', () => {
+    S.team.mode = 'accumulation'; teamModeUI();
+    if (S.team.grooveId) { teamAccumApplyEntry(); buildPercGrids(); teamRenderParticipants(); }
+    percStatusSet('Mode accumulation : les voix entrent une à une (ordre d\'entrée en jam).');
+    if (!isPlaying) drawStatic();
+  });
+  $('teamModeDist').addEventListener('click', () => {
+    S.team.mode = 'distribution'; teamModeUI();
+    Object.keys(percGrids).forEach(id => { if (!claveData[id]) percMuted[id] = false; });
+    if (S.team.participants.length) teamAutoPartition(true);
+    buildPercGrids(); teamRenderParticipants();
+    percStatusSet('Mode distribution : un groove complet partagé entre les participants.');
+    if (!isPlaying) drawStatic();
+  });
+  $('teamNext').addEventListener('click', teamAccumNext);
+  $('teamAccumReset').addEventListener('click', teamAccumReset);
+  $('teamAuto').addEventListener('click', () => teamAutoPartition(false));
+  $('teamAddPart').addEventListener('click', () => {
+    teamAddParticipant();
+    buildPercGrids();      // rafraîchit les sélecteurs d'assignation des rangées
+    teamRenderParticipants();
+  });
 
   // ---- plein écran percussion ----
   let percFsOpen = false;
@@ -2091,9 +5518,10 @@ swing 62
     S.volume = e.target.value / 100;
     if (masterGain) masterGain.gain.value = S.volume;
   });
-  $('beatsSel').addEventListener('change', e => { S.beats = +e.target.value; buildStepGrid(); if (!isPlaying) drawStatic(); });
+  $('beatsSel').addEventListener('change', e => { S.beats = +e.target.value; buildStepGrid(); refreshPercGrids(); if (!isPlaying) drawStatic(); });
   $('subdivSel').addEventListener('change', e => { S.subdiv = +e.target.value; if (!isPlaying) drawStatic(); });
   $('accentCheck').addEventListener('change', e => S.accentFirst = e.target.checked);
+  $('pulseMuteCheck').addEventListener('change', e => S.sound.pulseMuted = e.target.checked);
 
   $('swingSlider').addEventListener('input', e => setSwing(+e.target.value));
   $('shiftCheck').addEventListener('change', e => S.shift.on = e.target.checked);
@@ -2108,21 +5536,21 @@ swing 62
 
   $('clavePreset').addEventListener('change', e => { applyPreset(e.target.value); e.target.value = ''; });
   $('claveCount').addEventListener('change', e => {
-    const n = +e.target.value, old = S.clave.steps;
-    S.clave.count = n;
-    S.clave.steps = new Array(n).fill(0).map((_, i) => old[i] || 0);
-    buildStepGrid();
+    const n = +e.target.value;
+    // 12/16 = choix de famille : asservit clave ET percussion ensemble (§7.7).
+    if (n === 12 || n === 16) { setFamily(n === 12 ? 'tern' : 'bin'); return; }
+    // 8 pas = cellule courte propre à la clave (tresillo, cinquillo) : la famille ne bouge pas.
+    claveSetCount(n);
     if (!isPlaying) drawStatic();
   });
   $('claveClear').addEventListener('click', () => {
-    S.clave.steps.fill(0); refreshStepGrid(); if (!isPlaying) drawStatic();
-  });
-  $('claveFreq').addEventListener('input', e => {
-    S.clave.freq = +e.target.value; $('claveFreqVal').textContent = S.clave.freq + ' Hz';
+    CLAVE_VOICES.forEach(v => claveData[v.id].grid.fill(0));
+    refreshStepGrid(); percLineRender(); if (!isPlaying) drawStatic();
   });
   $('polySel').addEventListener('change', e => { S.poly = +e.target.value; if (!isPlaying) drawStatic(); });
 
   $('gapMode').addEventListener('change', e => { S.gap.mode = e.target.value; resetGap(); });
+  $('gapTarget').addEventListener('change', e => { S.gap.target = e.target.value; resetGap(); });
   $('gapPlay').addEventListener('change', e => { S.gap.playN = Math.max(1, +e.target.value); resetGap(); });
   $('gapMute').addEventListener('change', e => { S.gap.muteM = Math.max(1, +e.target.value); resetGap(); });
   $('gapProb').addEventListener('input', e => {
@@ -2587,28 +6015,37 @@ swing 62
   window.addEventListener('resize', () => { if (fsOpen) sizeFs(); });
 
   // ============ WIZARD ============
+  // Restructuré : le wizard pose UNIQUEMENT le contexte et la famille (+ surcouches).
+  // Plus d'écrans de réglage fin par couche : clave, groove perc, etc. se posent
+  // AU JUGÉ, en direct, dans les sections, sur le socle qui tourne.
   const wiz = {
     step: 0,
-    goal: null,          // 'simple' | 'groove' | 'clave' | 'gap' | 'routine'
+    context: null,       // 'simple' | 'pile' | 'archet'
+    family: 'bin',       // 'bin' | 'tern'  (si pile)
+    over: { gap: false, routine: false },  // surcouches cochées
     tempo: 92, beats: 4, subdiv: 1,
-    extra: {}            // choix de l'étape 3
+    perso: false,        // programme percussion personnalisé (questionnaire, si pile)
+    answers: null        // réponses du questionnaire → buildKitProfile
   };
 
-  const GOALS = [
-    { id: 'simple',  t: 'Un tempo, un clic',            d: 'Métronome classique, réglages essentiels — mode simple.' },
-    { id: 'groove',  t: 'Groove & swing',               d: 'Swing asymétrique, placement behind/ahead the beat.' },
-    { id: 'clave',   t: 'Claves & polyrythmie',         d: 'Cellules rythmiques en boucle, visualisation circulaire.' },
-    { id: 'perc',    t: 'Percussion & indépendance',    d: 'Djembé, cajón, dunduns — variations et appel-réponse.' },
-    { id: 'archet',  t: 'Coups d\'archet',              d: 'Tirer/pousser, liaisons, reprises — du violon à la contrebasse.' },
-    { id: 'gap',     t: 'Horloge interne (gap clicks)', d: 'Le clic se coupe : ton tempo intérieur prend le relais.' },
-    { id: 'routine', t: 'Routine programmée',           d: 'Endurance, accelerando, coupures — session scriptée.' }
+  // Contextes = premier écran. Trois choix exclusifs.
+  const CONTEXTS = [
+    { id: 'simple', t: 'Un tempo, un clic', d: 'Métronome nu — tempo, mesure, subdivision. Rien d\u2019autre.' },
+    { id: 'pile',   t: 'Pile rythmique',    d: 'Pulsation, claves et percussions se posent ensemble sur le même cycle.' },
+    { id: 'archet', t: 'Coups d\u2019archet', d: 'Aller-retour de l\u2019archet visualisés — du violon à la contrebasse. Mode à part.' }
   ];
 
   const wizOverlay = $('wizOverlay');
 
   function openWizard() {
-    wiz.step = 0; wiz.goal = null;
-    wiz.tempo = S.tempo; wiz.beats = S.beats; wiz.subdiv = S.subdiv; wiz.extra = {};
+    wiz.step = 0;
+    wiz.context = null;
+    wiz.family = (S.family === 'tern') ? 'tern' : 'bin';
+    wiz.over = { gap: false, routine: false };
+    wiz.tempo = S.tempo; wiz.beats = S.beats; wiz.subdiv = S.subdiv;
+    wiz.perso = false;
+    wiz.answers = { objectif: 'regularite', niveau: 'debutant', instrument: 'djembe',
+                    periodOverride: 4, dynamicsOverride: 'accentuee', lateralite: 'alternance' };
     wizOverlay.classList.add('open');
     renderWizard();
   }
@@ -2617,11 +6054,43 @@ swing 62
     store.set('fm-metro-wizard-done', '1');
   }
 
-  function wizSteps() { return wiz.goal === 'simple' || wiz.goal === null ? 3 : 4; }
+  // écrans dynamiques : contexte → tempo/mesure (+ famille & surcouches si pile)
+  //   → [questionnaire pédagogique, si pile + programme perso] → récap
+  function wizStepKeys() {
+    const keys = ['context', 'tempo'];
+    if (wiz.context === 'pile' && wiz.perso) keys.push('quiz');
+    keys.push('recap');
+    return keys;
+  }
+  function wizSteps() { return wizStepKeys().length; }
+
+  // Questionnaire pédagogique (passe 2, §3) : libellés musiciens ; valeurs = entrées de buildKitProfile.
+  const QUIZ_OBJECTIFS = [
+    { id: 'separation',   t: 'Séparation mains / baguettes' },
+    { id: 'independance', t: 'Indépendance des voix' },
+    { id: 'dynamique',    t: 'Nuances et accents' },
+    { id: 'regularite',   t: 'Régularité / stabilité du tempo' }
+  ];
+  const QUIZ_NIVEAUX = { debutant: 'Débutant', intermediaire: 'Intermédiaire', avance: 'Avancé' };
+  const QUIZ_INSTRS = [
+    ['djembe', 'Djembé (basse · tone · slap)'],
+    ['cajon', 'Cajón (grave · aigu)'],
+    ['dunduns', 'Dunduns & cloche']
+  ];
+
+  // réponses du wizard → signature de buildKitProfile (la famille vient de l'écran tempo).
+  function quizAnswers() {
+    return Object.assign({}, wiz.answers, {
+      subdivision: wiz.family === 'tern' ? 'ternaire' : 'binaire'
+    });
+  }
 
   function renderWizard() {
     const body = $('wizBody'), dots = $('wizDots');
-    const total = wizSteps();
+    const keys = wizStepKeys();
+    const total = keys.length;
+    if (wiz.step > total - 1) wiz.step = total - 1;
+    const key = keys[wiz.step];
     dots.innerHTML = '';
     for (let i = 0; i < total; i++) {
       const s = document.createElement('span');
@@ -2629,22 +6098,22 @@ swing 62
       dots.appendChild(s);
     }
     $('wizBack').style.visibility = wiz.step === 0 ? 'hidden' : 'visible';
-    $('wizNext').textContent = wiz.step === total - 1 ? '✓ C\'est parti' : 'Continuer →';
+    $('wizNext').textContent = wiz.step === total - 1 ? '\u2713 C\u2019est parti' : 'Continuer \u2192';
 
-    if (wiz.step === 0) {
+    if (key === 'context') {
       $('wizTitle').textContent = 'Que veux-tu travailler ?';
-      $('wizSub').textContent = 'L\'assistant règle le métronome pour toi — tu pourras tout ajuster ensuite.';
-      body.innerHTML = '<div class="wiz-options">' + GOALS.map(g =>
-        '<button class="wiz-opt' + (wiz.goal === g.id ? ' sel' : '') + '" data-goal="' + g.id + '"><b>' + g.t + '</b><small>' + g.d + '</small></button>'
+      $('wizSub').textContent = 'Choisis un contexte — tu poseras tout le reste à la main, en direct.';
+      body.innerHTML = '<div class="wiz-options">' + CONTEXTS.map(c =>
+        '<button class="wiz-opt' + (wiz.context === c.id ? ' sel' : '') + '" data-ctx="' + c.id + '"><b>' + c.t + '</b><small>' + c.d + '</small></button>'
       ).join('') + '</div>';
       body.querySelectorAll('.wiz-opt').forEach(b => b.addEventListener('click', () => {
-        wiz.goal = b.dataset.goal; renderWizard();
+        wiz.context = b.dataset.ctx; renderWizard();
       }));
     }
-    else if (wiz.step === 1) {
+    else if (key === 'tempo') {
       $('wizTitle').textContent = 'Tempo et mesure';
       $('wizSub').textContent = 'Le point de départ de ta session.';
-      body.innerHTML =
+      let html =
         '<div class="row"><label>Tempo</label><input type="range" id="wTempo" min="30" max="260" value="' + wiz.tempo + '"><span class="val" id="wTempoVal">' + wiz.tempo + ' BPM</span></div>' +
         '<div class="row"><label>Temps par cycle</label><select id="wBeats" style="width:auto;">' +
           [2,3,4,5,6,7].map(n => '<option' + (n === wiz.beats ? ' selected' : '') + '>' + n + '</option>').join('') +
@@ -2654,129 +6123,99 @@ swing 62
           '<option value="3"' + (wiz.subdiv===3?' selected':'') + '>Triolets</option>' +
           '<option value="4"' + (wiz.subdiv===4?' selected':'') + '>Doubles</option>' +
         '</select></div>';
+      // famille + surcouches : seulement en contexte « pile rythmique »
+      if (wiz.context === 'pile') {
+        html +=
+          '<div class="row" style="margin-top:14px;"><label>Grille rythmique</label>' +
+          '<select id="wFamily" style="width:auto;">' +
+            '<option value="bin"' + (wiz.family==='bin'?' selected':'') + '>Binaire · 16 pas</option>' +
+            '<option value="tern"' + (wiz.family==='tern'?' selected':'') + '>Ternaire · 12 pas</option>' +
+          '</select></div>' +
+          '<div class="hint">Clave et percussion partageront cette grille.</div>' +
+          '<div class="row" style="margin-top:12px;"><label>Surcouches</label>' +
+          '<label class="check"><input type="checkbox" id="wOverGap"' + (wiz.over.gap ? ' checked' : '') + '> Horloge interne (gap)</label>' +
+          '<label class="check"><input type="checkbox" id="wOverRoutine"' + (wiz.over.routine ? ' checked' : '') + '> Routine programmée</label></div>' +
+          '<div class="hint">Optionnelles — elles se posent par-dessus la pile, tu peux les activer plus tard.</div>' +
+          '<div class="row" style="margin-top:12px;"><label>Programme percussion</label>' +
+          '<label class="check"><input type="checkbox" id="wPerso"' + (wiz.perso ? ' checked' : '') + '> Assistant pédagogique (questionnaire)</label></div>' +
+          '<div class="hint">Coché : un court questionnaire choisit un objectif et l’app génère un kit de percussion adapté (groove, variations, mains). Décoché : tu poses tout à la main.</div>';
+      }
+      body.innerHTML = html;
       $('wTempo').addEventListener('input', e => {
         wiz.tempo = +e.target.value; $('wTempoVal').textContent = wiz.tempo + ' BPM';
       });
       $('wBeats').addEventListener('change', e => wiz.beats = +e.target.value);
       $('wSubdiv').addEventListener('change', e => wiz.subdiv = +e.target.value);
+      if (wiz.context === 'pile') {
+        $('wFamily').addEventListener('change', e => wiz.family = e.target.value);
+        $('wOverGap').addEventListener('change', e => wiz.over.gap = e.target.checked);
+        $('wOverRoutine').addEventListener('change', e => wiz.over.routine = e.target.checked);
+        $('wPerso').addEventListener('change', e => wiz.perso = e.target.checked);
+      }
     }
-    else if (wiz.step === 2 && wizSteps() === 4) {
-      renderWizStep3(body);
+    else if (key === 'quiz') {
+      $('wizTitle').textContent = 'Programme personnalisé';
+      $('wizSub').textContent = 'Quelques réponses — l’app génère ton kit de percussion.';
+      const a = wiz.answers;
+      let html =
+        '<div class="row"><label>Objectif</label><select id="qObj" style="flex:1;min-width:200px;">' +
+          QUIZ_OBJECTIFS.map(o => '<option value="' + o.id + '"' + (a.objectif===o.id?' selected':'') + '>' + o.t + '</option>').join('') +
+        '</select></div>' +
+        '<div class="row"><label>Niveau</label><select id="qNiv" style="width:auto;">' +
+          Object.keys(QUIZ_NIVEAUX).map(n => '<option value="' + n + '"' + (a.niveau===n?' selected':'') + '>' + QUIZ_NIVEAUX[n] + '</option>').join('') +
+        '</select></div>' +
+        '<div class="row"><label>Instrument</label><select id="qInstr" style="width:auto;">' +
+          QUIZ_INSTRS.map(p => '<option value="' + p[0] + '"' + (a.instrument===p[0]?' selected':'') + '>' + p[1] + '</option>').join('') +
+        '</select></div>' +
+        '<div class="row"><label>Stabilité avant complexification</label><input type="range" id="qPeriod" min="1" max="8" value="' + a.periodOverride + '"><span class="val" id="qPeriodVal">' + a.periodOverride + ' mes.</span></div>';
+      if (a.objectif === 'dynamique') {
+        html +=
+          '<div class="row"><label>Contrastes de nuances</label><select id="qDyn" style="width:auto;">' +
+            '<option value="accentuee"' + (a.dynamicsOverride==='accentuee'?' selected':'') + '>Marqués (accents francs)</option>' +
+            '<option value="progressive"' + (a.dynamicsOverride==='progressive'?' selected':'') + '>Progressifs (montée graduelle)</option>' +
+          '</select></div>';
+      }
+      html +=
+        '<div class="row"><label>Mains</label><select id="qLat" style="width:auto;">' +
+          '<option value="droitier"' + (a.lateralite==='droitier'?' selected':'') + '>Droitier</option>' +
+          '<option value="gaucher"' + (a.lateralite==='gaucher'?' selected':'') + '>Gaucher</option>' +
+          '<option value="alternance"' + (a.lateralite==='alternance'?' selected':'') + '>Alternance stricte D-G</option>' +
+        '</select></div>' +
+        '<div class="hint">La grille (' + (wiz.family==='tern'?'ternaire · 12':'binaire · 16') + ') vient de l’écran précédent. Tu pourras tout retoucher ensuite dans la section Percussion.</div>';
+      body.innerHTML = html;
+      $('qObj').addEventListener('change', e => { a.objectif = e.target.value; renderWizard(); });
+      $('qNiv').addEventListener('change', e => a.niveau = e.target.value);
+      $('qInstr').addEventListener('change', e => a.instrument = e.target.value);
+      $('qPeriod').addEventListener('input', e => {
+        a.periodOverride = +e.target.value; $('qPeriodVal').textContent = a.periodOverride + ' mes.';
+      });
+      if (a.objectif === 'dynamique') $('qDyn').addEventListener('change', e => a.dynamicsOverride = e.target.value);
+      $('qLat').addEventListener('change', e => a.lateralite = e.target.value);
     }
     else {
       // récapitulatif
       $('wizTitle').textContent = 'Récapitulatif';
       $('wizSub').textContent = 'Vérifie, puis lance-toi.';
-      const g = GOALS.find(x => x.id === wiz.goal) || GOALS[0];
+      const c = CONTEXTS.find(x => x.id === wiz.context) || CONTEXTS[0];
       let extra = '';
-      if (wiz.goal === 'groove') extra = 'Swing <b>' + (wiz.extra.swing || 50) + ' %</b>' + (wiz.extra.shift ? ' · clic de placement <b>' + (wiz.extra.shiftMs >= 0 ? '+' : '') + wiz.extra.shiftMs + ' ms</b>' : '');
-      if (wiz.goal === 'clave') extra = 'Preset : <b>' + (wiz.extra.presetLabel || 'aucun (grille vide)') + '</b>';
-      if (wiz.goal === 'perc') extra = 'Instrument : <b>' + PERC_INSTR[wiz.extra.percInstr || 'djembe'].label + '</b> · exercice : <b>' +
-        ({ off: 'libre', add: 'ajout progressif', sub: 'soustraction', call: 'appel-réponse', guide: 'progression guidée' }[wiz.extra.percMode || 'add']) + '</b>';
-      if (wiz.goal === 'archet') extra = 'Instrument : <b>' + INSTR[wiz.extra.instr || 'violon'].label + '</b> · exercice : <b>' + BOW_PRESETS[wiz.extra.bowPreset || 'debutant'].label + '</b>';
-      if (wiz.goal === 'gap') extra = 'Gap <b>' + ({fixed:'fixe',prog:'progressif',rand:'aléatoire'}[wiz.extra.gapMode] || 'fixe') + '</b> · jouer <b>' + (wiz.extra.gapPlay || 4) + '</b>, couper <b>' + (wiz.extra.gapMute || 1) + '</b>';
-      if (wiz.goal === 'routine') extra = 'Une routine d\'exemple sera préremplie dans la section Script.';
+      if (wiz.context === 'pile') {
+        const over = [];
+        if (wiz.over.gap) over.push('horloge interne');
+        if (wiz.over.routine) over.push('routine');
+        extra = 'Grille : <b>' + (wiz.family === 'tern' ? 'ternaire (12)' : 'binaire (16)') + '</b>' +
+          (over.length ? '<br>Surcouches : <b>' + over.join(', ') + '</b>' : '');
+        if (wiz.perso) {
+          const obj = (QUIZ_OBJECTIFS.find(o => o.id === wiz.answers.objectif) || {}).t || wiz.answers.objectif;
+          const instr = PERC_INSTR[wiz.answers.instrument] ? PERC_INSTR[wiz.answers.instrument].label : wiz.answers.instrument;
+          extra += '<br>Programme perso : <b>' + obj + '</b> · ' + QUIZ_NIVEAUX[wiz.answers.niveau] + ' · kit ' + instr;
+        }
+      }
       body.innerHTML = '<div class="wiz-recap">' +
-        'Objectif : <b>' + g.t + '</b><br>' +
+        'Contexte : <b>' + c.t + '</b><br>' +
         'Tempo : <b>' + wiz.tempo + ' BPM</b> · ' + wiz.beats + ' temps · ' +
         ({1:'noires',2:'croches',3:'triolets',4:'doubles'}[wiz.subdiv]) +
         (extra ? '<br>' + extra : '') +
-        '<br>Mode : <b>' + (wiz.goal === 'simple' ? 'Simple' : 'Expert') + '</b></div>';
-    }
-  }
-
-  function renderWizStep3(body) {
-    if (wiz.goal === 'groove') {
-      $('wizTitle').textContent = 'Réglage du groove';
-      $('wizSub').textContent = 'Swing asymétrique et placement dans le temps.';
-      const sw = wiz.extra.swing || 58;
-      body.innerHTML =
-        '<div class="row"><label>Swing</label><input type="range" id="wSwing" min="50" max="85" value="' + sw + '"><span class="val" id="wSwingVal">' + sw + ' %</span></div>' +
-        '<div class="hint">Repères : 50 % droit · ~58–62 % samba/choro · 66 % ternaire.</div>' +
-        '<div class="row" style="margin-top:12px;"><label class="check"><input type="checkbox" id="wShift"' + (wiz.extra.shift ? ' checked' : '') + '> Clic de placement</label></div>' +
-        '<div class="row"><label>Décalage</label><input type="range" id="wShiftMs" min="-80" max="80" value="' + (wiz.extra.shiftMs || 25) + '"><span class="val" id="wShiftMsVal">' + (wiz.extra.shiftMs >= 0 || wiz.extra.shiftMs === undefined ? '+' : '') + (wiz.extra.shiftMs || 25) + ' ms</span></div>';
-      wiz.extra.swing = sw;
-      wiz.extra.shiftMs = wiz.extra.shiftMs || 25;
-      $('wSwing').addEventListener('input', e => { wiz.extra.swing = +e.target.value; $('wSwingVal').textContent = wiz.extra.swing + ' %'; });
-      $('wShift').addEventListener('change', e => wiz.extra.shift = e.target.checked);
-      $('wShiftMs').addEventListener('input', e => {
-        wiz.extra.shiftMs = +e.target.value;
-        $('wShiftMsVal').textContent = (wiz.extra.shiftMs >= 0 ? '+' : '') + wiz.extra.shiftMs + ' ms';
-      });
-    }
-    else if (wiz.goal === 'clave') {
-      $('wizTitle').textContent = 'Choisis une clave';
-      $('wizSub').textContent = 'Tu pourras l\'éditer pas à pas ensuite.';
-      const opts = [
-        ['son32', 'Son clave 3-2'], ['son23', 'Son clave 2-3'], ['rumba32', 'Rumba 3-2'],
-        ['bossa', 'Bossa'], ['partido', 'Partido alto (variante)'], ['tresillo', 'Tresillo'], ['cinquillo', 'Cinquillo']
-      ];
-      body.innerHTML = '<div class="wiz-options">' + opts.map(o =>
-        '<button class="wiz-opt' + (wiz.extra.preset === o[0] ? ' sel' : '') + '" data-p="' + o[0] + '"><b>' + o[1] + '</b></button>'
-      ).join('') + '</div>';
-      body.querySelectorAll('.wiz-opt').forEach(b => b.addEventListener('click', () => {
-        wiz.extra.preset = b.dataset.p;
-        wiz.extra.presetLabel = b.textContent;
-        renderWizard();
-      }));
-    }
-    else if (wiz.goal === 'perc') {
-      $('wizTitle').textContent = 'Percussion & indépendance';
-      $('wizSub').textContent = 'Choisis l\'instrument et l\'exercice — le groove de base se met en place tout seul.';
-      body.innerHTML = '<div class="wiz-options">' + Object.keys(PERC_INSTR).map(k =>
-        '<button class="wiz-opt' + ((wiz.extra.percInstr || 'djembe') === k ? ' sel' : '') + '" data-pi="' + k + '"><b>' + PERC_INSTR[k].label + '</b></button>'
-      ).join('') + '</div>' +
-      '<div class="row" style="margin-top:14px;"><label>Exercice</label><select id="wPercMode" style="flex:1;">' +
-        [['off', 'Libre (groove seul)'], ['add', 'Ajout progressif'], ['sub', 'Soustraction'], ['call', 'Appel-réponse'], ['guide', 'Progression guidée (mains)']].map(o =>
-          '<option value="' + o[0] + '"' + ((wiz.extra.percMode || 'add') === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'
-        ).join('') + '</select></div>';
-      wiz.extra.percInstr = wiz.extra.percInstr || 'djembe';
-      wiz.extra.percMode = wiz.extra.percMode || 'add';
-      body.querySelectorAll('.wiz-opt').forEach(b => b.addEventListener('click', () => {
-        wiz.extra.percInstr = b.dataset.pi; renderWizard();
-      }));
-      $('wPercMode').addEventListener('change', e => wiz.extra.percMode = e.target.value);
-    }
-    else if (wiz.goal === 'archet') {
-      $('wizTitle').textContent = 'Ton instrument, ton archet';
-      $('wizSub').textContent = 'La jauge s\'adapte : point d\'équilibre, zone de puissance au talon.';
-      body.innerHTML = '<div class="wiz-options">' + Object.keys(INSTR).map(k =>
-        '<button class="wiz-opt' + ((wiz.extra.instr || 'violon') === k ? ' sel' : '') + '" data-i="' + k + '"><b>' + INSTR[k].label + '</b></button>'
-      ).join('') + '</div>' +
-      '<div class="row" style="margin-top:14px;"><label>Exercice</label><select id="wBowPreset" style="flex:1;">' +
-        Object.keys(BOW_PRESETS).map(k =>
-          '<option value="' + k + '"' + ((wiz.extra.bowPreset || 'debutant') === k ? ' selected' : '') + '>' + BOW_PRESETS[k].label + '</option>'
-        ).join('') + '</select></div>';
-      wiz.extra.instr = wiz.extra.instr || 'violon';
-      wiz.extra.bowPreset = wiz.extra.bowPreset || 'debutant';
-      body.querySelectorAll('.wiz-opt').forEach(b => b.addEventListener('click', () => {
-        wiz.extra.instr = b.dataset.i; renderWizard();
-      }));
-      $('wBowPreset').addEventListener('change', e => wiz.extra.bowPreset = e.target.value);
-    }
-    else if (wiz.goal === 'gap') {
-      $('wizTitle').textContent = 'Réglage des coupures';
-      $('wizSub').textContent = 'Le métronome se tait, ton horloge interne continue.';
-      const gm = wiz.extra.gapMode || 'fixed';
-      body.innerHTML =
-        '<div class="row"><label>Mode</label><select id="wGapMode" style="width:auto;">' +
-          '<option value="fixed"' + (gm==='fixed'?' selected':'') + '>Fixe (N jouées / M coupées)</option>' +
-          '<option value="prog"' + (gm==='prog'?' selected':'') + '>Progressif (1, 2, 4, 8…)</option>' +
-          '<option value="rand"' + (gm==='rand'?' selected':'') + '>Aléatoire</option>' +
-        '</select></div>' +
-        '<div class="row"><label>Mesures jouées</label><input type="number" id="wGapPlay" min="1" max="64" value="' + (wiz.extra.gapPlay || 4) + '" style="width:80px;">' +
-        '<label style="min-width:auto;">coupées</label><input type="number" id="wGapMute" min="1" max="32" value="' + (wiz.extra.gapMute || 1) + '" style="width:80px;"></div>';
-      wiz.extra.gapMode = gm; wiz.extra.gapPlay = wiz.extra.gapPlay || 4; wiz.extra.gapMute = wiz.extra.gapMute || 1;
-      $('wGapMode').addEventListener('change', e => wiz.extra.gapMode = e.target.value);
-      $('wGapPlay').addEventListener('change', e => wiz.extra.gapPlay = Math.max(1, +e.target.value));
-      $('wGapMute').addEventListener('change', e => wiz.extra.gapMute = Math.max(1, +e.target.value));
-    }
-    else if (wiz.goal === 'routine') {
-      $('wizTitle').textContent = 'Routine programmée';
-      $('wizSub').textContent = 'Un exemple sera prérempli — modifie-le librement.';
-      body.innerHTML = '<div class="wiz-recap">La section <b>Routine programmée</b> s\'ouvrira avec un exemple :<br>' +
-        '<code>80bpm 5min</code> puis <code>80->120bpm 10min</code> puis <code>gap 2/16</code>…<br>' +
-        'Clique « Lancer la routine » quand tu es prêt.</div>';
+        '<br>Mode : <b>' + (wiz.context === 'simple' ? 'Simple' : 'Expert') + '</b></div>';
     }
   }
 
@@ -2785,67 +6224,42 @@ swing 62
     S.beats = wiz.beats; $('beatsSel').value = wiz.beats;
     S.subdiv = wiz.subdiv; $('subdivSel').value = wiz.subdiv;
 
-    if (wiz.goal === 'simple') {
+    if (wiz.context === 'simple') {
+      setContext('');
       setMode('simple');
-    } else {
-      setMode('expert');
-      document.querySelectorAll('details.section').forEach(d => d.open = false);
-      if (wiz.goal === 'groove') {
-        setSwing(wiz.extra.swing || 58);
-        S.shift.on = !!wiz.extra.shift;
-        $('shiftCheck').checked = S.shift.on;
-        S.shift.ms = wiz.extra.shiftMs || 25;
-        $('shiftSlider').value = S.shift.ms;
-        $('shiftVal').textContent = (S.shift.ms >= 0 ? '+' : '') + S.shift.ms + ' ms';
-        if (wiz.subdiv === 1) { S.subdiv = 2; $('subdivSel').value = 2; } // le swing a besoin d'une subdivision
-        $('secGroove').open = true;
-      }
-      if (wiz.goal === 'clave') {
-        if (wiz.extra.preset) applyPreset(wiz.extra.preset);
-        $('secClave').open = true;
-      }
-      if (wiz.goal === 'perc') {
-        percSetInstr(wiz.extra.percInstr || 'djembe');
-        $('percInstr').value = S.perc.instr;
-        S.perc.mode = wiz.extra.percMode || 'add';
-        $('percMode').value = S.perc.mode;
-        S.perc.on = true;
-        $('percOn').checked = true;
-        $('secPerc').open = true;
-      }
-      if (wiz.goal === 'archet') {
-        bowInstr = wiz.extra.instr || 'violon';
-        $('bowInstr').value = bowInstr;
-        $('bowNote').textContent = INSTR[bowInstr].note;
-        applyBowPreset(wiz.extra.bowPreset || 'debutant');
-        $('secArchet').open = true;
-      }
-      if (wiz.goal === 'gap') {
-        S.gap.mode = wiz.extra.gapMode || 'fixed';
-        S.gap.playN = wiz.extra.gapPlay || 4;
-        S.gap.muteM = wiz.extra.gapMute || 1;
-        $('gapMode').value = S.gap.mode;
-        $('gapPlay').value = S.gap.playN;
-        $('gapMute').value = S.gap.muteM;
-        resetGap();
-        $('secGap').open = true;
-      }
-      if (wiz.goal === 'routine') {
-        $('secScript').open = true;
-        $('secScript').scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
     }
+    else if (wiz.context === 'archet') {
+      setMode('expert');
+      setContext('archet');
+      document.querySelectorAll('details.section').forEach(d => d.open = false);
+      $('secArchet').open = true;
+    }
+    else { // pile rythmique
+      setMode('expert');
+      setContext('pile');
+      setFamily(wiz.family);          // aligne clave + perc sur la grille choisie
+      // programme personnalisé : le moteur de règles génère et pose le kit de percussion
+      if (wiz.perso) applyKitProfile(buildKitProfile(quizAnswers()), wiz.answers.instrument);
+      document.querySelectorAll('details.section').forEach(d => d.open = false);
+      // on ouvre les couches pour poser au jugé ; le socle reste accessible replié
+      $('secClave').open = true;
+      $('secPerc').open = true;
+      if (wiz.over.gap) $('secGap').open = true;
+      if (wiz.over.routine) $('secScript').open = true;
+    }
+
     buildStepGrid();
     drawStatic();
     closeWizard();
-    if (wiz.goal !== 'routine' && !isPlaying) start();
+    // on démarre pour entendre le socle tourner, sauf si une routine est prévue à lancer à la main
+    if (!(wiz.context === 'pile' && wiz.over.routine) && !isPlaying) start();
   }
 
   $('wizardBtn').addEventListener('click', openWizard);
   $('wizSkip').addEventListener('click', closeWizard);
   $('wizBack').addEventListener('click', () => { if (wiz.step > 0) { wiz.step--; renderWizard(); } });
   $('wizNext').addEventListener('click', () => {
-    if (wiz.step === 0 && !wiz.goal) return; // il faut choisir un objectif
+    if (wiz.step === 0 && !wiz.context) return; // il faut choisir un contexte
     if (wiz.step >= wizSteps() - 1) { applyWizard(); return; }
     wiz.step++;
     renderWizard();
@@ -2858,6 +6272,10 @@ swing 62
   setMode(store.get('fm-metro-mode') === 'expert' ? 'expert' : 'simple');
   setTempo(92);
   setSwing(50);
+  // famille (bin/tern) : restaurée sans rebuild (les grilles sont bâties juste après)
+  setFamily(store.get('fm-metro-family') === 'tern' ? 'tern' : 'bin', false);
+  // contexte : restauré ; par défaut « pile rythmique » pour ne rien masquer d'emblée
+  setContext(store.get('fm-metro-context') || 'pile');
   buildStepGrid();
   bowCompile(false);
   percSetInstr('djembe');
