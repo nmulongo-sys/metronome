@@ -357,6 +357,20 @@
   .wiz-nav { display: flex; justify-content: space-between; gap: 10px; margin-top: 22px; }
   .wiz-recap { background: var(--fm-panel-2); border: 1px solid var(--fm-line); border-radius: 10px; padding: 14px 16px; font-size: .9rem; line-height: 1.7; }
   .wiz-recap b { color: var(--fm-accent); }
+  /* Team Spirit & répertoire (passe 3, étape 4) */
+  .ts-parts { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 12px; }
+  .ts-part { border: 1px solid var(--fm-line); border-radius: 10px; padding: 8px 10px; background: var(--fm-panel-2); min-width: 190px; }
+  .ts-part.solo { border-color: var(--fm-accent); box-shadow: inset 0 0 0 1px var(--fm-accent); }
+  .ts-part .ts-part-head { display: flex; align-items: center; gap: 6px; }
+  .ts-part input.ts-name { flex: 1; min-width: 60px; }
+  .ts-part .ts-line { color: var(--fm-sub); font-size: .78rem; margin-top: 5px; line-height: 1.5; }
+  .ts-chip { display: inline-block; font-size: .68rem; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--fm-line); color: var(--fm-sub); }
+  .ts-chip.basse { background: var(--fm-voice-1, rgba(120,120,200,.18)); }
+  .ts-chip.medium { background: var(--fm-voice-2, rgba(120,200,140,.18)); }
+  .ts-chip.aigu { background: var(--fm-voice-3, rgba(210,170,90,.18)); }
+  .ts-chip.adapte { color: var(--fm-accent-2); border-color: var(--fm-accent-2); }
+  .ts-voice select.ts-assign { width: auto; min-width: 120px; }
+  .ts-warn { color: var(--fm-accent-2); }
 </style>
 
 <script>
@@ -629,6 +643,46 @@
       kick/caisse claire pour le rock, la basse pour le Kuku — puis l'app ajoute une frappe à la fois, toutes les
       N mesures ou avec les boutons ← →, en t'expliquant à chaque étape quelle main va où, jusqu'au groove complet.
       Les patterns marqués <i>adaptation</i> sont des approximations pédagogiques : édite-les selon ta référence.</div>
+    </div>
+  </details>
+
+  <!-- 2 bis. Team Spirit & répertoire (passe 3, étape 4) -->
+  <details class="section" id="secTeam" data-strate="couche">
+    <summary><span class="sec-title">Team Spirit &amp; répertoire</span><span class="sec-sub">un groove · plusieurs instruments · une ligne par personne</span></summary>
+    <div class="section-body">
+      <div class="row">
+        <label>Répertoire</label>
+        <select id="tsFamily" style="width:auto;"></select>
+        <select id="tsGroove" style="flex:1;min-width:200px;"></select>
+        <button class="btn-sm primary" id="tsLoad">Charger</button>
+        <button class="btn-sm" id="tsUnload" title="Revenir à la percussion focale">Décharger</button>
+      </div>
+      <div class="row">
+        <label>Jouer tout à</label>
+        <select id="tsOverride" style="width:auto;">
+          <option value="authentique" selected>Instruments authentiques</option>
+        </select>
+        <span id="tsOverrideBadge" class="hint" style="margin:0;"></span>
+      </div>
+      <div class="row">
+        <label class="check"><input type="checkbox" id="tsOn"> Mode team spirit (répartir entre participants)</label>
+        <button class="btn-sm" id="tsAddPart">+ Participant</button>
+        <button class="btn-sm" id="tsAuto" title="Répartir les voix par tessiture, équilibré">Répartir auto</button>
+        <label class="check"><input type="checkbox" id="tsFinger"> Vérifier les doigtés</label>
+      </div>
+      <div id="tsParticipants" class="ts-parts"></div>
+      <div id="tsVoices"></div>
+      <div id="tsFingerOut" class="script-status" style="white-space:pre-line;"></div>
+      <div class="row" style="margin-top:10px;">
+        <button class="btn-sm" id="tsExportAll">⭳ Exporter tout (JSON)</button>
+      </div>
+      <div class="script-status" id="tsStatus"></div>
+      <div class="hint">Charge un groove de la bibliothèque puis choisis <b>l'instrument de jeu</b> :
+      rien n'oblige à rester sur l'instrument « authentique » — joue le répertoire du djembé au cajón si tu veux
+      (les voix sont replacées par <b>tessiture</b>, marquées <i>adapté</i>). En <b>mode team spirit</b>, assigne chaque
+      voix à un participant, écoute la part de chacun (<b>solo</b>/<b>muet</b>), et exporte sa <b>ligne en JSON</b> pour
+      la travailler chez soi. <b>Vérifier les doigtés</b> signale quand une même main est demandée deux fois au même
+      instant pour un même participant (physiquement impossible).</div>
     </div>
   </details>
 
@@ -1074,6 +1128,8 @@ swing 62
     if (!brk && percMuted[voice]) return true;
     if (S.perc.on && percCallSilent && !claveData[voice] &&
         (percWork === 'all' || voice === percWork)) return true;
+    // team spirit (passe 3 étape 4) : focal en sourdine + solo/mute par participant
+    if (typeof tsMuted === 'function' && tsMuted(voice, brk)) return true;
     return false;
   }
 
@@ -4592,6 +4648,7 @@ swing 62
           }
           percBreakActive = true;
           percBreaksPlayed++;
+          if (typeof tsProgressBump === 'function') tsProgressBump('break', S.perc.breakLevel);
           percStatusSet('BREAK — niveau ' + S.perc.breakLevel + '/4 · ' + percCurrentBreak().label);
           if (S.perc.breakEcho) percBreakEchoPending = true;
         } else {
@@ -4609,6 +4666,7 @@ swing 62
       if (percGuide && percGuide.idx < percGuide.stages.length - 1 && percMeasures % S.perc.period === 0) {
         percGuide.idx++;
         percGuideApply();
+        if (typeof tsProgressBump === 'function') tsProgressBump('guide', percGuide.idx + 1);
       }
       refreshPercGrids();
       return;
@@ -4723,6 +4781,8 @@ swing 62
     rebuildPercMeta();   // identité de timbre par voix, alignée sur le jeu de voix courant
     buildPercRowsInto($('percVoices'));
     buildPercRowsInto($('percFsVoices'));
+    // team spirit : ré-injecte les voix ts.* après toute reconstruction du jeu focal
+    if (typeof tsSyncGrids === 'function') tsSyncGrids();
     refreshPercGrids();
   }
 
@@ -5133,6 +5193,392 @@ swing 62
   $('percFsBtn').addEventListener('click', openPercFs);
   $('percFsClose').addEventListener('click', closePercFs);
   $('percFsPlay').addEventListener('click', toggle);
+
+  // ============ TEAM SPIRIT & RÉPERTOIRE (passe 3, étape 4) ============
+  // Une surface d'édition distincte des modes générateur (arbitrage A) : on charge un
+  // groove de la bibliothèque GROOVES, on choisit librement l'instrument de jeu (le rôle/
+  // tessiture prime sur l'instrument exact — arbitrage D), puis on répartit les voix entre
+  // participants (solo/mute par participant, hook dans percLayerMuted). Les voix vivent dans
+  // percGrids/percOffsets/percMeta avec un id namespacé « ts.<voix> » ; rebuildPercMeta les
+  // préserve déjà (branche prev), et tsSyncGrids les ré-injecte après chaque reconstruction.
+  const TS_PREFIX = 'ts.';
+  // clés de routage audio réellement rendues par playPerc (§3.1)
+  const TS_VALID = {
+    'djembe.basse':1,'djembe.tone':1,'djembe.slap':1,'cajon.grave':1,'cajon.aigu':1,
+    'dunduns.dundunba':1,'dunduns.sangban':1,'dunduns.kenkeni':1,'dunduns.cloche':1,
+    'agogo.grave':1,'agogo.aigu':1,'surdo.grave':1,'surdo.marcante':1,'recoreco.raclement':1
+  };
+  // substitution rôle → voiceKind par instrument : rend TOUTE voix audible sur TOUT
+  // instrument (le djembé joué au cajón, etc.). Le rôle (tessiture) prime.
+  const TS_SUB = {
+    djembe:  { basse:'basse',   medium:'tone',     aigu:'slap',     timekeeper:'slap' },
+    cajon:   { basse:'grave',   medium:'grave',    aigu:'aigu',     timekeeper:'aigu' },
+    dunduns: { basse:'dundunba',medium:'sangban',  aigu:'kenkeni',  timekeeper:'cloche' },
+    agogo:   { basse:'grave',   medium:'grave',    aigu:'aigu',     timekeeper:'aigu' },
+    surdo:   { basse:'grave',   medium:'marcante', aigu:'marcante', timekeeper:'marcante' },
+    recoreco:{ basse:'raclement',medium:'raclement',aigu:'raclement',timekeeper:'raclement' }
+  };
+  const TS = { loaded:false, grooveId:'', override:'authentique', on:false, checkFinger:false,
+               voices:[], participants:[] };
+  let tsPid = 0;
+
+  function tsEsc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g,
+      c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  }
+  function tsFamilies() {
+    const seen = [], set = {};
+    GROOVES.forEach(g => { if (!set[g.family]) { set[g.family] = 1; seen.push(g.family); } });
+    return seen;
+  }
+  // résout (instr, voiceKind, role) vers une clé de routage valide ; renvoie aussi
+  // approx=true quand une substitution par tessiture a été nécessaire.
+  function tsResolve(instr, voiceKind, role) {
+    if (!TS_SUB[instr]) instr = 'djembe';
+    let vk = voiceKind, approx = false;
+    if (!TS_VALID[instr + '.' + vk]) {
+      vk = (TS_SUB[instr] && TS_SUB[instr][role]) || TS_SUB[instr].medium;
+      approx = true;
+    }
+    return { instr, voiceKind: vk, approx };
+  }
+  function tsPlayedLabel(v) {
+    const def = PERC_INSTR[v.instr];
+    return (def ? def.label.replace(/\s*\(.*$/, '') : v.instr) + ' · ' + v.voiceKind;
+  }
+
+  // ---- (dé)chargement d'un groove ----
+  function tsLoadGroove() {
+    const g = GROOVES.find(x => x.id === $('tsGroove').value);
+    if (!g) return;
+    TS.grooveId = g.id; TS.loaded = true;
+    // la famille (16 bin / 12 tern) suit le groove ; percSetInstr rebâtit le focal,
+    // le hook tsSyncGrids ré-injecte nos voix juste après.
+    if (S.perc.count !== g.count) setFamily(g.count === 12 ? 'tern' : 'bin');
+    TS.voices = g.voices.map((v, i) => {
+      const base = { gid: v.id.replace(/[^a-z0-9]+/gi, '-') + '-' + i, label: v.label,
+                     role: v.role || 'medium', origInstr: v.instr, origKind: v.voiceKind,
+                     grid: (v.grid || []).slice(), participant: null };
+      return Object.assign(base, tsResolveFor(base));
+    });
+    TS.on = $('tsOn').checked;
+    S.perc.on = true; $('percOn').checked = true;
+    tsSyncGrids();
+    tsRefresh();
+    $('tsStatus').textContent = 'Répertoire « ' + g.label + ' » chargé (' + TS.voices.length +
+      ' voix). La percussion focale est en sourdine — « Décharger » pour revenir.';
+    if (!isPlaying) drawStatic();
+  }
+  // résout une voix selon l'override courant (authentique vs instrument imposé)
+  function tsResolveFor(v) {
+    if (TS.override === 'authentique') {
+      const r = tsResolve(v.origInstr, v.origKind, v.role);
+      return { instr: r.instr, voiceKind: r.voiceKind, approx: r.approx };
+    }
+    const r = tsResolve(TS.override, v.origKind, v.role);
+    return { instr: r.instr, voiceKind: r.voiceKind, approx: true };
+  }
+  function tsApplyOverride() {
+    TS.override = $('tsOverride').value;
+    TS.voices.forEach(v => Object.assign(v, tsResolveFor(v)));
+    tsSyncGrids();
+    tsRefresh();
+    if (!isPlaying) drawStatic();
+  }
+  function tsUnload() {
+    TS.loaded = false; TS.on = false; $('tsOn').checked = false;
+    tsSyncGrids();   // retire les voix ts.* de l'état moteur
+    tsRefresh();
+    $('tsStatus').textContent = 'Répertoire déchargé — retour à la percussion focale.';
+    if (!isPlaying) drawStatic();
+  }
+  // écrit (ou retire) les voix ts.* dans percGrids/percOffsets/percMeta.
+  function tsSyncGrids() {
+    for (const vid in percGrids) if (vid.indexOf(TS_PREFIX) === 0) {
+      delete percGrids[vid]; delete percOffsets[vid]; delete percMeta[vid]; delete percMuted[vid];
+    }
+    if (!TS.loaded) return;
+    TS.voices.forEach(v => {
+      const id = TS_PREFIX + v.gid;
+      percGrids[id] = v.grid.slice();
+      percOffsets[id] = new Array(v.grid.length).fill(0);
+      percMeta[id] = { instr: v.instr, voiceKind: v.voiceKind };
+    });
+  }
+  // mute métier team spirit — appelé par percLayerMuted. Quand un groove est chargé, la
+  // percussion focale est en sourdine ; les voix ts.* suivent le solo/mute des participants.
+  function tsMuted(voice, brk) {
+    if (!TS.loaded) return false;
+    if (claveData[voice]) return false;
+    if (voice.indexOf(TS_PREFIX) !== 0) return true;   // focal en sourdine
+    if (!TS.on) return false;                           // répertoire libre : tout audible
+    if (brk) return false;
+    const v = TS.voices.find(x => TS_PREFIX + x.gid === voice);
+    if (!v || v.participant == null) return false;      // voix commune : toujours audible
+    const p = TS.participants.find(x => x.id === v.participant);
+    if (p && p.mute) return true;
+    const anySolo = TS.participants.some(x => x.solo);
+    if (anySolo && !(p && p.solo)) return true;
+    return false;
+  }
+
+  // ---- participants ----
+  function tsAddParticipant() {
+    tsPid++;
+    TS.participants.push({ id: 'p' + tsPid, label: 'Participant ' + tsPid, solo: false, mute: false });
+    if (!TS.on) { TS.on = true; $('tsOn').checked = true; S.perc.on = true; $('percOn').checked = true; }
+    tsRefresh();
+  }
+  function tsRemoveParticipant(id) {
+    TS.participants = TS.participants.filter(p => p.id !== id);
+    TS.voices.forEach(v => { if (v.participant === id) v.participant = null; });
+    tsRefresh();
+    if (!isPlaying) drawStatic();
+  }
+  // répartition auto équilibrée par tessiture (rôle) — les rôles tournent chacun sur les
+  // participants, pour que chacun récupère un mélange grave/médium/aigu.
+  function tsAutoDistribute() {
+    if (!TS.participants.length) tsAddParticipant();
+    if (!TS.participants.length) return;
+    const byRole = { basse: [], medium: [], aigu: [], timekeeper: [] };
+    TS.voices.forEach(v => (byRole[v.role] || byRole.medium).push(v));
+    let k = 0;
+    Object.keys(byRole).forEach(r => byRole[r].forEach(v => {
+      v.participant = TS.participants[k % TS.participants.length].id; k++;
+    }));
+    tsRefresh();
+    if (!isPlaying) drawStatic();
+  }
+
+  // ---- détection des doigtés impossibles (2 mains identiques au même instant) ----
+  // Pour un même participant (ou tout le groove si aucun participant), on regarde chaque
+  // pas : deux frappes exigeant la MÊME main, ou plus de deux frappes simultanées, sont
+  // physiquement injouables par un·e seul·e percussionniste.
+  function tsFingerConflicts() {
+    if (!TS.loaded) return [];
+    const groups = {};   // participantId|'tous' → voix
+    TS.voices.forEach(v => {
+      const key = TS.on && v.participant != null ? v.participant : 'tous';
+      (groups[key] = groups[key] || []).push(v);
+    });
+    const out = [];
+    Object.keys(groups).forEach(key => {
+      const vs = groups[key];
+      const hands = vs.map(v => ({ v, h: percHandsFor(v.grid) }));
+      const n = TS.voices.length ? TS.voices[0].grid.length : 0;
+      for (let i = 0; i < n; i++) {
+        const hits = [];
+        hands.forEach(x => { if (x.v.grid[i] > 0) hits.push({ label: x.v.label, hand: x.h[i] }); });
+        if (hits.length < 2) continue;
+        const dCount = hits.filter(x => x.hand === 'D').length;
+        const gCount = hits.filter(x => x.hand === 'G').length;
+        if (hits.length > 2 || dCount > 1 || gCount > 1) {
+          const who = (key === 'tous') ? '' : ((TS.participants.find(p => p.id === key) || {}).label + ' — ');
+          const which = dCount > 1 ? 'main D' : (gCount > 1 ? 'main G' : (hits.length + ' frappes'));
+          out.push(who + percStepName(i) + ' : ' + which + ' demandée par ' +
+            hits.map(x => x.label).join(' + ') + ' → impossible');
+        }
+      }
+    });
+    return out;
+  }
+
+  // ---- export JSON « ma ligne » ----
+  function tsGrooveMeta() {
+    const g = GROOVES.find(x => x.id === TS.grooveId) || {};
+    return { id: g.id, label: g.label, family: g.family, count: g.count, tempo: g.tempo };
+  }
+  function tsVoiceExport(v) {
+    return { label: v.label, role: v.role, instr: v.instr, voiceKind: v.voiceKind,
+             authentique: !v.approx, grid: v.grid, mains: percHandsFor(v.grid) };
+  }
+  function tsDownload(obj, name) {
+    const blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+  function tsExportParticipant(id) {
+    const p = TS.participants.find(x => x.id === id); if (!p) return;
+    const mine = TS.voices.filter(v => v.participant === id);
+    if (!mine.length) { $('tsStatus').textContent = 'Aucune voix assignée à ' + p.label + '.'; return; }
+    tsDownload({ type: 'fm-metro-ligne', version: 1, participant: p.label,
+      groove: tsGrooveMeta(), voix: mine.map(tsVoiceExport) },
+      'ma-ligne-' + p.label.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '.json');
+    $('tsStatus').textContent = 'Ligne de ' + p.label + ' exportée (' + mine.length + ' voix).';
+  }
+  function tsExportAll() {
+    if (!TS.loaded) { $('tsStatus').textContent = 'Charge d\'abord un groove.'; return; }
+    tsDownload({ type: 'fm-metro-groove', version: 1, groove: tsGrooveMeta(),
+      participants: TS.participants.map(p => p.label),
+      voix: TS.voices.map(v => Object.assign({ participant:
+        (TS.participants.find(p => p.id === v.participant) || {}).label || null }, tsVoiceExport(v))) },
+      'groove-' + (TS.grooveId || 'export') + '.json');
+    $('tsStatus').textContent = 'Groove complet exporté.';
+  }
+
+  // ---- rendu du panneau ----
+  function tsMiniGrid(v) {
+    const hands = percHandsFor(v.grid);
+    let h = '<div class="steps mini" style="pointer-events:none;">';
+    for (let i = 0; i < v.grid.length; i++) {
+      const cls = 'step' + (v.grid[i] === 1 ? ' on' : v.grid[i] === 2 ? ' acc' : '');
+      h += '<button class="' + cls + '">' + (v.grid[i] > 0 ? hands[i] : '') + '</button>';
+    }
+    return h + '</div>';
+  }
+  function tsPartOptions(sel) {
+    let h = '<option value=""' + (sel == null ? ' selected' : '') + '>— commun —</option>';
+    TS.participants.forEach(p => {
+      h += '<option value="' + p.id + '"' + (sel === p.id ? ' selected' : '') + '>' + tsEsc(p.label) + '</option>';
+    });
+    return h;
+  }
+  function tsRefresh() {
+    // badge authentique / adapté
+    const nAdapt = TS.voices.filter(v => v.approx).length;
+    $('tsOverrideBadge').textContent = !TS.loaded ? '' :
+      (nAdapt ? nAdapt + ' voix adaptées par tessiture' : 'rendu authentique');
+
+    // participants + leur ligne
+    const parts = $('tsParticipants');
+    parts.innerHTML = TS.participants.map(p => {
+      const mine = TS.voices.filter(v => v.participant === p.id);
+      const line = mine.length
+        ? mine.map(v => tsEsc(v.label) + ' <span class="ts-chip ' + v.role + '">' + v.role + '</span>').join(' · ')
+        : '<i>aucune voix</i>';
+      return '<div class="ts-part' + (p.solo ? ' solo' : '') + '" data-p="' + p.id + '">' +
+        '<div class="ts-part-head">' +
+          '<input class="ts-name" data-p="' + p.id + '" value="' + tsEsc(p.label) + '">' +
+          '<label class="check"><input type="checkbox" class="ts-solo" data-p="' + p.id + '"' + (p.solo ? ' checked' : '') + '> solo</label>' +
+          '<label class="check"><input type="checkbox" class="ts-mute" data-p="' + p.id + '"' + (p.mute ? ' checked' : '') + '> muet</label>' +
+        '</div>' +
+        '<div class="ts-line">' + line + '</div>' +
+        '<div style="margin-top:6px;display:flex;gap:6px;">' +
+          '<button class="btn-sm ts-exp" data-p="' + p.id + '">⭳ Ma ligne</button>' +
+          '<button class="btn-sm ts-del" data-p="' + p.id + '">✕</button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    // voix du groove
+    const wrap = $('tsVoices');
+    if (!TS.loaded) { wrap.innerHTML = ''; }
+    else {
+      wrap.innerHTML = TS.voices.map(v =>
+        '<div class="perc-voice ts-voice" data-g="' + v.gid + '">' +
+          '<span class="pv-label">' + tsEsc(v.label) +
+            ' <span class="ts-chip ' + v.role + '">' + v.role + '</span></span>' +
+          '<span class="ts-chip' + (v.approx ? ' adapte' : '') + '" title="instrument de jeu">' +
+            tsEsc(tsPlayedLabel(v)) + (v.approx ? ' · adapté' : '') + '</span>' +
+          (TS.on ? '<select class="ts-assign" data-g="' + v.gid + '">' + tsPartOptions(v.participant) + '</select>' : '') +
+          tsMiniGrid(v) +
+        '</div>').join('');
+    }
+
+    // doigtés
+    const fout = $('tsFingerOut');
+    if (TS.checkFinger && TS.loaded) {
+      const c = tsFingerConflicts();
+      fout.innerHTML = c.length
+        ? '<span class="ts-warn">⚠ Doigtés impossibles :</span>\n' + c.map(tsEsc).join('\n')
+        : '✓ Aucun doigté impossible détecté.';
+    } else { fout.innerHTML = ''; }
+
+    tsWire();
+  }
+  // (ré)attache les écouteurs des éléments rendus dynamiquement
+  function tsWire() {
+    document.querySelectorAll('#tsParticipants .ts-name').forEach(el =>
+      el.addEventListener('change', e => {
+        const p = TS.participants.find(x => x.id === e.target.dataset.p);
+        if (p) { p.label = e.target.value || p.label; tsRefresh(); }
+      }));
+    document.querySelectorAll('#tsParticipants .ts-solo').forEach(el =>
+      el.addEventListener('change', e => {
+        const p = TS.participants.find(x => x.id === e.target.dataset.p);
+        if (p) { p.solo = e.target.checked; tsRefresh(); if (!isPlaying) drawStatic(); }
+      }));
+    document.querySelectorAll('#tsParticipants .ts-mute').forEach(el =>
+      el.addEventListener('change', e => {
+        const p = TS.participants.find(x => x.id === e.target.dataset.p);
+        if (p) { p.mute = e.target.checked; if (!isPlaying) drawStatic(); }
+      }));
+    document.querySelectorAll('#tsParticipants .ts-exp').forEach(el =>
+      el.addEventListener('click', e => tsExportParticipant(e.target.dataset.p)));
+    document.querySelectorAll('#tsParticipants .ts-del').forEach(el =>
+      el.addEventListener('click', e => tsRemoveParticipant(e.target.dataset.p)));
+    document.querySelectorAll('#tsVoices .ts-assign').forEach(el =>
+      el.addEventListener('change', e => {
+        const v = TS.voices.find(x => x.gid === e.target.dataset.g);
+        if (v) { v.participant = e.target.value || null; tsRefresh(); if (!isPlaying) drawStatic(); }
+      }));
+  }
+
+  // ---- mémorisation de la progression par niveau (exercices) ----
+  // Persiste, par instrument focal, le niveau atteint dans les exercices « break » et
+  // « guide » — la reprise réaffiche le niveau mémorisé.
+  function tsProgressAll() {
+    try { return JSON.parse(store.get('fm-metro-progress') || '{}'); } catch (e) { return {}; }
+  }
+  function tsProgressBump(kind, level) {
+    if (!level) return;
+    const all = tsProgressAll();
+    const key = S.perc.instr;
+    all[key] = all[key] || {};
+    if (!(all[key][kind] >= level)) { all[key][kind] = level; store.set('fm-metro-progress', JSON.stringify(all)); }
+    tsProgressNote();
+  }
+  function tsProgressNote() {
+    const el = $('tsProgressNote'); if (!el) return;
+    const p = tsProgressAll()[S.perc.instr] || {};
+    const bits = [];
+    if (p.break) bits.push('break niveau ' + p.break + '/4');
+    if (p.guide) bits.push('guide étape ' + p.guide);
+    el.textContent = bits.length ? '· mémorisé : ' + bits.join(' · ') : '';
+  }
+  function tsProgressRestore() {
+    const p = tsProgressAll()[S.perc.instr] || {};
+    if (p.break) { S.perc.breakLevel = Math.max(1, Math.min(4, p.break)); $('percBreakLvl').value = String(S.perc.breakLevel); }
+    tsProgressNote();
+  }
+
+  // ---- init ----
+  function tsInit() {
+    // sélecteurs répertoire
+    $('tsFamily').innerHTML = tsFamilies().map(f => '<option value="' + f + '">' + f + '</option>').join('');
+    $('tsOverride').innerHTML = '<option value="authentique" selected>Instruments authentiques</option>' +
+      Object.keys(PERC_INSTR).map(k => '<option value="' + k + '">' +
+        tsEsc(PERC_INSTR[k].label.replace(/\s*\(.*$/, '')) + '</option>').join('');
+    tsFillGrooves();
+    $('tsFamily').addEventListener('change', tsFillGrooves);
+    $('tsLoad').addEventListener('click', tsLoadGroove);
+    $('tsUnload').addEventListener('click', tsUnload);
+    $('tsOverride').addEventListener('change', tsApplyOverride);
+    $('tsOn').addEventListener('change', e => {
+      TS.on = e.target.checked;
+      if (TS.on) { S.perc.on = true; $('percOn').checked = true; }
+      tsRefresh(); if (!isPlaying) drawStatic();
+    });
+    $('tsAddPart').addEventListener('click', tsAddParticipant);
+    $('tsAuto').addEventListener('click', tsAutoDistribute);
+    $('tsFinger').addEventListener('change', e => { TS.checkFinger = e.target.checked; tsRefresh(); });
+    $('tsExportAll').addEventListener('click', tsExportAll);
+    // note de progression, insérée dans la ligne de break existante
+    const note = document.createElement('span');
+    note.id = 'tsProgressNote'; note.className = 'hint'; note.style.margin = '0';
+    const brRow = $('percBreakRow'); if (brRow) brRow.appendChild(note);
+    $('percBreakLvl').addEventListener('change', e => tsProgressBump('break', +e.target.value));
+    $('percInstr').addEventListener('change', tsProgressRestore);
+    tsProgressRestore();
+    tsRefresh();
+  }
+  function tsFillGrooves() {
+    const fam = $('tsFamily').value;
+    $('tsGroove').innerHTML = GROOVES.filter(g => g.family === fam)
+      .map(g => '<option value="' + g.id + '">' + tsEsc(g.label) + '</option>').join('');
+  }
 
   // ============ TEMPO ============
   function nameOf(bpm) {
@@ -5939,6 +6385,7 @@ swing 62
   buildStepGrid();
   bowCompile(false);
   percSetInstr('djembe');
+  tsInit();
   drawStatic();
   // premier lancement : ouvrir l'assistant
   if (!store.get('fm-metro-wizard-done')) openWizard();
