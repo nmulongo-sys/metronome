@@ -865,8 +865,9 @@
         deux mains par joueur (jamais plus de 2 frappes simultanées ; quand deux voix tombent ensemble,
         les mains se répartissent — les D/G des cartes sont recalculés pour l'ensemble). Cumuler des
         instruments différents n'arrive qu'en dernier recours. Avec <b>1 joueur</b> : la combinaison de lignes
-        que tu peux tenir seul. Les lignes écartées passent en <b>backing track</b> si la case est cochée,
-        en sourdine sinon.</div>
+        que tu peux tenir seul. Les lignes écartées passent en <b>backing track</b> si la case est cochée
+        (en sourdine sinon) et <b>sortent du séquenceur</b> — personne ne les joue ; elles restent dans ce
+        classement (badge), une réassignation les y ramène.</div>
         <div id="tsRank" class="ts-rank"></div>
         <div class="script-status" id="tsWizOut"></div>
       </div>
@@ -4656,7 +4657,7 @@ swing 62
   let percStyleCur = null; // style actuellement appliqué (pour ancres et texte de départ)
 
   function percGuideBuild() {
-    const voices = percActiveVoices();
+    const voices = percHumanVoices();   // la guidée n'enseigne que les lignes jouées par un humain
     const targets = {};
     voices.forEach(v => targets[v.id] = (percGrids[v.id] || []).slice());
     const all = [];
@@ -4778,10 +4779,11 @@ swing 62
     return v ? v.label : vid;
   }
 
-  // voix ciblées par le générateur : 'all' = toutes les voix actives (non muettes)
+  // voix ciblées par le générateur : 'all' = toutes les voix jouées par un humain
+  // (non muettes) — les lignes écartées (backing track) ne s'exercent pas
   function percWorkVoices() {
     if (percWork !== 'all') return (percWork && percGrids[percWork]) ? [percWork] : [];
-    return percActiveVoices().map(v => v.id)
+    return percHumanVoices().map(v => v.id)
       .filter(vid => percGrids[vid] && !percMuted[vid]);
   }
 
@@ -4924,12 +4926,18 @@ swing 62
     if (repLoaded()) return TS.voices.map(v => ({ id: TS_PREFIX + v.gid, label: v.label, ts: v }));
     return PERC_INSTR[S.perc.instr].voices.map(v => ({ id: v.id, label: v.label }));
   }
+  // voix JOUÉES PAR UN HUMAIN : les lignes écartées par « Qui joue quoi ? » (backing
+  // track ou sourdine) sortent du séquenceur, de la voix travaillée et de la guidée —
+  // elles restent audibles (ligne de briques) et réassignables (classement).
+  function percHumanVoices() {
+    return percActiveVoices().filter(v => !(v.ts && v.ts.dropped));
+  }
 
   // ---- UI percussion ----
   function buildPercRowsInto(wrap) {
     wrap.innerHTML = '';
     const n = S.perc.count;
-    percActiveVoices().forEach(v => {
+    percHumanVoices().forEach(v => {
       const row = document.createElement('div'); row.className = 'perc-voice';
       const lab = document.createElement('span'); lab.className = 'pv-label'; lab.textContent = v.label;
       if (v.ts) {
@@ -5129,7 +5137,7 @@ swing 62
   function percWorkRefresh() {
     percWork = 'all';
     $('percWork').innerHTML = '<option value="all" selected>Toutes les voix</option>' +
-      percActiveVoices().map(v => '<option value="' + v.id + '">' + tsEsc(v.label) + '</option>').join('');
+      percHumanVoices().map(v => '<option value="' + v.id + '">' + tsEsc(v.label) + '</option>').join('');
   }
 
   function percSetInstr(instr) {
@@ -5880,8 +5888,13 @@ swing 62
     const dropped = TS.voices.filter(v => v.dropped);
     $('tsWizOut').textContent = dropped.length
       ? dropped.length + ' ligne(s) écartée(s) — ' + dropped.map(v => v.label).join(', ') +
-        (TS.backing ? ' — jouée(s) par l\'app (backing track).' : ' — en sourdine.')
+        (TS.backing ? ' — jouée(s) par l\'app (backing track), retirée(s) du séquenceur.'
+                    : ' — en sourdine, retirée(s) du séquenceur.')
       : 'Toutes les lignes sont couvertes par ' + n + ' joueur' + (n > 1 ? 's' : '') + '.';
+    // les lignes écartées sortent du séquenceur (elles restent audibles en backing
+    // et réassignables depuis le classement) → rangées et voix travaillée à rebâtir
+    buildPercGrids();
+    percWorkRefresh();
     tsRefresh();
     if (!isPlaying) drawStatic();
   }
@@ -6081,8 +6094,13 @@ swing 62
       el.addEventListener('change', e => {
         const v = TS.voices.find(x => x.gid === e.target.dataset.g);
         if (v) {
+          const wasDropped = v.dropped;
           v.participant = e.target.value || null;
           if (v.participant) v.dropped = false;   // réassignation manuelle = la voix redevient jouée
+          if (wasDropped && !v.dropped) {         // …et réapparaît dans le séquenceur
+            buildPercGrids();
+            percWorkRefresh();
+          }
           tsRefresh(); if (!isPlaying) drawStatic();
         }
       }));

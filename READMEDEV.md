@@ -123,6 +123,16 @@ de partage.
 
 ## Journal de développement
 
+### 2026-07-07 — Les lignes écartées sortent du séquenceur (backing = son, pas d'édition)
+- `percHumanVoices()` = `percActiveVoices()` moins les lignes écartées par « Qui joue
+  quoi ? » (`v.dropped`). Consommé par les rangées du séquenceur (`buildPercRowsInto`),
+  la voix travaillée (`percWorkVoices`/`percWorkRefresh`) et la progression guidée.
+  Les lignes écartées restent **audibles** (backing track → ligne de briques, légende)
+  et visibles dans le **classement** (badge) ; une réassignation manuelle les fait
+  réapparaître dans le séquenceur (`buildPercGrids` sur transition dropped→jouée).
+- Recette : samba, « Qui joue quoi ? » à 2 joueurs → Agogô + Ganzá écartées, séquenceur
+  6 → 4 rangées, légende complète (6 voix sonnent), réassignation → 5 rangées.
+
 ### 2026-07-07 — Mains d'ENSEMBLE + répartition auto jouable + mini-grilles une ligne
 - **Mains par ensemble** (`tsHandsForSet`) : les D/G d'un participant sont calculés sur
   l'ensemble des voix qu'il tient — deux voix qui frappent au même instant se **partagent**
