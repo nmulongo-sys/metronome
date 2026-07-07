@@ -1804,6 +1804,2520 @@ swing 62
     ]
   };
 
+  /* ============ BIBLIOTHÈQUE DE GROOVES (passe 3 étape 3 — DONNÉES) ============
+     Corpus des 6 fichiers grooves-*.md converti en table JS (spec passe 3 §5).
+     Conversion DÉTERMINISTE : X->2 (accent) · x->1 (frappe) · .->0 (silence),
+     grid.length === count (16 bin / 12 tern). Chaque voix porte son identité de
+     timbre (instr + voiceKind, §2) routée par playPerc (étapes 1-2) ; approx:true
+     = substitution par tessiture (arbitrage D, timbre le plus proche du rôle).
+     uncertain:true = grille reconstruite (tout l'ouest-africain, §5.3) — drapeau
+     visible, non bloquant. isBreak:true = cadence à ne pas boucler.
+     Table de correspondance §5.2 figée dans le convertisseur. AUCUNE UI ici : la
+     bibliothèque est consommée par le mode team spirit (étape 4). */
+  const GROOVES = [
+ {
+  "id": "bresil-samba-batucada",
+  "family": "bresil",
+  "label": "Samba Batucada",
+  "origin": "Rio de Janeiro, Brésil",
+  "context": "moteur polyrythmique des escolas de samba au Carnaval de Rio.",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 120,
+   "max": 145,
+   "jam": 105
+  },
+  "reliability": "élevée",
+  "sources": "Ed Uribe *The Essence of Brazilian Percussion & Drum Set* ; Duduka Da Fonseca *Brazilian",
+  "voices": [
+   {
+    "id": "bresil-samba-batucada.surdo-de-primeira",
+    "label": "Surdo de primeira",
+    "instr": "surdo",
+    "voiceKind": "grave",
+    "role": "basse",
+    "grid": [0,0,0,0,2,0,0,0,0,0,0,0,2,0,0,0],
+    "uncertain": false,
+    "description": "fondation, temps 2",
+    "enterOrder": 2,
+    "difficulty": "facile"
+   },
+   {
+    "id": "bresil-samba-batucada.surdo-de-segunda",
+    "label": "Surdo de segunda",
+    "instr": "surdo",
+    "voiceKind": "marcante",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0],
+    "uncertain": false,
+    "description": "réponse, temps 1",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "bresil-samba-batucada.caixa",
+    "label": "Caixa",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "medium",
+    "grid": [1,0,1,2,1,0,1,2,1,0,1,2,1,0,1,2],
+    "uncertain": false,
+    "approx": true,
+    "description": "tapis double-croches",
+    "enterOrder": 4,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "bresil-samba-batucada.tamborim",
+    "label": "Tamborim",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [2,0,0,2,0,0,2,0,0,0,2,0,0,2,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "timeline (teleco-teco)",
+    "enterOrder": 6,
+    "difficulty": "difficile"
+   },
+   {
+    "id": "bresil-samba-batucada.agogo",
+    "label": "Agogô",
+    "instr": "agogo",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [2,0,0,0,2,0,0,0,2,0,0,0,2,0,0,0],
+    "uncertain": false,
+    "description": "appui métallique",
+    "enterOrder": 5,
+    "difficulty": "facile"
+   },
+   {
+    "id": "bresil-samba-batucada.ganza-chocalho",
+    "label": "Ganzá/chocalho",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    "uncertain": false,
+    "approx": true,
+    "description": "flux continu",
+    "enterOrder": 3,
+    "difficulty": "facile"
+   }
+  ],
+  "variations": [
+   {
+    "id": "bresil-samba-batucada.tamborim-carreteiro",
+    "label": "Tamborim « carreteiro",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "isBreak": false
+   },
+   {
+    "id": "bresil-samba-batucada.caixa-em-cima-mocidade",
+    "label": "Caixa « em cima » Mocidade",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "medium",
+    "grid": [2,0,0,1,0,0,2,0,0,0,1,0,2,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "isBreak": false
+   },
+   {
+    "id": "bresil-samba-batucada.surdo-3-cortador",
+    "label": "Surdo 3 / cortador",
+    "instr": "surdo",
+    "voiceKind": "marcante",
+    "role": "medium",
+    "grid": [0,0,2,0,0,0,2,0,0,0,2,0,0,0,2,0],
+    "uncertain": false,
+    "isBreak": false
+   }
+  ]
+ },
+ {
+  "id": "bresil-maracatu-nacao-baque-virado",
+  "family": "bresil",
+  "label": "Maracatu Nação (baque virado)",
+  "origin": "Recife / Olinda, Pernambuco",
+  "context": "percussion des cortèges de couronnement du Rei e Rainha do Congo, aujourd'hui portée par les nations de maracatu (Estrela Brilhante, Leão Coroado).",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 95,
+   "max": 115,
+   "jam": 85
+  },
+  "reliability": "élevée",
+  "sources": "*Massa: Brazilian Music & Culture* podcast (ép. « Maracatu de Baque Virado ») ; page Wikipédia « Maracatu Nação » ; blog Brazilian Percussion (« Maracatu »). Instrumentation (alfaia/gonguê/caixa/agbê/mineiro) très standardisée ; les patterns d'alfaia varient sensiblement d'une nation à l'autre. INCERTAIN : la timeline exacte du gonguê connaît des variantes selon les nations ; celle donnée ici est ",
+  "voices": [
+   {
+    "id": "bresil-maracatu-nacao-baque-virado.gongue",
+    "label": "Gonguê",
+    "instr": "dunduns",
+    "voiceKind": "cloche",
+    "role": "aigu",
+    "grid": [2,0,0,2,0,0,2,0,2,0,0,2,0,0,2,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "timeline de cloche",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "bresil-maracatu-nacao-baque-virado.alfaia-marcante",
+    "label": "Alfaia marcante",
+    "instr": "surdo",
+    "voiceKind": "grave",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "fondation, temps forts",
+    "enterOrder": 2,
+    "difficulty": "facile"
+   },
+   {
+    "id": "bresil-maracatu-nacao-baque-virado.alfaia-meio",
+    "label": "Alfaia meio",
+    "instr": "surdo",
+    "voiceKind": "marcante",
+    "role": "medium",
+    "grid": [0,0,0,0,1,0,1,0,0,0,0,0,1,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "remplissage syncopé",
+    "enterOrder": 6,
+    "difficulty": "difficile"
+   },
+   {
+    "id": "bresil-maracatu-nacao-baque-virado.caixa-tarol",
+    "label": "Caixa/tarol",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    "uncertain": false,
+    "approx": true,
+    "description": "roulé continu (buzz)",
+    "enterOrder": 5,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "bresil-maracatu-nacao-baque-virado.agbe-xequere",
+    "label": "Agbê/xequerê",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "medium",
+    "grid": [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "bruit blanc, texture",
+    "enterOrder": 3,
+    "difficulty": "facile"
+   },
+   {
+    "id": "bresil-maracatu-nacao-baque-virado.mineiro-ganza",
+    "label": "Mineiro/ganzá",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    "uncertain": false,
+    "approx": true,
+    "description": "flux métallique continu",
+    "enterOrder": 4,
+    "difficulty": "facile"
+   }
+  ],
+  "variations": [
+   {
+    "id": "bresil-maracatu-nacao-baque-virado.alfaia-marcante-debutant",
+    "label": "Alfaia marcante « débutant",
+    "instr": "surdo",
+    "voiceKind": "grave",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "isBreak": false
+   },
+   {
+    "id": "bresil-maracatu-nacao-baque-virado.alfaia-meio-resposta",
+    "label": "Alfaia meio « resposta",
+    "instr": "surdo",
+    "voiceKind": "marcante",
+    "role": "medium",
+    "grid": [0,0,0,0,2,0,2,0,0,0,0,0,2,0,2,0],
+    "uncertain": false,
+    "approx": true,
+    "isBreak": true
+   },
+   {
+    "id": "bresil-maracatu-nacao-baque-virado.virada-d-ensemble",
+    "label": "Virada d'ensemble",
+    "instr": "djembe",
+    "voiceKind": "tone",
+    "role": "medium",
+    "grid": [2,0,2,0,2,0,2,0,2,0,2,0,2,0,2,0],
+    "uncertain": false,
+    "approx": true,
+    "isBreak": true
+   }
+  ]
+ },
+ {
+  "id": "bresil-baiao",
+  "family": "bresil",
+  "label": "Baião",
+  "origin": "Nordeste (sertão), Brésil",
+  "context": "rythme rural du Nordeste popularisé nationalement par Luiz Gonzaga dans les années 1940-50, socle du forró pé-de-serra.",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 100,
+   "max": 130,
+   "jam": 95
+  },
+  "reliability": "élevée",
+  "sources": "Larry Crook *Brazilian Music: Northeastern Traditions and the Heartbeat of a Modern Nation* (et travaux sur la zabumba de Caruaru — technique mailloche/peau grave + bâton/peau aiguë, triangle à ~45° en croches) ; page Wikipédia « Baião (music) » ; Encyclopedia.com « Baião ». Le couple zabumba/triangle est très standardisé ; le placement précis du contre-temps aigu varie selon les joueurs. INCERTAI",
+  "voices": [
+   {
+    "id": "bresil-baiao.zabumba-grave",
+    "label": "Zabumba grave",
+    "instr": "surdo",
+    "voiceKind": "grave",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,2,0,0,2,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "accent mailloche, boum",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "bresil-baiao.zabumba-aigu",
+    "label": "Zabumba aigu",
+    "instr": "djembe",
+    "voiceKind": "tone",
+    "role": "medium",
+    "grid": [0,0,0,1,0,0,0,0,0,0,0,1,0,1,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "bâton étouffé, contre",
+    "enterOrder": 3,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "bresil-baiao.triangle-ouvert",
+    "label": "Triangle ouvert",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1],
+    "uncertain": false,
+    "approx": true,
+    "description": "accents résonnants",
+    "enterOrder": 4,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "bresil-baiao.triangle-ferme",
+    "label": "Triangle fermé",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,1,1,0,1,1,0,1,1,0,1,1,0,1,1,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "croches étouffées",
+    "enterOrder": 2,
+    "difficulty": "facile"
+   }
+  ],
+  "variations": [
+   {
+    "id": "bresil-baiao.zabumba-grave-xote",
+    "label": "Zabumba grave « xote",
+    "instr": "surdo",
+    "voiceKind": "grave",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0],
+    "uncertain": true,
+    "approx": true,
+    "isBreak": false
+   },
+   {
+    "id": "bresil-baiao.zabumba-grave-debutant",
+    "label": "Zabumba grave débutant",
+    "instr": "surdo",
+    "voiceKind": "grave",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "isBreak": false
+   },
+   {
+    "id": "bresil-baiao.triangle-galope",
+    "label": "Triangle « galopé",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,1,1,0,1,1,0,1,0,1,1,0,1,1,0],
+    "uncertain": false,
+    "approx": true,
+    "isBreak": false
+   }
+  ]
+ },
+ {
+  "id": "bresil-ijexa-afoxe",
+  "family": "bresil",
+  "label": "Ijexá / Afoxé",
+  "origin": "Salvador, Bahia (candomblé ketu, afoxé Filhos de Gandhy)",
+  "context": "rythme sacré du candomblé nation ketu, sorti du terreiro par les afoxés du carnaval de Salvador (Filhos de Gandhy, fondé 1949).",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 90,
+   "max": 110,
+   "jam": 85
+  },
+  "reliability": "élevée",
+  "sources": "Pulsewave « Rhythm Tip – Afoxé » (agogô : quatre coups aigus, un grave, trois aigus, un grave — le grave renforce un accent principal des tambours ; tierce entre les cloches) ; page Wikipédia « Ijexá » (agogô = timeline/clave asymétrique, ensemble Rum/Rumpi/Lê + agbê + caxixi, syncope sur temps faibles) ; partition Carl Dixon *Ijexa Rhythms* (2020, agogô + Lê/Rumpi/Rum + tamborim « Bahia » + surdo",
+  "voices": [
+   {
+    "id": "bresil-ijexa-afoxe.agogo-grave",
+    "label": "Agogô grave",
+    "instr": "agogo",
+    "voiceKind": "grave",
+    "role": "basse",
+    "grid": [2,0,0,0,2,0,0,0,0,0,0,0,2,0,0,0],
+    "uncertain": false,
+    "description": "cloche basse, accents forts",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "bresil-ijexa-afoxe.agogo-aigu",
+    "label": "Agogô aigu",
+    "instr": "agogo",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,0,2,0,0,0,2,0,2,0,0,0,0,0,2,0],
+    "uncertain": false,
+    "description": "cloche haute, syncope",
+    "enterOrder": 2,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "bresil-ijexa-afoxe.xequere-agbe",
+    "label": "Xequerê/agbê",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "medium",
+    "grid": [0,0,2,0,0,0,2,0,0,0,2,0,0,0,2,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "appui, souligne l'agogô",
+    "enterOrder": 5,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "bresil-ijexa-afoxe.rum",
+    "label": "Rum",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "medium",
+    "grid": [0,0,0,0,2,0,0,0,0,0,0,0,2,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "conversation, temps 2",
+    "enterOrder": 6,
+    "difficulty": "difficile"
+   },
+   {
+    "id": "bresil-ijexa-afoxe.rumpi-le",
+    "label": "Rumpi/Lê",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "medium",
+    "grid": [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "pouls régulier",
+    "enterOrder": 4,
+    "difficulty": "facile"
+   },
+   {
+    "id": "bresil-ijexa-afoxe.ganza-caxixi",
+    "label": "Ganzá/caxixi",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    "uncertain": false,
+    "approx": true,
+    "description": "flux continu",
+    "enterOrder": 3,
+    "difficulty": "facile"
+   }
+  ],
+  "variations": [
+   {
+    "id": "bresil-ijexa-afoxe.agogo-debutant-1-ligne",
+    "label": "Agogô « débutant » 1 ligne",
+    "instr": "agogo",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,0,2,0,0,0,2,0,0,0,2,0,0,0,2,0],
+    "uncertain": false,
+    "isBreak": false
+   },
+   {
+    "id": "bresil-ijexa-afoxe.xequere-resposta",
+    "label": "Xequerê « resposta",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "medium",
+    "grid": [2,0,0,0,2,0,0,0,2,0,0,0,2,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "isBreak": true
+   },
+   {
+    "id": "bresil-ijexa-afoxe.rum-dobrado",
+    "label": "Rum « dobrado",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [0,0,0,0,2,0,0,0,2,0,0,0,2,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "isBreak": true
+   }
+  ]
+ },
+ {
+  "id": "bresil-samba-reggae",
+  "family": "bresil",
+  "label": "Samba-Reggae",
+  "origin": "Salvador, Bahia (blocos afro : Olodum, Ilê Aiyê, Timbalada)",
+  "context": "créé dans les blocos afro de Salvador (le terme apparaît en 1986 avec Olodum), il fusionne la batucada de rue et le backbeat du reggae.",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 90,
+   "max": 120,
+   "jam": 90
+  },
+  "reliability": "élevée",
+  "sources": "Pulsewave « Rhythm Tip – Samba Reggae » ; page Wikipédia « Samba reggae » (surdos en 4-5 voix imbriquées, caixas/repiques en contretemps, tempo medium, feel reggae) ; blog Brazilian Percussion (« Samba reggae », score à 5 voix de surdo : fundo 1, fundo 2, martelo, virada 1/2 + caixa + repinique). La répartition des surdos est très standardisée ; le motif de caixa et les paradas varient selon les b",
+  "voices": [
+   {
+    "id": "bresil-samba-reggae.surdo-1-fundo",
+    "label": "Surdo 1 « fundo",
+    "instr": "surdo",
+    "voiceKind": "grave",
+    "role": "basse",
+    "grid": [0,0,0,0,2,0,0,0,0,0,0,0,2,0,0,0],
+    "uncertain": false,
+    "description": "pouls grave, temps 2/4",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "bresil-samba-reggae.surdo-2-fundo",
+    "label": "Surdo 2 « fundo",
+    "instr": "surdo",
+    "voiceKind": "marcante",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0],
+    "uncertain": false,
+    "description": "réponse, temps 1/3",
+    "enterOrder": 2,
+    "difficulty": "facile"
+   },
+   {
+    "id": "bresil-samba-reggae.surdo-3-dobra",
+    "label": "Surdo 3 « dobra",
+    "instr": "surdo",
+    "voiceKind": "marcante",
+    "role": "medium",
+    "grid": [0,0,2,0,0,0,2,0,0,0,2,0,0,0,2,0],
+    "uncertain": false,
+    "description": "remplissage marqué",
+    "enterOrder": 5,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "bresil-samba-reggae.caixa",
+    "label": "Caixa",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,1,1,1,0,1,1,1,0,1,1,1,0,1,1],
+    "uncertain": false,
+    "approx": true,
+    "description": "tapis double-croches",
+    "enterOrder": 3,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "bresil-samba-reggae.repique",
+    "label": "Repique",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [2,0,0,2,0,0,2,0,2,0,0,2,0,0,2,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "appels/paradas, accent",
+    "enterOrder": 6,
+    "difficulty": "difficile"
+   },
+   {
+    "id": "bresil-samba-reggae.tamborim",
+    "label": "Tamborim",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "medium",
+    "grid": [2,0,0,2,0,0,2,0,0,0,2,0,0,2,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "timeline « teleco »",
+    "enterOrder": 4,
+    "difficulty": "moyen"
+   }
+  ],
+  "variations": [
+   {
+    "id": "bresil-samba-reggae.caixa-skank-debutant",
+    "label": "Caixa « skank » débutant",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "isBreak": false
+   },
+   {
+    "id": "bresil-samba-reggae.surdo-3-virado",
+    "label": "Surdo 3 « virado",
+    "instr": "surdo",
+    "voiceKind": "marcante",
+    "role": "medium",
+    "grid": [0,0,2,0,0,2,0,0,0,0,2,0,0,2,0,0],
+    "uncertain": false,
+    "isBreak": true
+   },
+   {
+    "id": "bresil-samba-reggae.repique-chamada",
+    "label": "Repique « chamada",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [2,0,2,0,2,0,2,0,2,0,2,0,2,0,2,0],
+    "uncertain": false,
+    "approx": true,
+    "isBreak": true
+   }
+  ]
+ },
+ {
+  "id": "ouest-africain-kuku",
+  "family": "ouest-africain",
+  "label": "Kuku",
+  "origin": "Guinée forestière / région de Beyla (aire malinké, aussi jouée en Côte d'Ivoire)",
+  "context": "Rythme de fête très répandu, souvent le premier enseigné aux débutants ; danse de femmes en cercle, à l'origine liée au retour de la pêche (tontinkan, embodiedrhythm).",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 100,
+   "max": 160,
+   "jam": 110
+  },
+  "reliability": "faible",
+  "sources": "tontinkan (contexte), embodiedrhythm (mètre binaire, structure 2+3, tempo), WAP-pages Kuku (existence de la transcription complète), djemberhythms/Oak National (description de l'accompagnement). **",
+  "voices": [
+   {
+    "id": "ouest-africain-kuku.kenkeni-pk",
+    "label": "kenkeni",
+    "instr": "dunduns",
+    "voiceKind": "kenkeni",
+    "role": "basse",
+    "grid": [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],
+    "uncertain": true,
+    "description": "pouls régulier (croches)",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-kuku.sangban-pk",
+    "label": "sangban",
+    "instr": "dunduns",
+    "voiceKind": "sangban",
+    "role": "medium",
+    "grid": [0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0],
+    "uncertain": true,
+    "description": "chant de l'ensemble",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-kuku.dununba-pk",
+    "label": "dununba",
+    "instr": "dunduns",
+    "voiceKind": "dundunba",
+    "role": "basse",
+    "grid": [0,0,0,0,0,0,0,0,0,0,2,0,0,0,2,0],
+    "uncertain": true,
+    "description": "basse syncopée, peu d'appuis",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-kuku.djembe-b",
+    "label": "djembé B",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0],
+    "uncertain": true,
+    "description": "ancre sur les temps 1 et 3",
+    "enterOrder": 5,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "ouest-africain-kuku.djembe-t",
+    "label": "djembé T",
+    "instr": "djembe",
+    "voiceKind": "tone",
+    "role": "medium",
+    "grid": [0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0],
+    "uncertain": true,
+    "description": "double tonique en levée",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-kuku.djembe-s",
+    "label": "djembé S",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "aigu",
+    "grid": [0,0,0,0,0,0,2,0,0,0,0,0,0,0,2,0],
+    "uncertain": true,
+    "description": "claqué en contretemps",
+    "enterOrder": null,
+    "difficulty": ""
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "ouest-africain-djole-djolo-yole",
+  "family": "ouest-africain",
+  "label": "Djolé (Djolo / Yolé)",
+  "origin": "peuple Temné, Sierra Leone ; popularisé en Guinée",
+  "context": "Rythme de danse à masque (le masque représente une femme, porté par un homme), joué lors de grandes fêtes de village : récolte, fin du Ramadan, mariage (tontinkan, Wikipédia).",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": null,
+   "max": null,
+   "jam": 120
+  },
+  "reliability": "faible",
+  "sources": "Wikipédia « Djolé » (origine Temné, sikko, mètre), tontinkan (contexte), recherche djembeloops/Malcolm Smith (rôles, 4/4, >120 bpm), Scribd « Djole Notation ». **",
+  "voices": [
+   {
+    "id": "ouest-africain-djole-djolo-yole.kenkeni-pk",
+    "label": "kenkeni",
+    "instr": "dunduns",
+    "voiceKind": "kenkeni",
+    "role": "basse",
+    "grid": [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0],
+    "uncertain": true,
+    "description": "ponctuation, souvent tons fermés",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-djole-djolo-yole.sangban-pk",
+    "label": "sangban",
+    "instr": "dunduns",
+    "voiceKind": "sangban",
+    "role": "medium",
+    "grid": [1,0,0,1,0,0,1,0,0,0,1,0,0,0,0,0],
+    "uncertain": true,
+    "description": "motif ouvert/fermé signature",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-djole-djolo-yole.dununba-pk",
+    "label": "dununba",
+    "instr": "dunduns",
+    "voiceKind": "dundunba",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0],
+    "uncertain": true,
+    "description": "appuis forts sur 1 et 3",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-djole-djolo-yole.djembe-b",
+    "label": "djembé B",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,2,0,0,0,0,2,0,0,2,0,0,0,0],
+    "uncertain": true,
+    "description": "phrase de basse dansante",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-djole-djolo-yole.djembe-t",
+    "label": "djembé T",
+    "instr": "djembe",
+    "voiceKind": "tone",
+    "role": "medium",
+    "grid": [0,0,0,0,1,0,1,0,0,0,0,0,1,0,1,0],
+    "uncertain": true,
+    "description": "toniques de réponse",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-djole-djolo-yole.djembe-s",
+    "label": "djembé S",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "aigu",
+    "grid": [0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0],
+    "uncertain": true,
+    "description": "claqués de remplissage",
+    "enterOrder": null,
+    "difficulty": ""
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "ouest-africain-kassa",
+  "family": "ouest-africain",
+  "label": "Kassa",
+  "origin": "Malinké de Haute-Guinée (nord-est), rythme de récolte",
+  "context": "« Kassa » = grenier ; rythme de travail joué aux champs pendant la moisson pour soutenir les moissonneurs, clôturé par la fête *Kassalodon* (tontinkan).",
+  "count": 16,
+  "family_meter": "tern",
+  "tempo": {
+   "min": 110,
+   "max": 140,
+   "jam": 120
+  },
+  "reliability": "faible",
+  "sources": "tontinkan (origine, contexte, Kassa Soro), recherche djemberhythms (parenté Soli, feel du sangban binaire/ternaire), WAP-pages Kassa (existence transcription). **",
+  "voices": [
+   {
+    "id": "ouest-africain-kassa.kenkeni-pk",
+    "label": "kenkeni",
+    "instr": "dunduns",
+    "voiceKind": "kenkeni",
+    "role": "basse",
+    "grid": [0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0],
+    "uncertain": true,
+    "description": "contretemps régulier",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-kassa.sangban-pk",
+    "label": "sangban",
+    "instr": "dunduns",
+    "voiceKind": "sangban",
+    "role": "medium",
+    "grid": [1,0,0,0,1,0,0,0,1,0,1,0,0,0,0,0],
+    "uncertain": true,
+    "description": "voix maîtresse (feel mobile)",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-kassa.dununba-pk",
+    "label": "dununba",
+    "instr": "dunduns",
+    "voiceKind": "dundunba",
+    "role": "basse",
+    "grid": [0,0,0,0,0,0,0,0,2,0,0,0,0,0,2,0],
+    "uncertain": true,
+    "description": "ponctuation grave",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-kassa.djembe-b",
+    "label": "djembé B",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,0,2,0,0,0,2,0,0,0,2,0,0,0],
+    "uncertain": true,
+    "description": "pouls de basse sur les temps",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-kassa.djembe-t",
+    "label": "djembé T",
+    "instr": "djembe",
+    "voiceKind": "tone",
+    "role": "medium",
+    "grid": [0,0,1,1,0,0,1,1,0,0,1,1,0,0,1,1],
+    "uncertain": true,
+    "description": "tissu de toniques",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-kassa.djembe-s",
+    "label": "djembé S",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "aigu",
+    "grid": [0,0,0,0,2,0,0,0,0,0,0,0,2,0,0,0],
+    "uncertain": true,
+    "description": "claqués d'appui",
+    "enterOrder": null,
+    "difficulty": ""
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "ouest-africain-madan-maraka-foli-djagbe-en-guinee",
+  "family": "ouest-africain",
+  "label": "Madan (Maraka fôli / Djagbé en Guinée)",
+  "origin": "Maninka du Manden, sud de Bamako (Mali)",
+  "context": "Appelé **Madan au Mali**, **Djagbé en Guinée**, **Djagba dans la région de Kouroussa** ; rythme malinké de **Haute-Guinée (région de Siguiri/Kouroussa, aire du Wassolon)**, popularisé par l'album *Wassolon* de Mamady Keïta.",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 120,
+   "max": 150,
+   "jam": 125
+  },
+  "reliability": "faible",
+  "sources": "dimensionsinrhythm (« The Proximate Three in Practice », analyse d'après Billmeier & Keïta 2004 : 4/4, Haute-Guinée/Siguiri, tresillo djembé, quintillo cloches, sangban cascara), tontinkan « Djagbe » (origine malinké, Tabaski, noms régionaux), drummedup (Madan/Djagbé/Tabaski), recherche « Wassolon » de Mamady Keïta (enregistrement de référence). **",
+  "voices": [
+   {
+    "id": "ouest-africain-madan-maraka-foli-djagbe-en-guinee.kenkeni-cl",
+    "label": "kenkeni",
+    "instr": "dunduns",
+    "voiceKind": "kenkeni",
+    "role": "aigu",
+    "grid": [2,0,1,0,2,0,1,0,2,0,1,0,2,0,1,0],
+    "uncertain": true,
+    "description": "cloche « quintillo »",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-madan-maraka-foli-djagbe-en-guinee.sangban-cl",
+    "label": "sangban",
+    "instr": "dunduns",
+    "voiceKind": "sangban",
+    "role": "aigu",
+    "grid": [1,0,0,1,0,0,1,0,1,0,0,1,0,0,1,0],
+    "uncertain": true,
+    "description": "cloche type cascara/palitos",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-madan-maraka-foli-djagbe-en-guinee.dununba-cl",
+    "label": "dununba",
+    "instr": "dunduns",
+    "voiceKind": "dundunba",
+    "role": "aigu",
+    "grid": [2,0,1,0,2,0,1,0,2,0,1,0,2,0,1,0],
+    "uncertain": true,
+    "description": "cloche « quintillo »",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-madan-maraka-foli-djagbe-en-guinee.djembe-b",
+    "label": "djembé B",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,2,0,0,2,0,0,0,0,0,0,0,0,0],
+    "uncertain": true,
+    "description": "1er accompt. : tresillo (3-3-2)",
+    "enterOrder": 4,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "ouest-africain-madan-maraka-foli-djagbe-en-guinee.djembe-t",
+    "label": "djembé T",
+    "instr": "djembe",
+    "voiceKind": "tone",
+    "role": "medium",
+    "grid": [0,0,0,0,0,0,0,0,1,0,1,0,1,0,1,0],
+    "uncertain": true,
+    "description": "toniques de réponse",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-madan-maraka-foli-djagbe-en-guinee.djembe-s",
+    "label": "djembé S",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "aigu",
+    "grid": [0,0,2,0,0,2,0,0,0,0,0,2,0,0,2,0],
+    "uncertain": true,
+    "description": "claqués sur le tresillo",
+    "enterOrder": null,
+    "difficulty": ""
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "ouest-africain-soli-soli-lent",
+  "family": "ouest-africain",
+  "label": "Soli (Soli lent)",
+  "origin": "Malinké de Guinée, rythme d'initiation",
+  "context": "Rythme d'**initiation/circoncision** des garçons et des filles ; malinké, joué dans toute la Guinée (tontinkan, recherche).",
+  "count": 12,
+  "family_meter": "tern",
+  "tempo": {
+   "min": 90,
+   "max": 120,
+   "jam": 100
+  },
+  "reliability": "faible",
+  "sources": "davekobrenski (mètre 12/8, rôles sangban/dununba/kenkeni), tontinkan (origine initiation, Soli lent/rapide/Manian), recherche djemberhythms (parenté Kassa), WAP-pages Soli (existence transcription), Scribd « Soli Lent » / « Soli Rapide ». **",
+  "voices": [
+   {
+    "id": "ouest-africain-soli-soli-lent.kenkeni-pk",
+    "label": "kenkeni",
+    "instr": "dunduns",
+    "voiceKind": "kenkeni",
+    "role": "basse",
+    "grid": [0,0,1,0,0,0,1,0,0,0,1,0],
+    "uncertain": true,
+    "description": "contretemps ternaire (« off-beat »)",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-soli-soli-lent.sangban-pk",
+    "label": "sangban",
+    "instr": "dunduns",
+    "voiceKind": "sangban",
+    "role": "medium",
+    "grid": [1,0,0,1,0,0,1,0,1,0,0,0],
+    "uncertain": true,
+    "description": "motif renforçant le 3-contre-4",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-soli-soli-lent.dununba-pk",
+    "label": "dununba",
+    "instr": "dunduns",
+    "voiceKind": "dundunba",
+    "role": "basse",
+    "grid": [0,0,0,2,0,0,0,0,0,2,0,0],
+    "uncertain": true,
+    "description": "dialogue avec le sangban",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "ouest-africain-soli-soli-lent.djembe-b",
+    "label": "djembé B",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,1,0,0,2,0,0,1,0,0],
+    "uncertain": true,
+    "description": "basse ternaire",
+    "enterOrder": 3,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "ouest-africain-soli-soli-lent.djembe-t",
+    "label": "djembé T",
+    "instr": "djembe",
+    "voiceKind": "tone",
+    "role": "medium",
+    "grid": [1,0,1,1,0,1,1,0,1,1,0,1],
+    "uncertain": true,
+    "description": "accompagnement 12/8 « passe-temps »",
+    "enterOrder": 5,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "ouest-africain-soli-soli-lent.djembe-s",
+    "label": "djembé S",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "aigu",
+    "grid": [0,0,2,0,0,0,0,0,2,0,0,0],
+    "uncertain": true,
+    "description": "claqués d'appui",
+    "enterOrder": null,
+    "difficulty": ""
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "funk-funky-drummer",
+  "family": "funk",
+  "label": "Funky Drummer",
+  "origin": "James Brown, batteur Clyde Stubblefield (enregistré le 20 nov. 1969, Cincinnati)",
+  "context": "Le break de batterie le plus samplé de l'histoire ; James Brown baptise le titre d'après son batteur pendant la prise.",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 96,
+   "max": 104,
+   "jam": 96
+  },
+  "reliability": "moyenne",
+  "sources": "DrumsTheWord (eBook p. 59 + leçon), Wills Drum Lessons (PDF), MusicRadar, Ethan Hein, Wikipédia, Modern Drummer (transcription Marc Atkinson, existence vérifiée).",
+  "voices": [
+   {
+    "id": "funk-funky-drummer.kick",
+    "label": "kick",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,1,0,0,0,0,0,0,0,1,0,0,1,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "fondation syncopée",
+    "enterOrder": 2,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "funk-funky-drummer.snare",
+    "label": "snare",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,0,0,0,2,0,0,1,0,1,0,1,2,0,0,1],
+    "uncertain": false,
+    "approx": true,
+    "description": "backbeats + ghosts (l'âme du groove)",
+    "enterOrder": 3,
+    "difficulty": "facile"
+   },
+   {
+    "id": "funk-funky-drummer.charley-f",
+    "label": "charley f.",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1],
+    "uncertain": false,
+    "approx": true,
+    "description": "tapis de doubles-croches",
+    "enterOrder": 1,
+    "difficulty": "difficile"
+   },
+   {
+    "id": "funk-funky-drummer.charley-o",
+    "label": "charley o.",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,0,0,0,0,2,0,0,0,0,0,0,0,2,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "respirations sur les « e »",
+    "enterOrder": 5,
+    "difficulty": "moyen"
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "funk-cold-sweat",
+  "family": "funk",
+  "label": "Cold Sweat",
+  "origin": "James Brown, batteur Clyde Stubblefield (1967)",
+  "context": "Souvent cité comme le morceau fondateur du funk : tout l'orchestre se cale sur la batterie.",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 108,
+   "max": 118,
+   "jam": 112
+  },
+  "reliability": "moyenne",
+  "sources": "DrumsTheWord (eBook p. 39 + leçon), Total Drummer, PDF Escuela Borja Cortés (♩=112), Drumeo (« Cold Sweat, Part 1 » dans le top 10).",
+  "voices": [
+   {
+    "id": "funk-cold-sweat.kick-a",
+    "label": "kick A",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "le « one » puis pousse",
+    "enterOrder": 3,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "funk-cold-sweat.snare-a",
+    "label": "snare A",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,0,0,0,2,0,0,1,0,1,0,0,0,0,2,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "backbeat 2, ghosts, backbeat déplacé sur &4",
+    "enterOrder": 2,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "funk-cold-sweat.charley-a",
+    "label": "charley A",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,1,0,1,0,1,0,1,0,0,0,1,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "croches régulières",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "funk-cold-sweat.charl-o-a",
+    "label": "charl.o. A",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "ouverture avec le kick (&3)",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "funk-cold-sweat.kick-b",
+    "label": "kick B",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "évite le 1 (suspension)",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "funk-cold-sweat.snare-b",
+    "label": "snare B",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,1,0,0,2,0,0,1,0,1,0,0,2,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "ghost e1, backbeats 2 et 4 normaux",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "funk-cold-sweat.charley-b",
+    "label": "charley B",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "croches régulières",
+    "enterOrder": null,
+    "difficulty": ""
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "funk-get-up-i-feel-like-being-a-sex-machine",
+  "family": "funk",
+  "label": "Get Up (I Feel Like Being a) Sex Machine",
+  "origin": "James Brown, batteur John « Jabo » Starks (1970)",
+  "context": "Le groove hypnotique de Jabo Starks (et non Stubblefield) sous la basse de Bootsy Collins : ouvertures de charley sur les « & » de 1 et 3 menant aux backbeats.",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 104,
+   "max": 112,
+   "jam": 108
+  },
+  "reliability": "moyenne",
+  "sources": "DrumsTheWord (eBook p. 60), Drumeo (« A Drummer's Guide To Funk », qui crédite Starks parmi les batteurs du titre), *The Funkmasters* (Slutsky/Silverman — le titre figure au répertoire James Brown 1960-1973 couvert par la méthode). Batteur vérifié : John « Jabo » Starks.",
+  "voices": [
+   {
+    "id": "funk-get-up-i-feel-like-being-a-sex-machine.kick",
+    "label": "kick",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "le « one » + relance &3",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "funk-get-up-i-feel-like-being-a-sex-machine.snare",
+    "label": "snare",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,0,0,0,2,0,1,1,0,1,0,0,2,0,0,1],
+    "uncertain": false,
+    "approx": true,
+    "description": "backbeats 2/4 + ghosts de liaison",
+    "enterOrder": 2,
+    "difficulty": "facile"
+   },
+   {
+    "id": "funk-get-up-i-feel-like-being-a-sex-machine.charley-f",
+    "label": "charley f.",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,0,0,1,0,1,1,1,0,0,0,1,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "croches brisées, resserrées beat 2",
+    "enterOrder": 3,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "funk-get-up-i-feel-like-being-a-sex-machine.charley-o",
+    "label": "charley o.",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,0,2,0,0,0,0,0,0,0,2,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "signature : « & » de 1 et de 3",
+    "enterOrder": null,
+    "difficulty": ""
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "funk-cissy-strut",
+  "family": "funk",
+  "label": "Cissy Strut",
+  "origin": "The Meters, batteur Joseph « Zigaboo » Modeliste (1969)",
+  "context": "Instrumental fondateur du funk de La Nouvelle-Orléans, premier album des Meters.",
+  "count": 16,
+  "family_meter": "tern",
+  "tempo": {
+   "min": 84,
+   "max": 96,
+   "jam": 90
+  },
+  "reliability": "moyenne",
+  "sources": "DrumsTheWord (eBook p. 38 + leçon), Drummer Cafe (88 bpm), Francis Drumming Blog.",
+  "voices": [
+   {
+    "id": "funk-cissy-strut.kick",
+    "label": "kick",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,1,0,0,0,0,1,0,0,1,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "ponctuation second line",
+    "enterOrder": 1,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "funk-cissy-strut.snare",
+    "label": "snare",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,0,0,0,2,1,0,0,0,0,0,0,2,2,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "réponses, doublé final",
+    "enterOrder": 2,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "funk-cissy-strut.charley",
+    "label": "charley",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,1,1,0,0,0,0,2,0,1,2,0,0,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "ligne linéaire, ghost sur e3",
+    "enterOrder": 3,
+    "difficulty": "difficile"
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "funk-what-is-hip",
+  "family": "funk",
+  "label": "What Is Hip?",
+  "origin": "Tower of Power, batteur David Garibaldi (INCERTAIN : 1973, non vérifié en source ouverte)",
+  "context": "Garibaldi a co-écrit le titre : il « a ajouté de la syncope à un pattern qu'il jouait souvent et suggéré la ligne de basse en doubles-croches » (Wikipédia).",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 100,
+   "max": 110,
+   "jam": 100
+  },
+  "reliability": "moyenne",
+  "sources": "Wikipédia « David Garibaldi (musician) » (consulté), DrumsTheWord eBook p. 167 (consulté, idiome), *Off the Record* (Garibaldi, Alfred — méthode publiée).",
+  "voices": [
+   {
+    "id": "funk-what-is-hip.kick",
+    "label": "kick",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,1,0,0,1,0,0,0,1,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "syncope avec la basse",
+    "enterOrder": 3,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "funk-what-is-hip.snare",
+    "label": "snare",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,0,0,0,2,0,0,1,0,1,0,0,2,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "backbeats + ghosts (réduits)",
+    "enterOrder": 2,
+    "difficulty": "facile"
+   },
+   {
+    "id": "funk-what-is-hip.charley",
+    "label": "charley",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    "uncertain": false,
+    "approx": true,
+    "description": "doubles-croches (2 mains possibles)",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "funk-funk-on-the-one",
+  "family": "funk",
+  "label": "Funk « on the one »",
+  "origin": "groove générique à la James Brown (pattern pédagogique, pas un titre précis)",
+  "context": "Squelette commun aux grooves James Brown : accent massif sur le 1 (« the One »), backbeats 2/4, kick de relance sur le « & » de 3.",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 90,
+   "max": 110,
+   "jam": 96
+  },
+  "reliability": "moyenne",
+  "sources": "DrumsTheWord eBook p. 39, 60, 110 (consulté), Drumeo « A Drummer's Guide To Funk » (consulté).",
+  "voices": [
+   {
+    "id": "funk-funk-on-the-one.kick",
+    "label": "kick",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "LE « one » + relance",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "funk-funk-on-the-one.snare",
+    "label": "snare",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,0,0,0,2,0,0,0,0,0,0,0,2,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "backbeats 2 et 4",
+    "enterOrder": 2,
+    "difficulty": "facile"
+   },
+   {
+    "id": "funk-funk-on-the-one.charley",
+    "label": "charley",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "croches régulières",
+    "enterOrder": 3,
+    "difficulty": "facile"
+   },
+   {
+    "id": "funk-funk-on-the-one.tambourin",
+    "label": "tambourin",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "double le backbeat (optionnel)",
+    "enterOrder": 4,
+    "difficulty": "facile"
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "reggae-one-drop",
+  "family": "reggae",
+  "label": "One drop",
+  "origin": "Jamaïque, fin des années 1960 (Kingston, studios roots)",
+  "context": "Pattern signature du roots reggae, popularisé par Carlton Barrett (Bob Marley & The Wailers) ; la paternité est disputée entre Barrett, son frère Aston et Winston Grennan (Wikipedia).",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 60,
+   "max": 95,
+   "jam": 75
+  },
+  "reliability": "moyenne",
+  "sources": "- https://en.wikipedia.org/wiki/One_drop_rhythm",
+  "voices": [
+   {
+    "id": "reggae-one-drop.kick",
+    "label": "Kick",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "l'unique appui, temps 3",
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "reggae-one-drop.cross-stick",
+    "label": "Cross-stick",
+    "instr": "djembe",
+    "voiceKind": "tone",
+    "role": "medium",
+    "grid": [0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "soudé au kick sur 3",
+    "enterOrder": 3,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "reggae-one-drop.hi-hat",
+    "label": "Hi-hat",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,2,0,1,0,2,0,1,0,2,0,1,0,2,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "croches, accents en levée",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "reggae-one-drop.skank-perc-aigue",
+    "label": "Skank (perc. aiguë)",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "contretemps (guitare/clavier)",
+    "enterOrder": 2,
+    "difficulty": "facile"
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "reggae-rockers",
+  "family": "reggae",
+  "label": "Rockers",
+  "origin": "Jamaïque, milieu des années 1970 (Channel One, Sly Dunbar)",
+  "context": "Style plus dur et plus dansant que le one drop, pionnié par Sly Dunbar (Sly & Robbie) au studio Channel One.",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 75,
+   "max": 80,
+   "jam": 75
+  },
+  "reliability": "moyenne",
+  "sources": "- https://www.dancehallmag.com/2026/01/27/features/sly-dunbar-ten-essential-songs-bearing-the-reggae-legends-mark.html",
+  "voices": [
+   {
+    "id": "reggae-rockers.kick",
+    "label": "Kick",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "ancre les temps 1 et 3",
+    "enterOrder": 2,
+    "difficulty": "facile"
+   },
+   {
+    "id": "reggae-rockers.rimshot-snare",
+    "label": "Rimshot/snare",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "backbeat sur 3",
+    "enterOrder": 3,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "reggae-rockers.hi-hat",
+    "label": "Hi-hat",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "croches régulières",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "reggae-rockers.skank-perc-aigue",
+    "label": "Skank (perc. aiguë)",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "contretemps",
+    "enterOrder": 4,
+    "difficulty": "moyen"
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "reggae-steppers",
+  "family": "reggae",
+  "label": "Steppers",
+  "origin": "Jamaïque, seconde moitié des années 1970 (roots militant)",
+  "context": "Le « four on the floor » du reggae : kick en noires sur les quatre temps — « solid, driving quarter notes on each beat » (Modern Drummer).",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 110,
+   "max": 140,
+   "jam": 120
+  },
+  "reliability": "moyenne",
+  "sources": "- https://www.moderndrummer.com/article/february-2019-reggae-101-the-steppers-beat/ (extrait public)",
+  "voices": [
+   {
+    "id": "reggae-steppers.kick",
+    "label": "Kick",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "quatre noires, moteur",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "reggae-steppers.cross-stick",
+    "label": "Cross-stick",
+    "instr": "djembe",
+    "voiceKind": "tone",
+    "role": "medium",
+    "grid": [0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "ancrage sur 3",
+    "enterOrder": 3,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "reggae-steppers.hi-hat",
+    "label": "Hi-hat",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,2,0,1,0,2,0,1,0,2,0,1,0,2,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "croches, accents en levée",
+    "enterOrder": 2,
+    "difficulty": "facile"
+   },
+   {
+    "id": "reggae-steppers.skank-perc-aigue",
+    "label": "Skank (perc. aiguë)",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "contretemps",
+    "enterOrder": 4,
+    "difficulty": "moyen"
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "reggae-ska",
+  "family": "reggae",
+  "label": "Ska",
+  "origin": "Jamaïque, 1962 (Kingston, The Skatalites)",
+  "context": "Ancêtre uptempo du reggae, né fin 1962 d'un ajustement du jeu de Lloyd Knibb (The Skatalites) — « a slight change in Lloyd Knibb's drum rhythm was the landmark for the birth of ska » (résultat corroboré par la page Ska stroke/Grokipedia via recherche et par Bax Music qui cite Knibb).",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 110,
+   "max": 135,
+   "jam": 120
+  },
+  "reliability": "moyenne",
+  "sources": "- https://studydrums.com/ccrtska.html",
+  "voices": [
+   {
+    "id": "reggae-ska.kick",
+    "label": "Kick",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "temps forts 1 et 3",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "reggae-ska.snare-rimshot",
+    "label": "Snare (rimshot)",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,0,0,0,2,0,0,0,0,0,0,0,2,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "backbeat 2 et 4",
+    "enterOrder": 2,
+    "difficulty": "facile"
+   },
+   {
+    "id": "reggae-ska.hi-hat",
+    "label": "Hi-hat",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "contretemps seulement",
+    "enterOrder": 3,
+    "difficulty": "difficile"
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "reggae-nyabinghi",
+  "family": "reggae",
+  "label": "Nyabinghi",
+  "origin": "Jamaïque, années 1950 (camps rastafari, Count Ossie)",
+  "context": "Rythme cérémoniel rastafari en 4/4, « heartbeat » lent joué sur trois tambours à main — idéal pour un jam multi-participants sans batterie.",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 70,
+   "max": 80,
+   "jam": 70
+  },
+  "reliability": "moyenne",
+  "sources": "- https://en.wikipedia.org/wiki/Nyabinghi_rhythm",
+  "voices": [
+   {
+    "id": "reggae-nyabinghi.basse-thunder",
+    "label": "Basse « thunder",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "pouls : ouvert sur 1, étouffé sur 3",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "reggae-nyabinghi.funde",
+    "label": "Funde",
+    "instr": "djembe",
+    "voiceKind": "tone",
+    "role": "medium",
+    "grid": [0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "gardien régulier",
+    "enterOrder": 2,
+    "difficulty": "facile"
+   },
+   {
+    "id": "reggae-nyabinghi.repeater-kete",
+    "label": "Repeater (kete)",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,0,1,0,0,1,0,0,0,0,1,0,0,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "voix soliste, syncopes",
+    "enterOrder": 3,
+    "difficulty": "difficile"
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "hiphop-1-boom-bap-classique",
+  "family": "hiphop",
+  "label": "1. Boom bap classique",
+  "origin": "type « Impeach the President » (The Honey Drippers, 1973)",
+  "context": "Le break d'ouverture d'« Impeach the President » est l'un des plus samplés de l'histoire (Audio Two « Top Billin' », Notorious B.I.G.",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 85,
+   "max": 95,
+   "jam": 90
+  },
+  "reliability": "élevée",
+  "sources": "drum-patterns.com/impeach-the-president/ (grille, 112 BPM) ; ethanhein.com/wp/2010/impeach-the-president/ ; blog.native-instruments.com/drum-patterns/ ; attackmagazine.com/technique/beat-dissected/90s-boom-bap-hip-hop/. **",
+  "voices": [
+   {
+    "id": "hiphop-1-boom-bap-classique.hi-hat-ferme-aigu",
+    "label": "hi-hat fermé (aigu)",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,1,0,1,0,1,1,1,0,0,0,1,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "hiphop-1-boom-bap-classique.hi-hat-ouvert-aigu",
+    "label": "hi-hat ouvert (aigu)",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 4,
+    "difficulty": "facile"
+   },
+   {
+    "id": "hiphop-1-boom-bap-classique.snare-medium",
+    "label": "snare (médium)",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,0,0,0,2,0,0,0,0,0,0,0,2,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 2,
+    "difficulty": "facile"
+   },
+   {
+    "id": "hiphop-1-boom-bap-classique.kick-grave",
+    "label": "kick (grave)",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,1,2,0,0,0,0,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 3,
+    "difficulty": "moyen"
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "hiphop-2-funky-drummer",
+  "family": "hiphop",
+  "label": "2. Funky Drummer",
+  "origin": "break de Clyde Stubblefield (James Brown, 1969)",
+  "context": "Break enregistré à Cincinnati en 1969, samplé par Public Enemy, Run-DMC, N.W.A, LL Cool J, Dr.",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 96,
+   "max": 100,
+   "jam": 96
+  },
+  "reliability": "élevée",
+  "sources": "drumstheword.com (leçon Funky Drummer) ; willsdrumlessons.com — PDF de transcription consulté ; musicradar.com/how-to/how-to-program-a-funky-drummer-style-midi-break-in-your-daw (99 BPM, vélocités) ; ethanhein.com/wp/2023/building-the-funky-drummer-beat/ ; en.wikipedia.org/wiki/Funky_Drummer. **",
+  "voices": [
+   {
+    "id": "hiphop-2-funky-drummer.hi-hat-ferme-aigu",
+    "label": "hi-hat fermé (aigu)",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 3,
+    "difficulty": "difficile"
+   },
+   {
+    "id": "hiphop-2-funky-drummer.hi-hat-ouvert-aigu",
+    "label": "hi-hat ouvert (aigu)",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 4,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "hiphop-2-funky-drummer.snare-medium",
+    "label": "snare (médium)",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,0,0,0,2,0,0,1,0,1,0,1,2,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "hiphop-2-funky-drummer.kick-grave",
+    "label": "kick (grave)",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,1,0,0,0,0,0,0,0,1,0,0,1,0,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 2,
+    "difficulty": "moyen"
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "hiphop-3-amen-break",
+  "family": "hiphop",
+  "label": "3. Amen break",
+  "origin": "« Amen, Brother » (The Winstons, G.C. Coleman, 1969)",
+  "context": "Break de 4 mesures (~6–7 s) à 1:26 d'« Amen, Brother », parmi les enregistrements les plus samplés de l'histoire ; en hip-hop : N.W.A « Straight Outta Compton », Salt-N-Pepa « I Desire », Mantronix « King of the Beats » (Wikipedia).",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 120,
+   "max": 136,
+   "jam": 120
+  },
+  "reliability": "élevée",
+  "sources": "en.wikipedia.org/wiki/Amen_break (structure, 136 BPM, usages hip-hop) ; drum-patterns.com/amen-break/ (grille pas à pas) ; drumstheword.com (leçon Amen Break) ; audiolabs-erlangen.de (Reverse Engineering the Amen Break, ≈140 BPM). **",
+  "voices": [
+   {
+    "id": "hiphop-3-amen-break.ride-charley-aigu",
+    "label": "ride/charley (aigu)",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "hiphop-3-amen-break.snare-medium",
+    "label": "snare (médium)",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,0,0,0,2,0,0,1,0,1,0,0,2,0,0,1],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 3,
+    "difficulty": "facile"
+   },
+   {
+    "id": "hiphop-3-amen-break.kick-grave",
+    "label": "kick (grave)",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 2,
+    "difficulty": "moyen"
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "hiphop-4-trap",
+  "family": "hiphop",
+  "label": "4. Trap",
+  "origin": "kick 808 syncopé, snare sur le 3, hats en doubles-croches",
+  "context": "Style dominant des années 2010 (Lex Luger, Metro Boomin cités comme références par eMastered).",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 130,
+   "max": 160,
+   "jam": 140
+  },
+  "reliability": "élevée",
+  "sources": "studiobrootle.com/trap-drum-patterns/ ; emastered.com/blog/trap-drum-patterns ; kickdrum.io/patterns/808-trap (140 BPM, kick 1 + « et » de 3). **",
+  "voices": [
+   {
+    "id": "hiphop-4-trap.a-hi-hat-ferme-aigu",
+    "label": "A hi-hat fermé (aigu)",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 3,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "hiphop-4-trap.a-hi-hat-ouvert-aigu",
+    "label": "A hi-hat ouvert (aigu)",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 4,
+    "difficulty": "facile"
+   },
+   {
+    "id": "hiphop-4-trap.a-snare-clap-medium",
+    "label": "A snare/clap (médium)",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "hiphop-4-trap.a-kick-808-grave",
+    "label": "A kick 808 (grave)",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 2,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "hiphop-4-trap.b-hi-hat-ferme-aigu",
+    "label": "B hi-hat fermé (aigu)",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "hiphop-4-trap.b-hi-hat-ouvert-aigu",
+    "label": "B hi-hat ouvert (aigu)",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "hiphop-4-trap.b-snare-clap-medium",
+    "label": "B snare/clap (médium)",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": null,
+    "difficulty": ""
+   },
+   {
+    "id": "hiphop-4-trap.b-kick-808-grave",
+    "label": "B kick 808 (grave)",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,0,0,0,1,0,0,1,1,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": null,
+    "difficulty": ""
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "hiphop-5-west-coast-g-funk",
+  "family": "hiphop",
+  "label": "5. West Coast / G-funk",
+  "origin": "le « gangsta boogie » (années 90)",
+  "context": "Sous-genre californien (Dr.",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 95,
+   "max": 105,
+   "jam": 95
+  },
+  "reliability": "élevée",
+  "sources": "attackmagazine.com/technique/beat-dissected/west-coast-hip-hop/ (grille, 95–105 BPM, swing 50 %) ; openmusic.academy/docs/GL9DzDbUJtRjSCrPpunKXp (style, shaker, exemples). **",
+  "voices": [
+   {
+    "id": "hiphop-5-west-coast-g-funk.shaker-aigu",
+    "label": "shaker (aigu)",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "hiphop-5-west-coast-g-funk.hi-hat-ouvert-aigu",
+    "label": "hi-hat ouvert (aigu)",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,0,0,1,0,0,0,1,0,0,0,1,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 4,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "hiphop-5-west-coast-g-funk.hi-hat-ferme-aigu",
+    "label": "hi-hat fermé (aigu)",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 5,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "hiphop-5-west-coast-g-funk.clap-snare-medium",
+    "label": "clap/snare (médium)",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,0,0,0,2,0,0,0,0,0,0,0,2,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 2,
+    "difficulty": "facile"
+   },
+   {
+    "id": "hiphop-5-west-coast-g-funk.kick-grave",
+    "label": "kick (grave)",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,0,2,0,0,0,0,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "enterOrder": 3,
+    "difficulty": "moyen"
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "rock-backbeat-rock-de-base-money-beat",
+  "family": "rock",
+  "label": "Backbeat rock de base (« money beat »)",
+  "origin": "le groove fondateur du rock, standardisé dès les années 1950-60",
+  "context": "C'est le premier groove enseigné dans quasiment toutes les méthodes de batterie : croches au charleston, caisse claire sur 2 et 4, grosse caisse sur 1 et 3.",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 85,
+   "max": 100,
+   "jam": 85
+  },
+  "reliability": "moyenne",
+  "sources": "- https://dddrums.com/how-to-play-back-in-black-drum-lesson-acdc/ (groove principal : hi-hat croches, kick 1 et 3, snare 2 et 4)",
+  "voices": [
+   {
+    "id": "rock-backbeat-rock-de-base-money-beat.hi-hat",
+    "label": "hi-hat",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "pulsation en croches",
+    "enterOrder": 3,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "rock-backbeat-rock-de-base-money-beat.snare",
+    "label": "snare",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,0,0,0,2,0,0,0,0,0,0,0,2,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "backbeat 2 et 4",
+    "enterOrder": 2,
+    "difficulty": "facile"
+   },
+   {
+    "id": "rock-backbeat-rock-de-base-money-beat.kick",
+    "label": "kick",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "ancrage 1 et 3",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "rock-four-on-the-floor-rock-disco-rock",
+  "family": "rock",
+  "label": "Four-on-the-floor rock / disco-rock",
+  "origin": "kick sur chaque temps, adopté par le rock à l'ère disco (fin 70s)",
+  "context": "Grosse caisse sur les 4 temps, backbeat maintenu sur 2 et 4 : le beat disco absorbé par le rock.",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 100,
+   "max": 115,
+   "jam": null
+  },
+  "reliability": "moyenne",
+  "sources": "- https://drummagazine.com/lesson-four-on-the-floor-disco/ (pattern complet kick/snare/hi-hat + exemples « Miss You », « Another Brick in the Wall »)",
+  "voices": [
+   {
+    "id": "rock-four-on-the-floor-rock-disco-rock.hi-hat",
+    "label": "hi-hat",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,2,0,1,0,2,0,1,0,2,0,1,0,2,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "croches, contretemps marqués",
+    "enterOrder": 3,
+    "difficulty": "moyen"
+   },
+   {
+    "id": "rock-four-on-the-floor-rock-disco-rock.snare",
+    "label": "snare",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,0,0,0,2,0,0,0,0,0,0,0,2,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "backbeat constant",
+    "enterOrder": 2,
+    "difficulty": "facile"
+   },
+   {
+    "id": "rock-four-on-the-floor-rock-disco-rock.kick",
+    "label": "kick",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,0,2,0,0,0,2,0,0,0,2,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "pulsation 4 temps",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "rock-when-the-levee-breaks",
+  "family": "rock",
+  "label": "« When the Levee Breaks »",
+  "origin": "groove lourd à feel half-time (John Bonham, Led Zeppelin, 1971)",
+  "context": "Le break de batterie le plus samplé du rock, enregistré dans la cage d'escalier de Headley Grange avec deux micros en hauteur (Roland Articles).",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 68,
+   "max": 78,
+   "jam": 68
+  },
+  "reliability": "moyenne",
+  "sources": "- https://www.drumeo.com/beat/when-the-levee-breaks-drum-beat/ (hi-hat croches, kick doux après le 1, ghost notes après 2 et 4)",
+  "voices": [
+   {
+    "id": "rock-when-the-levee-breaks.hi-hat",
+    "label": "hi-hat",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "croches appuyées",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "rock-when-the-levee-breaks.snare",
+    "label": "snare",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,0,0,0,2,0,0,0,0,0,0,0,2,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "backbeat 2 et 4",
+    "enterOrder": 2,
+    "difficulty": "facile"
+   },
+   {
+    "id": "rock-when-the-levee-breaks.kick",
+    "label": "kick",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,1,0,0,0,0,0,2,0,0,2,2,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "motif signature",
+    "enterOrder": 3,
+    "difficulty": "difficile"
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "rock-shuffle-blues-rock",
+  "family": "rock",
+  "label": "Shuffle blues-rock",
+  "origin": "la base ternaire du rock, héritée du blues électrique (Texas/Chicago)",
+  "context": "Subdivision en triolets dont on ne joue que la 1re et la 3e note au charleston (« jouer une, sauter une, jouer une », Total Drummer), backbeat sur 2 et 4, kick sur 1 et 3.",
+  "count": 12,
+  "family_meter": "tern",
+  "tempo": {
+   "min": 90,
+   "max": 120,
+   "jam": null
+  },
+  "reliability": "moyenne",
+  "sources": "- https://www.totaldrummer.com/blues-shuffle-drum-beat/ (hi-hat 1re et 3e note du triolet, snare 2 et 4, kick 1 et 3)",
+  "voices": [
+   {
+    "id": "rock-shuffle-blues-rock.hi-hat",
+    "label": "hi-hat",
+    "instr": "cajon",
+    "voiceKind": "aigu",
+    "role": "aigu",
+    "grid": [1,0,1,1,0,1,1,0,1,1,0,1],
+    "uncertain": false,
+    "approx": true,
+    "description": "motif shuffle ternaire",
+    "enterOrder": 3,
+    "difficulty": "difficile"
+   },
+   {
+    "id": "rock-shuffle-blues-rock.snare",
+    "label": "snare",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "medium",
+    "grid": [0,0,0,2,0,0,0,0,0,2,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "backbeat 2 et 4",
+    "enterOrder": 2,
+    "difficulty": "facile"
+   },
+   {
+    "id": "rock-shuffle-blues-rock.kick",
+    "label": "kick",
+    "instr": "djembe",
+    "voiceKind": "basse",
+    "role": "basse",
+    "grid": [2,0,0,0,0,0,2,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "ancrage 1 et 3",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   }
+  ],
+  "variations": []
+ },
+ {
+  "id": "rock-stomp-stomp-clap-we-will-rock-you",
+  "family": "rock",
+  "label": "Stomp-stomp-clap (« We Will Rock You »)",
+  "origin": "percussion corporelle de stade (Queen, 1977)",
+  "context": "Pas un groove de batterie : deux frappes de pieds + un clap, en boucle, enregistrés par le groupe en overdub sur une estrade de studio avec des delays pour simuler une foule (Wikipédia).",
+  "count": 16,
+  "family_meter": "bin",
+  "tempo": {
+   "min": 76,
+   "max": 84,
+   "jam": 76
+  },
+  "reliability": "moyenne",
+  "sources": "- https://en.wikipedia.org/wiki/We_Will_Rock_You (motif stomp-stomp-clap, enregistrement en overdub avec delays, conception participative, hymne de stade)",
+  "voices": [
+   {
+    "id": "rock-stomp-stomp-clap-we-will-rock-you.stomps",
+    "label": "stomps",
+    "instr": "surdo",
+    "voiceKind": "grave",
+    "role": "basse",
+    "grid": [2,0,1,0,0,0,0,0,2,0,1,0,0,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "deux appuis « we will »",
+    "enterOrder": 1,
+    "difficulty": "facile"
+   },
+   {
+    "id": "rock-stomp-stomp-clap-we-will-rock-you.claps",
+    "label": "claps",
+    "instr": "djembe",
+    "voiceKind": "slap",
+    "role": "aigu",
+    "grid": [0,0,0,0,2,0,0,0,0,0,0,0,2,0,0,0],
+    "uncertain": false,
+    "approx": true,
+    "description": "réponse claquée",
+    "enterOrder": 2,
+    "difficulty": "facile"
+   }
+  ],
+  "variations": []
+ }
+];
+
   let percGrids = {};          // voix -> tableau de pas (0/1/2)
   let percOffsets = {};        // voix -> micro-décalage par pas (−0.45 … +0.45 pas)
   let percMuted = {};          // voix -> muet (checkbox)
