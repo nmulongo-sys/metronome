@@ -262,6 +262,23 @@
     margin-right: 5px; vertical-align: -1px;
   }
 
+  /* ---- écran de jeu (passe 4.1) : MES briques en grand, le reste en accompagnement ----
+     Visible uniquement en mode « Jouer » (mode simple recomposé). Mes voix = briques
+     pleine couleur, hauteur double, main D/G inscrite ; le backing (tout le reste,
+     y compris les lignes écartées) = briques atténuées, masquables — l'audio, lui,
+     ne dépend jamais de cet affichage. */
+  #playScreen { display: none; margin-bottom: 14px; }
+  body.mode-simple #playScreen { display: block; }
+  .play-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .play-line { height: 170px; }
+  .pl-brick.mine {
+    height: 20px; display: flex; align-items: center; justify-content: center;
+    font-size: .68rem; font-weight: 700; color: #fff;
+    text-shadow: 0 1px 2px rgba(20,15,8,.55); border-radius: 3px;
+  }
+  .pl-brick.back { opacity: .25; }
+  #playScreen.no-back .pl-brick.back { display: none; }
+
   /* ---- percussion ---- */
   .perc-voice { display: flex; align-items: center; gap: 10px; margin: 8px 0; flex-wrap: wrap; }
   .perc-voice .pv-label { min-width: 92px; color: var(--fm-sub); font-size: .82rem; }
@@ -417,8 +434,8 @@
     </div>
     <div class="header-actions">
       <div class="seg" role="group" aria-label="Mode">
-        <button id="modeSimpleBtn" class="sel">Simple</button>
-        <button id="modeExpertBtn">Expert</button>
+        <button id="modeSimpleBtn" class="sel">▶ Jouer</button>
+        <button id="modeExpertBtn">Configurer</button>
       </div>
       <button class="btn-ghost" id="wizardBtn">✦ Assistant</button>
       <button class="btn-ghost" id="themeBtn">◐ Mode sombre</button>
@@ -472,6 +489,23 @@
     <div class="card staff circle-wrap">
       <canvas id="wheel" width="320" height="320"></canvas>
       <div class="status-line" id="statusLine">Prêt</div>
+    </div>
+  </div>
+
+  <!-- ============ ÉCRAN DE JEU (passe 4.1) ============ -->
+  <div class="card" id="playScreen">
+    <div class="play-bar">
+      <label style="min-width:auto;">Je suis :</label>
+      <select id="playWho" style="width:auto;"><option value="solo">Solo</option></select>
+      <label class="check"><input type="checkbox" id="playBacking" checked> Voir l'accompagnement</label>
+      <span style="flex:1;"></span>
+      <button class="btn-sm" id="playSetupBtn" title="Rouvrir l'écran d'accueil (seul / à plusieurs · apprentissage)">⟲ Setup</button>
+    </div>
+    <div class="perc-line play-line" id="playLine"></div>
+    <div class="perc-line-legend" id="playLegend"></div>
+    <div class="row hide" id="playHintRow" style="margin-bottom:0;">
+      <span class="hint" style="margin:0;" id="playHintTxt">Ma ligne n'est pas encore répartie.</span>
+      <button class="btn-sm primary" id="playDist1">Répartir selon priorités (1 joueur)</button>
     </div>
   </div>
 
@@ -913,6 +947,30 @@ swing 62
   </div>
 </div>
 
+<!-- ============ ÉCRAN D'ACCUEIL « JE JOUE » (passe 4.1) ============ -->
+<div class="wiz-overlay" id="playSetup">
+  <div class="wiz">
+    <div class="kicker">Écran d'accueil</div>
+    <h2>Prêt à jouer ?</h2>
+    <div class="wiz-sub">Deux choix — tout le reste s'ajuste ensuite derrière « Configurer ».</div>
+    <div class="wiz-sub" style="margin-bottom:8px;"><b>On joue…</b></div>
+    <div class="wiz-options" style="grid-template-columns:1fr 1fr;">
+      <button class="wiz-opt sel" id="psSolo"><b>Seul</b><small>toute la ligne jouable est à moi</small></button>
+      <button class="wiz-opt" id="psMulti"><b>À plusieurs</b><small>chacun sa ligne — même groove, même classement, même répartition sur chaque appareil</small></button>
+    </div>
+    <div class="row hide" id="psNRow" style="margin:10px 0 0;">
+      <label style="min-width:auto;">Nombre de joueurs</label>
+      <input type="number" id="psN" min="2" max="12" value="2" style="width:72px;">
+    </div>
+    <div class="wiz-sub" style="margin:18px 0 8px;"><b>Apprentissage</b> (ajout progressif sur ma ligne)</div>
+    <div class="wiz-options" style="grid-template-columns:1fr 1fr;">
+      <button class="wiz-opt" id="psLearnYes"><b>Oui</b><small>ma ligne se construira frappe par frappe — choix mémorisé, l'exercice arrive à la prochaine étape</small></button>
+      <button class="wiz-opt sel" id="psLearnNo"><b>Non</b><small>je joue la ligne complète</small></button>
+    </div>
+    <div class="wiz-nav"><span></span><button class="btn-sm primary" id="psGo">C'est parti →</button></div>
+  </div>
+</div>
+
 <script>
 (() => {
   'use strict';
@@ -936,6 +994,10 @@ swing 62
     perc: { on: false, instr: 'djembe', count: 16, mode: 'off', period: 2,
             breakId: '', breakLevel: 4, breakAuto: false, breakEcho: false,
             handRule: 'alt', lefty: false },
+    /* passe 4 (étape 4.1) : écran de jeu — qui je suis ; learn/learnPaused posés
+       dès 4.1 (mémorisés à l'accueil), exploités par l'apprentissage en 4.2.
+       n = nombre de joueurs choisi à l'accueil ; showBacking = affichage (pas l'audio). */
+    play: { who: 'solo', learn: false, learnPaused: false, n: 1, showBacking: true },
     volume: 0.8
   };
 
@@ -986,6 +1048,8 @@ swing 62
     $('modeSimpleBtn').classList.toggle('sel', m === 'simple');
     $('modeExpertBtn').classList.toggle('sel', m === 'expert');
     store.set('fm-metro-mode', m);
+    // écran de jeu (4.1) : le mode simple recomposé — rafraîchi à l'entrée
+    if (m === 'simple' && typeof playLineRender === 'function') playLineRender();
   }
   $('modeSimpleBtn').addEventListener('click', () => setMode('simple'));
   $('modeExpertBtn').addEventListener('click', () => setMode('expert'));
@@ -1572,6 +1636,11 @@ swing 62
       if (lc) { lc.style.display = 'block'; lc.style.left = ((phase < 0 ? 0 : phase) * 100) + '%'; }
       $('percLine').classList.toggle('break-now', S.perc.on && percBreakActive);
     }
+    // curseur de l'écran de jeu (4.1) — même phase, même motif
+    if (document.body.classList.contains('mode-simple')) {
+      const pc = $('playLine') && $('playLine').querySelector('.pl-cursor');
+      if (pc) { pc.style.display = 'block'; pc.style.left = ((phase < 0 ? 0 : phase) * 100) + '%'; }
+    }
     $('statusLine').innerHTML = mutedThisCycle
       ? '<span class="mute">' + (S.gap.target === 'all'
           ? '● COUPÉ — tiens le tempo !'
@@ -1594,6 +1663,8 @@ swing 62
     const lc = $('percLine') && $('percLine').querySelector('.pl-cursor');
     if (lc) lc.style.display = 'none';
     if ($('percLine')) $('percLine').classList.remove('break-now');
+    const pc = $('playLine') && $('playLine').querySelector('.pl-cursor');
+    if (pc) pc.style.display = 'none';
     drawBowStatic();
   }
 
@@ -4846,6 +4917,18 @@ swing 62
     percLineRender();
   }
 
+  // la liste de voix affichables (id, libellé, couleur) — partagée entre la ligne de
+  // réduction et l'écran de jeu (4.1) : voix du répertoire quand un groove est chargé
+  // (le focal est alors en sourdine), voix du focal sinon — clave dans les deux cas.
+  function plVoiceList() {
+    const def = PERC_INSTR[S.perc.instr];
+    const base = (typeof TS !== 'undefined' && TS.loaded)
+      ? TS.voices.map((v, k) => ({ id: TS_PREFIX + v.gid, label: v.label, color: 'var(--fm-voice-' + (k % 6 + 1) + ')' }))
+      : def.voices.map((v, k) => ({ id: v.id, label: v.label, color: 'var(--fm-voice-' + (k % 4 + 1) + ')' }));
+    return base
+      .concat(CLAVE_VOICES.map((v, k) => ({ id: v.id, label: v.label, color: 'var(--fm-voice-' + (k + 5) + ')' })));
+  }
+
   // ---- ligne de réduction (solfège) : le groove qui SONNE, sur une seule ligne ----
   // Chaque frappe = une brique colorée par voix ; frappes qui coïncident (même
   // fraction de cycle, même à counts différents) = briques empilées, instrument
@@ -4862,14 +4945,7 @@ swing 62
       d.style.left = (b / S.beats * 100) + '%';
       line.appendChild(d);
     }
-    const def = PERC_INSTR[S.perc.instr];
-    // la ligne montre ce qui SONNE : les voix du répertoire quand un groove est chargé
-    // (le focal est alors en sourdine), les voix du focal sinon — clave dans les deux cas.
-    const base = (typeof TS !== 'undefined' && TS.loaded)
-      ? TS.voices.map((v, k) => ({ id: TS_PREFIX + v.gid, label: v.label, color: 'var(--fm-voice-' + (k % 6 + 1) + ')' }))
-      : def.voices.map((v, k) => ({ id: v.id, label: v.label, color: 'var(--fm-voice-' + (k % 4 + 1) + ')' }));
-    const voices = base
-      .concat(CLAVE_VOICES.map((v, k) => ({ id: v.id, label: v.label, color: 'var(--fm-voice-' + (k + 5) + ')' })));
+    const voices = plVoiceList();
     const audible = id => !percMuted[id] && !(typeof tsMuted === 'function' && tsMuted(id, false));
     const groups = {};   // clé = fraction du cycle (précision 1/4800) → briques coïncidentes
     voices.forEach(v => {
@@ -4903,6 +4979,7 @@ swing 62
       if (!g || !audible(v.id) || !g.some(x => x > 0)) return '';
       return '<span><span class="chip" style="background:' + v.color + '"></span>' + v.label + '</span>';
     }).join('');
+    playLineRender();   // écran de jeu (4.1) : même chemin de mise à jour que la réduction
   }
 
   // ---- divulgation progressive : le mode d'exercice pilote les contrôles visibles ----
@@ -5744,6 +5821,7 @@ swing 62
     } else { fout.innerHTML = ''; }
 
     tsRankRender();
+    playWhoRender();   // écran de jeu (4.1) : le sélecteur « Je suis » suit les participants
     percLineRender();
     tsWire();
   }
@@ -5847,6 +5925,228 @@ swing 62
     $('tsGroove').innerHTML = GROOVES.filter(g => g.family === fam)
       .map(g => '<option value="' + g.id + '">' + tsEsc(g.label) + '</option>').join('');
   }
+
+  // ============ ÉCRAN DE JEU (passe 4, étape 4.1) ============
+  // Le mode simple recomposé : l'écran répond à « qui je suis » puis montre MA ligne
+  // en grand (briques pleine couleur, hauteur double, main D/G inscrite — doigté =
+  // tsHandsMerged, la phrase fusionnée du joueur) ; tout le reste, lignes écartées
+  // comprises, s'affiche en accompagnement atténué et masquable. L'AUDIO ne dépend
+  // jamais de cet affichage (backing/sourdine restent pilotés par tsMuted).
+  // Réutilisation stricte : tsWizDistribute (répartition déterministe),
+  // tsHandsMerged (doigté fusionné), plVoiceList (voix + couleurs), curseur existant.
+
+  function playSave() {
+    store.set('fm-metro-play', JSON.stringify(S.play));
+  }
+
+  // sélecteur « Je suis : Solo | Participant 1…N | Tous » — suit TS.participants ;
+  // un who orphelin (participant disparu) retombe sur Solo, de façon persistée.
+  function playWhoRender() {
+    const sel = $('playWho'); if (!sel) return;
+    let h = '<option value="solo">Solo</option>';
+    TS.participants.forEach(p => { h += '<option value="' + p.id + '">' + tsEsc(p.label) + '</option>'; });
+    if (TS.participants.length) h += '<option value="tous">Tous</option>';
+    sel.innerHTML = h;
+    if (!Array.prototype.some.call(sel.options, o => o.value === S.play.who)) {
+      S.play.who = 'solo'; playSave();
+    }
+    sel.value = S.play.who;
+  }
+
+  // MES voix selon S.play.who : { ids: {voiceId:1}, hands: {voiceId: mains[]} }.
+  // - participant : ses voix, doigtées sur SA phrase fusionnée ;
+  // - solo : tout ce qui est assigné (= tout ce qui est jouable par un joueur une
+  //   fois la répartition à 1 joueur faite) ;
+  // - tous : toutes les voix non écartées, mains fusionnées par joueur (voix
+  //   communes : doigté par voix) ;
+  // - répertoire libre (pas de participants actifs) : toute la ligne est à moi ;
+  // - sans groove chargé : les voix audibles du focal (l'écran de jeu sert aussi
+  //   les grooves édités à la main).
+  function playMine() {
+    const who = S.play.who, ids = {}, hands = {};
+    if (TS.loaded && TS.on) {
+      if (who === 'tous') {
+        const merged = tsMergedMap();
+        TS.voices.forEach(v => {
+          if (v.dropped) return;   // écartée : personne ne la joue → accompagnement
+          ids[TS_PREFIX + v.gid] = 1;
+          hands[TS_PREFIX + v.gid] = merged[v.gid] || percHandsFor(v.grid);
+        });
+      } else {
+        const mine = (who !== 'solo' && TS.participants.some(p => p.id === who))
+          ? TS.voices.filter(v => v.participant === who)
+          : TS.voices.filter(v => v.participant != null);   // solo : tout l'assigné
+        const merged = tsHandsMerged(mine);
+        mine.forEach(v => { ids[TS_PREFIX + v.gid] = 1; hands[TS_PREFIX + v.gid] = merged[v.gid]; });
+      }
+    } else if (TS.loaded) {
+      // répertoire libre : tout audible, une seule personne joue → tout est à moi
+      const merged = tsHandsMerged(TS.voices);
+      TS.voices.forEach(v => { ids[TS_PREFIX + v.gid] = 1; hands[TS_PREFIX + v.gid] = merged[v.gid]; });
+    } else {
+      const def = PERC_INSTR[S.perc.instr];
+      const mine = def.voices
+        .filter(v => percGrids[v.id] && !percMuted[v.id] && percGrids[v.id].some(x => x > 0))
+        .map(v => ({ gid: v.id, grid: percGrids[v.id] }));
+      const merged = tsHandsMerged(mine);
+      mine.forEach(v => { ids[v.gid] = 1; hands[v.gid] = merged[v.gid]; });
+    }
+    return { ids, hands };
+  }
+
+  // rendu de l'écran de jeu — mêmes groupes de coïncidence que la ligne de réduction ;
+  // mes briques (hauteur double, main inscrite) s'empilent sous celles du backing.
+  function playLineRender() {
+    const line = $('playLine'), leg = $('playLegend');
+    if (!line) return;
+    line.querySelectorAll('.pl-brick, .pl-beat').forEach(e => e.remove());
+    if (!line.querySelector('.pl-cursor')) {
+      const cu = document.createElement('div'); cu.className = 'pl-cursor'; line.appendChild(cu);
+    }
+    for (let b = 0; b < S.beats; b++) {
+      const d = document.createElement('div'); d.className = 'pl-beat';
+      d.style.left = (b / S.beats * 100) + '%';
+      line.appendChild(d);
+    }
+    const m = playMine();
+    const voices = plVoiceList();
+    const audible = id => !percMuted[id] && !(typeof tsMuted === 'function' && tsMuted(id, false));
+    // lignes écartées : visibles en accompagnement même quand elles ne sonnent pas
+    const dropSet = {};
+    if (TS.loaded && TS.on) TS.voices.forEach(v => { if (v.dropped) dropSet[TS_PREFIX + v.gid] = 1; });
+    const groups = {};
+    voices.forEach(v => {
+      const g = percGrids[v.id];
+      if (!g) return;
+      const mine = !!m.ids[v.id];
+      if (!mine && !audible(v.id) && !dropSet[v.id]) return;   // backing = ce qui sonne + les écartées
+      const n = g.length;
+      for (let i = 0; i < n; i++) {
+        if (!g[i]) continue;
+        const key = Math.round(i / n * 4800);
+        (groups[key] = groups[key] || []).push({
+          v, mine, acc: g[i] === 2,
+          hand: mine ? ((m.hands[v.id] || [])[i] || '') : '',
+          off: (percOffsets[v.id] && percOffsets[v.id][i]) || 0,
+          w: 100 / n
+        });
+      }
+    });
+    for (const key in groups) {
+      // mes briques en bas (sur la ligne de base), l'accompagnement au-dessus
+      const arr = groups[key].slice().sort((a, b) => (b.mine ? 1 : 0) - (a.mine ? 1 : 0));
+      let bottom = 11;
+      arr.forEach(b => {
+        const el = document.createElement('div');
+        el.className = 'pl-brick' + (b.mine ? ' mine' : ' back') + (b.acc ? ' acc' : '');
+        el.style.left = (key / 48) + '%';
+        el.style.width = 'calc(' + b.w + '% - 2px)';
+        el.style.bottom = bottom + 'px';
+        el.style.background = b.v.color;
+        if (b.off) el.style.transform = 'translateX(' + (b.off * 100) + '%)';
+        if (b.mine && b.hand) el.textContent = b.hand;
+        line.appendChild(el);
+        bottom += b.mine ? 22 : 11;
+      });
+    }
+    // légende réduite à MES voix
+    if (leg) leg.innerHTML = voices.map(v => {
+      const g = percGrids[v.id];
+      if (!m.ids[v.id] || !g || !g.some(x => x > 0)) return '';
+      return '<span><span class="chip" style="background:' + v.color + '"></span>' + v.label + '</span>';
+    }).join('') || '<span>Ma ligne est vide — charge un groove (Configurer ▸ Répertoire) ou répartis les voix.</span>';
+    // proposition « Répartir selon priorités (1 joueur) » : solo, groove chargé,
+    // mais répartition absente ou faite pour plusieurs (spec §3.3, premier passage)
+    const need = TS.loaded && TS.on && S.play.who === 'solo' &&
+      (TS.participants.length !== 1 || !TS.voices.some(v => v.participant != null));
+    $('playHintRow').classList.toggle('hide', !need);
+  }
+
+  // ---- écran d'accueil (setup) : 2 choix, mémorisés (fm-metro-play) ----
+  let psMulti = false, psLearn = false;
+  function playSetupSync() {
+    $('psSolo').classList.toggle('sel', !psMulti);
+    $('psMulti').classList.toggle('sel', psMulti);
+    $('psNRow').classList.toggle('hide', !psMulti);
+    $('psLearnYes').classList.toggle('sel', psLearn);
+    $('psLearnNo').classList.toggle('sel', !psLearn);
+  }
+  function openPlaySetup() {
+    psMulti = S.play.n > 1;
+    psLearn = S.play.learn;
+    $('psN').value = String(Math.max(2, S.play.n));
+    playSetupSync();
+    $('playSetup').classList.add('open');
+  }
+  function closePlaySetup() { $('playSetup').classList.remove('open'); }
+  function applyPlaySetup() {
+    S.play.n = psMulti ? Math.max(2, Math.min(12, parseInt($('psN').value, 10) || 2)) : 1;
+    S.play.learn = psLearn;
+    S.play.learnPaused = false;
+    $('tsWizN').value = String(S.play.n);
+    if (TS.loaded) {
+      // groove chargé : répartition immédiate — déterministe, donc identique sur
+      // chaque appareil qui indique le même groove, le même N et le même classement.
+      tsWizDistribute();
+    } else {
+      // pas de groove : on prépare les participants pour le sélecteur « Je suis »
+      while (TS.participants.length < S.play.n) tsAddParticipantSilent();
+      while (TS.participants.length > S.play.n) {
+        const p = TS.participants.pop();
+        TS.voices.forEach(v => { if (v.participant === p.id) v.participant = null; });
+      }
+      tsRefresh();
+    }
+    S.play.who = (psMulti && TS.participants.length) ? TS.participants[0].id : 'solo';
+    playSave();
+    playWhoRender();
+    closePlaySetup();
+    setMode('simple');
+    if (!isPlaying) drawStatic();
+  }
+
+  // restauration au chargement : état sauvegardé → écran de jeu ; sinon → accueil.
+  function playRestore() {
+    let saved = null;
+    try { saved = JSON.parse(store.get('fm-metro-play') || 'null'); } catch (e) {}
+    if (!saved) { openPlaySetup(); return; }
+    S.play.who = saved.who || 'solo';
+    S.play.learn = !!saved.learn;
+    S.play.learnPaused = !!saved.learnPaused;
+    S.play.n = Math.max(1, Math.min(12, parseInt(saved.n, 10) || 1));
+    S.play.showBacking = saved.showBacking !== false;
+    $('playBacking').checked = S.play.showBacking;
+    $('playScreen').classList.toggle('no-back', !S.play.showBacking);
+    $('tsWizN').value = String(S.play.n);
+    // les participants renaissent déterministes (p1…pN) — la répartition, elle,
+    // se refait en rechargeant le même groove (tsWizDistribute est déterministe).
+    while (TS.participants.length < S.play.n) tsAddParticipantSilent();
+    tsRefresh();   // rafraîchit sélecteur + écran de jeu (playWhoRender coerce si besoin)
+  }
+
+  $('playWho').addEventListener('change', e => {
+    S.play.who = e.target.value; playSave(); playLineRender();
+  });
+  $('playBacking').addEventListener('change', e => {
+    S.play.showBacking = e.target.checked;
+    $('playScreen').classList.toggle('no-back', !S.play.showBacking);
+    playSave();
+  });
+  $('playSetupBtn').addEventListener('click', openPlaySetup);
+  $('playDist1').addEventListener('click', () => {
+    $('tsWizN').value = '1';
+    S.play.n = 1; playSave();
+    tsWizDistribute();
+  });
+  $('psSolo').addEventListener('click', () => { psMulti = false; playSetupSync(); });
+  $('psMulti').addEventListener('click', () => { psMulti = true; playSetupSync(); });
+  $('psLearnYes').addEventListener('click', () => { psLearn = true; playSetupSync(); });
+  $('psLearnNo').addEventListener('click', () => { psLearn = false; playSetupSync(); });
+  $('psGo').addEventListener('click', applyPlaySetup);
+  $('playSetup').addEventListener('click', e => {
+    // fermer sans valider n'est permis que si un état existe déjà (sinon premier lancement)
+    if (e.target === $('playSetup') && store.get('fm-metro-play')) closePlaySetup();
+  });
 
   // ============ TEMPO ============
   function nameOf(bpm) {
@@ -6655,8 +6955,10 @@ swing 62
   percSetInstr('djembe');
   tsInit();
   drawStatic();
-  // premier lancement : ouvrir l'assistant
-  if (!store.get('fm-metro-wizard-done')) openWizard();
+  // passe 4.1 : l'écran d'accueil « Je joue » est la porte d'entrée — il restaure
+  // l'état sauvegardé (fm-metro-play) ou s'ouvre au premier lancement. L'assistant
+  // ne s'ouvre plus automatiquement ; il reste accessible via ✦ Assistant.
+  playRestore();
 })();
 </script>
 </body>
