@@ -1,6 +1,6 @@
 # Métronome — Spécification passe 4 : « Je joue »
 
-**Statut : brouillon à valider — 2026-07-08**
+**Statut : VALIDÉE le 2026-07-08 (toutes questions tranchées).**
 **Principe : l'interface s'organise par l'usage, plus par les modules.**
 
 ---
@@ -11,9 +11,12 @@ Aujourd'hui l'écran empile des modules (focal, répertoire, team spirit, exerci
 navigue entre eux. Après la passe 4, l'écran répond à deux questions puis montre **une seule
 chose** : ce que je dois jouer, séquentiellement.
 
-**Setup (2 choix) :**
+**Setup — écran d'accueil (2 choix) :**
 1. On joue : **seul** / **à plusieurs** (N joueurs)
 2. **Apprentissage** : oui / non
+
+Affiché au premier lancement (aucun état sauvegardé) puis mémorisé ; rouvrable à tout moment
+par un bouton **⟲ Setup** de l'écran de jeu.
 
 **Écran de jeu (le mode simple, recomposé) :** mes briques défilantes en grand, le reste sonne
 en accompagnement. Tout l'existant reste accessible derrière un bouton **Configurer** (l'actuel
@@ -38,7 +41,8 @@ Persisté dans `localStorage` (`fm-metro-play`), restauré au chargement.
 
 ### 3.1 En-tête minimal
 Tempo, start/stop, tap tempo, sélecteur **« Je suis : [Solo | Participant 1…N | Tous] »**,
-interrupteur **Apprentissage**, bouton **Configurer**.
+**⟲ Setup** (rouvre l'écran d'accueil), **Configurer**. Le choix seul/à plusieurs et
+l'apprentissage vivent dans l'écran d'accueil, pas dans la barre.
 
 ### 3.2 Briques en grand (mode « player » de `percLineRender`)
 - **Mes voix** : briques pleine couleur, hauteur double, **main D/G inscrite dans la brique**
@@ -96,14 +100,14 @@ Livraison : fichier complet à chaque étape, entrée datée au journal, jamais 
 
 ---
 
-## 6. Points tranchés (session du 08-07)
+## 6. Points tranchés
 
+**Session du 08-07 :**
 - Vue séquentielle : **briques défilantes en grand** (pas la grille).
 - À plusieurs : **les deux** modes d'appareil (chacun le sien / un seul).
 - Apprentissage : **ajout progressif d'abord**, avec **pause de mémorisation** ; appel-réponse plus tard.
 - Répartition et doigté : réutilisation stricte de l'existant (`tsWizDistribute`, `tsHandsMerged`), aucune nouvelle logique musicale.
 
-## 7. Questions ouvertes (à trancher avant 4.1)
-
-1. Le setup (2 questions) : écran d'accueil au premier lancement, ou simple barre en tête de l'écran de jeu ? (proposition : barre en tête, pas d'écran bloquant)
-2. « Tous » sur un seul appareil : les mains affichées sont celles de chaque joueur (fusionnées par joueur) — confirmer que c'est lisible ou réserver les mains aux vues individuelles.
+**Sur maquette (passe4-questions.html), même session :**
+- Setup : **écran d'accueil** au premier lancement, mémorisé, rouvrable via ⟲ Setup (option A).
+- Vue « Tous » : **mains D/G inscrites dans les briques** de chaque joueur (option A).
