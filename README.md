@@ -27,12 +27,12 @@ Tout est dans `metronome.html` :
 |---|---|
 | `<style>` | jusqu'à la fin du bloc en tête ; variables `--fm-*`, classes `.step`, `.perc-voice`, `.ts-*` |
 | bootstrap thème | petit `<script>` avant l'IIFE (lit `?theme=`, applique avant peinture) |
-| markup UI | sections `<details class="section">` (clave, percussion, **team spirit**, archet…) |
+| markup UI | carte **écran de jeu** `#playScreen` (visible en mode Jouer), sections `<details class="section">` (clave, percussion, **team spirit**, archet…), overlays `#wizOverlay` (assistant) et `#playSetup` (écran d'accueil) |
 | app | grand `<script>` en IIFE `(() => { 'use strict'; … })()`, divisé par des commentaires `// ==== NOM ====` |
 
 Sections JS principales : `ÉTAT` (l'objet `S`), `AUDIO`, `CALCUL DU CYCLE`, `GAP`, `ORDONNANCEUR`,
 `VISUALISATION`, `CLAVE MULTI-VOIX`, `PERCUSSION & INDÉPENDANCE`, `TEAM SPIRIT & RÉPERTOIRE`,
-`DSL PÉDAGOGIQUE`, `WIZARD`, `INIT`.
+`ÉCRAN DE JEU (passe 4, étape 4.1)`, `DSL PÉDAGOGIQUE`, `WIZARD`, `INIT`.
 
 ## Modèle percussion (passe 3)
 
@@ -83,6 +83,34 @@ Points d'ancrage moteur (minimaux) : `tsSyncGrids()` en fin de `buildPercGrids`,
 `percLayerMuted`, `tsProgressBump()` dans `percOnNewMeasure`. Hors chargement de groove, tout est no-op
 (non-régression passe 2).
 
+## Écran de jeu (passe 4, étape 4.1)
+
+Le **mode simple recomposé** : le seg d'en-tête devient **▶ Jouer / Configurer** (Configurer =
+l'actuel mode expert, inchangé). En mode Jouer, la carte `#playScreen` montre **ma ligne en grand**.
+
+- **État** : `S.play = { who: 'solo'|<participantId>|'tous', learn, learnPaused, n, showBacking }`,
+  persisté (`fm-metro-play`), restauré par `playRestore()` à l'init. `learn`/`learnPaused` sont
+  posés dès 4.1 (mémorisés à l'accueil) et seront exploités par l'apprentissage en 4.2.
+- **Écran d'accueil** (`#playSetup`, `openPlaySetup`) : 2 choix — seul / à plusieurs (N 2–12) et
+  apprentissage oui/non. Ouvert au premier lancement (aucun `fm-metro-play`), rouvrable via
+  **⟲ Setup**. Il remplace l'ouverture automatique de l'assistant (✦ Assistant reste manuel).
+  À la validation, groove chargé → `tsWizDistribute()` immédiat (déterministe : même groove +
+  même N + même classement = même répartition sur chaque appareil) ; sans groove → les
+  participants sont créés (ids `p1…pN`, déterministes) pour le sélecteur.
+- **Rendu** (`playLineRender`, chaîné en fin de `percLineRender` — même chemin de mise à jour) :
+  `playMine()` détermine MES voix selon `S.play.who` — participant : ses voix ; solo : tout
+  l'assigné (proposition « Répartir selon priorités (1 joueur) » affichée tant que la répartition
+  manque, spec §3.3) ; tous : toutes les voix non écartées, mains par joueur (`tsMergedMap`) ;
+  répertoire libre : tout ; sans groove : les voix audibles du **focal**. Mes briques :
+  `.pl-brick.mine`, pleine couleur, hauteur double (20 px), **main D/G inscrite dans la brique**
+  (doigté = `tsHandsMerged`, phrase fusionnée). Le reste, **lignes écartées comprises** :
+  `.pl-brick.back`, opacité 0,25, masquable par « Voir l'accompagnement » (`#playScreen.no-back`,
+  CSS pur — **l'audio ne dépend jamais de cet affichage**, il reste piloté par `tsMuted`).
+  Légende réduite à mes voix ; curseur temps réel = motif existant, piloté par `draw()`.
+- **Réutilisation stricte** : `tsWizDistribute`, `tsHandsMerged`, `tsMergedMap`, `plVoiceList`
+  (constructeur voix + couleurs extrait de `percLineRender`, partagé). Aucune nouvelle logique
+  musicale.
+
 ## Persistance (localStorage)
 
 | clé | contenu |
@@ -93,7 +121,8 @@ Points d'ancrage moteur (minimaux) : `tsSyncGrids()` en fin de `buildPercGrids`,
 | `fm-metro-family` | `bin` (16) \| `tern` (12) |
 | `fm-metro-perc-presets` | `{ nom: {instr, count, grids, offsets, muted} }` |
 | `fm-metro-progress` | `{ instr: { break: 1..4, guide: n } }` — progression par niveau (étape 4) |
-| `fm-metro-wizard-done` | l'assistant ne s'ouvre plus automatiquement |
+| `fm-metro-play` | `{ who, learn, learnPaused, n, showBacking }` — écran de jeu (4.1) ; absent = premier lancement → écran d'accueil |
+| `fm-metro-wizard-done` | posé quand l'assistant est utilisé (depuis 4.1 il ne s'ouvre plus automatiquement — l'écran d'accueil le remplace) |
 
 Les participants / assignations team spirit vivent en mémoire ; l'export JSON « ma ligne » est le vecteur
 de partage.
@@ -108,6 +137,40 @@ de partage.
 - **Substitution instrument** : compléter `TS_SUB[instr]` (rôle → voiceKind valide).
 
 ## Journal de développement
+
+### 2026-07-08 — Étape 4.1 : écran de jeu (setup, briques en grand, « Je suis »)
+- **Écran d'accueil** (`#playSetup`) au premier lancement : seul / à plusieurs (N) +
+  apprentissage oui/non, mémorisé (`fm-metro-play`), rouvrable via **⟲ Setup**. Remplace
+  l'ouverture automatique de l'assistant (✦ Assistant reste accessible manuellement).
+- **Écran de jeu** (`#playScreen`, mode simple recomposé ; seg d'en-tête relabellé
+  **▶ Jouer / Configurer**, contenu expert inchangé) : mes briques pleine couleur, hauteur
+  double, **main D/G inscrite dans la brique** (`tsHandsMerged`, phrase fusionnée) ; le reste —
+  **lignes écartées comprises** — en accompagnement atténué (opacité 0,25), masquable
+  (« Voir l'accompagnement », affichage pur : l'audio reste piloté par `tsMuted`). Sélecteur
+  **« Je suis : Solo | Participant 1…N | Tous »** (« Tous » = toutes les lignes pleine couleur
+  avec mains, validé sur maquette) ; sans groove chargé, ma ligne = les voix du focal.
+  Curseur temps réel = motif existant. Solo + groove sans répartition → proposition
+  « Répartir selon priorités (1 joueur) » (spec §3.3).
+- **État** : `S.play = { who, learn, learnPaused, n, showBacking }` persisté/restauré ;
+  `learn`/`learnPaused` posés dès 4.1, exploités en 4.2. Participants restaurés déterministes
+  (`p1…pN`) ; la répartition se refait en rechargeant le même groove (`tsWizDistribute`
+  déterministe). Un `who` orphelin retombe sur Solo, de façon persistée.
+- **Réutilisation stricte** : `tsWizDistribute`, `tsHandsMerged`, `tsMergedMap` ; extraction de
+  `plVoiceList()` (voix + couleurs) partagée entre `percLineRender` et `playLineRender`, ce
+  dernier chaîné en fin de `percLineRender` (même chemin de mise à jour). Aucune nouvelle
+  logique musicale.
+- **Recette headless** (jsdom + stubs, `recette-4-1.js`) : 43/43 — restauration `fm-metro-play`,
+  briques/légende filtrées selon `who` (samba N=2 de référence : P1 = primeira + caixa
+  → 14 briques, P2 = segunda + tamborim → 7, « Tous » → 21), loi du doigté fusionné vérifiée
+  sur les briques rendues (paire = D+G, singles alternés), bascule accompagnement (classe
+  `no-back`, briques conservées au DOM), écartées visibles backing ON/OFF, focal 7 briques
+  sans groove, accueil au premier lancement, expert intact. Restent à l'œil/l'oreille sur
+  Android : lisibilité des mains à 16 pas sur petit écran, hauteur de la ligne de jeu,
+  position de ⟲ Setup si la barre déborde.
+- **Choix documentés** : main toujours inscrite **dans** la brique (à ≥ 1/16 de largeur une
+  lettre tient ; le repli « au-dessus » et la césure 8+8 sont reportés en 4.3) ; à la
+  validation de l'accueil avec groove chargé, la répartition est exécutée immédiatement
+  (pas seulement proposée) — la proposition ne subsiste que pour un groove chargé après coup.
 
 ### 2026-07-08 — Doigté fusionné par joueur ; jouabilité imposée partout
 - **Cause des lignes injouables** (constatées en capture : kick-D et charley-D au même pas) :
