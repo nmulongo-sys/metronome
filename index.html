@@ -699,6 +699,21 @@ swing 62
     </div>
   </details>
 
+  <!-- 6. Bibliothèque partagée -->
+  <details class="section" id="secBiblio">
+    <summary><span class="sec-title">Bibliothèque partagée</span><span class="sec-sub">routines · Supabase</span></summary>
+    <div class="section-body">
+      <div class="row" style="gap:8px;flex-wrap:wrap">
+        <input id="biblioTitre" type="text" maxlength="120" placeholder="Titre de la routine à publier" style="flex:1;min-width:160px">
+        <button class="btn-sm primary" id="btnBiblioPublish">Publier la routine</button>
+        <button class="btn-sm" id="btnBiblioRefresh">Charger la bibliothèque</button>
+      </div>
+      <div class="script-status" id="biblioFb"></div>
+      <div id="biblioList" style="margin-top:8px"></div>
+      <div class="hint" style="margin-top:8px">Le <b>canon</b> (routines de référence) est visible sans connexion. <b>Connecte-toi</b> (en haut) pour voir les routines de la classe et publier les tiennes. « Importer » place la routine dans l'éditeur ci-dessus.</div>
+    </div>
+  </details>
+
   <div class="kbd-hint">Espace : lecture · ↑↓ : tempo ±1 · T : tap tempo</div>
 </div>
 
@@ -3111,6 +3126,9 @@ Contraintes : bpm entre 30 et 260 ; swing entre 50 et 85 ; gap n < total.
   }
 
   function renderAccount(){
+    /* état exposé + événement pour les autres modules (bibliothèque) */
+    window.fmCurrentUser=currentUser; window.fmCurrentProfil=currentProfil;
+    try{ document.dispatchEvent(new CustomEvent('fm-auth',{detail:{user:currentUser,profil:currentProfil}})); }catch(e){}
     if(!btn) return;
     if(currentUser){
       var name=(currentProfil&&currentProfil.pseudo)||currentUser.email||'Compte';
@@ -3147,6 +3165,91 @@ Contraintes : bpm entre 30 et 260 ; swing entre 50 et 85 ; gap n < total.
     });
   }
   if(document.readyState!=='loading') init(); else document.addEventListener('DOMContentLoaded', init);
+})();
+</script>
+<script>
+/* ===== Bibliothèque partagée (Supabase) : routines canon/classe + publication ===== */
+(function(){
+  function el(id){ return document.getElementById(id); }
+  function esc(s){ var d=document.createElement('div'); d.textContent=(s==null?'':String(s)); return d.innerHTML; }
+  function fb(msg,ok){ var e=el('biblioFb'); if(e){ e.textContent=msg||''; e.style.color=ok?'var(--fm-accent)':'#d9534f'; } }
+  function sb(){ return (window.fmSupabase&&window.fmSupabase())||null; }
+  function user(){ return window.fmCurrentUser||null; }
+
+  function tagFor(row){
+    if(row.canon) return 'Référence';
+    var u=user();
+    if(u && row.owner===u.id) return 'Moi';
+    if(row.partage_classe) return 'Classe';
+    return '';
+  }
+  async function loadBiblio(){
+    var list=el('biblioList'); if(!list) return;
+    var c=sb(); if(!c){ fb('Client Supabase indisponible (réseau ?).',false); return; }
+    fb('Chargement…',true);
+    try{
+      var res=await c.from('mt_routines')
+        .select('id,titre,script,owner,canon,partage_classe,updated_at')
+        .order('canon',{ascending:false}).order('titre',{ascending:true});
+      if(res.error){ fb('Erreur : '+res.error.message,false); return; }
+      var data=res.data||[]; list.innerHTML='';
+      if(!data.length){ fb(user()?'Bibliothèque vide pour l\'instant.':'Aucune routine de référence pour l\'instant.',true); return; }
+      fb(data.length+' routine(s)'+(user()?'':' · connecte-toi pour voir la classe'),true);
+      data.forEach(function(row){
+        var r=document.createElement('div');
+        r.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid rgba(128,128,128,.2)';
+        var left=document.createElement('span');
+        var tag=tagFor(row);
+        left.innerHTML='<b>'+esc(row.titre||'(sans titre)')+'</b>'+(tag?' <span class="sec-sub">· '+tag+'</span>':'');
+        var b=document.createElement('button'); b.className='btn-sm'; b.textContent='Importer';
+        b.onclick=function(){
+          var ta=el('scriptArea');
+          if(!ta){ fb('Éditeur de routine introuvable.',false); return; }
+          ta.value=(row.script||'');
+          try{ ta.dispatchEvent(new Event('input',{bubbles:true})); }catch(e){}
+          var sec=el('secScript'); if(sec&&!sec.open) sec.open=true;
+          fb('« '+(row.titre||'routine')+' » chargée dans l\'éditeur ✓',true);
+        };
+        r.appendChild(left); r.appendChild(b); list.appendChild(r);
+      });
+    }catch(e){ fb('Échec : '+(e&&e.message||e),false); }
+  }
+
+  async function publish(){
+    var c=sb(); if(!c){ fb('Client Supabase indisponible (réseau ?).',false); return; }
+    var u=user(); if(!u){ fb('Connecte-toi (en haut) pour publier tes routines.',false); return; }
+    var ta=el('scriptArea'); var script=ta?(ta.value||'').trim():'';
+    if(!script){ fb('L\'éditeur de routine est vide.',false); return; }
+    var ti=el('biblioTitre'); var titre=(ti?(ti.value||''):'').trim();
+    if(!titre){
+      /* défaut : 1re ligne de commentaire, sinon 1re ligne non vide */
+      var lines=script.split('\n');
+      var cm=lines.find(function(l){ return /^#\s*\S/.test(l); });
+      titre=(cm?cm.replace(/^#\s*/,''):(lines.find(function(l){return l.trim();})||'Routine')).slice(0,120);
+    }
+    titre=titre.slice(0,120);
+    fb('Publication…',true);
+    try{
+      var res=await c.from('mt_routines')
+        .insert({ owner:u.id, titre:titre, script:script, partage_classe:true, canon:false })
+        .select().maybeSingle();
+      if(res.error){ fb('Erreur : '+res.error.message,false); return; }
+      fb('« '+titre+' » publiée dans la classe ✓',true);
+      loadBiblio();
+    }catch(e){ fb('Échec : '+(e&&e.message||e),false); }
+  }
+
+  function updatePublishBtn(){
+    var pb=el('btnBiblioPublish'); if(!pb) return;
+    pb.title=user()?'Publier la routine de l\'éditeur dans la bibliothèque de la classe':'Connecte-toi (en haut) pour publier';
+  }
+  function wire(){
+    var rb=el('btnBiblioRefresh'); if(rb&&!rb._wired){ rb._wired=true; rb.addEventListener('click',loadBiblio); }
+    var pb=el('btnBiblioPublish'); if(pb&&!pb._wired){ pb._wired=true; pb.addEventListener('click',publish); }
+    updatePublishBtn();
+  }
+  document.addEventListener('fm-auth', updatePublishBtn);
+  if(document.readyState!=='loading') wire(); else document.addEventListener('DOMContentLoaded', wire);
 })();
 </script>
 <!-- =================== FIN COMPTE (Supabase · lien magique) =================== -->
