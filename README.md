@@ -138,6 +138,31 @@ de partage.
 
 ## Journal de développement
 
+### 2026-07-09 — Passe 5 étape 5.3-bis : corps / tenue de la basse (anti-staccato) + estampille de build
+- **Diagnostic mesuré** (enregistrement WAV de la basse isolée, 92 BPM) : la basse ne sature pas
+  (crête −5,2 dBFS, zéro écrêtage — le +3 dBFS du mix venait des percussions), mais chaque note
+  ne dure que ~15 ms audibles, soit **9 % d'une double-croche** (163 ms à 92 BPM) → « extrême
+  staccato ». Cause : enveloppe en **pluck-vers-zéro** (`exponentialRampToValueAtTime(0.0001, t+dur)`,
+  attaque puis mort), aggravée par une durée plafonnée en dur.
+- **Enveloppe refondue** (`bassVoice`) : attaque → petite décroissance vers un **niveau de tenue**
+  (`sus = 0.78 × pic`) → **maintien** de ce niveau (le corps de la note) → **release** bref borné
+  (≤ 60 ms). La note existe pendant toute sa durée au lieu de s'éteindre aussitôt. Le piqué, quand
+  on le veut, vient maintenant de la **durée** (ghost court), pas de la forme.
+- **Durée calée sur la subdivision** : plafond absolu `dm[1]` retiré ; `dur = stepDur × fill × durTempo`
+  avec `fill` par articulation (`finger 0.90`, `slap 0.82`, `pop 0.80`, `ghost 0.35`) et plancher
+  audible 20 ms. finger/slap/pop tiennent l'essentiel du pas (léger détaché, pas d'empiètement sur
+  le pas suivant) ; ghost reste piqué. L'adaptation tempo (§2.3) est conservée.
+- **Estampille de build** : constante `BUILD` (+ `BUILD_DATE`) affichée dans l'en-tête (`#buildStamp`)
+  — sert à savoir de quel build vient un enregistrement de validation. À bumper à chaque passe.
+- **Recette** `recette-5-3-bis.js` **15/15** (+ non-régression `5-1` **20/20**, `5-1-bis` **21/21**,
+  `5-2` **23/23**, `5-3` **38/38**) : durée finger ≈ 0,90 × stepDur × facteur tempo et < stepDur ;
+  ghost < finger ; monotonie tempo + plancher 20 ms ; fracs et déterminisme intacts ; les 4
+  articulations se synthétisent sans exception ; estampille renseignée. **La forme de tenue
+  (le sustain) reste un critère d'oreille** — le headless prouve la durée, pas le corps ressenti.
+- **Ensuite** (non fait ici) : présence de la basse sur mobile (niveau + bas-médium/exciteur) et
+  limiteur de bus master contre l'écrêtage percussion — à réécouter après ce correctif d'enveloppe.
+  Branche `metronomefunk-0.5.3-bis` (depuis `metronomefunk-0.5.3`).
+
 ### 2026-07-09 — Passe 5 étape 5.3 : progressions harmoniques + tonalités
 - **`BASS_PROGS` peuplé des 6 progressions** (§2.4) : `vamp1` (I⁷, James Brown), `vamp2` (I⁷→IV⁷,
   Sex Machine), `dorien` (i⁷→IV⁷, Chameleon), `mixo` (I⁷→♭VII, rock-funk mixolydien), `blues`

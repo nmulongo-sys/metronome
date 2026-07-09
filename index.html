@@ -442,6 +442,7 @@
     <div class="brand">
       <h1>Métronome</h1>
       <div class="kicker">Formation musicale · Groove &amp; horloge interne</div>
+      <div class="build-stamp" id="buildStamp" style="font-size:11px;opacity:.5;margin-top:2px;font-variant-numeric:tabular-nums;"></div>
     </div>
     <div class="header-actions">
       <div class="seg" role="group" aria-label="Mode">
@@ -1131,6 +1132,10 @@ swing 62
     volume: 0.8
   };
 
+  // Identité du build affichée dans l'en-tête (5.3-bis). Bumper à chaque passe : elle sert à
+  // savoir de quel build vient un enregistrement de validation.
+  const BUILD = 'metronomefunk-0.5.3-bis', BUILD_DATE = '2026-07-09';
+
   let audioCtx = null, masterGain = null, noiseBuf = null;
   let isPlaying = false;
   let schedulerTimer = null;
@@ -1371,11 +1376,21 @@ swing 62
     const osc = audioCtx.createOscillator();
     osc.type = 'sawtooth'; osc.frequency.value = freq;
 
-    // Enveloppe d'amplitude commune, en sortie de mixage des deux branches.
+    // Enveloppe d'amplitude (5.3-bis) : attaque → petite décroissance vers un niveau de TENUE
+    // (le corps de la note) → maintien à ce niveau → release bref. Remplace le pluck-vers-zéro
+    // (attaque puis mort immédiate) qui rendait toute note staccato et sans corps. Le caractère
+    // piqué, quand on le veut (ghost court), vient désormais de la DURÉE, pas de la forme.
     const g = audioCtx.createGain();
+    const pk  = Math.max(vol, 0.0002);                        // pic d'attaque
+    const sus = Math.max(vol * 0.78, 0.0002);                 // niveau de tenue (corps)
+    const rel = Math.min(0.06, dur * 0.30);                   // release bref, borné
+    const dEnd = t + attack + Math.min(0.03, dur * 0.18);     // fin de la décroissance vers le sustain
+    const hEnd = Math.max(dEnd + 0.005, t + dur - rel);       // fin de tenue (début du release)
     g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(Math.max(vol, 0.0002), t + attack);   // attaque : douce (finger) → vive (slap/pop)
-    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    g.gain.exponentialRampToValueAtTime(pk, t + attack);      // attaque : douce (finger) → vive (slap/pop)
+    g.gain.exponentialRampToValueAtTime(sus, dEnd);           // → niveau de tenue
+    g.gain.setValueAtTime(sus, hEnd);                         // MAINTIEN du corps jusqu'ici
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);     // release
     g.connect(masterGain);
 
     // Branche 1 — corps propre : LP doux, conserve la vraie fondamentale.
@@ -1728,7 +1743,10 @@ swing 62
     if (!pat || !prog) return;
     const bar = prog.bars[bassBarIdx % prog.bars.length];
     const stepDur = (S.beats * 60 / S.tempo) / pat.steps;
-    const durMul = { finger: [2.0, 0.28], ghost: [0.8, 0.08], pop: [1.4, 0.16], slap: [1.6, 0.20] };
+    // 5.3-bis : durée = fraction du PAS (plus de plafond absolu qui tronquait la note à ~15 ms
+    // → staccato). finger/slap/pop TIENNENT la note (≈ 0.80–0.90 du pas, léger détaché) ; le
+    // ghost reste piqué (0.35). L'adaptation tempo (§2.3) resserre encore à tempo rapide.
+    const durFill = { finger: 0.90, ghost: 0.35, pop: 0.80, slap: 0.82 };
     const dens = S.bass.density, prof = S.bass.vel, vary = !!S.bass.vary;
     // k borné : 0 (lent, 70 BPM) → 1 (rapide, 150 BPM). Interpolations linéaires (§2.3).
     const k = Math.max(0, Math.min(1, (S.tempo - 70) / 80));
@@ -1744,7 +1762,7 @@ swing 62
         const wEff = Math.min(1, h.w * wGhostsT);                            // ornements : respirent avec le tempo
         if (bassRng() >= wEff) continue;                                     // (piliers jamais tirés → immuables)
       }
-      const dm = durMul[h.art] || [1.5, 0.18];
+      const fill = durFill[h.art] != null ? durFill[h.art] : 0.85;
       let gain = BASS_ART_GAIN[h.art] != null ? BASS_ART_GAIN[h.art] : 0.7;
       gain = bassVelShape(gain, prof);                                        // profil de vélocité (§2.2)
       if (h.art === 'ghost') gain *= ghostGainT;                             // adaptation tempo des ghosts (§2.3)
@@ -1755,7 +1773,7 @@ swing 62
           freq: bassNoteFreq(S.bass.key, bar.deg, h.deg),
           art: h.art,
           gain: gain,
-          dur: Math.min(stepDur * dm[0], dm[1]) * durTempo
+          dur: Math.max(stepDur * fill * durTempo, 0.02)                      // plancher audible 20 ms
         }
       });
     }
@@ -7446,6 +7464,7 @@ swing 62
   percSetInstr('djembe');
   tsInit();
   bassRestore();
+  { const _bs = $('buildStamp'); if (_bs) _bs.textContent = 'build ' + BUILD + ' · ' + BUILD_DATE; }
   drawStatic();
   // passe 4.1 : l'écran d'accueil « Je joue » est la porte d'entrée — il restaure
   // l'état sauvegardé (fm-metro-play) ou s'ouvre au premier lancement. L'assistant
