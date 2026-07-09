@@ -138,6 +138,39 @@ de partage.
 
 ## Journal de développement
 
+### 2026-07-10 — Passe 5 étape 5.3c : recalibrage du curseur legato (verdict d'écoute)
+- **Nomenclature** : à partir de cette étape, les suffixes latins (bis/ter/quater) cèdent la
+  place aux lettres — 5.3c succède à 5.3-ter. Les artefacts déjà livrés gardent leurs noms.
+- **Verdict d'écoute** (HP de bureau, 92 BPM) sur 5.3-ter : le bout droit du curseur (L=1 :
+  finger 1,30 · release 180 ms/×0,50) était le **minimum** acceptable de legato — « c'était
+  bien mais il ne fallait pas moins ». Toute la course couvrait une zone inutilisable.
+- **Recalibrage** (spec `metronome-passe5-5-3c-spec.md`, dosages tranchés en session) :
+  la fenêtre glisse d'un cran vers le lié — **`L = 1 + fraction` ∈ [1, 2]**, mêmes droites
+  -ter prolongées. **Plancher (curseur 0) = ancien max -ter** (finger 1,30 · rel ×0,50),
+  **défaut curseur 25** (L=1,25 : finger 1,40 · rel 210 ms/×0,55), **plafond L=2**
+  (finger 1,70 · slap 1,74 · pop 1,80 · rel 300 ms/×0,70). Libellé UI : « Détaché ↔ lié »
+  → **« Lié ↔ très lié »** (le pôle détaché n'existe plus, par décision d'oreille).
+  Ghost hors curseur (0,35), tirage/fracs/bus/limiteur/corps : intacts.
+- **Stockage inchangé** (`S.bass.legato` = fraction 0–1, clé `fm-metro-bass`) : aucune
+  migration — toute valeur héritée de -ter est relue comme position et atterrit
+  mécaniquement dans la zone validée (ex. 0,5 → L=1,5).
+- **Retouches documentées** (les dosages -ter figés en recette sont recalibrés par
+  construction) : `recette-5-3-ter.js` — blocs [1]/[2] alignés sur la nouvelle fenêtre
+  (le bloc [2] passe de « continuité 5.3-bis » à « plancher = ancien max -ter strict »),
+  estampille génériquée (`0\.5\.3`) ; `recette-5-3-bis.js` (3e retouche) — attendus de [1]
+  alignés sur le plancher 1,30/> stepDur (l'état -bis strict n'est plus atteignable),
+  invariant anti-staccato d'origine (> 100 ms) conservé, estampille génériquée sans tiret
+  (`0\.5\.3-` ne matchait pas `c`). Assertions mécaniques, ghost, bus, persistance : intactes.
+- **Recette** `recette-5-3c.js` **21/21** : défaut 25/L=1,25 sur état vierge, plancher
+  bit à bit = ancien max -ter (durées + release sur l'automation), plafond L=2, monotonie
+  stricte sur toute la course, ghost constant, persistance en fraction + héritage sans
+  migration, estampille, limiteur/bus toujours câblés. Non-régression : 5-1 (20), 5-1-bis
+  (21), 5-2 (23), 5-3 (38) **inchangées** ; 5-3-bis (15) et 5-3-ter (28) vertes avec les
+  seules retouches ci-dessus. Recettes exécutées en local (Node 22 portable + jsdom).
+- **À valider à l'oreille** : le défaut L=1,25 (léger cran au-dessus du son validé) et le
+  haut de la course. Estampille `metronomefunk-0.5.3c`. Branche `metronomefunk-0.5.3c`
+  (depuis `metronomefunk-0.5.3-ter`, `7a54a0a`).
+
 ### 2026-07-10 — Passe 5 étape 5.3-ter : basse legato & respiration
 - **Curseur « détaché ↔ lié »** (`#bassLegato`, 0–100, défaut 50 ; `S.bass.legato` persisté) —
   un seul geste pilote **deux** paramètres : les **durFill** des notes structurantes
