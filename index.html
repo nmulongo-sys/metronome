@@ -849,6 +849,9 @@
         <label>Gabarit</label>
         <select id="bassPattern" style="width:auto;">
           <option value="theOne" selected>The One — ancre sur le 1</option>
+          <option value="syncopeGrave">Syncope grave — décalé autour du 1</option>
+          <option value="octaves">Octaves — pompe disco-funk</option>
+          <option value="ghostPendule">Ghost pendule — nappe de 16es</option>
         </select>
         <label style="min-width:auto;">Tonalité</label>
         <select id="bassKey" style="width:auto;">
@@ -866,10 +869,30 @@
           <option value="B">Si (B)</option>
         </select>
       </div>
+      <div class="row">
+        <label>Densité</label>
+        <select id="bassDensity" style="width:auto;">
+          <option value="1">1 — allégé</option>
+          <option value="2" selected>2 — normal</option>
+          <option value="3">3 — chargé</option>
+        </select>
+        <label style="min-width:auto;">Dynamique</label>
+        <select id="bassVel" style="width:auto;">
+          <option value="plat">Plate — peu de contraste</option>
+          <option value="mixte" selected>Mixte</option>
+          <option value="contraste">Contrastée — poche accents/ghosts</option>
+        </select>
+      </div>
+      <div class="row">
+        <label class="check"><input type="checkbox" id="bassVary"> Variations (jeu vivant)</label>
+      </div>
       <div class="hint">Une voix de basse funk synthétisée qui accompagne le percussionniste — pour
-      caler le jeu sur ses syncopes et ses silences (FUNK-I2). Étape 5.1 : gabarit <b>The One</b>
-      sur un vamp d'un accord, jeu déterministe. Densité, dynamique, progressions et tonalités
-      multiples, drop-outs de maintien du <i>time</i> : étapes suivantes.</div>
+      caler le jeu sur ses syncopes et ses silences (FUNK-I2). Choisis un <b>gabarit</b>, une
+      <b>tonalité</b>, la <b>densité</b> (allégé → chargé) et le profil de <b>dynamique</b>.
+      <b>Variations</b> activé, la ligne se joue de façon vivante (tirage des ornements) ;
+      désactivé, elle est régulière et prévisible. La ligne s'allège et se raccourcit d'elle-même
+      quand le tempo monte. Progressions harmoniques multiples et drop-outs de maintien du
+      <i>time</i> : étapes suivantes.</div>
     </div>
   </details>
 
@@ -1103,6 +1126,8 @@ swing 62
   let measureCount = 0, mutedThisCycle = false;
   let gapRemainPlay = 0, gapRemainMute = 0, gapProgSize = 1;
   let bassBarIdx = 0, bassRealized = [];   // passe 5 : position dans la progression + notes réalisées de la mesure
+  let bassRng = Math.random;               // 5.2 : RNG du tirage probabiliste. Prod = Math.random ;
+                                           // la recette headless injecte un générateur déterministe via fmMetroBass().setRng.
   let script = null;
   let tapTimes = [];
 
@@ -1587,8 +1612,36 @@ swing 62
       { i: 0,  deg: 'R',   art: 'finger', w: 1,   lvl: 1 },   // The One — pilier
       { i: 6,  deg: '5',   art: 'ghost',  w: 0.5, lvl: 2 },
       { i: 8,  deg: 'R',   art: 'finger', w: 0.8, lvl: 1 },   // 2e moitié
-      { i: 10, deg: 'oct', art: 'pop',    w: 0.4, lvl: 3 },   // w<0.5 → muet en déterministe (5.1)
+      { i: 10, deg: 'oct', art: 'pop',    w: 0.4, lvl: 3 },   // w<0.5 → muet en déterministe
       { i: 14, deg: '5',   art: 'ghost',  w: 0.5, lvl: 2 }
+    ] },
+    // syncopeGrave (FUNK-B3) : le grave se décale autour de The One (anticipé/retardé).
+    syncopeGrave: { steps: 16, hits: [
+      { i: 0,  deg: 'R',   art: 'finger', w: 1,   lvl: 1 },   // The One — pilier
+      { i: 6,  deg: 'R',   art: 'finger', w: 0.7, lvl: 2 },   // grave anticipé (« et » de 2)
+      { i: 8,  deg: '5',   art: 'ghost',  w: 0.5, lvl: 2 },
+      { i: 11, deg: 'R',   art: 'finger', w: 0.6, lvl: 3 },   // grave retardé
+      { i: 14, deg: 'oct', art: 'pop',    w: 0.5, lvl: 3 }    // ponctuation aiguë avant la reprise
+    ] },
+    // octaves : pompe fondamentale/octave (disco-funk), croches marquées.
+    octaves: { steps: 16, hits: [
+      { i: 0,  deg: 'R',   art: 'finger', w: 1,   lvl: 1 },   // pilier
+      { i: 4,  deg: 'oct', art: 'finger', w: 0.8, lvl: 2 },
+      { i: 8,  deg: 'R',   art: 'finger', w: 0.9, lvl: 1 },   // 2e moitié
+      { i: 12, deg: 'oct', art: 'finger', w: 0.8, lvl: 2 },
+      { i: 2,  deg: 'R',   art: 'ghost',  w: 0.4, lvl: 3 },   // remplissage ghost (densité 3, jeu vivant)
+      { i: 10, deg: 'oct', art: 'ghost',  w: 0.4, lvl: 3 }
+    ] },
+    // ghostPendule (FUNK-D1) : nappe de ghosts sur 16es + piliers. Densité strictement emboîtée.
+    ghostPendule: { steps: 16, hits: [
+      { i: 0,  deg: 'R',   art: 'finger', w: 1,   lvl: 1 },   // pilier
+      { i: 8,  deg: 'R',   art: 'finger', w: 0.9, lvl: 1 },   // pilier de 2e moitié
+      { i: 4,  deg: '5',   art: 'ghost',  w: 0.6, lvl: 2 },
+      { i: 12, deg: '5',   art: 'ghost',  w: 0.6, lvl: 2 },
+      { i: 2,  deg: 'R',   art: 'ghost',  w: 0.6, lvl: 3 },
+      { i: 6,  deg: 'R',   art: 'ghost',  w: 0.6, lvl: 3 },
+      { i: 10, deg: '5',   art: 'ghost',  w: 0.6, lvl: 3 },
+      { i: 14, deg: '5',   art: 'ghost',  w: 0.6, lvl: 3 }
     ] }
   };
 
@@ -1614,8 +1667,21 @@ swing 62
     return bassKeyRootFreq(key) * Math.pow(2, semi / 12);
   }
 
+  // Profil de vélocité (§2.2) : écart des gains autour de l'ancre « normal » (finger ≈ 0.7).
+  //   plat = comprimé vers normal (lisible débutant) · mixte = identité · contraste = écart maximal.
+  function bassVelShape(gain, prof) {
+    const A = 0.7;                                                             // ancre 'normal'
+    if (prof === 'plat')      return A + (gain - A) * 0.35;
+    if (prof === 'contraste') return A + (gain - A) * 1.4;
+    return gain;                                                              // mixte
+  }
+
   // Réalise les notes de la mesure courante dans bassRealized ([{frac, note}]).
-  // 5.1 : déterministe (piliers + w>=0.5), donc rejouable à l'identique (recette headless).
+  // vary=false : chemin DÉTERMINISTE (piliers + w>=0.5), rejouable à l'identique (recette 5.1).
+  // vary=true  : tirage probabiliste par w (bassRng) ; les piliers (w=1) sont toujours joués.
+  // Densité : un pas n'existe qu'à S.bass.density >= lvl (1 ⊂ 2 ⊂ 3, piliers lvl 1 constants).
+  // Adaptation continue au tempo (§2.3) : gain des ghosts, durée des notes et proba des pas
+  // non-piliers respirent avec le BPM ; les piliers ne bougent jamais.
   function bassRealize() {
     bassRealized = [];
     const pat = BASS_PATTERNS[S.bass.pattern], prog = BASS_PROGS[S.bass.prog];
@@ -1623,16 +1689,33 @@ swing 62
     const bar = prog.bars[bassBarIdx % prog.bars.length];
     const stepDur = (S.beats * 60 / S.tempo) / pat.steps;
     const durMul = { finger: [2.0, 0.28], ghost: [0.8, 0.08], pop: [1.4, 0.16], slap: [1.6, 0.20] };
+    const dens = S.bass.density, prof = S.bass.vel, vary = !!S.bass.vary;
+    // k borné : 0 (lent, 70 BPM) → 1 (rapide, 150 BPM). Interpolations linéaires (§2.3).
+    const k = Math.max(0, Math.min(1, (S.tempo - 70) / 80));
+    const durTempo   = 1.15 + (0.70 - 1.15) * k;                              // legato lent → sec rapide
+    const ghostGainT = 1.20 + (0.64 - 1.20) * k;                              // ghost ≈ 0.30 → 0.16 (base mixte 0.25)
+    const wGhostsT   = 1.20 + (0.65 - 1.20) * k;                              // proba des pas non-piliers (la ligne se dépouille)
     for (const h of pat.hits) {
-      if (!(h.w >= 0.5)) continue;                                              // déterministe : pas de RNG (→ 5.2)
+      if (h.lvl > dens) continue;                                             // densité : le pas n'existe pas
+      const pilier = h.w >= 1;
+      if (!vary) {
+        if (!pilier && !(h.w >= 0.5)) continue;                              // déterministe : piliers + w>=0.5
+      } else if (!pilier) {
+        const wEff = Math.min(1, h.w * wGhostsT);                            // ornements : respirent avec le tempo
+        if (bassRng() >= wEff) continue;                                     // (piliers jamais tirés → immuables)
+      }
       const dm = durMul[h.art] || [1.5, 0.18];
+      let gain = BASS_ART_GAIN[h.art] != null ? BASS_ART_GAIN[h.art] : 0.7;
+      gain = bassVelShape(gain, prof);                                        // profil de vélocité (§2.2)
+      if (h.art === 'ghost') gain *= ghostGainT;                             // adaptation tempo des ghosts (§2.3)
+      gain = Math.max(0.02, Math.min(1, gain));
       bassRealized.push({
         frac: h.i / pat.steps,
         note: {
           freq: bassNoteFreq(S.bass.key, bar.deg, h.deg),
           art: h.art,
-          gain: BASS_ART_GAIN[h.art] != null ? BASS_ART_GAIN[h.art] : 0.7,
-          dur: Math.min(stepDur * dm[0], dm[1])
+          gain: gain,
+          dur: Math.min(stepDur * dm[0], dm[1]) * durTempo
         }
       });
     }
@@ -1659,6 +1742,9 @@ swing 62
       bassEvents: function () { computeCycle(); return events.filter(e => e.layer === 'bass'); },
       noteFreq: bassNoteFreq,
       keyRootFreq: bassKeyRootFreq,
+      // 5.2 : injection d'un RNG déterministe pour la recette headless du tirage probabiliste.
+      // En prod, bassRng reste Math.random ; setRng(null) restaure ce défaut.
+      setRng: function (fn) { bassRng = (typeof fn === 'function') ? fn : Math.random; return true; },
       // 5.1-bis : sonde de synthèse. Construit le graphe d'une articulation via playBass
       // (self-contained : ensureCtx idempotent, aucune mutation d'état). Sert au smoke-test
       // headless (recette-5-1-bis.js) ; en prod, joue une note de contrôle à t=now.
@@ -1681,9 +1767,15 @@ swing 62
     if (!BASS_PATTERNS[S.bass.pattern]) S.bass.pattern = 'theOne';
     if (!BASS_PROGS[S.bass.prog]) S.bass.prog = 'vamp1';
     if (BASS_PC[S.bass.key] == null) S.bass.key = 'E';
+    if ([1, 2, 3].indexOf(S.bass.density) === -1) S.bass.density = 2;         // 5.2
+    if (['plat', 'mixte', 'contraste'].indexOf(S.bass.vel) === -1) S.bass.vel = 'mixte';
+    S.bass.vary = !!S.bass.vary;
     $('bassOn').checked = !!S.bass.on;
     $('bassPattern').value = S.bass.pattern;
     $('bassKey').value = S.bass.key;
+    $('bassDensity').value = String(S.bass.density);
+    $('bassVel').value = S.bass.vel;
+    $('bassVary').checked = !!S.bass.vary;
   }
 
   // ============ SCRIPT ============
@@ -6549,6 +6641,9 @@ swing 62
   $('bassOn').addEventListener('change', e => { S.bass.on = e.target.checked; bassPersist(); });
   $('bassPattern').addEventListener('change', e => { S.bass.pattern = e.target.value; bassPersist(); });
   $('bassKey').addEventListener('change', e => { S.bass.key = e.target.value; bassPersist(); });
+  $('bassDensity').addEventListener('change', e => { S.bass.density = +e.target.value; bassPersist(); });
+  $('bassVel').addEventListener('change', e => { S.bass.vel = e.target.value; bassPersist(); });
+  $('bassVary').addEventListener('change', e => { S.bass.vary = e.target.checked; bassPersist(); });
 
   $('pulseFreq').addEventListener('input', e => {
     S.sound.pulseFreq = +e.target.value; $('pulseFreqVal').textContent = S.sound.pulseFreq + ' Hz';

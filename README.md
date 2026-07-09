@@ -138,6 +138,38 @@ de partage.
 
 ## Journal de développement
 
+### 2026-07-09 — Passe 5 étape 5.2 : générateur probabiliste + densité + vélocités + tempo
+- **`bassRealize()` devient génératif** sans casser le déterminisme 5.1. Deux chemins :
+  `vary=false` reproduit **exactement** 5.1 (piliers `w=1` + pas `w≥0.5`, aucun RNG) ; `vary=true`
+  **tire** chaque pas non-pilier selon sa proba `w` via `bassRng()`. Les **piliers ne sont jamais
+  tirés** (toujours joués) — l'ancre et The One restent.
+- **Densité 1/2/3** par filtre `lvl` : un pas n'existe qu'à `S.bass.density ≥ h.lvl`. Emboîtement
+  strict `1 ⊂ 2 ⊂ 3`, piliers (`lvl 1`) constants (vérifié sur `ghostPendule` : 2 ⊂ 4 ⊂ 8 pas).
+- **Profils de vélocité** (`bassVelShape`, §2.2) : écart des gains autour de l'ancre « normal »
+  (finger ≈ 0.7). `plat` comprime (×0.35, lisible débutant) · `mixte` = identité · `contraste`
+  élargit (×1.4, poche accents/ghosts). Gain borné `[0.02, 1]`.
+- **Adaptation continue au tempo** (§2.3), après le profil `vel`, `k = clamp((BPM−70)/80, 0, 1)` :
+  durée `×1.15 → ×0.70` (legato lent → sec rapide) ; gain des ghosts `≈0.30 → 0.16` (facteur
+  `1.20 → 0.64` sur la base mixte 0.25) ; proba des pas non-piliers `×1.20 → 0.65` (la ligne se
+  dépouille en montant). **Piliers immuables** (ni tirés, ni allégés en présence). Valeurs de la
+  spec figées comme définitives — pas de réglage d'oreille possible ici, la recette est le garde-fou.
+- **3 gabarits restants** ajoutés à `BASS_PATTERNS` : `syncopeGrave` (FUNK-B3, grave décalé autour
+  du 1), `octaves` (pompe fondamentale/octave disco-funk), `ghostPendule` (FUNK-D1, nappe de 16es +
+  piliers, densité strictement emboîtée). Sélecteur de gabarit UI étendu.
+- **UI `secBass`** : ajout densité (3 crans), profil de dynamique, case **Variations (jeu vivant)** ;
+  listeners + persistance (`bassRestore` reflète et garde `density/vel/vary`). Écran de jeu → 5.4.
+- **RNG injectable** : `bassRng` (module) = `Math.random` en prod ; le hook `fmMetroBass().setRng(fn)`
+  permet à la recette d'injecter un générateur déterministe (mulberry32) et `setRng(null)` restaure
+  le défaut. Aucune mutation nouvelle en prod.
+- **Recette** `recette-5-2.js` **23/23** (+ non-régression `recette-5-1.js` **20/20**,
+  `recette-5-1-bis.js` **21/21**) : déterminisme `vary=false` intact ; densité emboîtée + piliers
+  constants ; à 150 vs 70 BPM gain ghost, durée et nombre de pas non-piliers décroissants (RNG
+  constant 0.5) ; reproductibilité à graine fixe ; `vary=false` n'appelle jamais le RNG (RNG qui
+  jette ⇒ aucune exception) ; les 3 gabarits réalisent des notes valides.
+- **À valider à l'oreille (Android)** : rendu des profils de dynamique et de la respiration au tempo
+  (le headless prouve la mécanique, pas le goût). Branche `metronomefunk-0.5.2` (depuis
+  `metronomefunk-0.5.1-bis`).
+
 ### 2026-07-09 — Passe 5 étape 5.1-bis : audibilité de la basse sur HP Android (exciteur harmonique)
 - **Problème** (retour utilisateur) : en E, `theOne` joue des fondamentales à ~41–62 Hz, sous le
   plancher de restitution d'un haut-parleur de téléphone → basse quasi inaudible. Cause : `bassFinger`
