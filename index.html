@@ -838,6 +838,41 @@
     </div>
   </details>
 
+  <!-- Basse funk (passe 5) -->
+  <details class="section" id="secBass" data-strate="couche">
+    <summary><span class="sec-title">Basse funk</span><span class="sec-sub">accompagnement génératif</span></summary>
+    <div class="section-body">
+      <div class="row">
+        <label class="check"><input type="checkbox" id="bassOn"> Activer la basse</label>
+      </div>
+      <div class="row">
+        <label>Gabarit</label>
+        <select id="bassPattern" style="width:auto;">
+          <option value="theOne" selected>The One — ancre sur le 1</option>
+        </select>
+        <label style="min-width:auto;">Tonalité</label>
+        <select id="bassKey" style="width:auto;">
+          <option value="C">Do (C)</option>
+          <option value="C#">Do♯ (C#)</option>
+          <option value="D">Ré (D)</option>
+          <option value="D#">Ré♯ (D#)</option>
+          <option value="E" selected>Mi (E)</option>
+          <option value="F">Fa (F)</option>
+          <option value="F#">Fa♯ (F#)</option>
+          <option value="G">Sol (G)</option>
+          <option value="G#">Sol♯ (G#)</option>
+          <option value="A">La (A)</option>
+          <option value="A#">La♯ (A#)</option>
+          <option value="B">Si (B)</option>
+        </select>
+      </div>
+      <div class="hint">Une voix de basse funk synthétisée qui accompagne le percussionniste — pour
+      caler le jeu sur ses syncopes et ses silences (FUNK-I2). Étape 5.1 : gabarit <b>The One</b>
+      sur un vamp d'un accord, jeu déterministe. Densité, dynamique, progressions et tonalités
+      multiples, drop-outs de maintien du <i>time</i> : étapes suivantes.</div>
+    </div>
+  </details>
+
   <!-- 4. Gap clicks -->
   <details class="section" id="secGap" data-strate="enveloppe">
     <summary><span class="sec-title">Horloge interne</span><span class="sec-sub">gap clicks</span></summary>
@@ -1040,6 +1075,22 @@ swing 62
        dès 4.1 (mémorisés à l'accueil), exploités par l'apprentissage en 4.2.
        n = nombre de joueurs choisi à l'accueil ; showBacking = affichage (pas l'audio). */
     play: { who: 'solo', learn: false, learnPaused: false, n: 1, showBacking: true },
+    /* passe 5 (étape 5.1) : basse funk générative (accompagnement, FUNK-I2).
+       Forme complète de la spec §2 posée dès 5.1 ; seuls on/pattern/prog/key sont
+       exploités ici (chemin DÉTERMINISTE : piliers + pas w>=0.5). density/vel/vary
+       (probabiliste, §2.2-2.3) → 5.2 ; progressions supplémentaires → 5.3 ;
+       drop-outs → 5.4. La basse est hors percGrids : indépendante de S.perc.on. */
+    bass: {
+      on: false,
+      pattern: 'theOne',   // gabarit d'intentions (BASS_PATTERNS) — 5.1 : theOne seul
+      prog: 'vamp1',       // progression harmonique (BASS_PROGS) — 5.1 : vamp1 seul
+      key: 'E',            // tonalité chromatique (12) — défaut E (mi, standard basse)
+      density: 2,          // 1 allégé · 2 normal · 3 chargé (exploité en 5.2)
+      vel: 'mixte',        // 'plat' | 'mixte' | 'contraste' (exploité en 5.2)
+      vary: false,         // variations probabilistes (5.2) ; 5.1 reste déterministe
+      swingFollow: true,   // 16es de la basse suivent S.swing (appliqué en 5.4)
+      drop: { on: false, everyN: 4, lenBeats: 2 }   // drop-outs (5.4)
+    },
     volume: 0.8
   };
 
@@ -1051,6 +1102,7 @@ swing 62
   let cycleStart = 0, cycleDur = 1, events = [], evIdx = 0, totalBeats = 0;
   let measureCount = 0, mutedThisCycle = false;
   let gapRemainPlay = 0, gapRemainMute = 0, gapProgSize = 1;
+  let bassBarIdx = 0, bassRealized = [];   // passe 5 : position dans la progression + notes réalisées de la mesure
   let script = null;
   let tapTimes = [];
 
@@ -1231,6 +1283,70 @@ swing 62
     }
   }
 
+  /* ---- basse funk (passe 5 §3) : synthèse maison, zéro échantillon ----
+     Trois articulations + ghost dérivé. E1 (~41 Hz) : l'audibilité sur haut-parleur
+     Android tient aux harmoniques du triangle/saw — critère de recette à l'oreille (5.1). */
+  // doigté classique : triangle + sub sinus une octave dessous, enveloppe de filtre passe-bas (rond).
+  function bassFinger(t, freq, vol, dur) {
+    const o = audioCtx.createOscillator(), sub = audioCtx.createOscillator();
+    const g = audioCtx.createGain(), subG = audioCtx.createGain(), f = audioCtx.createBiquadFilter();
+    o.type = 'triangle'; o.frequency.value = freq;
+    sub.type = 'sine'; sub.frequency.value = freq / 2;          // renfort sub-grave
+    subG.gain.value = 0.55;
+    f.type = 'lowpass'; f.Q.value = 6;
+    f.frequency.setValueAtTime(Math.min(freq * 6, 1400), t);
+    f.frequency.exponentialRampToValueAtTime(Math.max(freq * 2, 120), t + dur * 0.9);
+    o.connect(f); sub.connect(subG); subG.connect(f); f.connect(g); g.connect(masterGain);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(Math.max(vol, 0.0002), t + 0.008);   // attaque douce, doigté
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.start(t); sub.start(t); o.stop(t + dur + 0.02); sub.stop(t + dur + 0.02);
+  }
+  // slap : corps triangle plus ouvert + transitoire de bruit passe-haut bref (claquement du pouce).
+  function bassSlap(t, freq, vol, dur) {
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain(), f = audioCtx.createBiquadFilter();
+    o.type = 'triangle'; o.frequency.value = freq;
+    f.type = 'lowpass'; f.Q.value = 7;
+    f.frequency.setValueAtTime(Math.min(freq * 9, 2600), t);
+    f.frequency.exponentialRampToValueAtTime(Math.max(freq * 2.5, 160), t + dur * 0.8);
+    o.connect(f); f.connect(g); g.connect(masterGain);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(Math.max(vol, 0.0002), t + 0.004);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.start(t); o.stop(t + dur + 0.02);
+    const src = audioCtx.createBufferSource(), ng = audioCtx.createGain(), nf = audioCtx.createBiquadFilter();
+    src.buffer = noiseBuf; nf.type = 'highpass'; nf.frequency.value = 2200; nf.Q.value = 0.7;
+    src.connect(nf); nf.connect(ng); ng.connect(masterGain);
+    ng.gain.setValueAtTime(vol * 0.5, t);
+    ng.gain.exponentialRampToValueAtTime(0.0001, t + 0.03);
+    src.start(t); src.stop(t + 0.04);
+  }
+  // pop (« tiré ») : saw filtrée, enveloppe de filtre rapide et haute, transitoire fin.
+  function bassPop(t, freq, vol, dur) {
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain(), f = audioCtx.createBiquadFilter();
+    o.type = 'sawtooth'; o.frequency.value = freq;
+    f.type = 'lowpass'; f.Q.value = 9;
+    f.frequency.setValueAtTime(Math.min(freq * 14, 4200), t);
+    f.frequency.exponentialRampToValueAtTime(Math.max(freq * 2, 200), t + Math.min(dur, 0.12) * 0.7);
+    o.connect(f); f.connect(g); g.connect(masterGain);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(Math.max(vol, 0.0002), t + 0.003);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.start(t); o.stop(t + dur + 0.02);
+  }
+  // routeur : une note {freq, art, gain, dur} → l'articulation. ghost = doigté court/bas/mat.
+  function playBass(t, note) {
+    if (!note) return;
+    const dur = note.dur || 0.18, freq = note.freq || 82, vol = note.gain != null ? note.gain : 0.7;
+    switch (note.art) {
+      case 'slap':  bassSlap(t, freq, vol, dur); break;
+      case 'pop':   bassPop(t, freq, vol, dur); break;
+      case 'ghost': bassFinger(t, freq, vol, Math.min(dur, 0.08)); break;
+      case 'finger':
+      default:      bassFinger(t, freq, vol, dur); break;
+    }
+  }
+
   function playPerc(t, voice, accent) {
     // passe 3 étape 1 : l'identité de timbre est portée par la VOIX (percMeta), plus par le
     // global S.perc.instr — plusieurs instruments peuvent sonner en même temps. Repli sur le
@@ -1283,13 +1399,15 @@ swing 62
     return false;
   }
 
-  function playClick(t, layer, accent, voice, brk) {
+  function playClick(t, layer, accent, voice, brk, note) {
     if (mutedThisCycle && gapTargets(layer, voice)) return;
     // clic muet : le métronome se tait (pulsation, subdivisions, clic décalé),
     // les couches à grille (clave, percussion) et la polyrythmie continuent
     if (S.sound.pulseMuted && (layer === 'beat' || layer === 'sub' || layer === 'shift')) return;
     if (percLayerMuted(layer, voice, brk)) return;
     if (layer === 'perc') { playPerc(t, voice, accent); return; }
+    // passe 5 : basse funk (accompagnement) — la note porte freq/art/gain/dur (§4.3)
+    if (layer === 'bass') { playBass(t, note); return; }
     const st = S.sound;
     switch (layer) {
       case 'beat': {
@@ -1361,6 +1479,11 @@ swing 62
     if (S.perc.on && percBreakActive) {
       for (const e of percBreakEvents()) events.push(e);
     }
+    // couche basse funk (passe 5) — accompagnement hors percGrids ; famille binaire (v1).
+    // Les notes sont réalisées par mesure (bassOnNewMeasure/bassResetCycle) → simple recopie.
+    if (S.bass.on && S.family === 'bin') {
+      for (const b of bassRealized) events.push({ frac: b.frac, layer: 'bass', note: b.note });
+    }
     events.sort((a, b) => a.frac - b.frac);
     evIdx = 0;
   }
@@ -1417,6 +1540,109 @@ swing 62
       mutedThisCycle = true;
       if (gapRemainMute === 0) gapRemainPlay = g.playN;
     }
+  }
+
+  // ============ BASSE FUNK (passe 5) ============
+  // Accompagnement génératif (FUNK-I2). 5.1 : gabarit theOne sur vamp1, chemin DÉTERMINISTE
+  // (piliers w=1 + pas w>=0.5, aucun RNG). Le tirage probabiliste, la densité, les profils
+  // de vélocité et l'adaptation au tempo arrivent en 5.2 ; les autres progressions en 5.3.
+
+  // Gabarits d'intentions sur grille de 16 pas (§2.1). Un pas = { i, deg, art, w, lvl } :
+  //   deg : degré relatif à l'accord courant · art : articulation · w : proba (1 = pilier)
+  //   lvl : densité minimale (exploité en 5.2). 5.1 ne définit que theOne (FUNK-T1).
+  const BASS_PATTERNS = {
+    theOne: { steps: 16, hits: [
+      { i: 0,  deg: 'R',   art: 'finger', w: 1,   lvl: 1 },   // The One — pilier
+      { i: 6,  deg: '5',   art: 'ghost',  w: 0.5, lvl: 2 },
+      { i: 8,  deg: 'R',   art: 'finger', w: 0.8, lvl: 1 },   // 2e moitié
+      { i: 10, deg: 'oct', art: 'pop',    w: 0.4, lvl: 3 },   // w<0.5 → muet en déterministe (5.1)
+      { i: 14, deg: '5',   art: 'ghost',  w: 0.5, lvl: 2 }
+    ] }
+  };
+
+  // Progressions harmoniques (§2.4). 5.1 : vamp1 seul (vamp statique 1 accord, James Brown).
+  const BASS_PROGS = {
+    vamp1: { bars: [ { deg: 'I', quality: '7' } ] }
+  };
+
+  // Résolveur chromatique key + degré → fréquence. Fondamentale repliée dans la tessiture
+  // de basse E1–D2 ; les degrés se déploient au-dessus (§2.4). Table générale (12 tonalités).
+  const BASS_PC = { C: 0, 'C#': 1, D: 2, 'D#': 3, E: 4, F: 5, 'F#': 6, G: 7, 'G#': 8, A: 9, 'A#': 10, B: 11 };
+  const DEG_SEMI = { R: 0, oct: 12, '5': 7, '3': 4, b7: 10, appr: -1 };        // relatif à l'accord
+  const CHORD_ROOT_SEMI = { I: 0, i: 0, IV: 5, bVII: 10, V: 7, ii: 2 };        // accord relatif à key
+  const BASS_ART_GAIN = { ghost: 0.25, finger: 0.7, slap: 1.0, pop: 0.85 };    // vélocités de base (§2.2 ; profils → 5.2)
+
+  function bassKeyRootFreq(key) {
+    const E1 = 41.203;                                                          // mi grave, corde à vide
+    const n = ((BASS_PC[key] - BASS_PC.E) % 12 + 12) % 12;                      // 0..11 demi-tons au-dessus de E1
+    return E1 * Math.pow(2, n / 12);                                            // E1..~D#2
+  }
+  function bassNoteFreq(key, chordDeg, deg) {
+    const semi = (CHORD_ROOT_SEMI[chordDeg] || 0) + (DEG_SEMI[deg] || 0);
+    return bassKeyRootFreq(key) * Math.pow(2, semi / 12);
+  }
+
+  // Réalise les notes de la mesure courante dans bassRealized ([{frac, note}]).
+  // 5.1 : déterministe (piliers + w>=0.5), donc rejouable à l'identique (recette headless).
+  function bassRealize() {
+    bassRealized = [];
+    const pat = BASS_PATTERNS[S.bass.pattern], prog = BASS_PROGS[S.bass.prog];
+    if (!pat || !prog) return;
+    const bar = prog.bars[bassBarIdx % prog.bars.length];
+    const stepDur = (S.beats * 60 / S.tempo) / pat.steps;
+    const durMul = { finger: [2.0, 0.28], ghost: [0.8, 0.08], pop: [1.4, 0.16], slap: [1.6, 0.20] };
+    for (const h of pat.hits) {
+      if (!(h.w >= 0.5)) continue;                                              // déterministe : pas de RNG (→ 5.2)
+      const dm = durMul[h.art] || [1.5, 0.18];
+      bassRealized.push({
+        frac: h.i / pat.steps,
+        note: {
+          freq: bassNoteFreq(S.bass.key, bar.deg, h.deg),
+          art: h.art,
+          gain: BASS_ART_GAIN[h.art] != null ? BASS_ART_GAIN[h.art] : 0.7,
+          dur: Math.min(stepDur * dm[0], dm[1])
+        }
+      });
+    }
+  }
+
+  // Une réalisation par mesure, appelée depuis startNewCycle (indépendante de S.perc.on).
+  function bassOnNewMeasure() {
+    if (!S.bass.on) { bassRealized = []; return; }
+    const prog = BASS_PROGS[S.bass.prog];
+    bassBarIdx = (bassBarIdx + 1) % (prog ? prog.bars.length : 1);              // avance dans la progression
+    bassRealize();
+  }
+
+  // Réinitialise la progression au démarrage (mesure 1 = 1re barre).
+  function bassResetCycle() { bassBarIdx = 0; if (S.bass.on) bassRealize(); else bassRealized = []; }
+
+  // Seuil de diagnostic (même esprit que window.fmMetroAudio) : lecture + recalculs
+  // idempotents (réalisation par mesure, computeCycle) déjà effectués en boucle pendant le
+  // jeu — n'introduit aucune mutation nouvelle. Sert à la recette headless (recette-5-1.js).
+  window.fmMetroBass = function () {
+    return {
+      state: S.bass,
+      realize: function () { bassResetCycle(); return bassRealized.map(b => ({ frac: b.frac, note: b.note })); },
+      bassEvents: function () { computeCycle(); return events.filter(e => e.layer === 'bass'); },
+      noteFreq: bassNoteFreq,
+      keyRootFreq: bassKeyRootFreq
+    };
+  };
+
+  // Persistance localStorage (même mécanique que fm-metro-play).
+  function bassPersist() { store.set('fm-metro-bass', JSON.stringify(S.bass)); }
+  function bassRestore() {
+    let saved = null;
+    try { saved = JSON.parse(store.get('fm-metro-bass') || 'null'); } catch (e) {}
+    if (saved && typeof saved === 'object') Object.assign(S.bass, saved);
+    // garde-fous contre un état stocké par une étape ultérieure ou corrompu
+    if (!BASS_PATTERNS[S.bass.pattern]) S.bass.pattern = 'theOne';
+    if (!BASS_PROGS[S.bass.prog]) S.bass.prog = 'vamp1';
+    if (BASS_PC[S.bass.key] == null) S.bass.key = 'E';
+    $('bassOn').checked = !!S.bass.on;
+    $('bassPattern').value = S.bass.pattern;
+    $('bassKey').value = S.bass.key;
   }
 
   // ============ SCRIPT ============
@@ -1510,6 +1736,7 @@ swing 62
     scriptOnNewMeasure();
     updateGapForNewMeasure();
     percOnNewMeasure();
+    bassOnNewMeasure();
     computeCycle();
     cycleStart = t;
   }
@@ -1521,7 +1748,7 @@ swing 62
         const ev = events[evIdx];
         const t = cycleStart + ev.frac * cycleDur + (ev.offMs ? ev.offMs / 1000 : 0);
         if (t < now + AHEAD) {
-          playClick(Math.max(t, now + 0.005), ev.layer, ev.accent || 0, ev.voice, ev.brk);
+          playClick(Math.max(t, now + 0.005), ev.layer, ev.accent || 0, ev.voice, ev.brk, ev.note);
           evIdx++;
           continue;
         }
@@ -1543,6 +1770,7 @@ swing 62
     percResetBreakState();
     percMeasures = 0; percCallSilent = false;
     mutedThisCycle = false;
+    bassResetCycle();
     computeCycle();
     cycleStart = audioCtx.currentTime + 0.1;
     schedulerTimer = setInterval(scheduler, LOOKAHEAD_MS);
@@ -6275,6 +6503,12 @@ swing 62
     S.gap.prob = +e.target.value; $('gapProbVal').textContent = S.gap.prob + ' %';
   });
 
+  // basse funk (passe 5) : on/off, gabarit, tonalité. Un changement prend effet à la
+  // mesure suivante (réalisation par mesure) ; hors lecture, il est simplement mémorisé.
+  $('bassOn').addEventListener('change', e => { S.bass.on = e.target.checked; bassPersist(); });
+  $('bassPattern').addEventListener('change', e => { S.bass.pattern = e.target.value; bassPersist(); });
+  $('bassKey').addEventListener('change', e => { S.bass.key = e.target.value; bassPersist(); });
+
   $('pulseFreq').addEventListener('input', e => {
     S.sound.pulseFreq = +e.target.value; $('pulseFreqVal').textContent = S.sound.pulseFreq + ' Hz';
   });
@@ -6998,6 +7232,7 @@ swing 62
   bowCompile(false);
   percSetInstr('djembe');
   tsInit();
+  bassRestore();
   drawStatic();
   // passe 4.1 : l'écran d'accueil « Je joue » est la porte d'entrée — il restaure
   // l'état sauvegardé (fm-metro-play) ou s'ouvre au premier lancement. L'assistant

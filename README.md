@@ -30,7 +30,7 @@ Tout est dans `metronome.html` :
 | markup UI | carte **écran de jeu** `#playScreen` (visible en mode Jouer), sections `<details class="section">` (clave, percussion, **team spirit**, archet…), overlays `#wizOverlay` (assistant) et `#playSetup` (écran d'accueil) |
 | app | grand `<script>` en IIFE `(() => { 'use strict'; … })()`, divisé par des commentaires `// ==== NOM ====` |
 
-Sections JS principales : `ÉTAT` (l'objet `S`), `AUDIO`, `CALCUL DU CYCLE`, `GAP`, `ORDONNANCEUR`,
+Sections JS principales : `ÉTAT` (l'objet `S`), `AUDIO`, `CALCUL DU CYCLE`, `GAP`, `BASSE FUNK (passe 5)`, `ORDONNANCEUR`,
 `VISUALISATION`, `CLAVE MULTI-VOIX`, `PERCUSSION & INDÉPENDANCE`, `TEAM SPIRIT & RÉPERTOIRE`,
 `ÉCRAN DE JEU (passe 4, étape 4.1)`, `DSL PÉDAGOGIQUE`, `WIZARD`, `INIT`.
 
@@ -138,6 +138,51 @@ de partage.
 
 ## Journal de développement
 
+### 2026-07-09 — Passe 5 étape 5.1 : synthèse basse funk (theOne, déterministe)
+- **Synthèse maison** (section `AUDIO`, zéro échantillon) : `bassFinger` (triangle + sub sinus,
+  enveloppe de filtre passe-bas), `bassSlap` (corps + transitoire de bruit passe-haut = claquement
+  du pouce), `bassPop` (saw, enveloppe de filtre rapide = le « tiré »), ghost = doigté court/bas/mat.
+  Routeur `playBass(t, note)` par articulation. Audibilité de E1 (~41 Hz) sur HP Android portée par
+  les harmoniques du triangle/saw — **critère d'oreille**, à valider.
+- **Nouvelle couche `layer:'bass'`** dans le pipeline existant : `computeCycle` empile
+  `{frac, layer:'bass', note:{freq,art,gain,dur}}` (famille binaire seulement, v1) ; l'ordonnanceur
+  passe `ev.note` à `playClick` (argument **additif**, non-cassant) qui route vers `playBass`.
+- **Section `BASSE FUNK (passe 5)`** : gabarits d'intentions 16 pas `{i,deg,art,w,lvl}` (5.1 :
+  `theOne` seul), progression `vamp1` seule, résolveur chromatique `key`+degré→fréquence
+  (fondamentale repliée dans la tessiture E1–D2, table 12 tonalités). `bassRealize()` réalise la
+  mesure courante **déterministe** (piliers `w=1` + pas `w≥0.5`, aucun RNG → le probabiliste vient
+  en 5.2). Ancrage : `bassOnNewMeasure()` dans `startNewCycle` (indépendant de `S.perc.on`, ≠ hook
+  `percOnNewMeasure` qui court-circuite si la percussion est éteinte), amorçage `bassResetCycle()`
+  dans `start()`.
+- **État `S.bass`** (forme complète de la spec §2 posée dès 5.1 ; 5.1 exploite `on/pattern/prog/key`),
+  persistance `fm-metro-bass`, restauration `bassRestore()` à l'INIT.
+- **UI** : section `<details id="secBass">` autonome (Configurer) — activer la basse, gabarit,
+  tonalité (12). Écran de jeu : rien encore (→ 5.4).
+- **Recette** `recette-5-1.js` (jsdom + stubs Web Audio/canvas, pilotage DOM, hook de diagnostic
+  `window.fmMetroBass()` calqué sur `window.fmMetroAudio`) : **20/20** — no-op si off, fracs
+  `[0, .375, .5, .875]` (pas 10 `w=0.4` exclu), articulations finger/ghost/finger/ghost,
+  déterminisme bit-à-bit, résolveur E1=41,203 Hz + transposition E→F, garde famille binaire,
+  persistance.
+- **Reste à régler à l'oreille** (Android) : timbres de basse et audibilité du grave.
+
+### 2026-07-09 — Passe 5 validée : spec « Basse funk » (accompagnement génératif)
+- **Spec `metronome-passe5-basse-spec.md` validée (rév. 2)** : voix de basse électrique funk
+  générée à la volée, accompagnement des parcours cajón/djembé (principe FUNK-I2). Tone.js et
+  échantillons **écartés** (zéro dépendance, fichier unique) : synthèse Web Audio maison
+  (`bassFinger`/`bassSlap`/`bassPop`, ghost dérivé), nouvelle couche `layer:'bass'` dans le
+  pipeline `computeCycle → events → playClick`.
+- **Modèle** : gabarits d'intentions 16 pas `{deg, art, w, lvl}` réalisés une fois par mesure
+  (`bassRealize`, déterministe si `vary:false`) ; 3 profils de vélocités (plat/mixte/contraste)
+  + **adaptation continue au tempo** (gain ghost, durée, densité d'ornementation — les piliers
+  `w=1` ne bougent jamais) ; **6 progressions harmoniques** (vamp JB, I7→IV7, dorien, mixo,
+  blues 12, jazz-funk) × **12 tonalités** (défaut E, entraînement de l'oreille) ; drop-outs via
+  la machine gap ciblée (`layer==='bass'`), hors `tsMuted`.
+- **Découpe en 4 étapes** (une par session) : 5.1 synthèse + `theOne` déterministe + `secBass`
+  minimale ; 5.2 générateur probabiliste + densité + vélocités/tempo ; 5.3 progressions +
+  tonalités + accord courant affiché ; 5.4 drop-outs + commandes écran de jeu + swing des 16es.
+- **Workflow ajouté** : à chaque fin d'étape, livrer un md combiné **brief de reprise + README
+  à jour**, terminé par la reconduction de la consigne pour l'étape suivante.
+
 ### 2026-07-08 — Étape 4.1 : écran de jeu (setup, briques en grand, « Je suis »)
 - **Écran d'accueil** (`#playSetup`) au premier lancement : seul / à plusieurs (N) +
   apprentissage oui/non, mémorisé (`fm-metro-play`), rouvrable via **⟲ Setup**. Remplace
@@ -237,5 +282,5 @@ de partage.
 
 - Spec d'abord, **une étape = une session**, fichier HTML complet. Aucune IA à l'exécution (moteur de règles
   embarqué). Grilles ouest-africaines encodées `uncertain` — à valider à l'oreille.
-- Specs/recettes : `metronome-passe3-spec.md`, `metronome-passe3-etape{1..4}-recette.md`,
+- Specs/recettes : `metronome-passe5-basse-spec.md`, `metronome-passe4-spec.md`, `metronome-passe3-spec.md`, `metronome-passe3-etape{1..4}-recette.md`,
   `metronome-passe2-spec.md`, corpus `grooves-*.md` + `convert-grooves.py`.
