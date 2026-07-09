@@ -1283,68 +1283,100 @@ swing 62
     }
   }
 
-  /* ---- basse funk (passe 5 §3) : synthèse maison, zéro échantillon ----
-     Trois articulations + ghost dérivé. E1 (~41 Hz) : l'audibilité sur haut-parleur
-     Android tient aux harmoniques du triangle/saw — critère de recette à l'oreille (5.1). */
-  // doigté classique : triangle + sub sinus une octave dessous, enveloppe de filtre passe-bas (rond).
-  function bassFinger(t, freq, vol, dur) {
-    const o = audioCtx.createOscillator(), sub = audioCtx.createOscillator();
-    const g = audioCtx.createGain(), subG = audioCtx.createGain(), f = audioCtx.createBiquadFilter();
-    o.type = 'triangle'; o.frequency.value = freq;
-    sub.type = 'sine'; sub.frequency.value = freq / 2;          // renfort sub-grave
-    subG.gain.value = 0.55;
-    f.type = 'lowpass'; f.Q.value = 6;
-    f.frequency.setValueAtTime(Math.min(freq * 6, 1400), t);
-    f.frequency.exponentialRampToValueAtTime(Math.max(freq * 2, 120), t + dur * 0.9);
-    o.connect(f); sub.connect(subG); subG.connect(f); f.connect(g); g.connect(masterGain);
-    g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(Math.max(vol, 0.0002), t + 0.008);   // attaque douce, doigté
-    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    o.start(t); sub.start(t); o.stop(t + dur + 0.02); sub.stop(t + dur + 0.02);
+  /* ---- basse funk (passe 5 §3 ; refonte 5.1-bis : audibilité HP Android) --------
+     Le grave (~41 Hz en E) est INAUDIBLE sur un petit haut-parleur. On s'appuie sur
+     la FONDAMENTALE VIRTUELLE : un exciteur harmonique (WaveShaper) génère 2f/3f/4f…
+     dans la bande ~150–800 Hz que le HP restitue, et l'oreille reconstruit la hauteur.
+     Ce même « growl » porte le caractère funk (doigté/slap). Corps en SAWTOOTH (toutes
+     harmoniques, 1/n) ≫ triangle (impaires seules, 1/n²) : c'est ce qui rendait la voix
+     muette. Le passe-bas de l'exciteur ne redescend plus sous ~600–900 Hz (il tombait à
+     120 Hz et étranglait les 3f–8f porteuses). Voix UNIQUE paramétrée par `opt` ; les opt
+     sont FIXES ici — 5.2 les modulera par vel/tempo (la brillance = le même levier). */
+
+  // Courbes de saturation du WaveShaper, en cache par niveau de drive. tanh légèrement
+  // asymétrique : sature un peu plus les alternances positives → ajoute la 2f (octave),
+  // qui renforce la hauteur perçue en plus des impaires du growl.
+  const _bassCurves = {};
+  function bassShaperCurve(drive) {
+    const key = drive.toFixed(2);
+    if (_bassCurves[key]) return _bassCurves[key];
+    const n = 2048, curve = new Float32Array(n), norm = Math.tanh(drive) || 1;
+    for (let i = 0; i < n; i++) {
+      const x = (i / (n - 1)) * 2 - 1;               // -1..1
+      const a = x >= 0 ? 1 : 0.7;                     // asymétrie douce → harmoniques paires
+      curve[i] = Math.tanh(drive * a * x) / norm;    // borné sur ±1
+    }
+    return (_bassCurves[key] = curve);
   }
-  // slap : corps triangle plus ouvert + transitoire de bruit passe-haut bref (claquement du pouce).
-  function bassSlap(t, freq, vol, dur) {
-    const o = audioCtx.createOscillator(), g = audioCtx.createGain(), f = audioCtx.createBiquadFilter();
-    o.type = 'triangle'; o.frequency.value = freq;
-    f.type = 'lowpass'; f.Q.value = 7;
-    f.frequency.setValueAtTime(Math.min(freq * 9, 2600), t);
-    f.frequency.exponentialRampToValueAtTime(Math.max(freq * 2.5, 160), t + dur * 0.8);
-    o.connect(f); f.connect(g); g.connect(masterGain);
+
+  // Réglages par articulation (opt fixes en 5.1-bis ; 5.2 modulera drive/cutoff par vel/tempo).
+  // Gains body+exciter tenus ≤ ~1.1 avant enveloppe pour éviter l'écrêtage sur slaps forts.
+  const BASS_ART_OPT = {
+    finger: { drive: 2.2, cutoffCeil: 1800, cutoffFloor: 700, attack: 0.008, bodyGain: 0.30, exciterGain: 0.70 },
+    slap:   { drive: 3.4, cutoffCeil: 2600, cutoffFloor: 800, attack: 0.004, bodyGain: 0.30, exciterGain: 0.80, transient: true },
+    pop:    { drive: 2.8, cutoffCeil: 3200, cutoffFloor: 900, attack: 0.003, bodyGain: 0.30, exciterGain: 0.75 },
+    ghost:  { drive: 1.6, cutoffCeil: 1200, cutoffFloor: 600, attack: 0.006, bodyGain: 0.22, exciterGain: 0.50 }
+  };
+
+  // Voix de basse unique. Chaîne : osc saw → [corps propre LP doux] + [exciteur : shaper → LP
+  // à plancher haut] → gain d'enveloppe → master. `opt` = BASS_ART_OPT[art] (voir ci-dessus).
+  function bassVoice(t, freq, vol, dur, opt) {
+    const o = opt || {};
+    const drive       = o.drive       != null ? o.drive       : 2.2;
+    const cutoffCeil  = o.cutoffCeil  != null ? o.cutoffCeil  : 1800;
+    const cutoffFloor = o.cutoffFloor != null ? o.cutoffFloor : 700;   // plancher relevé (était 120)
+    const attack      = o.attack      != null ? o.attack      : 0.008;
+    const bodyGain    = o.bodyGain    != null ? o.bodyGain    : 0.30;  // vraie fondamentale (bons HP/casque)
+    const exciterGain = o.exciterGain != null ? o.exciterGain : 0.70;  // harmoniques (portent le grave sur petit HP)
+
+    const osc = audioCtx.createOscillator();
+    osc.type = 'sawtooth'; osc.frequency.value = freq;
+
+    // Enveloppe d'amplitude commune, en sortie de mixage des deux branches.
+    const g = audioCtx.createGain();
     g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(Math.max(vol, 0.0002), t + 0.004);
+    g.gain.exponentialRampToValueAtTime(Math.max(vol, 0.0002), t + attack);   // attaque : douce (finger) → vive (slap/pop)
     g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    o.start(t); o.stop(t + dur + 0.02);
-    const src = audioCtx.createBufferSource(), ng = audioCtx.createGain(), nf = audioCtx.createBiquadFilter();
-    src.buffer = noiseBuf; nf.type = 'highpass'; nf.frequency.value = 2200; nf.Q.value = 0.7;
-    src.connect(nf); nf.connect(ng); ng.connect(masterGain);
-    ng.gain.setValueAtTime(vol * 0.5, t);
-    ng.gain.exponentialRampToValueAtTime(0.0001, t + 0.03);
-    src.start(t); src.stop(t + 0.04);
+    g.connect(masterGain);
+
+    // Branche 1 — corps propre : LP doux, conserve la vraie fondamentale.
+    const bodyF = audioCtx.createBiquadFilter();
+    bodyF.type = 'lowpass'; bodyF.Q.value = 0.7;
+    bodyF.frequency.value = Math.max(freq * 4, 220);
+    const bodyG = audioCtx.createGain(); bodyG.gain.value = bodyGain;
+    osc.connect(bodyF); bodyF.connect(bodyG); bodyG.connect(g);
+
+    // Branche 2 — exciteur harmonique : shaper (growl + 2f/3f…) → LP à plancher haut.
+    const shaper = audioCtx.createWaveShaper();
+    shaper.curve = bassShaperCurve(drive);
+    if ('oversample' in shaper) shaper.oversample = '4x';               // anti-alias
+    const exF = audioCtx.createBiquadFilter();
+    exF.type = 'lowpass'; exF.Q.value = 3;
+    exF.frequency.setValueAtTime(cutoffCeil, t);
+    exF.frequency.exponentialRampToValueAtTime(cutoffFloor, t + Math.max(dur * 0.8, 0.05));
+    const exG = audioCtx.createGain(); exG.gain.value = exciterGain;
+    osc.connect(shaper); shaper.connect(exF); exF.connect(exG); exG.connect(g);
+
+    osc.start(t); osc.stop(t + dur + 0.02);
+
+    // Transitoire optionnel (slap : claquement de pouce, bruit passe-haut bref).
+    if (o.transient) {
+      const src = audioCtx.createBufferSource(), ng = audioCtx.createGain(), nf = audioCtx.createBiquadFilter();
+      src.buffer = noiseBuf; nf.type = 'highpass'; nf.frequency.value = 2200; nf.Q.value = 0.7;
+      src.connect(nf); nf.connect(ng); ng.connect(masterGain);
+      ng.gain.setValueAtTime(vol * 0.5, t);
+      ng.gain.exponentialRampToValueAtTime(0.0001, t + 0.03);
+      src.start(t); src.stop(t + 0.04);
+    }
   }
-  // pop (« tiré ») : saw filtrée, enveloppe de filtre rapide et haute, transitoire fin.
-  function bassPop(t, freq, vol, dur) {
-    const o = audioCtx.createOscillator(), g = audioCtx.createGain(), f = audioCtx.createBiquadFilter();
-    o.type = 'sawtooth'; o.frequency.value = freq;
-    f.type = 'lowpass'; f.Q.value = 9;
-    f.frequency.setValueAtTime(Math.min(freq * 14, 4200), t);
-    f.frequency.exponentialRampToValueAtTime(Math.max(freq * 2, 200), t + Math.min(dur, 0.12) * 0.7);
-    o.connect(f); f.connect(g); g.connect(masterGain);
-    g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(Math.max(vol, 0.0002), t + 0.003);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    o.start(t); o.stop(t + dur + 0.02);
-  }
-  // routeur : une note {freq, art, gain, dur} → l'articulation. ghost = doigté court/bas/mat.
+
+  // routeur : une note {freq, art, gain, dur} → la voix paramétrée. ghost = voix courte/basse/mate.
   function playBass(t, note) {
     if (!note) return;
     const dur = note.dur || 0.18, freq = note.freq || 82, vol = note.gain != null ? note.gain : 0.7;
-    switch (note.art) {
-      case 'slap':  bassSlap(t, freq, vol, dur); break;
-      case 'pop':   bassPop(t, freq, vol, dur); break;
-      case 'ghost': bassFinger(t, freq, vol, Math.min(dur, 0.08)); break;
-      case 'finger':
-      default:      bassFinger(t, freq, vol, dur); break;
-    }
+    const art = note.art || 'finger';
+    if (art === 'ghost') { bassVoice(t, freq, vol, Math.min(dur, 0.08), BASS_ART_OPT.ghost); return; }
+    bassVoice(t, freq, vol, dur, BASS_ART_OPT[art] || BASS_ART_OPT.finger);
   }
 
   function playPerc(t, voice, accent) {
@@ -1626,7 +1658,16 @@ swing 62
       realize: function () { bassResetCycle(); return bassRealized.map(b => ({ frac: b.frac, note: b.note })); },
       bassEvents: function () { computeCycle(); return events.filter(e => e.layer === 'bass'); },
       noteFreq: bassNoteFreq,
-      keyRootFreq: bassKeyRootFreq
+      keyRootFreq: bassKeyRootFreq,
+      // 5.1-bis : sonde de synthèse. Construit le graphe d'une articulation via playBass
+      // (self-contained : ensureCtx idempotent, aucune mutation d'état). Sert au smoke-test
+      // headless (recette-5-1-bis.js) ; en prod, joue une note de contrôle à t=now.
+      probeVoice: function (art, t) {
+        ensureCtx();
+        playBass(t != null ? t : audioCtx.currentTime,
+          { freq: bassKeyRootFreq(S.bass.key), art: art || 'finger', gain: 0.7, dur: 0.18 });
+        return true;
+      }
     };
   };
 

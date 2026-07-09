@@ -138,6 +138,32 @@ de partage.
 
 ## Journal de développement
 
+### 2026-07-09 — Passe 5 étape 5.1-bis : audibilité de la basse sur HP Android (exciteur harmonique)
+- **Problème** (retour utilisateur) : en E, `theOne` joue des fondamentales à ~41–62 Hz, sous le
+  plancher de restitution d'un haut-parleur de téléphone → basse quasi inaudible. Cause : `bassFinger`
+  reposait sur un **triangle** (harmoniques impaires seules, 1/n²) + un **sous-octave sinus à ~20 Hz**
+  (inaudible), et le passe-bas redescendait à 120 Hz, étranglant les 3f–8f porteuses.
+- **Refonte synthèse** (aucune note changée — fracs/degrés/articulations/déterminisme intacts) : les
+  trois fonctions `bassFinger`/`bassSlap`/`bassPop` fusionnent en **une voix paramétrée
+  `bassVoice(t, freq, vol, dur, opt)`**. Deux branches sommées : *corps* sawtooth (toutes harmoniques,
+  1/n) filtré doux pour la vraie fondamentale (bons HP/casque) ; *exciteur harmonique* =
+  `WaveShaperNode` (courbe tanh légèrement asymétrique, 2048 pts, `oversample:'4x'`) → passe-bas à
+  **plancher relevé** (~600–900 Hz) qui préserve les harmoniques que le petit HP restitue. On exploite
+  la **fondamentale virtuelle** : l'oreille reconstruit le grave à partir de ces harmoniques, et le même
+  « growl » porte le caractère funk. **Sous-octave 20 Hz retiré.**
+- **`opt` par articulation** (`BASS_ART_OPT` : drive, plafond/plancher de brillance, attaque, gains
+  corps/exciteur, transitoire slap) — **valeurs fixes ici**, points de départ à régler à l'oreille.
+  5.2 modulera ces `opt` par `vel`/tempo (la brillance = le même levier), d'où le choix de poser la
+  voix paramétrée dès maintenant.
+- **Sonde** : `window.fmMetroBass().probeVoice(art, t)` ajoutée au hook diagnostic (self-contained :
+  `ensureCtx()` idempotent + `playBass` ; aucune mutation d'état ; en prod, joue une note de contrôle).
+- **Recettes** : `recette-5-1.js` **20/20 inchangée** (non-régression logique : la recette ne touche pas
+  la synthèse). Nouveau `recette-5-1-bis.js` **21/21** (smoke-test : 4 articulations construites sans
+  exception, WaveShaper câblé + courbe 2048 + `4x`, corps sawtooth présent, plus aucun triangle ni
+  oscillateur < 30 Hz, fracs `[0, .375, .5, .875]` intactes).
+- **À valider à l'oreille (Android)** : timbres, dosage du growl, audibilité effective du grave ; ajuster
+  `BASS_ART_OPT` au besoin. Branche `metronomefunk-0.5.1-bis` (depuis `metronomefunk-0.5.1`).
+
 ### 2026-07-09 — Passe 5 étape 5.1 : synthèse basse funk (theOne, déterministe)
 - **Synthèse maison** (section `AUDIO`, zéro échantillon) : `bassFinger` (triangle + sub sinus,
   enveloppe de filtre passe-bas), `bassSlap` (corps + transitoire de bruit passe-haut = claquement
