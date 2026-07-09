@@ -138,6 +138,35 @@ de partage.
 
 ## Journal de développement
 
+### 2026-07-09 — Passe 5 étape 5.3 : progressions harmoniques + tonalités
+- **`BASS_PROGS` peuplé des 6 progressions** (§2.4) : `vamp1` (I⁷, James Brown), `vamp2` (I⁷→IV⁷,
+  Sex Machine), `dorien` (i⁷→IV⁷, Chameleon), `mixo` (I⁷→♭VII, rock-funk mixolydien), `blues`
+  (12 mesures), `jazzfunk` (ii⁷→V⁷). Une barre = `{deg, quality}` ; le degré fixe la fondamentale
+  (`CHORD_ROOT_SEMI`, déjà complet depuis 5.1), la **qualité n'est qu'un libellé d'affichage**.
+- **Blues 12 mesures** développé de la notation comprimée `I7-IV7-I7-V7-IV7-I7` en blocs
+  I(4)·IV(2)·I(2)·V(1)·IV(1)·I(2) → `I I I I IV IV I I V IV I I`. La fondamentale change aux
+  **mesures 5, 9, 11** (+ 7 et 10). `bassBarIdx` (posé dès 5.1) avance la barre par mesure et boucle.
+- **Nom d'accord** : `PC_NAME` (pc→nom) + `bassChordName(key, chord)` composent racine + suffixe
+  de qualité (`E7`, `Em7`, `F#m7`, `D`…). `bassUpdateChordLabel()` met à jour `#bassChord` — en
+  lecture, l'accord de la mesure courante ; à l'arrêt/basse coupée, la **tête** de la progression
+  dans la tonalité choisie (l'élève voit d'avance ce qu'il aura).
+- **UI `secBass`** : sélecteur **Progression** (`#bassProg`, 6 options) + **affichage de l'accord**
+  courant (`#bassChord`). Listener `bassProg` (reprend la progression au début), rafraîchissement de
+  l'accord sur changement de progression/tonalité/activation ; `bassRestore`/`bassPersist` gèrent
+  `prog` avec garde-fou (`vamp1` par défaut). Report sur l'écran de jeu → 5.4.
+- **Hook `fmMetroBass`** enrichi (diagnostic, prod inchangée) : `currentBar()` (lecture sans
+  mutation), `newMeasure()` (avance d'une mesure = même mutation que le scheduler), `chordName()`.
+- **Limite latente notée** : `DEG_SEMI['3']` est une tierce **majeure** fixe ; sans effet en 5.3
+  (aucun gabarit n'utilise le degré `3`), à traiter si un gabarit mineur arrive (dorien/jazzfunk).
+- **Recette** `recette-5-3.js` **38/38** (+ non-régression `recette-5-1.js` **20/20**,
+  `recette-5-1-bis.js` **21/21**, `recette-5-2.js` **23/23**) : vamp1 déterministe intact ; 6
+  progressions valides + wrap de boucle ; blues → séquence des 12 fondamentales et changements
+  5/9/11 ; transposition E→G ⇒ mêmes fracs, fréquences ×2^(3/12) ; libellés d'accord (E7, Em7,
+  F#m7, D, A7, G7).
+- **À valider à l'oreille (Android)** : rendu des progressions et de la transposition (le headless
+  prouve la mécanique harmonique, pas le goût). Branche `metronomefunk-0.5.3` (depuis
+  `metronomefunk-0.5.2`).
+
 ### 2026-07-09 — Passe 5 étape 5.2 : générateur probabiliste + densité + vélocités + tempo
 - **`bassRealize()` devient génératif** sans casser le déterminisme 5.1. Deux chemins :
   `vary=false` reproduit **exactement** 5.1 (piliers `w=1` + pas `w≥0.5`, aucun RNG) ; `vary=true`

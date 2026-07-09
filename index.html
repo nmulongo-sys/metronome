@@ -870,6 +870,19 @@
         </select>
       </div>
       <div class="row">
+        <label>Progression</label>
+        <select id="bassProg" style="width:auto;">
+          <option value="vamp1" selected>Vamp 1 accord — James Brown</option>
+          <option value="vamp2">I⁷ → IV⁷ — Sex Machine</option>
+          <option value="dorien">i⁷ → IV⁷ — Chameleon (dorien)</option>
+          <option value="mixo">I⁷ → ♭VII — mixolydien (War)</option>
+          <option value="blues">Blues funk — 12 mesures</option>
+          <option value="jazzfunk">ii⁷ → V⁷ — jazz-funk</option>
+        </select>
+        <label style="min-width:auto;">Accord</label>
+        <span id="bassChord" aria-live="polite" style="font-weight:600;font-variant-numeric:tabular-nums;padding:2px 8px;">E7</span>
+      </div>
+      <div class="row">
         <label>Densité</label>
         <select id="bassDensity" style="width:auto;">
           <option value="1">1 — allégé</option>
@@ -888,11 +901,12 @@
       </div>
       <div class="hint">Une voix de basse funk synthétisée qui accompagne le percussionniste — pour
       caler le jeu sur ses syncopes et ses silences (FUNK-I2). Choisis un <b>gabarit</b>, une
-      <b>tonalité</b>, la <b>densité</b> (allégé → chargé) et le profil de <b>dynamique</b>.
-      <b>Variations</b> activé, la ligne se joue de façon vivante (tirage des ornements) ;
-      désactivé, elle est régulière et prévisible. La ligne s'allège et se raccourcit d'elle-même
-      quand le tempo monte. Progressions harmoniques multiples et drop-outs de maintien du
-      <i>time</i> : étapes suivantes.</div>
+      <b>progression</b> (du vamp 1 accord au blues 12 mesures), une <b>tonalité</b>, la
+      <b>densité</b> (allégé → chargé) et le profil de <b>dynamique</b>. L'<b>accord</b> courant
+      s'affiche pour travailler l'oreille : rejoue la même progression dans une autre tonalité et
+      tu entends la transposition. <b>Variations</b> activé, la ligne se joue de façon vivante
+      (tirage des ornements) ; désactivé, elle est régulière et prévisible. La ligne s'allège et se
+      raccourcit d'elle-même quand le tempo monte. Drop-outs de maintien du <i>time</i> : étape suivante.</div>
     </div>
   </details>
 
@@ -1645,17 +1659,43 @@ swing 62
     ] }
   };
 
-  // Progressions harmoniques (§2.4). 5.1 : vamp1 seul (vamp statique 1 accord, James Brown).
+  // Progressions harmoniques (§2.4). 5.3 : les 6 progressions. Une barre = { deg, quality } ;
+  // le degré fixe la fondamentale de l'accord (CHORD_ROOT_SEMI), la qualité n'est qu'un LIBELLÉ
+  // d'affichage (aucun gabarit n'utilise le degré '3'/'b7' → les hauteurs jouées sont R/oct/5,
+  // indépendantes de majeur/mineur ; cf. note tierce mineure sous DEG_SEMI). Gabarit ⊥ progression.
   const BASS_PROGS = {
-    vamp1: { bars: [ { deg: 'I', quality: '7' } ] }
+    vamp1:    { bars: [ { deg: 'I',  quality: '7' } ] },                                    // vamp statique 1 accord (James Brown)
+    vamp2:    { bars: [ { deg: 'I',  quality: '7' }, { deg: 'IV',   quality: '7'  } ] },    // I7 → IV7 (Sex Machine)
+    dorien:   { bars: [ { deg: 'i',  quality: 'm7' }, { deg: 'IV',   quality: '7'  } ] },   // i7 → IV7 (Chameleon, dorien)
+    mixo:     { bars: [ { deg: 'I',  quality: '7' }, { deg: 'bVII', quality: ''   } ] },    // I7 → bVII (rock-funk mixolydien, War)
+    // Blues funk 12 mesures : I(4) · IV(2) · I(2) · V(1) · IV(1) · I(2) — développement de la
+    // notation comprimée I7-IV7-I7-V7-IV7-I7 (§2.4). Fondamentale : change aux mesures 5, 9, 11.
+    blues:    { bars: [
+      { deg: 'I',  quality: '7' }, { deg: 'I',  quality: '7' }, { deg: 'I',  quality: '7' }, { deg: 'I',  quality: '7' },
+      { deg: 'IV', quality: '7' }, { deg: 'IV', quality: '7' }, { deg: 'I',  quality: '7' }, { deg: 'I',  quality: '7' },
+      { deg: 'V',  quality: '7' }, { deg: 'IV', quality: '7' }, { deg: 'I',  quality: '7' }, { deg: 'I',  quality: '7' }
+    ] },
+    jazzfunk: { bars: [ { deg: 'ii', quality: 'm7' }, { deg: 'V',    quality: '7'  } ] }    // ii7 → V7 (jazz-funk / boogaloo)
   };
 
   // Résolveur chromatique key + degré → fréquence. Fondamentale repliée dans la tessiture
   // de basse E1–D2 ; les degrés se déploient au-dessus (§2.4). Table générale (12 tonalités).
   const BASS_PC = { C: 0, 'C#': 1, D: 2, 'D#': 3, E: 4, F: 5, 'F#': 6, G: 7, 'G#': 8, A: 9, 'A#': 10, B: 11 };
   const DEG_SEMI = { R: 0, oct: 12, '5': 7, '3': 4, b7: 10, appr: -1 };        // relatif à l'accord
+  // ⚠ '3' = tierce MAJEURE fixe (4 demi-tons). Sur un accord mineur (dorien i7, jazzfunk ii7),
+  //   un futur gabarit qui jouerait '3' sonnerait faux (il faudrait un 'b3'=3). Aucun des 4
+  //   gabarits actuels n'utilise '3' → sans effet en 5.3 ; à traiter si un gabarit mineur arrive.
   const CHORD_ROOT_SEMI = { I: 0, i: 0, IV: 5, bVII: 10, V: 7, ii: 2 };        // accord relatif à key
   const BASS_ART_GAIN = { ghost: 0.25, finger: 0.7, slap: 1.0, pop: 0.85 };    // vélocités de base (§2.2 ; profils → 5.2)
+  const PC_NAME = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];   // classe de hauteur → nom (5.3, affichage)
+  const QUALITY_LABEL = { '7': '7', 'm7': 'm7', 'maj7': 'maj7', '': '' };      // suffixe d'accord (libellé seul)
+  // Nom lisible de l'accord courant (5.3) : racine (key + degré) + qualité. Purement cosmétique.
+  function bassChordName(key, chord) {
+    if (!chord) return '';
+    const pc = (((BASS_PC[key] || 0) + (CHORD_ROOT_SEMI[chord.deg] || 0)) % 12 + 12) % 12;
+    const suf = QUALITY_LABEL[chord.quality] != null ? QUALITY_LABEL[chord.quality] : (chord.quality || '');
+    return PC_NAME[pc] + suf;
+  }
 
   function bassKeyRootFreq(key) {
     const E1 = 41.203;                                                          // mi grave, corde à vide
@@ -1727,10 +1767,22 @@ swing 62
     const prog = BASS_PROGS[S.bass.prog];
     bassBarIdx = (bassBarIdx + 1) % (prog ? prog.bars.length : 1);              // avance dans la progression
     bassRealize();
+    bassUpdateChordLabel();                                                     // 5.3 : accord courant
   }
 
   // Réinitialise la progression au démarrage (mesure 1 = 1re barre).
-  function bassResetCycle() { bassBarIdx = 0; if (S.bass.on) bassRealize(); else bassRealized = []; }
+  function bassResetCycle() { bassBarIdx = 0; if (S.bass.on) bassRealize(); else bassRealized = []; bassUpdateChordLabel(); }
+
+  // Affiche l'accord courant (5.3, §7). En lecture avec basse active : l'accord de la mesure
+  // en cours (bassBarIdx). Sinon (à l'arrêt ou basse coupée) : le 1er accord de la progression
+  // sélectionnée dans la tonalité choisie — l'élève voit d'avance ce qu'il obtiendra.
+  function bassUpdateChordLabel() {
+    const el = $('bassChord'); if (!el) return;
+    const prog = BASS_PROGS[S.bass.prog];
+    if (!prog) { el.textContent = '—'; return; }
+    const idx = (S.bass.on && isPlaying) ? (bassBarIdx % prog.bars.length) : 0;
+    el.textContent = bassChordName(S.bass.key, prog.bars[idx]) || '—';
+  }
 
   // Seuil de diagnostic (même esprit que window.fmMetroAudio) : lecture + recalculs
   // idempotents (réalisation par mesure, computeCycle) déjà effectués en boucle pendant le
@@ -1742,6 +1794,28 @@ swing 62
       bassEvents: function () { computeCycle(); return events.filter(e => e.layer === 'bass'); },
       noteFreq: bassNoteFreq,
       keyRootFreq: bassKeyRootFreq,
+      // 5.3 : lecture de la barre courante (aucune mutation) — { barIdx, chord, name, rootFreq }.
+      currentBar: function () {
+        const prog = BASS_PROGS[S.bass.prog];
+        const bar = prog ? prog.bars[bassBarIdx % prog.bars.length] : null;
+        return bar ? { barIdx: bassBarIdx, chord: bar, name: bassChordName(S.bass.key, bar),
+                       rootFreq: bassNoteFreq(S.bass.key, bar.deg, 'R') } : null;
+      },
+      // 5.3 : avance d'une mesure (diagnostic headless des progressions). Même mutation que le
+      // scheduler via bassOnNewMeasure — pas d'un type nouveau. Renvoie la barre atteinte.
+      newMeasure: function () {
+        bassOnNewMeasure();
+        const prog = BASS_PROGS[S.bass.prog];
+        const bar = prog ? prog.bars[bassBarIdx % prog.bars.length] : null;
+        return bar ? { barIdx: bassBarIdx, chord: bar, name: bassChordName(S.bass.key, bar),
+                       rootFreq: bassNoteFreq(S.bass.key, bar.deg, 'R'),
+                       notes: bassRealized.map(b => ({ frac: b.frac, note: b.note })) } : null;
+      },
+      // 5.3 : nom de l'accord de tête de la progression courante (key + degré + qualité).
+      chordName: function () {
+        const prog = BASS_PROGS[S.bass.prog];
+        return prog ? bassChordName(S.bass.key, prog.bars[0]) : '';
+      },
       // 5.2 : injection d'un RNG déterministe pour la recette headless du tirage probabiliste.
       // En prod, bassRng reste Math.random ; setRng(null) restaure ce défaut.
       setRng: function (fn) { bassRng = (typeof fn === 'function') ? fn : Math.random; return true; },
@@ -1772,10 +1846,12 @@ swing 62
     S.bass.vary = !!S.bass.vary;
     $('bassOn').checked = !!S.bass.on;
     $('bassPattern').value = S.bass.pattern;
+    $('bassProg').value = S.bass.prog;
     $('bassKey').value = S.bass.key;
     $('bassDensity').value = String(S.bass.density);
     $('bassVel').value = S.bass.vel;
     $('bassVary').checked = !!S.bass.vary;
+    bassUpdateChordLabel();                                                     // 5.3 : accord de tête au chargement
   }
 
   // ============ SCRIPT ============
@@ -6638,9 +6714,10 @@ swing 62
 
   // basse funk (passe 5) : on/off, gabarit, tonalité. Un changement prend effet à la
   // mesure suivante (réalisation par mesure) ; hors lecture, il est simplement mémorisé.
-  $('bassOn').addEventListener('change', e => { S.bass.on = e.target.checked; bassPersist(); });
+  $('bassOn').addEventListener('change', e => { S.bass.on = e.target.checked; bassUpdateChordLabel(); bassPersist(); });
   $('bassPattern').addEventListener('change', e => { S.bass.pattern = e.target.value; bassPersist(); });
-  $('bassKey').addEventListener('change', e => { S.bass.key = e.target.value; bassPersist(); });
+  $('bassProg').addEventListener('change', e => { S.bass.prog = e.target.value; bassResetCycle(); bassPersist(); });   // 5.3 : reprend la progression au début
+  $('bassKey').addEventListener('change', e => { S.bass.key = e.target.value; bassUpdateChordLabel(); bassPersist(); });
   $('bassDensity').addEventListener('change', e => { S.bass.density = +e.target.value; bassPersist(); });
   $('bassVel').addEventListener('change', e => { S.bass.vel = e.target.value; bassPersist(); });
   $('bassVary').addEventListener('change', e => { S.bass.vary = e.target.checked; bassPersist(); });
