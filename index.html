@@ -667,7 +667,7 @@
         </div>
         <details id="iaRoutineSettings" style="margin-top:8px">
           <summary style="cursor:pointer">Réglages IA</summary>
-          <p class="hint" style="margin-top:6px">URL du proxy IA (Cloudflare Worker qui cache la clé Gemini). Mémorisée dans ce navigateur uniquement — voir le dossier <code>proxy/</code> du dépôt magic-drums pour le créer.</p>
+          <p class="hint" style="margin-top:6px">Proxy IA (Cloudflare Worker qui cache la clé Gemini) <b>déjà configuré</b> — rien à faire. Ce champ ne sert qu'à pointer un autre proxy ; il est mémorisé dans ce navigateur. Détails : dossier <code>proxy/</code> du dépôt magic-drums.</p>
           <input id="iaProxyUrl" type="url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://gemini-proxy.votre-sous-domaine.workers.dev" style="width:100%;box-sizing:border-box;font-family:ui-monospace,monospace;font-size:12.5px">
           <div class="row" style="margin-top:8px">
             <button class="btn-sm" id="btnSaveProxy">Enregistrer</button>
@@ -2153,7 +2153,9 @@ swing 62
 
   // ============ GÉNÉRATION IA (proxy Gemini) ============
   const IA_PROXY_KEY = 'metro_ia_proxy_v1';
-  const getProxyUrl = () => (store.get(IA_PROXY_KEY) || '').trim();
+  // Proxy partagé déployé (cache la clé Gemini) : défaut pour marcher sans manip.
+  const IA_PROXY_DEFAULT = 'https://gemini-proxy.nmulongo.workers.dev';
+  const getProxyUrl = () => ((store.get(IA_PROXY_KEY) || '').trim()) || IA_PROXY_DEFAULT;
   const setProxyUrl = (u) => store.set(IA_PROXY_KEY, (u || '').trim());
 
   function buildRoutinePrompt(wish) {
