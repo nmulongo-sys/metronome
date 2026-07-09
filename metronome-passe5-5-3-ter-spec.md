@@ -1,6 +1,6 @@
 # Spec 5.3-ter — « Basse legato & respiration »
 
-**Statut : PROPOSITION — à valider avant tout code.**
+**Statut : VALIDÉE le 2026-07-10 et IMPLÉMENTÉE — commit `7a54a0a`, branche `metronomefunk-0.5.3-ter`, recette 28/28.** (Reste : validation à l'oreille sur HP de bureau.)
 Base : branche `metronomefunk-0.5.3-bis` (commit `063433d`, recettes 5-1 → 5-3-bis toutes vertes).
 Branche cible : `metronomefunk-0.5.3-ter`. Estampille de build : `metronomefunk-0.5.3-ter`.
 
