@@ -658,6 +658,23 @@
   <details class="section" id="secScript">
     <summary><span class="sec-title">Routine programmée</span><span class="sec-sub">script</span></summary>
     <div class="section-body">
+      <div class="ia-gen" style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--fm-border,rgba(128,128,128,.25))">
+        <label style="display:block;font-weight:600;margin-bottom:6px">Générer par IA</label>
+        <textarea id="iaRoutineWish" spellcheck="false" placeholder="Décrivez la séance : ex. « échauffement 20 min, montée progressive de 70 à 130 BPM, puis coupures 1 mesure sur 8, finir en swing léger »"></textarea>
+        <div class="row" style="margin-top:8px">
+          <button class="btn-sm primary" id="btnGenRoutine">✨ Générer la routine</button>
+          <span class="script-status" id="iaRoutineFb"></span>
+        </div>
+        <details id="iaRoutineSettings" style="margin-top:8px">
+          <summary style="cursor:pointer">Réglages IA</summary>
+          <p class="hint" style="margin-top:6px">Proxy IA (Cloudflare Worker qui cache la clé Gemini) <b>déjà configuré</b> — rien à faire. Ce champ ne sert qu'à pointer un autre proxy ; il est mémorisé dans ce navigateur. Détails : dossier <code>proxy/</code> du dépôt magic-drums.</p>
+          <input id="iaProxyUrl" type="url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://gemini-proxy.votre-sous-domaine.workers.dev" style="width:100%;box-sizing:border-box;font-family:ui-monospace,monospace;font-size:12.5px">
+          <div class="row" style="margin-top:8px">
+            <button class="btn-sm" id="btnSaveProxy">Enregistrer</button>
+            <span class="script-status" id="iaCfgFb"></span>
+          </div>
+        </details>
+      </div>
       <textarea id="scriptArea" spellcheck="false"># Exemple de routine
 # 5 min à 80 BPM
 80bpm 5min
@@ -2133,6 +2150,86 @@ swing 62
     S.sound.pulseFreq = +e.target.value; $('pulseFreqVal').textContent = S.sound.pulseFreq + ' Hz';
   });
   $('clickType').addEventListener('change', e => S.sound.type = e.target.value);
+
+  // ============ GÉNÉRATION IA (proxy Gemini) ============
+  const IA_PROXY_KEY = 'metro_ia_proxy_v1';
+  // Proxy partagé déployé (cache la clé Gemini) : défaut pour marcher sans manip.
+  const IA_PROXY_DEFAULT = 'https://gemini-proxy.nmulongo.workers.dev';
+  const getProxyUrl = () => ((store.get(IA_PROXY_KEY) || '').trim()) || IA_PROXY_DEFAULT;
+  const setProxyUrl = (u) => store.set(IA_PROXY_KEY, (u || '').trim());
+
+  function buildRoutinePrompt(wish) {
+    const w = (wish || '').trim() || 'un échauffement progressif de 15 minutes';
+    return `Tu es un professeur de musique qui écrit une routine de métronome.
+Traduis cette demande en un SCRIPT de routine : ${w}
+
+Réponds UNIQUEMENT avec le script (une instruction par ligne), sans texte autour ni balises markdown.
+Grammaire acceptée, une instruction par ligne :
+  <bpm>bpm <durée><unité>        tempo constant. Ex. : 80bpm 5min
+  <a>-><b>bpm <durée><unité>     rampe de tempo (accelerando/rallentando). Ex. : 80->120bpm 10min
+  gap <n>/<total>                coupe (mute) n mesures sur chaque bloc de <total>. Ex. : gap 2/16
+  gap off                        désactive les coupures
+  swing <p>                      swing en pourcent (50 = droit, 66 = ternaire). Ex. : swing 62
+  # ...                          ligne de commentaire (ignorée)
+Unités de durée : min (minutes), s ou sec (secondes), mes (mesures). La durée peut être décimale (ex. 2.5min).
+Contraintes : bpm entre 30 et 260 ; swing entre 50 et 85 ; gap n < total.
+Écris une progression musicale et réaliste ; ajoute de courts commentaires # pour repérer les phases.`;
+  }
+
+  function stripFences(text) {
+    let s = String(text || '').trim();
+    const fence = s.match(/```(?:[a-z]*)?\s*([\s\S]*?)```/i);
+    if (fence) s = fence[1].trim();
+    return s;
+  }
+
+  async function generateRoutine() {
+    const url = getProxyUrl();
+    const fb = $('iaRoutineFb');
+    if (!url) {
+      fb.textContent = '⚙ Configurez d’abord l’URL du proxy dans « Réglages IA ».';
+      const s = $('iaRoutineSettings'); if (s) s.open = true;
+      return;
+    }
+    const btn = $('btnGenRoutine');
+    const oldLabel = btn ? btn.textContent : '';
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ Génération…'; }
+    fb.textContent = 'Génération en cours…';
+    try {
+      const resp = await fetch(url, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: buildRoutinePrompt($('iaRoutineWish').value), temperature: 0.7 })
+      });
+      let data = {};
+      try { data = await resp.json(); } catch (e) {}
+      if (!resp.ok) throw new Error(data.error || ('Erreur ' + resp.status));
+      if (!data.text) throw new Error('Réponse vide du proxy.');
+      const scriptText = stripFences(data.text);
+      $('scriptArea').value = scriptText;
+      const res = parseScript(scriptText);
+      if (res.error) {
+        fb.textContent = '⚠ Routine générée mais à corriger : ' + res.error;
+      } else {
+        fb.textContent = '✔ Routine générée (' + res.segs.length + ' instruction·s) — relisez puis « Lancer ».';
+      }
+    } catch (e) {
+      fb.textContent = '✖ Échec : ' + e.message;
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = oldLabel; }
+    }
+  }
+
+  $('btnGenRoutine').addEventListener('click', generateRoutine);
+  {
+    const proxyInput = $('iaProxyUrl');
+    if (proxyInput) {
+      proxyInput.value = getProxyUrl();
+      $('btnSaveProxy').addEventListener('click', () => {
+        setProxyUrl(proxyInput.value);
+        $('iaCfgFb').textContent = proxyInput.value.trim() ? '✔ URL enregistrée' : 'URL effacée.';
+      });
+    }
+  }
 
   $('scriptRun').addEventListener('click', () => {
     const res = parseScript($('scriptArea').value);
