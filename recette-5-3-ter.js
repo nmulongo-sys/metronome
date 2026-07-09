@@ -9,8 +9,13 @@
    ici on prouve la MÉCANIQUE.
 
    Portée 5.3-ter (spec metronome-passe5-5-3-ter-spec.md) :
-     [1] Chevauchement au défaut (L=0,5) : durée finger > stepDur (la queue déborde).
-     [2] Continuité : à L=0, durées et release = 5.3-bis strict.
+     [1] Chevauchement au curseur 50 : durée finger > stepDur (la queue déborde).
+     [2] Bornes du curseur : plancher (curseur 0) et plafond (curseur 100), durées + release.
+   RETOUCHES 5.3c (documentées, spec metronome-passe5-5-3c-spec.md §3) : la fenêtre du
+   curseur a été recalibrée d'après l'écoute — L = 1 + fraction ∈ [1, 2], l'ancien max -ter
+   (1,30 / rel ×0,50) devient le plancher. Les dosages attendus de [1] et [2] suivent la
+   nouvelle fenêtre ; l'estampille de [7] est génériquée (même retouche que recette-5-3-bis).
+   Mécanique, ghost, bus, limiteur, persistance : assertions intactes.
      [3] Ghost : hors legato (0,35 constant), toujours < finger et < son pas.
      [4] Limiteur : nœud présent, paramétré, câblé master → limiteur → destination.
      [5] Bus basse : HP 35 Hz en tête, réverb wet 0,12 « Espace » (off → 0), la voix
@@ -106,42 +111,44 @@ boot(() => {
   const B = window.fmMetroBass;
 
   // --- 1. Chevauchement au défaut (L = 0,5) -----------------------------------------------
-  console.log('[1] Chevauchement au défaut : la note structurante déborde sur le pas suivant');
+  console.log('[1] Chevauchement (curseur 50) : la note structurante déborde sur le pas suivant');
   setBass({ on: true, prog: 'vamp1', key: 'E', pattern: 'theOne', density: 2, vel: 'mixte', vary: false });
   setLegato(50); setTempo(92);
   const sd = stepDur(92), dT = durTempo(92);
   const real = B().realize();
   const finger = real.find(r => r.frac === 0).note;
-  near(finger.dur, sd * 1.10 * dT, 1e-3, 'finger dur ≈ 1,10 × stepDur × durTempo (défaut léger→moyen)');
+  near(finger.dur, sd * 1.50 * dT, 1e-3, 'finger dur ≈ 1,50 × stepDur × durTempo (curseur 50 — fenêtre 5.3c : L=1,5)');
   ok(finger.dur > sd, 'finger dur > stepDur : la queue déborde sur l’attaque suivante — le liant  (' + finger.dur.toFixed(3) + ' > ' + sd.toFixed(3) + ')');
   setBass({ pattern: 'syncopeGrave', density: 3 });
   const pop = B().realize().find(r => r.note.art === 'pop');
   ok(pop && pop.note.dur > sd, 'pop (syncopeGrave) : dur > stepDur aussi  (' + (pop ? pop.note.dur.toFixed(3) : '-') + ')');
   setBass({ pattern: 'theOne', density: 2 });
 
-  // --- 2. Continuité : L = 0 restitue 5.3-bis strict ---------------------------------------
-  console.log('\n[2] Continuité : à L=0, durées et release = 5.3-bis');
+  // --- 2. Bornes du curseur (fenêtre 5.3c : L = 1 + fraction) --------------------------------
+  // Retouche 5.3c : l'ancien bloc « continuité 5.3-bis » (curseur 0 = 0,90/rel ×0,30) est
+  // caduc — le plancher est désormais l'ancien max -ter (décision d'oreille, 92 BPM).
+  console.log('\n[2] Bornes : plancher (curseur 0 = ancien max -ter) et plafond (curseur 100)');
   setLegato(0);
   const f0 = B().realize().find(r => r.frac === 0).note;
-  near(f0.dur, sd * 0.90 * dT, 1e-3, 'L=0 : finger dur ≈ 0,90 × stepDur × durTempo (dosage 5.3-bis)');
+  near(f0.dur, sd * 1.30 * dT, 1e-3, 'curseur 0 : finger dur ≈ 1,30 × stepDur × durTempo (plancher = ancien max -ter)');
   const env0 = probeEnv(B, 'finger', 10);                       // probeVoice : dur fixe 0.18
   ok(!!env0, 'enveloppe observable (automation enregistrée)');
   if (env0) {
-    const rel0 = Math.min(0.06, 0.18 * 0.30);                   // = 0.054 (borne 5.3-bis)
+    const rel0 = Math.min(0.06 + 0.12, 0.18 * 0.50);            // L=1 : min(0.18, 0.09) = 0.09
     const susSet = env0.gain.calls.find(c => c[0] === 'set' && c[2] > 10.001);
-    near(susSet[2], 10 + 0.18 - rel0, 1e-6, 'L=0 : début du release à t + dur − min(60 ms ; dur×0,30)');
+    near(susSet[2], 10 + 0.18 - rel0, 1e-6, 'curseur 0 : début du release à t + dur − min(180 ms ; dur×0,50)');
     const last = env0.gain.calls[env0.gain.calls.length - 1];
     ok(last[0] === 'exp' && Math.abs(last[2] - 10.18) < 1e-9, 'la note se termine à t + dur (release exponentiel)');
   }
   setLegato(100);
   const env1 = probeEnv(B, 'finger', 20);
   if (env1) {
-    const rel1 = Math.min(0.06 + 0.12, 0.18 * (0.30 + 0.20));   // = min(0.18, 0.09) = 0.09
+    const rel1 = Math.min(0.06 + 0.24, 0.18 * (0.30 + 0.40));   // L=2 : min(0.30, 0.126) = 0.126
     const susSet1 = env1.gain.calls.find(c => c[0] === 'set' && c[2] > 20.001);
-    near(susSet1[2], 20 + 0.18 - rel1, 1e-6, 'L=1 : release allongé — borne dur×0,50 (' + (1000 * rel1).toFixed(0) + ' ms sur 180)');
-  } else { ok(false, 'enveloppe L=1 observable'); }
+    near(susSet1[2], 20 + 0.18 - rel1, 1e-6, 'curseur 100 : release allongé — borne dur×0,70 (' + (1000 * rel1).toFixed(0) + ' ms sur 180)');
+  } else { ok(false, 'enveloppe curseur 100 observable'); }
   const f1 = B().realize().find(r => r.frac === 0).note;
-  near(f1.dur, sd * 1.30 * dT, 1e-3, 'L=1 : finger dur ≈ 1,30 × stepDur × durTempo (très lié)');
+  near(f1.dur, sd * 1.70 * dT, 1e-3, 'curseur 100 : finger dur ≈ 1,70 × stepDur × durTempo (très lié)');
 
   // --- 3. Ghost hors legato : toujours piqué ------------------------------------------------
   console.log('\n[3] Ghost : jamais affecté par le curseur');
@@ -202,7 +209,7 @@ boot(() => {
   ok(Math.abs(saved.legato - 0.3) < 1e-9 && saved.space === false, 'fm-metro-bass : legato 0,30 + space false persistés');
   setLegato(50); setSpace(true);
   const bs = $('buildStamp');
-  ok(bs && /metronomefunk-0\.5\.3-ter/.test(bs.textContent), 'buildStamp : « ' + (bs ? bs.textContent : '(absent)') + ' »');
+  ok(bs && /metronomefunk-0\.5\.3/.test(bs.textContent), 'buildStamp : « ' + (bs ? bs.textContent : '(absent)') + ' »');   // génériquée (retouche 5.3c)
 
   console.log('\n----------------------------------------');
   console.log('  ' + pass + ' réussis, ' + fail + ' échoués sur ' + (pass + fail));
