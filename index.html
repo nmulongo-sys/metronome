@@ -75,6 +75,16 @@
     color: var(--fm-accent); font-weight: 600; margin-top: 4px;
   }
   .header-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .lang-switch { display: inline-flex; gap: 4px; align-items: center; }
+  .lang-btn {
+    display: inline-flex; align-items: center; gap: 5px; cursor: pointer;
+    background: var(--fm-panel); border: 1px solid var(--fm-line); color: var(--fm-sub);
+    padding: 5px 8px; border-radius: 7px; font-family: var(--fm-font-ui); font-size: .72rem;
+    font-weight: 600; letter-spacing: .04em; transition: border-color .12s, color .12s, background .12s;
+  }
+  .lang-btn:hover { color: var(--fm-ink); border-color: var(--fm-accent); }
+  .lang-btn.on { border-color: var(--fm-accent); background: var(--fm-accent); color: var(--fm-accent-ink); }
+  .lang-btn .flag { width: 18px; height: 12px; border-radius: 2px; box-shadow: 0 0 0 1px rgba(0,0,0,.15); display: block; }
   .seg { display: flex; border: 1px solid var(--fm-line); border-radius: 7px; overflow: hidden; background: var(--fm-panel); }
   .seg button {
     background: transparent; border: none; color: var(--fm-sub);
@@ -441,7 +451,11 @@
       <button class="btn-ghost" id="wizardBtn">✦ Assistant</button>
       <button class="btn-ghost" id="themeBtn">◐ Mode sombre</button>
       <button class="btn-ghost" id="btnAccount" title="Se connecter par lien magique">Se connecter</button>
-      <button class="btn-ghost" id="btnLang" title="Langue · Language · Idioma (cliquer pour changer)" aria-label="Langue · Language · Idioma">🇫🇷 FR</button>
+      <span id="langSwitch" class="lang-switch" role="group" aria-label="Langue / Language / Idioma">
+        <button type="button" class="lang-btn" data-lang="fr" title="Français" aria-label="Français"><svg class="flag" viewBox="0 0 3 2" aria-hidden="true"><rect width="3" height="2" fill="#fff"/><rect width="1" height="2" fill="#0055A4"/><rect x="2" width="1" height="2" fill="#EF4135"/></svg>FR</button>
+        <button type="button" class="lang-btn" data-lang="en" title="English" aria-label="English"><svg class="flag" viewBox="0 0 60 30" aria-hidden="true"><clipPath id="ukc"><path d="M0,0 v30 h60 v-30 z"/></clipPath><g clip-path="url(#ukc)"><path d="M0,0 v30 h60 v-30 z" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M30,0 v30 M0,15 h60" stroke="#fff" stroke-width="10"/><path d="M30,0 v30 M0,15 h60" stroke="#C8102E" stroke-width="6"/></g></svg>EN</button>
+        <button type="button" class="lang-btn" data-lang="pt" title="Português (Brasil)" aria-label="Português (Brasil)"><svg class="flag" viewBox="0 0 20 14" aria-hidden="true"><rect width="20" height="14" fill="#009B3A"/><path d="M10,1.2 L18.8,7 L10,12.8 L1.2,7 Z" fill="#FEDD00"/><circle cx="10" cy="7" r="2.7" fill="#002776"/></svg>BR</button>
+      </span>
     </div>
   </header>
 
@@ -494,7 +508,10 @@
       <div class="status-line" id="statusLine">Prêt</div>
       <div class="exp-audio" style="margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center">
         <span class="sec-sub" style="text-transform:none;letter-spacing:0">Export audio</span>
-        <select id="expDur" class="btn-sm" title="Durée enregistrée de ce qui joue" style="width:auto"><option value="10">10 s</option><option value="20">20 s</option><option value="30" selected>30 s</option><option value="60">60 s</option></select>
+        <label class="exp-dur" title="Durée à enregistrer (la boucle en cours)" style="display:inline-flex;align-items:center;gap:4px;color:var(--fm-sub);font-size:.8rem">Durée
+          <input id="expMin" type="number" min="0" max="60" value="0" inputmode="numeric" aria-label="minutes" style="width:44px;text-align:right"> min
+          <input id="expSec" type="number" min="0" max="59" value="30" inputmode="numeric" aria-label="secondes" style="width:44px;text-align:right"> s
+        </label>
         <button class="btn-sm" id="btnExpWav">WAV</button>
         <button class="btn-sm" id="btnExpMp3">MP3</button>
         <span class="script-status" id="expFb"></span>
@@ -7334,10 +7351,14 @@ swing 62
     }, seconds*1000 + 150);
   }
 
+  function expSeconds(){
+    var mn=parseInt((el('expMin')||{}).value,10)||0, sc=parseInt((el('expSec')||{}).value,10)||0;
+    var t=mn*60+sc; if(t<=0) t=30; if(t>1800) t=1800; /* garde-fou : 30 min max */ return t;
+  }
   function wire(){
-    var w=el('btnExpWav'), m=el('btnExpMp3'), d=el('expDur');
-    if(w&&!w._wired){ w._wired=true; w.addEventListener('click', function(){ run(+((d&&d.value)||30),'wav'); }); }
-    if(m&&!m._wired){ m._wired=true; m.addEventListener('click', function(){ run(+((d&&d.value)||30),'mp3'); }); }
+    var w=el('btnExpWav'), m=el('btnExpMp3');
+    if(w&&!w._wired){ w._wired=true; w.addEventListener('click', function(){ run(expSeconds(),'wav'); }); }
+    if(m&&!m._wired){ m._wired=true; m.addEventListener('click', function(){ run(expSeconds(),'mp3'); }); }
   }
   if(document.readyState!=='loading') wire(); else document.addEventListener('DOMContentLoaded', wire);
 })();
@@ -7371,6 +7392,7 @@ window.__I18N = { "en": {
   "Clic muet (couches seules)": "Muted click (layers only)",
   "Prêt": "Ready",
   "Export audio": "Audio export",
+  "Durée": "Length",
   "10 s": "10 s",
   "20 s": "20 s",
   "30 s": "30 s",
@@ -7712,6 +7734,7 @@ window.__I18N = { "en": {
   "Clic muet (couches seules)": "Clique mudo (apenas camadas)",
   "Prêt": "Pronto",
   "Export audio": "Exportação de áudio",
+  "Durée": "Duração",
   "10 s": "10 s",
   "20 s": "20 s",
   "30 s": "30 s",
@@ -8043,9 +8066,21 @@ window.__I18N = { "en": {
   function trEl(el){ if(!D||!el||!el.getAttribute)return; ['placeholder','title','aria-label'].forEach(function(a){ if(el.hasAttribute&&el.hasAttribute(a)){ var t=D[norm(el.getAttribute(a))]; if(t) el.setAttribute(a,t); } }); }
   function walk(root){ try{ var w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,null),n,ns=[]; while(n=w.nextNode())ns.push(n); ns.forEach(trText); if(root.querySelectorAll) root.querySelectorAll('[placeholder],[title],[aria-label]').forEach(trEl); if(root.nodeType===1) trEl(root); }catch(e){} }
   function enable(){ D=curDict(); if(!D) return; walk(document.body); try{ var obs=new MutationObserver(function(muts){ muts.forEach(function(m){ if(m.type==='characterData'){ trText(m.target); return; } m.addedNodes&&m.addedNodes.forEach(function(nd){ if(nd.nodeType===3)trText(nd); else if(nd.nodeType===1)walk(nd); }); }); }); obs.observe(document.body,{childList:true,subtree:true,characterData:true}); }catch(e){} }
-  function setBtn(){ var b=document.getElementById('btnLang'); if(b) b.textContent = FLAG[lang()] || '\uD83C\uDF10'; }
-  function toggle(){ var i=LANGS.indexOf(lang()); var next=LANGS[(i+1)%LANGS.length]; try{ localStorage.setItem('fm-lang',next); }catch(e){} try{ var u=new URL(location.href); u.searchParams.delete('lang'); history.replaceState(null,'',u.toString()); }catch(e){} location.reload(); }
-  function init(){ setBtn(); var b=document.getElementById('btnLang'); if(b&&!b._wired){ b._wired=true; b.addEventListener('click',toggle); } enable(); }
+  function setLang(code){
+    if(LANGS.indexOf(code)<0 || code===lang()) return;
+    try{ localStorage.setItem('fm-lang',code); }catch(e){}
+    try{ var u=new URL(location.href); u.searchParams.delete('lang'); history.replaceState(null,'',u.toString()); }catch(e){}
+    location.reload();
+  }
+  function highlight(){ var cur=lang(); document.querySelectorAll('.lang-btn').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-lang')===cur); }); }
+  function init(){
+    highlight();
+    document.querySelectorAll('.lang-btn').forEach(function(b){
+      if(b._wired) return; b._wired=true;
+      b.addEventListener('click', function(){ setLang(b.getAttribute('data-lang')); });
+    });
+    enable();
+  }
   if(document.readyState!=='loading') init(); else document.addEventListener('DOMContentLoaded', init);
 })();</script>
 <!-- =================== FIN i18n FR/EN =================== -->
