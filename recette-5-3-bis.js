@@ -7,9 +7,12 @@
    reste un critère d'oreille ; ici on garde les invariants OBSERVABLES.
 
    Portée 5.3-bis :
-     [1] Durée finger = fraction du pas (≈ 0.90 × stepDur × facteur tempo), et < stepDur
-         (la note tient l'essentiel du pas puis laisse un léger détaché — plus de note
-         tronquée à ~15 ms).
+     [1] Durée finger = fraction du pas (calée sur la subdivision — plus de note tronquée
+         à ~15 ms). RETOUCHE 5.3c : la fenêtre du curseur legato est recalibrée
+         (L = 1 + fraction, spec metronome-passe5-5-3c-spec.md) — curseur 0 = plancher
+         1,30 (ancien max -ter, validé à l'oreille) ; le dosage -bis strict (0,90,
+         < stepDur) n'est plus atteignable. Les attendus suivent le plancher ; l'invariant
+         anti-staccato d'origine (> 100 ms) est conservé tel quel.
      [2] Ghost reste piqué : durée ghost < durée finger au même tempo.
      [3] Monotonie tempo conservée (durée 150 < 70 BPM) ; plancher audible 20 ms tenu.
      [4] Non-régression : fracs theOne/dens2 inchangées, déterminisme intact.
@@ -75,8 +78,9 @@ function durTempo(bpm) { const k = Math.max(0, Math.min(1, (bpm - 70) / 80)); re
 boot(() => {
   console.log('\n=== Recette 5.3-bis — corps / tenue de la basse ===\n');
   const B = window.fmMetroBass;
-  // 5.3-ter : le curseur « détaché ↔ lié » (absent en 5.3-bis) est ramené à 0 = état 5.3-bis
-  // strict, pour que les dosages testés ici restent la référence. Défensif : no-op en 5.3-bis.
+  // 5.3-ter : le curseur legato (absent en 5.3-bis) est ramené à 0 pour que les dosages testés
+  // ici soient déterministes. Défensif : no-op en 5.3-bis. 5.3c : curseur 0 = plancher de la
+  // fenêtre recalibrée (1,30 = ancien max -ter) — les attendus de [1] suivent.
   if ($('bassLegato')) { $('bassLegato').value = '0'; fire('bassLegato', 'input'); }
 
   // --- 1. Durée finger calée sur le pas (≈ 0.90 × stepDur × facteur tempo, < stepDur) ------
@@ -85,9 +89,9 @@ boot(() => {
   setTempo(92);
   const real = B().realize();
   const finger = real.find(r => r.frac === 0).note;               // The One, pilier finger
-  const sd92 = stepDur(92), expFinger = sd92 * 0.90 * durTempo(92);
-  near(finger.dur, expFinger, 1e-3, 'finger dur ≈ 0.90 × stepDur × durTempo à 92 BPM');
-  ok(finger.dur < sd92, 'finger dur < stepDur : la note tient le pas puis laisse un détaché  (' + finger.dur.toFixed(3) + ' < ' + sd92.toFixed(3) + ')');
+  const sd92 = stepDur(92), expFinger = sd92 * 1.30 * durTempo(92);   // 5.3c : plancher legato
+  near(finger.dur, expFinger, 1e-3, 'finger dur ≈ 1.30 × stepDur × durTempo à 92 BPM (plancher 5.3c)');
+  ok(finger.dur > sd92, 'finger dur > stepDur : la queue déborde — plancher legato 5.3c  (' + finger.dur.toFixed(3) + ' > ' + sd92.toFixed(3) + ')');
   ok(finger.dur > 0.10, 'finger dur > 100 ms : plus de note tronquée à ~15 ms  (' + (1000 * finger.dur).toFixed(0) + ' ms)');
 
   // --- 2. Ghost reste piqué : plus court que le finger au même tempo ----------------------
@@ -121,7 +125,7 @@ boot(() => {
   // --- 6. Estampille de build ------------------------------------------------------------
   console.log('\n[6] Estampille de build affichée');
   const bs = $('buildStamp');
-  ok(bs && /metronomefunk-0\.5\.3-/.test(bs.textContent), 'buildStamp renseigné : « ' + (bs ? bs.textContent : '(absent)') + ' »');
+  ok(bs && /metronomefunk-0\.5\.3/.test(bs.textContent), 'buildStamp renseigné : « ' + (bs ? bs.textContent : '(absent)') + ' »');   // génériquée sans tiret (retouche 5.3c)
 
   console.log('\n----------------------------------------');
   console.log('  ' + pass + ' réussis, ' + fail + ' échoués sur ' + (pass + fail));
