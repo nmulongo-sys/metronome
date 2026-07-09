@@ -900,6 +900,11 @@
       <div class="row">
         <label class="check"><input type="checkbox" id="bassVary"> Variations (jeu vivant)</label>
       </div>
+      <div class="row">
+        <label for="bassLegato">Détaché ↔ lié</label>
+        <input type="range" id="bassLegato" min="0" max="100" value="50" style="flex:1;min-width:120px;">
+        <label class="check" style="min-width:auto;"><input type="checkbox" id="bassSpace" checked> Espace (réverb courte)</label>
+      </div>
       <div class="hint">Une voix de basse funk synthétisée qui accompagne le percussionniste — pour
       caler le jeu sur ses syncopes et ses silences (FUNK-I2). Choisis un <b>gabarit</b>, une
       <b>progression</b> (du vamp 1 accord au blues 12 mesures), une <b>tonalité</b>, la
@@ -907,7 +912,9 @@
       s'affiche pour travailler l'oreille : rejoue la même progression dans une autre tonalité et
       tu entends la transposition. <b>Variations</b> activé, la ligne se joue de façon vivante
       (tirage des ornements) ; désactivé, elle est régulière et prévisible. La ligne s'allège et se
-      raccourcit d'elle-même quand le tempo monte. Drop-outs de maintien du <i>time</i> : étape suivante.</div>
+      raccourcit d'elle-même quand le tempo monte. Le curseur <b>détaché ↔ lié</b> dose le liant
+      entre les notes (les ghosts restent piqués) ; <b>Espace</b> ajoute une réverb très courte
+      sur la basse seule — l'attaque et le <i>time</i> restent nets. Drop-outs de maintien du <i>time</i> : étape suivante.</div>
     </div>
   </details>
 
@@ -1126,6 +1133,8 @@ swing 62
       density: 2,          // 1 allégé · 2 normal · 3 chargé (exploité en 5.2)
       vel: 'mixte',        // 'plat' | 'mixte' | 'contraste' (exploité en 5.2)
       vary: false,         // variations probabilistes (5.2) ; 5.1 reste déterministe
+      legato: 0.5,         // 5.3-ter : curseur « détaché ↔ lié » (0–1) — durées + release
+      space: true,         // 5.3-ter : réverb courte sur la basse seule (off/discret)
       swingFollow: true,   // 16es de la basse suivent S.swing (appliqué en 5.4)
       drop: { on: false, everyN: 4, lenBeats: 2 }   // drop-outs (5.4)
     },
@@ -1134,9 +1143,11 @@ swing 62
 
   // Identité du build affichée dans l'en-tête (5.3-bis). Bumper à chaque passe : elle sert à
   // savoir de quel build vient un enregistrement de validation.
-  const BUILD = 'metronomefunk-0.5.3-bis', BUILD_DATE = '2026-07-09';
+  const BUILD = 'metronomefunk-0.5.3-ter', BUILD_DATE = '2026-07-10';
 
   let audioCtx = null, masterGain = null, noiseBuf = null;
+  let masterLimiter = null;                                   // 5.3-ter : limiteur de bus master
+  let bassBus = null, bassHP = null, bassWet = null;          // 5.3-ter : bus de la couche basse
   let isPlaying = false;
   let schedulerTimer = null;
   const LOOKAHEAD_MS = 25, AHEAD = 0.12;
@@ -1236,7 +1247,25 @@ swing 62
       audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       masterGain = audioCtx.createGain();
       masterGain.gain.value = S.volume;
-      masterGain.connect(audioCtx.destination);
+      // 5.3-ter : limiteur quasi-brickwall avant destination. Chevauchement legato + release
+      // long + réverb s'additionnent → sans garde-fou, écrêtage garanti (+3 dBFS mesuré à
+      // 82 BPM). Pas de sidechain : la basse doit rester une référence rythmique stable.
+      // Défensif : les stubs headless des recettes 5-1 → 5-3-bis n'ont pas ce nœud.
+      masterLimiter = null;
+      if (typeof audioCtx.createDynamicsCompressor === 'function') {
+        masterLimiter = audioCtx.createDynamicsCompressor();
+        try {
+          masterLimiter.threshold.value = -1.5;   // seuil (dBFS)
+          masterLimiter.knee.value = 0;
+          masterLimiter.ratio.value = 20;         // quasi-brickwall
+          masterLimiter.attack.value = 0.003;
+          masterLimiter.release.value = 0.12;
+        } catch (e) {}
+        masterGain.connect(masterLimiter);
+        masterLimiter.connect(audioCtx.destination);
+      } else {
+        masterGain.connect(audioCtx.destination);
+      }
       /* hook pour l'export audio (module externe) : lecture live via closure */
       window.fmMetroAudio = function(){ return { ctx: audioCtx, master: masterGain, playing: isPlaying }; };
       const len = audioCtx.sampleRate * 0.05;
@@ -1356,21 +1385,55 @@ swing 62
   // Réglages par articulation (opt fixes en 5.1-bis ; 5.2 modulera drive/cutoff par vel/tempo).
   // Gains body+exciter tenus ≤ ~1.1 avant enveloppe pour éviter l'écrêtage sur slaps forts.
   const BASS_ART_OPT = {
-    finger: { drive: 2.2, cutoffCeil: 1800, cutoffFloor: 700, attack: 0.008, bodyGain: 0.30, exciterGain: 0.70 },
-    slap:   { drive: 3.4, cutoffCeil: 2600, cutoffFloor: 800, attack: 0.004, bodyGain: 0.30, exciterGain: 0.80, transient: true },
-    pop:    { drive: 2.8, cutoffCeil: 3200, cutoffFloor: 900, attack: 0.003, bodyGain: 0.30, exciterGain: 0.75 },
-    ghost:  { drive: 1.6, cutoffCeil: 1200, cutoffFloor: 600, attack: 0.006, bodyGain: 0.22, exciterGain: 0.50 }
+    finger: { drive: 2.2, cutoffCeil: 1800, cutoffFloor: 700, attack: 0.008, bodyGain: 0.38, exciterGain: 0.70 },
+    slap:   { drive: 3.4, cutoffCeil: 2600, cutoffFloor: 800, attack: 0.004, bodyGain: 0.38, exciterGain: 0.80, transient: true },
+    pop:    { drive: 2.8, cutoffCeil: 3200, cutoffFloor: 900, attack: 0.003, bodyGain: 0.38, exciterGain: 0.75 },
+    ghost:  { drive: 1.6, cutoffCeil: 1200, cutoffFloor: 600, attack: 0.006, bodyGain: 0.28, exciterGain: 0.50 }
   };
 
+  // 5.3-ter : bus de la couche basse (créé au premier bassVoice — no-op strict si la basse
+  // reste coupée). Chaîne : voix → bassBus → high-pass 35 Hz → [sec + réverb courte] → master.
+  // High-pass : E1 = 41,2 Hz est la note la plus basse possible (résolveur replié 41–~78 Hz),
+  // la fondamentale n'est jamais touchée — seule la « boue » sub-sonique part. Réverb :
+  // impulsion générée à la volée (bruit × décroissance expo, ~0,35 s, 2 canaux décorrélés),
+  // mix bas — la traîne d'espace sans flouter l'attaque ni le time. Percussions : jamais
+  // routées ici (netteté du métronome). Défensif si createConvolver absent (stubs headless).
+  const BASS_WET = 0.12;                                        // mix réverb « discret »
+  function bassReverbImpulse() {
+    const sr = audioCtx.sampleRate, len = Math.max(1, Math.floor(sr * 0.35));
+    const buf = audioCtx.createBuffer(2, len, sr);
+    for (let c = 0; c < 2; c++) {
+      const d = buf.getChannelData(c);
+      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.8);
+    }
+    return buf;
+  }
+  function ensureBassBus() {
+    if (bassBus) return;
+    bassBus = audioCtx.createGain(); bassBus.gain.value = 1;
+    bassHP = audioCtx.createBiquadFilter();
+    bassHP.type = 'highpass'; bassHP.frequency.value = 35; bassHP.Q.value = 0.7;
+    bassBus.connect(bassHP);
+    bassHP.connect(masterGain);                                 // chemin sec (toujours présent)
+    bassWet = null;
+    if (typeof audioCtx.createConvolver === 'function') {
+      const conv = audioCtx.createConvolver();
+      conv.buffer = bassReverbImpulse();
+      bassWet = audioCtx.createGain();
+      bassWet.gain.value = S.bass.space ? BASS_WET : 0;
+      bassHP.connect(conv); conv.connect(bassWet); bassWet.connect(masterGain);
+    }
+  }
+
   // Voix de basse unique. Chaîne : osc saw → [corps propre LP doux] + [exciteur : shaper → LP
-  // à plancher haut] → gain d'enveloppe → master. `opt` = BASS_ART_OPT[art] (voir ci-dessus).
+  // à plancher haut] → gain d'enveloppe → bus basse → master. `opt` = BASS_ART_OPT[art].
   function bassVoice(t, freq, vol, dur, opt) {
     const o = opt || {};
     const drive       = o.drive       != null ? o.drive       : 2.2;
     const cutoffCeil  = o.cutoffCeil  != null ? o.cutoffCeil  : 1800;
     const cutoffFloor = o.cutoffFloor != null ? o.cutoffFloor : 700;   // plancher relevé (était 120)
     const attack      = o.attack      != null ? o.attack      : 0.008;
-    const bodyGain    = o.bodyGain    != null ? o.bodyGain    : 0.30;  // vraie fondamentale (bons HP/casque)
+    const bodyGain    = o.bodyGain    != null ? o.bodyGain    : 0.38;  // vraie fondamentale (bons HP/casque)
     const exciterGain = o.exciterGain != null ? o.exciterGain : 0.70;  // harmoniques (portent le grave sur petit HP)
 
     const osc = audioCtx.createOscillator();
@@ -1383,7 +1446,11 @@ swing 62
     const g = audioCtx.createGain();
     const pk  = Math.max(vol, 0.0002);                        // pic d'attaque
     const sus = Math.max(vol * 0.78, 0.0002);                 // niveau de tenue (corps)
-    const rel = Math.min(0.06, dur * 0.30);                   // release bref, borné
+    // 5.3-ter : release piloté par le curseur « détaché ↔ lié » — de 60 ms/×0,30 (L=0,
+    // comportement 5.3-bis strict) à 180 ms/×0,50 (L=1) : la note s'éteint au lieu de se
+    // couper. Le ghost, court, est borné mécaniquement par sa durée — il reste piqué.
+    const L = Math.max(0, Math.min(1, S.bass.legato != null ? S.bass.legato : 0.5));
+    const rel = Math.min(0.06 + 0.12 * L, dur * (0.30 + 0.20 * L));
     const dEnd = t + attack + Math.min(0.03, dur * 0.18);     // fin de la décroissance vers le sustain
     const hEnd = Math.max(dEnd + 0.005, t + dur - rel);       // fin de tenue (début du release)
     g.gain.setValueAtTime(0.0001, t);
@@ -1391,7 +1458,8 @@ swing 62
     g.gain.exponentialRampToValueAtTime(sus, dEnd);           // → niveau de tenue
     g.gain.setValueAtTime(sus, hEnd);                         // MAINTIEN du corps jusqu'ici
     g.gain.exponentialRampToValueAtTime(0.0001, t + dur);     // release
-    g.connect(masterGain);
+    ensureBassBus();
+    g.connect(bassBus);                                        // 5.3-ter : → bus basse (HP 35 Hz + réverb)
 
     // Branche 1 — corps propre : LP doux, conserve la vraie fondamentale.
     const bodyF = audioCtx.createBiquadFilter();
@@ -1406,8 +1474,16 @@ swing 62
     if ('oversample' in shaper) shaper.oversample = '4x';               // anti-alias
     const exF = audioCtx.createBiquadFilter();
     exF.type = 'lowpass'; exF.Q.value = 3;
+    // 5.3-ter : le sweep ne se referme plus pendant la tenue — descente vers un PALIER
+    // (l'exciteur reste ouvert, le corps porte au lieu de filer), maintien, puis fermeture
+    // vers le plancher pendant le release seulement. L'écart attaque→corps mesuré (~6 dB)
+    // venait pour moitié de cette fermeture précoce.
+    const cutHold = cutoffFloor + 0.35 * (cutoffCeil - cutoffFloor);
+    const tHold = t + Math.max(dur * 0.5, 0.04);
     exF.frequency.setValueAtTime(cutoffCeil, t);
-    exF.frequency.exponentialRampToValueAtTime(cutoffFloor, t + Math.max(dur * 0.8, 0.05));
+    exF.frequency.exponentialRampToValueAtTime(cutHold, tHold);
+    exF.frequency.setValueAtTime(cutHold, Math.max(t + dur - rel, tHold));
+    exF.frequency.exponentialRampToValueAtTime(cutoffFloor, t + dur);
     const exG = audioCtx.createGain(); exG.gain.value = exciterGain;
     osc.connect(shaper); shaper.connect(exF); exF.connect(exG); exG.connect(g);
 
@@ -1417,7 +1493,7 @@ swing 62
     if (o.transient) {
       const src = audioCtx.createBufferSource(), ng = audioCtx.createGain(), nf = audioCtx.createBiquadFilter();
       src.buffer = noiseBuf; nf.type = 'highpass'; nf.frequency.value = 2200; nf.Q.value = 0.7;
-      src.connect(nf); nf.connect(ng); ng.connect(masterGain);
+      src.connect(nf); nf.connect(ng); ng.connect(bassBus);   // 5.3-ter : via le bus basse
       ng.gain.setValueAtTime(vol * 0.5, t);
       ng.gain.exponentialRampToValueAtTime(0.0001, t + 0.03);
       src.start(t); src.stop(t + 0.04);
@@ -1746,7 +1822,16 @@ swing 62
     // 5.3-bis : durée = fraction du PAS (plus de plafond absolu qui tronquait la note à ~15 ms
     // → staccato). finger/slap/pop TIENNENT la note (≈ 0.80–0.90 du pas, léger détaché) ; le
     // ghost reste piqué (0.35). L'adaptation tempo (§2.3) resserre encore à tempo rapide.
-    const durFill = { finger: 0.90, ghost: 0.35, pop: 0.80, slap: 0.82 };
+    // 5.3-ter : le curseur « détaché ↔ lié » (S.bass.legato, 0–1) interpole la part du pas
+    // occupée par chaque note structurante. À L ≳ 0,25 le finger dépasse le pas : la queue
+    // déborde sur l'attaque suivante — le liant. Ghost JAMAIS affecté (reste piqué).
+    const Lg = Math.max(0, Math.min(1, S.bass.legato != null ? S.bass.legato : 0.5));
+    const durFill = {
+      finger: 0.90 + 0.40 * Lg,    // 0,90 (détaché = 5.3-bis) → 1,10 (défaut) → 1,30 (lié)
+      slap:   0.82 + 0.46 * Lg,    // 0,82 → 1,05 → 1,28
+      pop:    0.80 + 0.50 * Lg,    // 0,80 → 1,05 → 1,30
+      ghost:  0.35                 // hors legato — toujours piqué
+    };
     const dens = S.bass.density, prof = S.bass.vel, vary = !!S.bass.vary;
     // k borné : 0 (lent, 70 BPM) → 1 (rapide, 150 BPM). Interpolations linéaires (§2.3).
     const k = Math.max(0, Math.min(1, (S.tempo - 70) / 80));
@@ -1837,6 +1922,10 @@ swing 62
       // 5.2 : injection d'un RNG déterministe pour la recette headless du tirage probabiliste.
       // En prod, bassRng reste Math.random ; setRng(null) restaure ce défaut.
       setRng: function (fn) { bassRng = (typeof fn === 'function') ? fn : Math.random; return true; },
+      // 5.3-ter : lecture des nœuds de bus (diagnostic headless — limiteur, HP 35 Hz, réverb).
+      bus: function () {
+        return { limiter: masterLimiter, bassBus: bassBus, bassHP: bassHP, bassWet: bassWet, wetLevel: BASS_WET };
+      },
       // 5.1-bis : sonde de synthèse. Construit le graphe d'une articulation via playBass
       // (self-contained : ensureCtx idempotent, aucune mutation d'état). Sert au smoke-test
       // headless (recette-5-1-bis.js) ; en prod, joue une note de contrôle à t=now.
@@ -1862,6 +1951,9 @@ swing 62
     if ([1, 2, 3].indexOf(S.bass.density) === -1) S.bass.density = 2;         // 5.2
     if (['plat', 'mixte', 'contraste'].indexOf(S.bass.vel) === -1) S.bass.vel = 'mixte';
     S.bass.vary = !!S.bass.vary;
+    if (typeof S.bass.legato !== 'number' || !isFinite(S.bass.legato)) S.bass.legato = 0.5;   // 5.3-ter
+    S.bass.legato = Math.max(0, Math.min(1, S.bass.legato));
+    S.bass.space = S.bass.space !== false;                                                    // 5.3-ter
     $('bassOn').checked = !!S.bass.on;
     $('bassPattern').value = S.bass.pattern;
     $('bassProg').value = S.bass.prog;
@@ -1869,6 +1961,8 @@ swing 62
     $('bassDensity').value = String(S.bass.density);
     $('bassVel').value = S.bass.vel;
     $('bassVary').checked = !!S.bass.vary;
+    $('bassLegato').value = String(Math.round(S.bass.legato * 100));                          // 5.3-ter
+    $('bassSpace').checked = !!S.bass.space;                                                  // 5.3-ter
     bassUpdateChordLabel();                                                     // 5.3 : accord de tête au chargement
   }
 
@@ -6739,6 +6833,8 @@ swing 62
   $('bassDensity').addEventListener('change', e => { S.bass.density = +e.target.value; bassPersist(); });
   $('bassVel').addEventListener('change', e => { S.bass.vel = e.target.value; bassPersist(); });
   $('bassVary').addEventListener('change', e => { S.bass.vary = e.target.checked; bassPersist(); });
+  $('bassLegato').addEventListener('input', e => { S.bass.legato = (+e.target.value) / 100; bassPersist(); });   // 5.3-ter
+  $('bassSpace').addEventListener('change', e => { S.bass.space = e.target.checked; if (bassWet) bassWet.gain.value = S.bass.space ? BASS_WET : 0; bassPersist(); });   // 5.3-ter
 
   $('pulseFreq').addEventListener('input', e => {
     S.sound.pulseFreq = +e.target.value; $('pulseFreqVal').textContent = S.sound.pulseFreq + ' Hz';

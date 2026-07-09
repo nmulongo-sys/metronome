@@ -138,6 +138,46 @@ de partage.
 
 ## Journal de développement
 
+### 2026-07-10 — Passe 5 étape 5.3-ter : basse legato & respiration
+- **Curseur « détaché ↔ lié »** (`#bassLegato`, 0–100, défaut 50 ; `S.bass.legato` persisté) —
+  un seul geste pilote **deux** paramètres : les **durFill** des notes structurantes
+  (finger 0,90→1,10→1,30 · slap 0,82→1,05→1,28 · pop 0,80→1,05→1,30 ; à L ≳ 0,25 la queue
+  déborde sur l'attaque suivante = le liant) et le **release** (60 ms/×0,30 → 180 ms/×0,50 :
+  la note s'éteint au lieu de se couper). **L=0 = 5.3-bis strict** (continuité prouvée en
+  recette). **Ghost hors curseur** (0,35, toujours piqué) ; fracs et déterminisme intacts —
+  le curseur ne touche jamais le tirage.
+- **Corps soutenu** : le sweep de l'exciteur ne se referme plus pendant la tenue — descente
+  vers un **palier** (`floor + 0,35 × (ceil − floor)` à `dur×0,5`), maintien, fermeture vers
+  le plancher pendant le release seulement ; `bodyGain` 0,30 → 0,38 (ghost 0,22 → 0,28).
+  Cible : écart attaque→corps mesuré ~6 dB → ~3-4 dB.
+- **Bus basse** (créé au premier `bassVoice` — no-op strict si la basse reste coupée) :
+  voix → `bassBus` → **high-pass 35 Hz** (E1 = 41,2 Hz jamais touché, la boue sub-sonique
+  part) → chemin sec + **réverb courte** (`ConvolverNode`, impulsion générée : bruit ×
+  décroissance expo ~0,35 s, 2 canaux décorrélés, **wet 0,12**) → master. Case
+  **« Espace »** (`#bassSpace`, cochée par défaut, persistée) : décochée → wet 0.
+  Percussions jamais routées dans ce bus (netteté du métronome).
+- **Limiteur de bus master** (obligatoire — chevauchement + release + réverb s'additionnent,
+  +3 dBFS mesuré à 82 BPM) : `DynamicsCompressor` quasi-brickwall `masterGain → limiteur →
+  destination` — seuil −1,5 dB, knee 0, ratio 20:1, attaque 3 ms, release 120 ms. Pas de
+  sidechain (il casserait la référence rythmique). Défensif : si `createDynamicsCompressor`
+  ou `createConvolver` manquent (stubs headless), chemins directs — aucune recette antérieure
+  modifiée dans sa mécanique.
+- **Hook `fmMetroBass`** enrichi : `bus()` (limiteur, bassBus, HP, wet — diagnostic seul).
+  Estampille `metronomefunk-0.5.3-ter`.
+- **Recette** `recette-5-3-ter.js` **28/28** (stubs enrichis : AudioParam enregistreurs,
+  compressor/convolver présents, connexions tracées) : chevauchement au défaut, continuité
+  L=0, ghost constant aux trois positions, limiteur paramétré et câblé sans contournement,
+  HP 35 Hz, wet 0,12/0, routage exclusif de la voix dans le bus, non-régression fracs/
+  déterminisme/tempo/plancher, persistance, estampille. Non-régression : 5-1 (20), 5-1-bis
+  (21), 5-2 (23), 5-3 (38) **inchangées** ; `recette-5-3-bis` (15) : **2 retouches
+  documentées** — curseur legato ramené à 0 en tête (défensif, no-op sur un build -bis) car
+  ses dosages testés sont ceux de L=0, et estampille génériquée (`0.5.3-`), assertions
+  musicales intactes.
+- **À valider à l'oreille (HP de bureau)** : dose du liant au défaut, douceur du release,
+  présence du corps, discrétion de la traîne, absence de pompage du limiteur. Branche
+  `metronomefunk-0.5.3-ter` (depuis `metronomefunk-0.5.3-bis`).
+
+
 ### 2026-07-09 — Passe 5 étape 5.3-bis : corps / tenue de la basse (anti-staccato) + estampille de build
 - **Diagnostic mesuré** (enregistrement WAV de la basse isolée, 92 BPM) : la basse ne sature pas
   (crête −5,2 dBFS, zéro écrêtage — le +3 dBFS du mix venait des percussions), mais chaque note
@@ -394,5 +434,5 @@ de partage.
 
 - Spec d'abord, **une étape = une session**, fichier HTML complet. Aucune IA à l'exécution (moteur de règles
   embarqué). Grilles ouest-africaines encodées `uncertain` — à valider à l'oreille.
-- Specs/recettes : `metronome-passe5-basse-spec.md`, `metronome-passe4-spec.md`, `metronome-passe3-spec.md`, `metronome-passe3-etape{1..4}-recette.md`,
+- Specs/recettes : `metronome-passe5-5-3-ter-spec.md`, `metronome-passe5-basse-spec.md`, `metronome-passe4-spec.md`, `metronome-passe3-spec.md`, `metronome-passe3-etape{1..4}-recette.md`,
   `metronome-passe2-spec.md`, corpus `grooves-*.md` + `convert-grooves.py`.

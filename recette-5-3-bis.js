@@ -75,6 +75,9 @@ function durTempo(bpm) { const k = Math.max(0, Math.min(1, (bpm - 70) / 80)); re
 boot(() => {
   console.log('\n=== Recette 5.3-bis — corps / tenue de la basse ===\n');
   const B = window.fmMetroBass;
+  // 5.3-ter : le curseur « détaché ↔ lié » (absent en 5.3-bis) est ramené à 0 = état 5.3-bis
+  // strict, pour que les dosages testés ici restent la référence. Défensif : no-op en 5.3-bis.
+  if ($('bassLegato')) { $('bassLegato').value = '0'; fire('bassLegato', 'input'); }
 
   // --- 1. Durée finger calée sur le pas (≈ 0.90 × stepDur × facteur tempo, < stepDur) ------
   console.log('[1] Durée finger = fraction du pas (calée sur la subdivision)');
@@ -118,7 +121,7 @@ boot(() => {
   // --- 6. Estampille de build ------------------------------------------------------------
   console.log('\n[6] Estampille de build affichée');
   const bs = $('buildStamp');
-  ok(bs && /metronomefunk-0\.5\.3-bis/.test(bs.textContent), 'buildStamp renseigné : « ' + (bs ? bs.textContent : '(absent)') + ' »');
+  ok(bs && /metronomefunk-0\.5\.3-/.test(bs.textContent), 'buildStamp renseigné : « ' + (bs ? bs.textContent : '(absent)') + ' »');
 
   console.log('\n----------------------------------------');
   console.log('  ' + pass + ' réussis, ' + fail + ' échoués sur ' + (pass + fail));
