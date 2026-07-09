@@ -441,6 +441,7 @@
       <button class="btn-ghost" id="wizardBtn">✦ Assistant</button>
       <button class="btn-ghost" id="themeBtn">◐ Mode sombre</button>
       <button class="btn-ghost" id="btnAccount" title="Se connecter par lien magique">Se connecter</button>
+      <button class="btn-ghost" id="btnLang" title="English / Français" aria-label="Langue / Language">🇬🇧 EN</button>
     </div>
   </header>
 
@@ -7342,5 +7343,89 @@ swing 62
 })();
 </script>
 <!-- =================== FIN EXPORT AUDIO =================== -->
+
+<!-- ===================== i18n FR/EN (bascule par drapeau · POC) ===================== -->
+<script>
+/* ===== Bascule FR/EN : traduit par correspondance du texte source français.
+   __EN_DICT est complété par la traduction (Gemini) ; clé = texte FR normalisé. ===== */
+window.__EN_DICT = Object.assign({
+  "Métronome":"Metronome",
+  "Formation musicale · Groove & horloge interne":"Music training · Groove & internal clock",
+  "▶ Jouer":"▶ Play",
+  "Configurer":"Configure",
+  "✦ Assistant":"✦ Assistant",
+  "◐ Mode sombre":"◐ Dark mode",
+  "◐ Mode clair":"◐ Light mode",
+  "Se connecter":"Log in",
+  "Se connecter par lien magique":"Log in with a magic link",
+  "Ton compte":"Your account",
+  "Se déconnecter":"Log out",
+  "▶ Démarrer":"▶ Start",
+  "■ Arrêter":"■ Stop",
+  "Tap":"Tap",
+  "Temps / cycle":"Beats / bar",
+  "Subdivision":"Subdivision",
+  "Volume":"Volume",
+  "Accent 1er temps":"Accent on beat 1",
+  "Clic muet (couches seules)":"Muted click (layers only)",
+  "Prêt":"Ready",
+  "Export audio":"Audio export",
+  "Durée enregistrée de ce qui joue":"Recorded length of what's playing",
+  "Bibliothèque partagée":"Shared library",
+  "routines · Supabase":"routines · Supabase",
+  "Publier la routine":"Publish routine",
+  "Charger la bibliothèque":"Load library",
+  "Titre de la routine à publier":"Title of the routine to publish",
+  "Routine programmée":"Programmed routine",
+  "▶ Lancer la routine":"▶ Run routine",
+  "■ Arrêter la routine":"■ Stop routine",
+  "Espace : lecture · ↑↓ : tempo ±1 · T : tap tempo":"Space: play · ↑↓: tempo ±1 · T: tap tempo"
+}, window.__EN_DICT || {});
+(function(){
+  var EN = window.__EN_DICT;
+  function norm(s){ return (s||'').replace(/\s+/g,' ').trim(); }
+  function lang(){ try{ var q=new URLSearchParams(location.search).get('lang'); if(q) return q; return localStorage.getItem('fm-lang')||'fr'; }catch(e){ return 'fr'; } }
+  function trText(node){
+    var raw=node.nodeValue; if(!raw) return; var key=norm(raw); if(!key) return;
+    var en=EN[key]; if(en){ var lead=(raw.match(/^\s*/)||[''])[0], trail=(raw.match(/\s*$/)||[''])[0]; if(node.nodeValue!==lead+en+trail) node.nodeValue=lead+en+trail; }
+  }
+  function trEl(el){
+    if(!el || !el.getAttribute) return;
+    ['placeholder','title','aria-label'].forEach(function(a){ if(el.hasAttribute && el.hasAttribute(a)){ var en=EN[norm(el.getAttribute(a))]; if(en) el.setAttribute(a,en); } });
+  }
+  function walk(root){
+    try{
+      var w=document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null), n, ns=[];
+      while(n=w.nextNode()) ns.push(n); ns.forEach(trText);
+      if(root.querySelectorAll) root.querySelectorAll('[placeholder],[title],[aria-label]').forEach(trEl);
+      if(root.nodeType===1) trEl(root);
+    }catch(e){}
+  }
+  function enableEN(){
+    walk(document.body);
+    try{
+      var obs=new MutationObserver(function(muts){ muts.forEach(function(m){
+        if(m.type==='characterData'){ trText(m.target); return; }
+        m.addedNodes && m.addedNodes.forEach(function(nd){ if(nd.nodeType===3) trText(nd); else if(nd.nodeType===1) walk(nd); });
+      }); });
+      obs.observe(document.body,{childList:true,subtree:true,characterData:true});
+    }catch(e){}
+  }
+  function setBtn(){ var b=document.getElementById('btnLang'); if(b) b.textContent = (lang()==='en') ? '🇫🇷 FR' : '🇬🇧 EN'; }
+  function toggle(){
+    var next = (lang()==='en') ? 'fr' : 'en';
+    try{ localStorage.setItem('fm-lang', next); }catch(e){}
+    try{ var u=new URL(location.href); u.searchParams.delete('lang'); history.replaceState(null,'',u.toString()); }catch(e){}
+    location.reload();
+  }
+  function init(){
+    setBtn();
+    var b=document.getElementById('btnLang'); if(b && !b._wired){ b._wired=true; b.addEventListener('click', toggle); }
+    if(lang()==='en') enableEN();
+  }
+  if(document.readyState!=='loading') init(); else document.addEventListener('DOMContentLoaded', init);
+})();
+</script>
+<!-- =================== FIN i18n FR/EN =================== -->
 </body>
 </html>
