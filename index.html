@@ -901,8 +901,8 @@
         <label class="check"><input type="checkbox" id="bassVary"> Variations (jeu vivant)</label>
       </div>
       <div class="row">
-        <label for="bassLegato">Détaché ↔ lié</label>
-        <input type="range" id="bassLegato" min="0" max="100" value="50" style="flex:1;min-width:120px;">
+        <label for="bassLegato">Lié ↔ très lié</label>
+        <input type="range" id="bassLegato" min="0" max="100" value="25" style="flex:1;min-width:120px;">
         <label class="check" style="min-width:auto;"><input type="checkbox" id="bassSpace" checked> Espace (réverb courte)</label>
       </div>
       <div class="hint">Une voix de basse funk synthétisée qui accompagne le percussionniste — pour
@@ -1133,7 +1133,7 @@ swing 62
       density: 2,          // 1 allégé · 2 normal · 3 chargé (exploité en 5.2)
       vel: 'mixte',        // 'plat' | 'mixte' | 'contraste' (exploité en 5.2)
       vary: false,         // variations probabilistes (5.2) ; 5.1 reste déterministe
-      legato: 0.5,         // 5.3-ter : curseur « détaché ↔ lié » (0–1) — durées + release
+      legato: 0.25,        // 5.3c : curseur « lié ↔ très lié » (fraction 0–1 → L = 1+f) — durées + release
       space: true,         // 5.3-ter : réverb courte sur la basse seule (off/discret)
       swingFollow: true,   // 16es de la basse suivent S.swing (appliqué en 5.4)
       drop: { on: false, everyN: 4, lenBeats: 2 }   // drop-outs (5.4)
@@ -1143,7 +1143,7 @@ swing 62
 
   // Identité du build affichée dans l'en-tête (5.3-bis). Bumper à chaque passe : elle sert à
   // savoir de quel build vient un enregistrement de validation.
-  const BUILD = 'metronomefunk-0.5.3-ter', BUILD_DATE = '2026-07-10';
+  const BUILD = 'metronomefunk-0.5.3c', BUILD_DATE = '2026-07-10';
 
   let audioCtx = null, masterGain = null, noiseBuf = null;
   let masterLimiter = null;                                   // 5.3-ter : limiteur de bus master
@@ -1446,10 +1446,11 @@ swing 62
     const g = audioCtx.createGain();
     const pk  = Math.max(vol, 0.0002);                        // pic d'attaque
     const sus = Math.max(vol * 0.78, 0.0002);                 // niveau de tenue (corps)
-    // 5.3-ter : release piloté par le curseur « détaché ↔ lié » — de 60 ms/×0,30 (L=0,
-    // comportement 5.3-bis strict) à 180 ms/×0,50 (L=1) : la note s'éteint au lieu de se
-    // couper. Le ghost, court, est borné mécaniquement par sa durée — il reste piqué.
-    const L = Math.max(0, Math.min(1, S.bass.legato != null ? S.bass.legato : 0.5));
+    // 5.3-ter : release piloté par le curseur — la note s'éteint au lieu de se couper.
+    // 5.3c : fenêtre recalibrée d'après l'écoute (92 BPM) — l'ancien max (L=1) devient le
+    // plancher : L = 1 + fraction ∈ [1, 2], de 180 ms/×0,50 à 300 ms/×0,70 (210 ms/×0,55
+    // au défaut). Le ghost, court, est borné mécaniquement par sa durée — il reste piqué.
+    const L = 1 + Math.max(0, Math.min(1, S.bass.legato != null ? S.bass.legato : 0.25));
     const rel = Math.min(0.06 + 0.12 * L, dur * (0.30 + 0.20 * L));
     const dEnd = t + attack + Math.min(0.03, dur * 0.18);     // fin de la décroissance vers le sustain
     const hEnd = Math.max(dEnd + 0.005, t + dur - rel);       // fin de tenue (début du release)
@@ -1822,14 +1823,15 @@ swing 62
     // 5.3-bis : durée = fraction du PAS (plus de plafond absolu qui tronquait la note à ~15 ms
     // → staccato). finger/slap/pop TIENNENT la note (≈ 0.80–0.90 du pas, léger détaché) ; le
     // ghost reste piqué (0.35). L'adaptation tempo (§2.3) resserre encore à tempo rapide.
-    // 5.3-ter : le curseur « détaché ↔ lié » (S.bass.legato, 0–1) interpole la part du pas
-    // occupée par chaque note structurante. À L ≳ 0,25 le finger dépasse le pas : la queue
-    // déborde sur l'attaque suivante — le liant. Ghost JAMAIS affecté (reste piqué).
-    const Lg = Math.max(0, Math.min(1, S.bass.legato != null ? S.bass.legato : 0.5));
+    // 5.3-ter : le curseur legato (S.bass.legato, fraction 0–1) interpole la part du pas
+    // occupée par chaque note structurante ; la queue déborde sur l'attaque suivante — le
+    // liant. 5.3c : fenêtre recalibrée d'après l'écoute (92 BPM) — l'ancien max devient le
+    // plancher : Lg = 1 + fraction ∈ [1, 2]. Ghost JAMAIS affecté (reste piqué).
+    const Lg = 1 + Math.max(0, Math.min(1, S.bass.legato != null ? S.bass.legato : 0.25));
     const durFill = {
-      finger: 0.90 + 0.40 * Lg,    // 0,90 (détaché = 5.3-bis) → 1,10 (défaut) → 1,30 (lié)
-      slap:   0.82 + 0.46 * Lg,    // 0,82 → 1,05 → 1,28
-      pop:    0.80 + 0.50 * Lg,    // 0,80 → 1,05 → 1,30
+      finger: 0.90 + 0.40 * Lg,    // 1,30 (plancher = ancien max -ter) → 1,40 (défaut) → 1,70
+      slap:   0.82 + 0.46 * Lg,    // 1,28 → 1,395 → 1,74
+      pop:    0.80 + 0.50 * Lg,    // 1,30 → 1,425 → 1,80
       ghost:  0.35                 // hors legato — toujours piqué
     };
     const dens = S.bass.density, prof = S.bass.vel, vary = !!S.bass.vary;
@@ -1951,7 +1953,7 @@ swing 62
     if ([1, 2, 3].indexOf(S.bass.density) === -1) S.bass.density = 2;         // 5.2
     if (['plat', 'mixte', 'contraste'].indexOf(S.bass.vel) === -1) S.bass.vel = 'mixte';
     S.bass.vary = !!S.bass.vary;
-    if (typeof S.bass.legato !== 'number' || !isFinite(S.bass.legato)) S.bass.legato = 0.5;   // 5.3-ter
+    if (typeof S.bass.legato !== 'number' || !isFinite(S.bass.legato)) S.bass.legato = 0.25;  // 5.3c : défaut curseur 25 (L=1,25)
     S.bass.legato = Math.max(0, Math.min(1, S.bass.legato));
     S.bass.space = S.bass.space !== false;                                                    // 5.3-ter
     $('bassOn').checked = !!S.bass.on;
