@@ -317,6 +317,23 @@
   #percFsVoices .step.on, #percFsVoices .step.acc { color: var(--fm-accent-ink); }
   .percfs .step { font-size: 1.1rem; }
 
+  /* ---- cours funk (C1) ---- */
+  #fkFiche .step {
+    font-family: var(--fm-font-ui); font-size: .6rem; font-weight: 600;
+    color: var(--fm-sub); padding: 0; line-height: 1; cursor: default;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #fkFiche .step.on, #fkFiche .step.acc { color: var(--fm-accent-ink); }
+  .fk-liste { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; }
+  .fk-item { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .fk-item .fk-titre { flex: 1; min-width: 160px; }
+  .fk-badge { font-size: .78rem; color: var(--fm-sub); }
+  .fk-fiche h4 { margin: 12px 0 4px; }
+  .fk-objectif { font-size: .85rem; color: var(--fm-sub); margin: 4px 0 8px; }
+  .fk-vocal { font-size: 1rem; letter-spacing: .05em; margin: 6px 0; }
+  .fk-critere { font-size: .85rem; color: var(--fm-sub); margin: 6px 0; }
+  .fk-fiche .pv-label { min-width: 128px; }
+
   /* ---- percussion plein écran ---- */
   .percfs {
     position: fixed; inset: 0; background: var(--fm-bg);
@@ -816,6 +833,31 @@
     </div>
   </details>
 
+  <!-- 2 quater. Cours funk (C1) -->
+  <details class="section" id="secCours" data-strate="couche">
+    <summary><span class="sec-title">Cours funk</span><span class="sec-sub">cajón · djembé · exercices par niveau</span></summary>
+    <div class="section-body">
+      <div class="row">
+        <label>Parcours</label>
+        <select id="fkParcours" style="width:auto;">
+          <option value="cajon" selected>Cajón funk</option>
+          <option value="djembe">Djembé funk</option>
+        </select>
+        <label style="min-width:auto;">Niveau</label>
+        <select id="fkNiveau" style="width:auto;"></select>
+        <span style="flex:1;"></span>
+        <button class="btn-sm" id="fkUnloadBtn" title="Décharger l'exercice et revenir à la percussion focale">Décharger</button>
+      </div>
+      <div id="fkListe" class="fk-liste"></div>
+      <div id="fkFiche" class="fk-fiche hide"></div>
+      <div class="script-status" id="fkStatus"></div>
+      <div class="hint">Choisis un exercice : sa grille se charge dans le moteur (la percussion focale passe en
+      sourdine) et le tempo se règle sur le <b>tempo conseillé</b>. Travaille avec le métronome — le premier temps
+      accentué est ton <b>One</b> — puis marque « Réussi » : la progression reste sur cet appareil. Les prérequis
+      sont un conseil d'ordre, jamais un verrou.</div>
+    </div>
+  </details>
+
   <!-- 3. Archet -->
   <details class="section" id="secArchet" data-strate="archet">
     <summary><span class="sec-title">Archet</span><span class="sec-sub">tirer · pousser · dérive</span></summary>
@@ -1184,7 +1226,7 @@ swing 62
 
   // Identité du build affichée dans l'en-tête (5.3-bis). Bumper à chaque passe : elle sert à
   // savoir de quel build vient un enregistrement de validation.
-  const BUILD = 'metronomefunk-0.5.4', BUILD_DATE = '2026-07-10';
+  const BUILD = 'metronomefunk-0.5.4-c1', BUILD_DATE = '2026-07-10';
 
   let audioCtx = null, masterGain = null, noiseBuf = null;
   let masterLimiter = null;                                   // 5.3-ter : limiteur de bus master
@@ -1568,13 +1610,16 @@ swing 62
       return;
     }
     const kind = meta ? meta.voiceKind : voice;
-    const v = (accent === 2 ? 1.0 : 0.8) * 0.9;
+    // cours funk C1 : gain optionnel par voix (niveau ghost, spec impl §2.2) — absent = 1
+    const v = (accent === 2 ? 1.0 : 0.8) * 0.9 * ((meta && meta.gain) || 1);
     switch (instr + '.' + kind) {
       case 'djembe.basse':     percDrum(t, 95, 52, 0.30, v); break;
       case 'djembe.tone':      percDrum(t, 230, 165, 0.13, v * 0.85); break;
       case 'djembe.slap':      percSnap(t, 2400, 1.2, v); percDrum(t, 420, 300, 0.05, v * 0.25); break;
       case 'cajon.grave':      percDrum(t, 115, 68, 0.17, v); break;
       case 'cajon.aigu':       percSnap(t, 1700, 0.9, v); percSnap(t, 3400, 2, v * 0.5); break;
+      // cours funk C1 : tone du cajón (CJ-G2 vs slap CJ-G3, spec impl §2.4) — fût médium court
+      case 'cajon.tone':       percDrum(t, 190, 130, 0.10, v * 0.8); break;
       case 'dunduns.dundunba': percDrum(t, 72, 48, 0.42, v * 1.1); break;
       case 'dunduns.sangban':  percDrum(t, 112, 78, 0.30, v); break;
       case 'dunduns.kenkeni':  percDrum(t, 175, 132, 0.20, v * 0.8); break;
@@ -1601,6 +1646,8 @@ swing 62
         (percWork === 'all' || voice === percWork)) return true;
     // team spirit (passe 3 étape 4) : focal en sourdine + solo/mute par participant
     if (typeof tsMuted === 'function' && tsMuted(voice, brk)) return true;
+    // cours funk C1 : exercice chargé = focal en sourdine, voix fk.* audibles
+    if (typeof fkMuted === 'function' && fkMuted(voice, brk)) return true;
     return false;
   }
 
@@ -5453,6 +5500,8 @@ swing 62
   }
 
   function percOnNewMeasure() {
+    // cours funk C1 : compteur de cycles de l'exercice (cold path, précédent tsProgressBump)
+    if (typeof fkOnNewMeasure === 'function') fkOnNewMeasure();
     if (!S.perc.on) { percCallSilent = false; return; }
     // exercice
     if (S.perc.mode !== 'break') { percBreakActive = false; percBreakEchoNow = false; percBreakEchoPending = false; }
@@ -5609,6 +5658,8 @@ swing 62
     buildPercRowsInto($('percFsVoices'));
     // team spirit : ré-injecte les voix ts.* après toute reconstruction du jeu focal
     if (typeof tsSyncGrids === 'function') tsSyncGrids();
+    // cours funk C1 : ré-injecte les voix fk.* (même contrat que ts.*)
+    if (typeof fkSyncGrids === 'function') fkSyncGrids();
     refreshPercGrids();
   }
 
@@ -5635,7 +5686,10 @@ swing 62
   // (le focal est alors en sourdine), voix du focal sinon — clave dans les deux cas.
   function plVoiceList() {
     const def = PERC_INSTR[S.perc.instr];
-    const base = (typeof TS !== 'undefined' && TS.loaded)
+    // cours funk C1 : exercice chargé = ses voix sur la ligne de réduction / l'écran de jeu
+    const base = (typeof FK !== 'undefined' && FK.loaded)
+      ? fkVoiceList().map((v, k) => ({ id: v.id, label: v.label, color: 'var(--fm-voice-' + (k % 6 + 1) + ')' }))
+      : (typeof TS !== 'undefined' && TS.loaded)
       ? TS.voices.map((v, k) => ({ id: TS_PREFIX + v.gid, label: v.label, color: 'var(--fm-voice-' + (k % 6 + 1) + ')' }))
       : def.voices.map((v, k) => ({ id: v.id, label: v.label, color: 'var(--fm-voice-' + (k % 4 + 1) + ')' }));
     return base
@@ -6042,7 +6096,7 @@ swing 62
   const TS_PREFIX = 'ts.';
   // clés de routage audio réellement rendues par playPerc (§3.1)
   const TS_VALID = {
-    'djembe.basse':1,'djembe.tone':1,'djembe.slap':1,'cajon.grave':1,'cajon.aigu':1,
+    'djembe.basse':1,'djembe.tone':1,'djembe.slap':1,'cajon.grave':1,'cajon.aigu':1,'cajon.tone':1,
     'dunduns.dundunba':1,'dunduns.sangban':1,'dunduns.kenkeni':1,'dunduns.cloche':1,
     'agogo.grave':1,'agogo.aigu':1,'surdo.grave':1,'surdo.marcante':1,'recoreco.raclement':1
   };
@@ -6089,6 +6143,8 @@ swing 62
   function tsLoadGroove() {
     const g = GROOVES.find(x => x.id === $('tsGroove').value);
     if (!g) return;
+    // cours funk C1 : exclusion mutuelle — un seul propriétaire des voix invitées à la fois
+    if (typeof fkUnload === 'function') fkUnload();
     TS.grooveId = g.id; TS.loaded = true;
     // la famille (16 bin / 12 tern) suit le groove ; percSetInstr rebâtit le focal,
     // le hook tsSyncGrids ré-injecte nos voix juste après.
@@ -6638,6 +6694,261 @@ swing 62
     $('tsGroove').innerHTML = GROOVES.filter(g => g.family === fam)
       .map(g => '<option value="' + g.id + '">' + tsEsc(g.label) + '</option>').join('');
   }
+
+
+  // ============ COURS FUNK (spec cours-funk-spec-implementation.md — étape C1) ============
+  // Patron team spirit : les voix d'un exercice vivent dans percGrids/percOffsets/percMeta
+  // sous « fk.<geste> » ; trio de hooks gardés (fkSyncGrids / fkMuted / fkOnNewMeasure) —
+  // no-op tant qu'aucun exercice n'est chargé. Les seules touches moteur sont le gain par
+  // voix (playPerc), le timbre cajon.tone et les lignes gardées (spec impl §2.4).
+  const FK_PREFIX = 'fk.';
+  const FK_GHOST_GAIN = 0.35;   // niveau ghost (dyn de la voix, spec impl §2.2) — à valider à l'oreille
+
+  // table geste → routage timbre + affichage (spec impl §2.3). Sert le son en C1 et
+  // l'animation en C2 (zone/main). Seuls les gestes-VOIX y figurent : les gestes qualité
+  // (CJ-M4 dynamique, DJ-G5 rebond open, TR-*) sont pédagogiques, sans voix propre.
+  const FK_GESTES = {
+    'CJ-G1': { instr: 'cajon',  voiceKind: 'grave', label: 'Grave',  main: 'D',   zone: 'centre de la tapa' },
+    'CJ-G2': { instr: 'cajon',  voiceKind: 'tone',  label: 'Tone',   main: 'D',   zone: 'bord supérieur, doigts joints' },
+    'CJ-G3': { instr: 'cajon',  voiceKind: 'aigu',  label: 'Slap',   main: 'G',   zone: 'arête supérieure' },
+    'CJ-M1': { instr: 'cajon',  voiceKind: 'tone',  label: 'Ghost',  main: 'alt', zone: 'bord, effleurement' },
+    'DJ-G1': { instr: 'djembe', voiceKind: 'basse', label: 'Bass',   main: 'D',   zone: 'centre de la peau' },
+    'DJ-G2': { instr: 'djembe', voiceKind: 'tone',  label: 'Tone',   main: 'alt', zone: 'bord, doigts joints' },
+    'DJ-G3': { instr: 'djembe', voiceKind: 'slap',  label: 'Slap',   main: 'G',   zone: 'bord, doigts ouverts' },
+    'DJ-M1': { instr: 'djembe', voiceKind: 'tone',  label: 'Touche', main: 'alt', zone: 'bord, effleurement' }
+  };
+
+  /* Données : copie embarquée de cours-funk-exercices-debutant.json (lot 1, 2026-07-10) —
+     le fichier JSON du dépôt reste la SOURCE DE VÉRITÉ éditoriale (spec impl §1.3) ; l'app
+     ne fetch jamais (offline). Régénérer cette constante à chaque lot, ne pas éditer ici. */
+  const FUNK_EXOS = [
+  {"id":"CAJ-1-E1-01","parcours":"cajon","niveauOrigine":1,"niveau":1,"schema":"E1","titre":"Le One au grave","objectif":"Ancrer le 1er temps comme référence d'organisation : un seul grave par mesure, posé exactement sur le One, corps détendu.","gestes":["CJ-G1"],"principes":["FUNK-T1"],"prerequis":[],"pattern":{"voix":[{"geste":"CJ-G1","grille16":"1000000000000000","dyn":"F"}],"mesures":2,"swing":null,"gap":null},"tempo":{"min":60,"conseille":80,"max":96},"critere":"8 cycles consécutifs sans dériver : le grave tombe avec le clic du One, son plein, main relâchée après la frappe.","vocalisation":{"systeme":"syllabique","defaut":"UN deux trois quatre"},"feel":null},
+  {"id":"CAJ-1-E1-02","parcours":"cajon","niveauOrigine":1,"niveau":1,"schema":"E1","titre":"Le One dans la pulsation","objectif":"Hiérarchiser la mesure : grave sur le One, tone discret sur 2, 3 et 4 — le premier temps doit ressortir sans forcer.","gestes":["CJ-G1","CJ-G2","CJ-M4"],"principes":["FUNK-T1"],"prerequis":["CAJ-1-E1-01"],"pattern":{"voix":[{"geste":"CJ-G1","grille16":"1000000000000000","dyn":"F"},{"geste":"CJ-G2","grille16":"0000100010001000","dyn":"mf"}],"mesures":2,"swing":null,"gap":null},"tempo":{"min":60,"conseille":80,"max":96},"critere":"La hiérarchie est audible les yeux fermés : on entend où est le One sans compter. 8 cycles stables.","vocalisation":{"systeme":"syllabique","defaut":"UN deux trois quatre"},"feel":null},
+  {"id":"CAJ-1-E2-01","parcours":"cajon","niveauOrigine":1,"niveau":1,"schema":"E2","titre":"Slap sur 2 et 4","objectif":"Isoler le backbeat : slap « catapulte » tranchant sur les temps 2 et 4, rien d'autre — le métronome tient les temps 1 et 3.","gestes":["CJ-G3"],"principes":["FUNK-B1"],"prerequis":["CAJ-1-E1-01"],"pattern":{"voix":[{"geste":"CJ-G3","grille16":"0000100000001000","dyn":"F"}],"mesures":2,"swing":null,"gap":null},"tempo":{"min":66,"conseille":88,"max":104},"critere":"8 cycles : chaque slap claque net (attaque + buzz timbre), régulier, sans lever l'épaule ni crisper le poignet.","vocalisation":{"systeme":"syllabique","defaut":"un DEUX trois QUATRE"},"feel":null},
+  {"id":"CAJ-1-E2-02","parcours":"cajon","niveauOrigine":1,"niveau":1,"schema":"E2","titre":"Kick-snare : grave 1-3, slap 2-4","objectif":"Le squelette funk transposé (grave = grosse caisse, slap = caisse claire) : alterner grave et slap avec un contraste maximal entre les deux sons.","gestes":["CJ-G1","CJ-G3","CJ-M4"],"principes":["FUNK-T1","FUNK-B1"],"prerequis":["CAJ-1-E2-01"],"pattern":{"voix":[{"geste":"CJ-G1","grille16":"1000000010000000","dyn":"F"},{"geste":"CJ-G3","grille16":"0000100000001000","dyn":"F"}],"mesures":2,"swing":null,"gap":null},"tempo":{"min":66,"conseille":88,"max":108},"critere":"8 cycles : grave rond et slap claquant clairement distincts (jamais deux sons moyens), tempo stable du début à la fin.","vocalisation":{"systeme":"syllabique","defaut":"fun KY drum MER"},"feel":null},
+  {"id":"CAJ-1-E3-01","parcours":"cajon","niveauOrigine":1,"niveau":1,"schema":"E3","titre":"Nappe de ghosts en croches","objectif":"Installer le toucher ghost : croches continues en effleurement, mains alternées D-G, aucune note qui ressort. C'est le futur « charley » du groove.","gestes":["CJ-M1","CJ-M4"],"principes":["FUNK-T2"],"prerequis":["CAJ-1-E1-01"],"pattern":{"voix":[{"geste":"CJ-M1","grille16":"1010101010101010","dyn":"ghost"}],"mesures":2,"swing":null,"gap":null},"tempo":{"min":60,"conseille":84,"max":100},"critere":"4 cycles : volume constant et très faible (on doit encore entendre le métronome par-dessus), régularité parfaite, poignets souples.","vocalisation":{"systeme":"syllabique","defaut":"ti-ka ti-ka ti-ka ti-ka"},"feel":null},
+  {"id":"CAJ-1-E3-02","parcours":"cajon","niveauOrigine":1,"niveau":1,"schema":"E3","titre":"Nappe en doubles-croches — la grille « sans repos »","objectif":"La grille de doubles-croches complète (16 pas), mains alternées, tout en ghost : sentir la mesure comme une nappe continue subdivisée.","gestes":["CJ-M1","CJ-M4"],"principes":["FUNK-T2"],"prerequis":["CAJ-1-E3-01"],"pattern":{"voix":[{"geste":"CJ-M1","grille16":"1111111111111111","dyn":"ghost"}],"mesures":2,"swing":null,"gap":null},"tempo":{"min":56,"conseille":72,"max":88},"critere":"4 cycles sans crispation ni fatigue (TR-2) : régularité des 16 pas, volume plancher constant, respiration normale.","vocalisation":{"systeme":"syllabique","defaut":"ta-ka-di-mi ta-ka-di-mi ta-ka-di-mi ta-ka-di-mi"},"feel":null},
+  {"id":"CAJ-1-E4-01","parcours":"cajon","niveauOrigine":1,"niveau":1,"schema":"E4","titre":"Groove socle funk","objectif":"Assembler les trois couches : grave sur 1 et 3, slap sur 2 et 4, ghosts sur les « et » — le premier vrai groove funk du parcours.","gestes":["CJ-G1","CJ-G3","CJ-M1","CJ-M4"],"principes":["FUNK-T1","FUNK-B1","FUNK-T2"],"prerequis":["CAJ-1-E2-02","CAJ-1-E3-01"],"pattern":{"voix":[{"geste":"CJ-G1","grille16":"1000000010000000","dyn":"F"},{"geste":"CJ-G3","grille16":"0000100000001000","dyn":"F"},{"geste":"CJ-M1","grille16":"0010001000100010","dyn":"ghost"}],"mesures":2,"swing":null,"gap":null},"tempo":{"min":66,"conseille":88,"max":104},"critere":"4 cycles : backbeat net, ghosts audibles mais jamais confondus avec les accents, aucune couche ne dérive.","vocalisation":{"systeme":"syllabique","defaut":"fun KY drum MER"},"feel":null},
+  {"id":"CAJ-1-E4-02","parcours":"cajon","niveauOrigine":1,"niveau":1,"schema":"E4","titre":"Groove socle + tone sur le « et » de 4","objectif":"Le même socle, avec un tone qui remplace le dernier ghost : la petite relance qui ramène vers le One sans précipiter.","gestes":["CJ-G1","CJ-G2","CJ-G3","CJ-M1","CJ-M4"],"principes":["FUNK-T1","FUNK-B1","FUNK-T2"],"prerequis":["CAJ-1-E4-01"],"pattern":{"voix":[{"geste":"CJ-G1","grille16":"1000000010000000","dyn":"F"},{"geste":"CJ-G3","grille16":"0000100000001000","dyn":"F"},{"geste":"CJ-M1","grille16":"0010001000100000","dyn":"ghost"},{"geste":"CJ-G2","grille16":"0000000000000010","dyn":"mf"}],"mesures":2,"swing":null,"gap":null},"tempo":{"min":66,"conseille":88,"max":104},"critere":"4 cycles : le tone du « et » de 4 relance vers le One sans accélérer — le One suivant tombe exactement avec le clic.","vocalisation":{"systeme":"syllabique","defaut":"fun KY drum MER"},"feel":null},
+  {"id":"DJE-1-F1-01","parcours":"djembe","niveauOrigine":1,"niveau":1,"schema":"F1","titre":"Le One à la basse","objectif":"Ancrer le One : une seule basse par mesure au centre de la peau, rebond « open » (la main quitte la peau, le son dure), corps détendu.","gestes":["DJ-G1","DJ-G5"],"principes":["FUNK-T1"],"prerequis":[],"pattern":{"voix":[{"geste":"DJ-G1","grille16":"1000000000000000","dyn":"F"}],"mesures":2,"swing":null,"gap":null},"tempo":{"min":60,"conseille":80,"max":96},"critere":"8 cycles sans dériver : basse ronde et résonante (jamais étouffée), posée avec le clic du One, épaules basses.","vocalisation":{"systeme":"gun-go-pa","defaut":"GUN – – –"},"feel":null},
+  {"id":"DJE-1-F1-02","parcours":"djembe","niveauOrigine":1,"niveau":1,"schema":"F1","titre":"Le One dans la pulsation","objectif":"Hiérarchiser : basse sur le One, touches ghost sur 2, 3 et 4 — le premier temps ressort, le reste respire à peine.","gestes":["DJ-G1","DJ-G5","DJ-M1"],"principes":["FUNK-T1"],"prerequis":["DJE-1-F1-01"],"pattern":{"voix":[{"geste":"DJ-G1","grille16":"1000000000000000","dyn":"F"},{"geste":"DJ-M1","grille16":"0000100010001000","dyn":"ghost"}],"mesures":2,"swing":null,"gap":null},"tempo":{"min":60,"conseille":80,"max":96},"critere":"La hiérarchie est audible les yeux fermés : le One se repère sans compter. 8 cycles stables.","vocalisation":{"systeme":"gun-go-pa","defaut":"GUN ti ti ti"},"feel":null},
+  {"id":"DJE-1-F2-01","parcours":"djembe","niveauOrigine":1,"niveau":1,"schema":"F2","titre":"Tone sur 2 et 4","objectif":"Isoler le backbeat au tone : doigts joints au bord, main droite sur 2, main gauche sur 4 — deux sons identiques.","gestes":["DJ-G2","DJ-G5"],"principes":["FUNK-B1"],"prerequis":["DJE-1-F1-01"],"pattern":{"voix":[{"geste":"DJ-G2","grille16":"0000100000001000","dyn":"F"}],"mesures":2,"swing":null,"gap":null},"tempo":{"min":66,"conseille":88,"max":104},"critere":"8 cycles : tone plein et clair, timbre identique main droite / main gauche, régularité parfaite.","vocalisation":{"systeme":"gun-go-pa","defaut":"– GO – DO"},"feel":null},
+  {"id":"DJE-1-F2-02","parcours":"djembe","niveauOrigine":1,"niveau":1,"schema":"F2","titre":"Bass-slap : le backbeat funk","objectif":"Le squelette funk à la voix djembé : basse sur 1 et 3, slap sur 2 et 4 — contraste maximal entre le rond et le claquant.","gestes":["DJ-G1","DJ-G3","DJ-G5"],"principes":["FUNK-T1","FUNK-B1"],"prerequis":["DJE-1-F2-01"],"pattern":{"voix":[{"geste":"DJ-G1","grille16":"1000000010000000","dyn":"F"},{"geste":"DJ-G3","grille16":"0000100000001000","dyn":"F"}],"mesures":2,"swing":null,"gap":null},"tempo":{"min":66,"conseille":88,"max":108},"critere":"8 cycles : basse ronde, slap qui claque (doigts relâchés, fouetté du poignet), jamais deux sons moyens, tempo stable.","vocalisation":{"systeme":"gun-go-pa","defaut":"GUN PA GUN PA"},"feel":null},
+  {"id":"DJE-1-F3-01","parcours":"djembe","niveauOrigine":1,"niveau":1,"schema":"F3","titre":"Nappe de touches en croches","objectif":"Installer le toucher ghost : croches continues en effleurement au bord, mains alternées D-G, aucune note qui ressort.","gestes":["DJ-M1","DJ-G5"],"principes":["FUNK-T2"],"prerequis":["DJE-1-F1-01"],"pattern":{"voix":[{"geste":"DJ-M1","grille16":"1010101010101010","dyn":"ghost"}],"mesures":2,"swing":null,"gap":null},"tempo":{"min":60,"conseille":84,"max":100},"critere":"4 cycles : volume constant très faible (le métronome reste audible par-dessus), régularité parfaite, poignets souples.","vocalisation":{"systeme":"gun-go-pa","defaut":"ti-gi ti-gi ti-gi ti-gi"},"feel":null},
+  {"id":"DJE-1-F3-02","parcours":"djembe","niveauOrigine":1,"niveau":1,"schema":"F3","titre":"Nappe en doubles-croches — la grille « sans repos »","objectif":"La grille de doubles-croches complète, mains alternées, tout en touches : sentir la mesure comme une trame continue.","gestes":["DJ-M1","DJ-G5"],"principes":["FUNK-T2"],"prerequis":["DJE-1-F3-01"],"pattern":{"voix":[{"geste":"DJ-M1","grille16":"1111111111111111","dyn":"ghost"}],"mesures":2,"swing":null,"gap":null},"tempo":{"min":56,"conseille":72,"max":88},"critere":"4 cycles sans crispation ni fatigue (TR-2) : régularité des 16 pas, volume plancher constant, respiration normale.","vocalisation":{"systeme":"gun-go-pa","defaut":"ti-gi-ti-gi ti-gi-ti-gi ti-gi-ti-gi ti-gi-ti-gi"},"feel":null},
+  {"id":"DJE-1-F4-01","parcours":"djembe","niveauOrigine":1,"niveau":1,"schema":"F4","titre":"Groove socle funk Gun-Go-Pa","objectif":"Assembler les trois couches : basse sur 1 et 3, slap sur 2 et 4, touches sur les « et » — le premier groove funk du parcours, à la voix djembé.","gestes":["DJ-G1","DJ-G3","DJ-M1","DJ-G5"],"principes":["FUNK-T1","FUNK-B1","FUNK-T2"],"prerequis":["DJE-1-F2-02","DJE-1-F3-01"],"pattern":{"voix":[{"geste":"DJ-G1","grille16":"1000000010000000","dyn":"F"},{"geste":"DJ-G3","grille16":"0000100000001000","dyn":"F"},{"geste":"DJ-M1","grille16":"0010001000100010","dyn":"ghost"}],"mesures":2,"swing":null,"gap":null},"tempo":{"min":66,"conseille":88,"max":104},"critere":"4 cycles : backbeat net, touches jamais confondues avec les accents, aucune couche ne dérive.","vocalisation":{"systeme":"gun-go-pa","defaut":"GUN PA GUN PA"},"feel":null},
+  {"id":"DJE-1-F4-02","parcours":"djembe","niveauOrigine":1,"niveau":1,"schema":"F4","titre":"Groove socle + tone sur le « et » de 4","objectif":"Le même socle, avec un tone qui remplace la dernière touche : la relance qui ramène vers le One sans précipiter.","gestes":["DJ-G1","DJ-G2","DJ-G3","DJ-M1","DJ-G5"],"principes":["FUNK-T1","FUNK-B1","FUNK-T2"],"prerequis":["DJE-1-F4-01"],"pattern":{"voix":[{"geste":"DJ-G1","grille16":"1000000010000000","dyn":"F"},{"geste":"DJ-G3","grille16":"0000100000001000","dyn":"F"},{"geste":"DJ-M1","grille16":"0010001000100000","dyn":"ghost"},{"geste":"DJ-G2","grille16":"0000000000000010","dyn":"mf"}],"mesures":2,"swing":null,"gap":null},"tempo":{"min":66,"conseille":88,"max":104},"critere":"4 cycles : le tone du « et » de 4 relance vers le One sans accélérer — le One suivant tombe exactement avec le clic.","vocalisation":{"systeme":"gun-go-pa","defaut":"GUN PA GUN PA"},"feel":null}
+  ];
+
+  const FK = { loaded: false, exoId: '', saved: null };
+
+  function fkExo(id) { return FUNK_EXOS.find(e => e.id === id); }
+  function fkProgress() {
+    try { return JSON.parse(store.get('fm-funk-progress') || '{}'); } catch (e) { return {}; }
+  }
+
+  // grille16 « 0/1 » → pas moteur : la dynamique de la voix porte la valeur (F = accent 2)
+  function fkGridFor(voix) {
+    const on = voix.dyn === 'F' ? 2 : 1;
+    return Array.from(voix.grille16, c => (c === '1' ? on : 0));
+  }
+  // swing → percOffsets des pas impairs, même formule que la basse 5.4 (spec impl §2.5) ;
+  // null ou 50 = binaire strict (tout le lot 1)
+  function fkOffsetsFor(exo, len) {
+    const offs = new Array(len).fill(0);
+    const sw = exo.pattern.swing;
+    if (sw && sw !== 50) { const d = 2 * sw / 100 - 1; for (let i = 1; i < len; i += 2) offs[i] = d; }
+    return offs;
+  }
+  // liste des voix de l'exercice chargé (consommée par plVoiceList — ligne de jeu)
+  function fkVoiceList() {
+    const e = FK.loaded ? fkExo(FK.exoId) : null;
+    if (!e) return [];
+    return e.pattern.voix
+      .filter(v => FK_GESTES[v.geste])
+      .map(v => ({ id: FK_PREFIX + v.geste, label: FK_GESTES[v.geste].label + ' (' + v.geste + ')' }));
+  }
+
+  // écrit (ou retire) les voix fk.* dans l'état moteur — même contrat que tsSyncGrids
+  function fkSyncGrids() {
+    for (const vid in percGrids) if (vid.indexOf(FK_PREFIX) === 0) {
+      delete percGrids[vid]; delete percOffsets[vid]; delete percMeta[vid]; delete percMuted[vid];
+    }
+    if (!FK.loaded) return;
+    const e = fkExo(FK.exoId);
+    if (!e) return;
+    e.pattern.voix.forEach(v => {
+      const g = FK_GESTES[v.geste];
+      if (!g) return;
+      const id = FK_PREFIX + v.geste;
+      percGrids[id] = fkGridFor(v);
+      percOffsets[id] = fkOffsetsFor(e, percGrids[id].length);
+      percMeta[id] = { instr: g.instr, voiceKind: g.voiceKind,
+                       gain: v.dyn === 'ghost' ? FK_GHOST_GAIN : 1 };
+    });
+  }
+  // mute métier : exercice chargé = focal (et breaks du focal) en sourdine, clave intacte
+  function fkMuted(voice, brk) {
+    if (!FK.loaded) return false;
+    if (claveData[voice]) return false;
+    return voice.indexOf(FK_PREFIX) !== 0;
+  }
+  // compteur de cycles (cold path — une fois par mesure, via percOnNewMeasure)
+  function fkOnNewMeasure() {
+    if (!FK.loaded) return;
+    const el = $('fkCycle');
+    const e = fkExo(FK.exoId);
+    if (!el || !e) return;
+    const mes = e.pattern.mesures || 1;
+    el.textContent = 'Cycle ' + Math.max(1, Math.ceil(measureCount / mes)) +
+      ' · mesure ' + (((Math.max(1, measureCount) - 1) % mes) + 1) + '/' + mes;
+  }
+
+  function fkLoad(id) {
+    const e = fkExo(id);
+    if (!e) return;
+    if (typeof TS !== 'undefined' && TS.loaded) tsUnload();   // exclusion mutuelle (spec impl §2.1)
+    if (!FK.loaded) FK.saved = { tempo: S.tempo, gap: Object.assign({}, S.gap) };
+    FK.loaded = true; FK.exoId = id;
+    if (S.perc.count !== 16) setFamily('bin');   // tout le cours est binaire (spec impl §2.7)
+    S.perc.on = true; $('percOn').checked = true;
+    setTempo(e.tempo.conseille);
+    // gap prescrit (schémas E9/F9, spec impl §2.6) — null : la machine reste à l'utilisateur
+    if (e.pattern.gap) { Object.assign(S.gap, e.pattern.gap); fkGapUiSync(); resetGap(); }
+    fkSyncGrids();
+    refreshPercGrids();
+    fkRenderListe();
+    fkRenderFiche(e);
+    $('fkStatus').textContent = 'Exercice « ' + e.titre + ' » chargé — percussion focale en sourdine, tempo ' +
+      e.tempo.conseille + '. « Décharger » pour revenir.';
+    if (!isPlaying) drawStatic();
+  }
+  function fkUnload() {
+    if (!FK.loaded) return;
+    FK.loaded = false; FK.exoId = '';
+    fkSyncGrids();
+    if (FK.saved) {
+      setTempo(FK.saved.tempo);
+      Object.assign(S.gap, FK.saved.gap); fkGapUiSync(); resetGap();
+      FK.saved = null;
+    }
+    refreshPercGrids();
+    fkRenderListe();
+    $('fkFiche').classList.add('hide'); $('fkFiche').innerHTML = '';
+    $('fkStatus').textContent = 'Exercice déchargé — retour à la percussion focale.';
+    if (!isPlaying) drawStatic();
+  }
+  function fkGapUiSync() {
+    $('gapMode').value = S.gap.mode;
+    if ($('gapTarget').querySelector('option[value="' + S.gap.target + '"]')) $('gapTarget').value = S.gap.target;
+    $('gapPlay').value = String(S.gap.playN); $('gapMute').value = String(S.gap.muteM);
+    $('gapProb').value = String(S.gap.prob); $('gapProbVal').textContent = S.gap.prob + ' %';
+  }
+  function fkMarkDone() {
+    if (!FK.loaded) return;
+    const all = fkProgress();
+    all[FK.exoId] = { fait: true, date: new Date().toISOString().slice(0, 10) };
+    store.set('fm-funk-progress', JSON.stringify(all));
+    fkRenderListe();
+    const e = fkExo(FK.exoId);
+    if (e) fkRenderFiche(e);
+    $('fkStatus').textContent = 'Bravo — « ' + (e ? e.titre : FK.exoId) + ' » marqué réussi (mémorisé sur cet appareil).';
+  }
+
+  // ---- rendu : niveaux, liste, fiche ----
+  function fkNiveauRefresh() {
+    const parc = $('fkParcours').value;
+    const opts = [1, 2, 3, 4].map(n => {
+      const nb = FUNK_EXOS.filter(e => e.parcours === parc && e.niveau === n).length;
+      const lab = ['Débutant', 'Intermédiaire', 'Avancé', 'Artiste'][n - 1];
+      return '<option value="' + n + '"' + (nb ? '' : ' disabled') + '>' + n + ' — ' + lab +
+        (nb ? ' (' + nb + ')' : ' (à venir)') + '</option>';
+    }).join('');
+    $('fkNiveau').innerHTML = opts;
+  }
+  function fkRenderListe() {
+    const parc = $('fkParcours').value, niv = +$('fkNiveau').value || 1;
+    const prog = fkProgress();
+    const list = FUNK_EXOS.filter(e => e.parcours === parc && e.niveau === niv);
+    $('fkListe').innerHTML = list.map(e => {
+      const fait = prog[e.id] && prog[e.id].fait;
+      const cur = FK.loaded && FK.exoId === e.id;
+      return '<div class="fk-item">' +
+        '<span class="fk-badge">' + (cur ? '▶' : (fait ? '✓' : '·')) + '</span>' +
+        '<span class="fk-titre">' + tsEsc(e.titre) +
+        ' <span class="fk-badge">' + tsEsc(e.schema) +
+        (e.niveauOrigine !== e.niveau ? ' · promu' : '') + '</span></span>' +
+        '<button class="btn-sm' + (cur ? '' : ' primary') + '" data-fkexo="' + tsEsc(e.id) + '">' +
+        (cur ? 'Rejouer' : 'Travailler') + '</button></div>';
+    }).join('') || '<div class="hint">Pas encore d\'exercices à ce niveau pour ce parcours.</div>';
+    $('fkListe').querySelectorAll('[data-fkexo]').forEach(b =>
+      b.addEventListener('click', () => fkLoad(b.dataset.fkexo)));
+  }
+  function fkRenderFiche(e) {
+    const prog = fkProgress();
+    const manque = (e.prerequis || []).filter(p => !(prog[p] && prog[p].fait))
+      .map(p => (fkExo(p) || { titre: p }).titre);
+    const rows = e.pattern.voix.map(v => {
+      const g = FK_GESTES[v.geste] || { label: v.geste };
+      const grid = fkGridFor(v);
+      const hands = percHandsFor(grid);
+      const cells = grid.map((val, i) =>
+        '<span class="step' + (val === 1 ? ' on' : val === 2 ? ' acc' : '') +
+        (percIsOnBeat(i) ? ' beatmark' : '') + '">' + (val > 0 ? hands[i] : '') + '</span>').join('');
+      return '<div class="perc-voice"><span class="pv-label">' + tsEsc(g.label) +
+        ' <span class="fk-badge">' + tsEsc(v.geste) + ' · ' + tsEsc(v.dyn) + '</span></span>' +
+        '<div class="steps mini">' + cells + '</div></div>';
+    }).join('');
+    const voc = e.vocalisation
+      ? '<div class="fk-vocal" title="Vocalisation par défaut (' + tsEsc(e.vocalisation.systeme) + ')">🗣 ' +
+        tsEsc(e.vocalisation.defaut) + '</div>'
+      : '';
+    $('fkFiche').innerHTML =
+      '<h4>' + tsEsc(e.titre) + ' <span class="fk-badge">' + tsEsc(e.id) + '</span></h4>' +
+      '<div class="fk-objectif">' + tsEsc(e.objectif) + '</div>' +
+      rows + voc +
+      '<div class="row" style="margin:8px 0;">' +
+        '<label style="min-width:auto;">Tempo</label>' +
+        '<button class="btn-sm" id="fkTempoBtn" title="Recaler sur le tempo conseillé">♩ ' + e.tempo.conseille + ' conseillé</button>' +
+        '<span class="fk-badge">plage ' + e.tempo.min + '–' + e.tempo.max + '</span>' +
+        '<span style="flex:1;"></span>' +
+        '<button class="btn-sm" id="fkPlayBtn">▶ / ■</button>' +
+        '<span class="fk-badge" id="fkCycle"></span>' +
+      '</div>' +
+      '<div class="fk-critere"><b>Critère :</b> ' + tsEsc(e.critere) + '</div>' +
+      (manque.length ? '<div class="hint" style="margin:6px 0;">Conseillé avant : ' +
+        manque.map(tsEsc).join(' · ') + '</div>' : '') +
+      '<div class="row" style="margin-top:8px;">' +
+        '<button class="btn-sm primary" id="fkDoneBtn">✓ Réussi</button>' +
+        '<span class="fk-badge">' + (prog[e.id] && prog[e.id].fait ? 'déjà réussi le ' + tsEsc(prog[e.id].date || '') : '') + '</span>' +
+      '</div>';
+    $('fkFiche').classList.remove('hide');
+    $('fkTempoBtn').addEventListener('click', () => { setTempo(e.tempo.conseille); });
+    $('fkPlayBtn').addEventListener('click', () => $('startBtn').click());
+    $('fkDoneBtn').addEventListener('click', fkMarkDone);
+  }
+
+  // ---- événements & init de la section ----
+  $('fkParcours').addEventListener('change', () => { fkNiveauRefresh(); fkRenderListe(); });
+  $('fkNiveau').addEventListener('change', fkRenderListe);
+  $('fkUnloadBtn').addEventListener('click', fkUnload);
+  fkNiveauRefresh();
+  fkRenderListe();
+
+  // diagnostic headless (précédent fmMetroBass) — recette-cours-1.js
+  window.fmFunk = function () {
+    return {
+      exos: FUNK_EXOS, gestes: FK_GESTES, state: FK,
+      load: fkLoad, unload: fkUnload, markDone: fkMarkDone,
+      grids: function () { return percGrids; },
+      offsets: function () { return percOffsets; },
+      meta: function () { return percMeta; },
+      muted: function (v, brk) { return percLayerMuted('perc', v, !!brk); },
+      gridFor: fkGridFor, offsetsFor: fkOffsetsFor,
+      progress: fkProgress, onNewMeasure: fkOnNewMeasure,
+      play: function (voice, accent) { ensureCtx(); playPerc(0, voice, accent); }
+    };
+  };
 
   // ============ ÉCRAN DE JEU (passe 4, étape 4.1) ============
   // Le mode simple recomposé : l'écran répond à « qui je suis » puis montre MA ligne

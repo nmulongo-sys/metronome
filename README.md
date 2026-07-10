@@ -139,6 +139,33 @@ de partage.
 
 ## Journal de développement
 
+### 2026-07-10 — Cours funk étape C1 : chargeur d'exercice & fiche (build 0.5.4-c1)
+- **Section « Cours funk »** (`#secCours`, strate couche) : parcours cajón/djembé × niveau → liste
+  d'exercices → fiche de travail. Consomme le **lot 1** (16 exercices Débutant) embarqué en
+  `const FUNK_EXOS` depuis `cours-funk-exercices-debutant.json` (source de vérité éditoriale ; l'app
+  ne fetch jamais). Spec : `cours-funk-spec-implementation.md` (§1 livraison en section, §2 mapping).
+- **Chargeur `pattern` → moteur** : patron team spirit, namespace `fk.<geste>`. Une voix par geste dans
+  `percGrids`/`percOffsets`/`percMeta` ; trio de hooks gardés `fkSyncGrids` / `fkMuted` / `fkOnNewMeasure`
+  (ré-injection après reconstruction focale, sourdine du focal, comptage de cycles) — **no-op tant qu'aucun
+  exercice n'est chargé**, non-régression par construction. Exclusion mutuelle avec le répertoire team spirit.
+- **Dynamiques** : `grille16` → pas moteur, `F` = accent (2), `mf`/`ghost` = pas normal (1) ; le niveau
+  **ghost** est porté par `percMeta.gain` (0,35, une ligne dans `playPerc`). **Seule extension de timbre :
+  `cajon.tone`** (fût médium court, distinct du slap `cajon.aigu`) — le lot 1 oppose tone (CJ-G2) et slap
+  (CJ-G3) dans un même exercice. Total des touches moteur : gain + `cajon.tone` + 3 lignes gardées.
+- **Swing** : `pattern.swing` → `percOffsets` des pas impairs, formule 5.4 `2·sw/100−1` ; lot 1 binaire strict
+  (offsets nuls). **Tempo** : `S.tempo = tempo.conseille` au chargement, plage min–max affichée (jamais
+  bornante) ; réglages tempo/gap utilisateur **sauvegardés puis restaurés** au déchargement. **Gap** : recopié
+  dans `S.gap` seulement si le schéma le prescrit (E9/F9, aucun au lot 1), machine intouchée.
+- **Fiche** : grille par voix (rendu `.step`, doigtés `percHandsFor`), vocalisation par défaut, tempo conseillé
+  recalable, critère de réussite, prérequis en **rappel non bloquant**, bouton « Réussi » (progression locale
+  `fm-funk-progress`). Diagnostic headless `window.fmFunk()`.
+- **Recette `recette-cours-1.js` : 36/36** (données embarquées, valeurs de pas + gain + routage, swing→offsets,
+  sourdine focale/clave intacte, tempo, décharge/restauration, exclusion mutuelle, progression, `cajon.tone`,
+  estampille). **Non-régression complète verte** : 5-1 (20), 5-1-bis (21), 5-2 (23), 5-3 (38), 5-3-bis (15),
+  5-3-ter (28), 5-3c (21), 5-4 (40).
+- **À valider à l'oreille** : gain ghost 0,35, paramètres `cajon.tone` (190/130/0,10), équilibre des trois
+  couches du groove socle. Suite : C2 (animation Canvas + vocalisation vivante), C3 (votes Supabase).
+
 ### 2026-07-10 — Passe 5 étape 5.4 : drop-outs, écran de jeu, swing des 16es (fin de passe)
 - **Drop-outs de maintien du time** (§6 de la spec de passe) : la basse se tait sur les
   `lenBeats` **derniers temps** de chaque période de `everyN` mesures et **re-rentre sur
