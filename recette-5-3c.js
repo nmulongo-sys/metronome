@@ -173,7 +173,7 @@ boot(() => {
   // --- 7. Estampille + bus toujours câblés -------------------------------------------------------
   console.log('\n[7] Estampille 5.3c + limiteur/bus intacts');
   const bs = $('buildStamp');
-  ok(bs && /metronomefunk-0\.5\.3c/.test(bs.textContent), 'buildStamp : « ' + (bs ? bs.textContent : '(absent)') + ' »');
+  ok(bs && /metronomefunk-0\.5\./.test(bs.textContent), 'buildStamp : « ' + (bs ? bs.textContent : '(absent)') + ' »');   // génériquée passe 5 (retouche 5.4 : le build avance à chaque étape)
   B().probeVoice('finger', 30);
   const bus = B().bus();
   ok(!!bus.limiter && bus.limiter.kind === 'compressor' && bus.limiter.threshold.value === -1.5,
