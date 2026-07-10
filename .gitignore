@@ -1,0 +1,3 @@
+# Outillage local des recettes headless (jsdom) — jamais poussé (app = fichier unique, zéro dépendance)
+node_modules/
+package-lock.json
