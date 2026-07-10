@@ -1,0 +1,415 @@
+{
+  "meta": {
+    "titre": "Cours Funk — lot 1 : exercices Débutant (niveau 1) des deux parcours",
+    "statut": "PROPOSITION — à valider",
+    "date": "2026-07-10",
+    "spec": "cours-funk-grille-spec.md §2 (grille) et §3 (schéma de données)",
+    "conventions": {
+      "grille16": "16 pas par mesure ; pas 0 = temps 1 ; 4 pas par temps ; les « et » (croches à contretemps) tombent sur les pas 2, 6, 10, 14",
+      "dyn": "F = accent, mf = médium, ghost = très faible (CJ-M1 / DJ-M1)",
+      "vocalisation": "une syllabe (ou un mot de subdivision) par temps ; « – » = temps non vocalisé ; MAJUSCULES = syllabe accentuée",
+      "mesures": "nombre de mesures jouées par cycle d'exercice (la grille se répète)",
+      "mains": "non codées ici : dérivées de la table geste → {zone, main} (spec §3 bis) ; alternance D/G précisée dans l'objectif quand elle est le sujet"
+    }
+  },
+  "exercices": [
+    {
+      "id": "CAJ-1-E1-01",
+      "parcours": "cajon",
+      "niveauOrigine": 1,
+      "niveau": 1,
+      "schema": "E1",
+      "titre": "Le One au grave",
+      "objectif": "Ancrer le 1er temps comme référence d'organisation : un seul grave par mesure, posé exactement sur le One, corps détendu.",
+      "gestes": ["CJ-G1"],
+      "principes": ["FUNK-T1"],
+      "prerequis": [],
+      "pattern": {
+        "voix": [
+          { "geste": "CJ-G1", "grille16": "1000000000000000", "dyn": "F" }
+        ],
+        "mesures": 2,
+        "swing": null,
+        "gap": null
+      },
+      "tempo": { "min": 60, "conseille": 80, "max": 96 },
+      "critere": "8 cycles consécutifs sans dériver : le grave tombe avec le clic du One, son plein, main relâchée après la frappe.",
+      "vocalisation": { "systeme": "syllabique", "defaut": "UN deux trois quatre" },
+      "feel": null
+    },
+    {
+      "id": "CAJ-1-E1-02",
+      "parcours": "cajon",
+      "niveauOrigine": 1,
+      "niveau": 1,
+      "schema": "E1",
+      "titre": "Le One dans la pulsation",
+      "objectif": "Hiérarchiser la mesure : grave sur le One, tone discret sur 2, 3 et 4 — le premier temps doit ressortir sans forcer.",
+      "gestes": ["CJ-G1", "CJ-G2", "CJ-M4"],
+      "principes": ["FUNK-T1"],
+      "prerequis": ["CAJ-1-E1-01"],
+      "pattern": {
+        "voix": [
+          { "geste": "CJ-G1", "grille16": "1000000000000000", "dyn": "F" },
+          { "geste": "CJ-G2", "grille16": "0000100010001000", "dyn": "mf" }
+        ],
+        "mesures": 2,
+        "swing": null,
+        "gap": null
+      },
+      "tempo": { "min": 60, "conseille": 80, "max": 96 },
+      "critere": "La hiérarchie est audible les yeux fermés : on entend où est le One sans compter. 8 cycles stables.",
+      "vocalisation": { "systeme": "syllabique", "defaut": "UN deux trois quatre" },
+      "feel": null
+    },
+    {
+      "id": "CAJ-1-E2-01",
+      "parcours": "cajon",
+      "niveauOrigine": 1,
+      "niveau": 1,
+      "schema": "E2",
+      "titre": "Slap sur 2 et 4",
+      "objectif": "Isoler le backbeat : slap « catapulte » tranchant sur les temps 2 et 4, rien d'autre — le métronome tient les temps 1 et 3.",
+      "gestes": ["CJ-G3"],
+      "principes": ["FUNK-B1"],
+      "prerequis": ["CAJ-1-E1-01"],
+      "pattern": {
+        "voix": [
+          { "geste": "CJ-G3", "grille16": "0000100000001000", "dyn": "F" }
+        ],
+        "mesures": 2,
+        "swing": null,
+        "gap": null
+      },
+      "tempo": { "min": 66, "conseille": 88, "max": 104 },
+      "critere": "8 cycles : chaque slap claque net (attaque + buzz timbre), régulier, sans lever l'épaule ni crisper le poignet.",
+      "vocalisation": { "systeme": "syllabique", "defaut": "un DEUX trois QUATRE" },
+      "feel": null
+    },
+    {
+      "id": "CAJ-1-E2-02",
+      "parcours": "cajon",
+      "niveauOrigine": 1,
+      "niveau": 1,
+      "schema": "E2",
+      "titre": "Kick-snare : grave 1-3, slap 2-4",
+      "objectif": "Le squelette funk transposé (grave = grosse caisse, slap = caisse claire) : alterner grave et slap avec un contraste maximal entre les deux sons.",
+      "gestes": ["CJ-G1", "CJ-G3", "CJ-M4"],
+      "principes": ["FUNK-T1", "FUNK-B1"],
+      "prerequis": ["CAJ-1-E2-01"],
+      "pattern": {
+        "voix": [
+          { "geste": "CJ-G1", "grille16": "1000000010000000", "dyn": "F" },
+          { "geste": "CJ-G3", "grille16": "0000100000001000", "dyn": "F" }
+        ],
+        "mesures": 2,
+        "swing": null,
+        "gap": null
+      },
+      "tempo": { "min": 66, "conseille": 88, "max": 108 },
+      "critere": "8 cycles : grave rond et slap claquant clairement distincts (jamais deux sons moyens), tempo stable du début à la fin.",
+      "vocalisation": { "systeme": "syllabique", "defaut": "fun KY drum MER" },
+      "feel": null
+    },
+    {
+      "id": "CAJ-1-E3-01",
+      "parcours": "cajon",
+      "niveauOrigine": 1,
+      "niveau": 1,
+      "schema": "E3",
+      "titre": "Nappe de ghosts en croches",
+      "objectif": "Installer le toucher ghost : croches continues en effleurement, mains alternées D-G, aucune note qui ressort. C'est le futur « charley » du groove.",
+      "gestes": ["CJ-M1", "CJ-M4"],
+      "principes": ["FUNK-T2"],
+      "prerequis": ["CAJ-1-E1-01"],
+      "pattern": {
+        "voix": [
+          { "geste": "CJ-M1", "grille16": "1010101010101010", "dyn": "ghost" }
+        ],
+        "mesures": 2,
+        "swing": null,
+        "gap": null
+      },
+      "tempo": { "min": 60, "conseille": 84, "max": 100 },
+      "critere": "4 cycles : volume constant et très faible (on doit encore entendre le métronome par-dessus), régularité parfaite, poignets souples.",
+      "vocalisation": { "systeme": "syllabique", "defaut": "ti-ka ti-ka ti-ka ti-ka" },
+      "feel": null
+    },
+    {
+      "id": "CAJ-1-E3-02",
+      "parcours": "cajon",
+      "niveauOrigine": 1,
+      "niveau": 1,
+      "schema": "E3",
+      "titre": "Nappe en doubles-croches — la grille « sans repos »",
+      "objectif": "La grille de doubles-croches complète (16 pas), mains alternées, tout en ghost : sentir la mesure comme une nappe continue subdivisée.",
+      "gestes": ["CJ-M1", "CJ-M4"],
+      "principes": ["FUNK-T2"],
+      "prerequis": ["CAJ-1-E3-01"],
+      "pattern": {
+        "voix": [
+          { "geste": "CJ-M1", "grille16": "1111111111111111", "dyn": "ghost" }
+        ],
+        "mesures": 2,
+        "swing": null,
+        "gap": null
+      },
+      "tempo": { "min": 56, "conseille": 72, "max": 88 },
+      "critere": "4 cycles sans crispation ni fatigue (TR-2) : régularité des 16 pas, volume plancher constant, respiration normale.",
+      "vocalisation": { "systeme": "syllabique", "defaut": "ta-ka-di-mi ta-ka-di-mi ta-ka-di-mi ta-ka-di-mi" },
+      "feel": null
+    },
+    {
+      "id": "CAJ-1-E4-01",
+      "parcours": "cajon",
+      "niveauOrigine": 1,
+      "niveau": 1,
+      "schema": "E4",
+      "titre": "Groove socle funk",
+      "objectif": "Assembler les trois couches : grave sur 1 et 3, slap sur 2 et 4, ghosts sur les « et » — le premier vrai groove funk du parcours.",
+      "gestes": ["CJ-G1", "CJ-G3", "CJ-M1", "CJ-M4"],
+      "principes": ["FUNK-T1", "FUNK-B1", "FUNK-T2"],
+      "prerequis": ["CAJ-1-E2-02", "CAJ-1-E3-01"],
+      "pattern": {
+        "voix": [
+          { "geste": "CJ-G1", "grille16": "1000000010000000", "dyn": "F" },
+          { "geste": "CJ-G3", "grille16": "0000100000001000", "dyn": "F" },
+          { "geste": "CJ-M1", "grille16": "0010001000100010", "dyn": "ghost" }
+        ],
+        "mesures": 2,
+        "swing": null,
+        "gap": null
+      },
+      "tempo": { "min": 66, "conseille": 88, "max": 104 },
+      "critere": "4 cycles : backbeat net, ghosts audibles mais jamais confondus avec les accents, aucune couche ne dérive.",
+      "vocalisation": { "systeme": "syllabique", "defaut": "fun KY drum MER" },
+      "feel": null
+    },
+    {
+      "id": "CAJ-1-E4-02",
+      "parcours": "cajon",
+      "niveauOrigine": 1,
+      "niveau": 1,
+      "schema": "E4",
+      "titre": "Groove socle + tone sur le « et » de 4",
+      "objectif": "Le même socle, avec un tone qui remplace le dernier ghost : la petite relance qui ramène vers le One sans précipiter.",
+      "gestes": ["CJ-G1", "CJ-G2", "CJ-G3", "CJ-M1", "CJ-M4"],
+      "principes": ["FUNK-T1", "FUNK-B1", "FUNK-T2"],
+      "prerequis": ["CAJ-1-E4-01"],
+      "pattern": {
+        "voix": [
+          { "geste": "CJ-G1", "grille16": "1000000010000000", "dyn": "F" },
+          { "geste": "CJ-G3", "grille16": "0000100000001000", "dyn": "F" },
+          { "geste": "CJ-M1", "grille16": "0010001000100000", "dyn": "ghost" },
+          { "geste": "CJ-G2", "grille16": "0000000000000010", "dyn": "mf" }
+        ],
+        "mesures": 2,
+        "swing": null,
+        "gap": null
+      },
+      "tempo": { "min": 66, "conseille": 88, "max": 104 },
+      "critere": "4 cycles : le tone du « et » de 4 relance vers le One sans accélérer — le One suivant tombe exactement avec le clic.",
+      "vocalisation": { "systeme": "syllabique", "defaut": "fun KY drum MER" },
+      "feel": null
+    },
+    {
+      "id": "DJE-1-F1-01",
+      "parcours": "djembe",
+      "niveauOrigine": 1,
+      "niveau": 1,
+      "schema": "F1",
+      "titre": "Le One à la basse",
+      "objectif": "Ancrer le One : une seule basse par mesure au centre de la peau, rebond « open » (la main quitte la peau, le son dure), corps détendu.",
+      "gestes": ["DJ-G1", "DJ-G5"],
+      "principes": ["FUNK-T1"],
+      "prerequis": [],
+      "pattern": {
+        "voix": [
+          { "geste": "DJ-G1", "grille16": "1000000000000000", "dyn": "F" }
+        ],
+        "mesures": 2,
+        "swing": null,
+        "gap": null
+      },
+      "tempo": { "min": 60, "conseille": 80, "max": 96 },
+      "critere": "8 cycles sans dériver : basse ronde et résonante (jamais étouffée), posée avec le clic du One, épaules basses.",
+      "vocalisation": { "systeme": "gun-go-pa", "defaut": "GUN – – –" },
+      "feel": null
+    },
+    {
+      "id": "DJE-1-F1-02",
+      "parcours": "djembe",
+      "niveauOrigine": 1,
+      "niveau": 1,
+      "schema": "F1",
+      "titre": "Le One dans la pulsation",
+      "objectif": "Hiérarchiser : basse sur le One, touches ghost sur 2, 3 et 4 — le premier temps ressort, le reste respire à peine.",
+      "gestes": ["DJ-G1", "DJ-G5", "DJ-M1"],
+      "principes": ["FUNK-T1"],
+      "prerequis": ["DJE-1-F1-01"],
+      "pattern": {
+        "voix": [
+          { "geste": "DJ-G1", "grille16": "1000000000000000", "dyn": "F" },
+          { "geste": "DJ-M1", "grille16": "0000100010001000", "dyn": "ghost" }
+        ],
+        "mesures": 2,
+        "swing": null,
+        "gap": null
+      },
+      "tempo": { "min": 60, "conseille": 80, "max": 96 },
+      "critere": "La hiérarchie est audible les yeux fermés : le One se repère sans compter. 8 cycles stables.",
+      "vocalisation": { "systeme": "gun-go-pa", "defaut": "GUN ti ti ti" },
+      "feel": null
+    },
+    {
+      "id": "DJE-1-F2-01",
+      "parcours": "djembe",
+      "niveauOrigine": 1,
+      "niveau": 1,
+      "schema": "F2",
+      "titre": "Tone sur 2 et 4",
+      "objectif": "Isoler le backbeat au tone : doigts joints au bord, main droite sur 2, main gauche sur 4 — deux sons identiques.",
+      "gestes": ["DJ-G2", "DJ-G5"],
+      "principes": ["FUNK-B1"],
+      "prerequis": ["DJE-1-F1-01"],
+      "pattern": {
+        "voix": [
+          { "geste": "DJ-G2", "grille16": "0000100000001000", "dyn": "F" }
+        ],
+        "mesures": 2,
+        "swing": null,
+        "gap": null
+      },
+      "tempo": { "min": 66, "conseille": 88, "max": 104 },
+      "critere": "8 cycles : tone plein et clair, timbre identique main droite / main gauche, régularité parfaite.",
+      "vocalisation": { "systeme": "gun-go-pa", "defaut": "– GO – DO" },
+      "feel": null
+    },
+    {
+      "id": "DJE-1-F2-02",
+      "parcours": "djembe",
+      "niveauOrigine": 1,
+      "niveau": 1,
+      "schema": "F2",
+      "titre": "Bass-slap : le backbeat funk",
+      "objectif": "Le squelette funk à la voix djembé : basse sur 1 et 3, slap sur 2 et 4 — contraste maximal entre le rond et le claquant.",
+      "gestes": ["DJ-G1", "DJ-G3", "DJ-G5"],
+      "principes": ["FUNK-T1", "FUNK-B1"],
+      "prerequis": ["DJE-1-F2-01"],
+      "pattern": {
+        "voix": [
+          { "geste": "DJ-G1", "grille16": "1000000010000000", "dyn": "F" },
+          { "geste": "DJ-G3", "grille16": "0000100000001000", "dyn": "F" }
+        ],
+        "mesures": 2,
+        "swing": null,
+        "gap": null
+      },
+      "tempo": { "min": 66, "conseille": 88, "max": 108 },
+      "critere": "8 cycles : basse ronde, slap qui claque (doigts relâchés, fouetté du poignet), jamais deux sons moyens, tempo stable.",
+      "vocalisation": { "systeme": "gun-go-pa", "defaut": "GUN PA GUN PA" },
+      "feel": null
+    },
+    {
+      "id": "DJE-1-F3-01",
+      "parcours": "djembe",
+      "niveauOrigine": 1,
+      "niveau": 1,
+      "schema": "F3",
+      "titre": "Nappe de touches en croches",
+      "objectif": "Installer le toucher ghost : croches continues en effleurement au bord, mains alternées D-G, aucune note qui ressort.",
+      "gestes": ["DJ-M1", "DJ-G5"],
+      "principes": ["FUNK-T2"],
+      "prerequis": ["DJE-1-F1-01"],
+      "pattern": {
+        "voix": [
+          { "geste": "DJ-M1", "grille16": "1010101010101010", "dyn": "ghost" }
+        ],
+        "mesures": 2,
+        "swing": null,
+        "gap": null
+      },
+      "tempo": { "min": 60, "conseille": 84, "max": 100 },
+      "critere": "4 cycles : volume constant très faible (le métronome reste audible par-dessus), régularité parfaite, poignets souples.",
+      "vocalisation": { "systeme": "gun-go-pa", "defaut": "ti-gi ti-gi ti-gi ti-gi" },
+      "feel": null
+    },
+    {
+      "id": "DJE-1-F3-02",
+      "parcours": "djembe",
+      "niveauOrigine": 1,
+      "niveau": 1,
+      "schema": "F3",
+      "titre": "Nappe en doubles-croches — la grille « sans repos »",
+      "objectif": "La grille de doubles-croches complète, mains alternées, tout en touches : sentir la mesure comme une trame continue.",
+      "gestes": ["DJ-M1", "DJ-G5"],
+      "principes": ["FUNK-T2"],
+      "prerequis": ["DJE-1-F3-01"],
+      "pattern": {
+        "voix": [
+          { "geste": "DJ-M1", "grille16": "1111111111111111", "dyn": "ghost" }
+        ],
+        "mesures": 2,
+        "swing": null,
+        "gap": null
+      },
+      "tempo": { "min": 56, "conseille": 72, "max": 88 },
+      "critere": "4 cycles sans crispation ni fatigue (TR-2) : régularité des 16 pas, volume plancher constant, respiration normale.",
+      "vocalisation": { "systeme": "gun-go-pa", "defaut": "ti-gi-ti-gi ti-gi-ti-gi ti-gi-ti-gi ti-gi-ti-gi" },
+      "feel": null
+    },
+    {
+      "id": "DJE-1-F4-01",
+      "parcours": "djembe",
+      "niveauOrigine": 1,
+      "niveau": 1,
+      "schema": "F4",
+      "titre": "Groove socle funk Gun-Go-Pa",
+      "objectif": "Assembler les trois couches : basse sur 1 et 3, slap sur 2 et 4, touches sur les « et » — le premier groove funk du parcours, à la voix djembé.",
+      "gestes": ["DJ-G1", "DJ-G3", "DJ-M1", "DJ-G5"],
+      "principes": ["FUNK-T1", "FUNK-B1", "FUNK-T2"],
+      "prerequis": ["DJE-1-F2-02", "DJE-1-F3-01"],
+      "pattern": {
+        "voix": [
+          { "geste": "DJ-G1", "grille16": "1000000010000000", "dyn": "F" },
+          { "geste": "DJ-G3", "grille16": "0000100000001000", "dyn": "F" },
+          { "geste": "DJ-M1", "grille16": "0010001000100010", "dyn": "ghost" }
+        ],
+        "mesures": 2,
+        "swing": null,
+        "gap": null
+      },
+      "tempo": { "min": 66, "conseille": 88, "max": 104 },
+      "critere": "4 cycles : backbeat net, touches jamais confondues avec les accents, aucune couche ne dérive.",
+      "vocalisation": { "systeme": "gun-go-pa", "defaut": "GUN PA GUN PA" },
+      "feel": null
+    },
+    {
+      "id": "DJE-1-F4-02",
+      "parcours": "djembe",
+      "niveauOrigine": 1,
+      "niveau": 1,
+      "schema": "F4",
+      "titre": "Groove socle + tone sur le « et » de 4",
+      "objectif": "Le même socle, avec un tone qui remplace la dernière touche : la relance qui ramène vers le One sans précipiter.",
+      "gestes": ["DJ-G1", "DJ-G2", "DJ-G3", "DJ-M1", "DJ-G5"],
+      "principes": ["FUNK-T1", "FUNK-B1", "FUNK-T2"],
+      "prerequis": ["DJE-1-F4-01"],
+      "pattern": {
+        "voix": [
+          { "geste": "DJ-G1", "grille16": "1000000010000000", "dyn": "F" },
+          { "geste": "DJ-G3", "grille16": "0000100000001000", "dyn": "F" },
+          { "geste": "DJ-M1", "grille16": "0010001000100000", "dyn": "ghost" },
+          { "geste": "DJ-G2", "grille16": "0000000000000010", "dyn": "mf" }
+        ],
+        "mesures": 2,
+        "swing": null,
+        "gap": null
+      },
+      "tempo": { "min": 66, "conseille": 88, "max": 104 },
+      "critere": "4 cycles : le tone du « et » de 4 relance vers le One sans accélérer — le One suivant tombe exactement avec le clic.",
+      "vocalisation": { "systeme": "gun-go-pa", "defaut": "GUN PA GUN PA" },
+      "feel": null
+    }
+  ]
+}
