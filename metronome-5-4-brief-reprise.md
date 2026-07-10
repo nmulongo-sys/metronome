@@ -8,7 +8,7 @@ Métronome pédagogique du Portail Formation Musicale : application HTML **fichi
 
 ## Décisions actées
 
-- **5.4 est CODÉE et VÉRIFIÉE** le 2026-07-10 (spec `metronome-passe5-5-4-spec.md`, VALIDÉE « go validé », IMPLÉMENTÉE). Build `metronomefunk-0.5.4 · 2026-07-10`. Ne pas recoder. Branche cible : `metronomefunk-0.5.4` (depuis `metronomefunk-0.5.3c`, tête `32a69d4`) — voir Points ouverts pour l'état du push.
+- **5.4 est LIVRÉE et POUSSÉE** le 2026-07-10 (spec `metronome-passe5-5-4-spec.md`, VALIDÉE « go validé », IMPLÉMENTÉE). Build `metronomefunk-0.5.4 · 2026-07-10`. Branche `metronomefunk-0.5.4` créée depuis `metronomefunk-0.5.3c` (`32a69d4`), 9 commits (8 fichiers + reprise de ce brief) — la tête est le commit du brief. Ne pas recoder.
 - **Drop-outs (design tranché, §2.1 de la spec 5.4)** : écart assumé avec la lettre du §4.4 de la spec de passe — le drop est une **fonction pure de `measureCount`** dans `bassRealize` (zéro machine à états nouvelle, machine gap intouchée d'un octet, gap utilisateur cumulable). Trou = `lenBeats` derniers temps de chaque période de `everyN` mesures, **re-entrée sur The One** (FUNK-T1). Queues legato **raccourcies au bord** du trou (plancher 20 ms). À l'arrêt (`measureCount = 0`), jamais de trou. L'alternative « cible `bass` dans le gap unifié » a été **écartée**.
 - **Swing des 16es** : `S.bass.swingFollow` (case « La basse suit le swing », cochée par défaut) — pas impairs à `(i−1+2·sw)/16`, même formule par paires que `subPositions`, appliquée **avant** le test de drop (le trou s'évalue sur la position sonnée). `sw = 50 %` ⇒ identité stricte.
 - **Écran de jeu** : ligne `#playBassGroup` « Basse : activer · densité · drop-outs · ♪ accord », synchro **bidirectionnelle** avec `secBass` (`bassPlayRefresh`). La pastille d'accord = **témoin d'activité** (§5 de la spec de passe, dernier morceau livré) : pulse via la boucle rAF du curseur (`bassPulseCheck`), pas au scheduling. Groupe grisé/désactivé en famille ternaire.
@@ -37,7 +37,6 @@ Métronome pédagogique du Portail Formation Musicale : application HTML **fichi
 
 ## Points ouverts
 
-- **Push de la branche `metronomefunk-0.5.4`** : si le push n'a pas été fait en fin du fil 5.4 (jeton non fourni), c'est la première action du nouveau fil — skill github-push, fichiers : `index.html`, `README.md`, `recette-5-4.js`, `recette-5-3-bis.js`, `recette-5-3-ter.js`, `recette-5-3c.js` (retouches estampille), `metronome-passe5-5-4-spec.md`, `metronome-5-4-brief-reprise.md`.
 - **Validation à l'oreille** (HP de bureau) : legato 5.3c (défaut L=1,25, haut de course) + drop-outs/swing 5.4. Verdict → retouche `5.3d`/`5.4b` éventuelle, ou clôture définitive de la passe 5.
 - **Après la passe 5** : à définir avec Jean (merge vers la branche principale du portail ? passe 6 ?). Rien d'acté.
 - Limites latentes reconduites : `DEG_SEMI['3']` = tierce majeure fixe (sans effet, aucun gabarit n'utilise le degré `3`) ; section basse hors i18n EN/PT (lot à part).
