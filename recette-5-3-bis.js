@@ -125,7 +125,7 @@ boot(() => {
   // --- 6. Estampille de build ------------------------------------------------------------
   console.log('\n[6] Estampille de build affichée');
   const bs = $('buildStamp');
-  ok(bs && /metronomefunk-0\.5\.3/.test(bs.textContent), 'buildStamp renseigné : « ' + (bs ? bs.textContent : '(absent)') + ' »');   // génériquée sans tiret (retouche 5.3c)
+  ok(bs && /metronomefunk-0\.5\./.test(bs.textContent), 'buildStamp renseigné : « ' + (bs ? bs.textContent : '(absent)') + ' »');   // génériquée passe 5 (retouches 5.3c puis 5.4)
 
   console.log('\n----------------------------------------');
   console.log('  ' + pass + ' réussis, ' + fail + ' échoués sur ' + (pass + fail));
