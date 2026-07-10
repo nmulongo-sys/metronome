@@ -139,6 +139,32 @@ de partage.
 
 ## Journal de développement
 
+### 2026-07-10 — Cours funk étape C2 : animation du geste & vocalisation vivante (build 0.5.4-c2)
+- **Animation du geste** (spec impl §4, grille §3 bis) : boucle au ralenti en **rendu génératif Canvas 2D**
+  piloté par `pattern` + `FK_GESTES`, aucun asset par exercice. Style hologramme fil de fer — **cajón ambre /
+  djembé cyan**, fond sombre, halos `shadowBlur`, maillage estompé par profondeur. **Vue subjective** du joueur :
+  tapa du cajón en plongée (trapèze perspectif), peau du djembé vue de dessus (anneaux concentriques). **Mains
+  silhouettes translucides** (contour lumineux, séparations de doigts, pouce côté interne) qui se portent vers
+  la frappe suivante ; levée maximale à mi-course, extension à la frappe ; halo chaud + onde au point d'impact.
+- **Horloge propre** (ralenti ×0,15 à ×1, réglable), **découplée du séquenceur** ; mini-rendu sonore des frappes
+  via `playPerc` **hors scheduler** et seulement quand le métronome ne joue pas (case « son du geste »). En
+  lecture réelle, la phase vient de la position du cycle audio — « deux sources d'index, même rendu ».
+- **Vocalisation vivante** : la ligne de syllabes devient des **chips surlignés** au fil de la boucle (accent =
+  gras, `–` = temps muet, sous-syllabes `-` réparties dans le temps → croches/doubles). **Personnalisation**
+  (éditer les syllabes / masquer) stockée **localement** `fm-funk-vocal` par exercice, jamais côté serveur ;
+  bouton « Rétablir » restaure le défaut. Ligne « geste courant » (ID · nom · main · zone).
+- **Cycle de vie** : une seule boucle rAF, démarrée à l'ouverture de la fiche, **arrêtée au déchargement / au
+  changement d'exercice** (aucun rAF résiduel). Table `FK_GESTES` étendue d'une position `(u,v)` par geste
+  (plan de l'instrument) — **aucun champ nouveau requis dans le schéma §3**.
+- **Recette `recette-cours-2.js` : 37/37** (parsing vocalisation, timeline & mains, couverture geste→position,
+  cycle de vie sans rAF résiduel, surbrillance, personnalisation/masquage `fm-funk-vocal`, phase). **Vérif
+  navigateur réelle** (Chromium, 390×850) : canvas dessiné, boucle qui tourne, surbrillance qui progresse,
+  arrêt propre au déchargement, 0 erreur JS applicative (seuls des échecs réseau CDN Supabase en `file://`).
+- **Non-régression complète verte** : C1 (36), 5-1 (20), 5-1-bis (21), 5-2 (23), 5-3 (38), 5-3-bis (15),
+  5-3-ter (28), 5-3c (21), 5-4 (40).
+- **À valider à l'œil sur appareil** : finesse de l'hologramme et des mains, placement des zones de frappe
+  (bord proche du djembé recalé sous les mains). Suite : C3 (votes Supabase, file offline).
+
 ### 2026-07-10 — Cours funk étape C1 : chargeur d'exercice & fiche (build 0.5.4-c1)
 - **Section « Cours funk »** (`#secCours`, strate couche) : parcours cajón/djembé × niveau → liste
   d'exercices → fiche de travail. Consomme le **lot 1** (16 exercices Débutant) embarqué en

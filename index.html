@@ -330,9 +330,24 @@
   .fk-badge { font-size: .78rem; color: var(--fm-sub); }
   .fk-fiche h4 { margin: 12px 0 4px; }
   .fk-objectif { font-size: .85rem; color: var(--fm-sub); margin: 4px 0 8px; }
-  .fk-vocal { font-size: 1rem; letter-spacing: .05em; margin: 6px 0; }
+  .fk-vocal { font-size: 1rem; letter-spacing: .05em; margin: 6px 0; display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; }
+  .fk-vocal.hidden { display: none; }
+  .fk-syl { padding: 1px 7px; border-radius: 6px; background: var(--fm-panel-2);
+    border: 1px solid var(--fm-line); color: var(--fm-sub); transition: none; }
+  .fk-syl.acc { font-weight: 700; color: var(--fm-ink); }
+  .fk-syl.cur { background: var(--fm-accent); border-color: var(--fm-accent); color: var(--fm-accent-ink); }
   .fk-critere { font-size: .85rem; color: var(--fm-sub); margin: 6px 0; }
   .fk-fiche .pv-label { min-width: 128px; }
+  /* animation du geste (C2) — boucle hologramme, vue subjective */
+  .fk-anim-wrap { margin: 10px 0; }
+  #fkCanvas { width: 100%; max-width: 420px; height: 240px; display: block; margin: 0 auto;
+    border-radius: 12px; background: #05060a; border: 1px solid var(--fm-line); }
+  .fk-anim-ctl { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 6px 0;
+    font-size: .82rem; color: var(--fm-sub); }
+  .fk-anim-ctl input[type=range] { width: 120px; }
+  .fk-geste-now { font-size: .82rem; color: var(--fm-sub); min-height: 1.1em; margin: 2px 0; }
+  .fk-vocal-edit { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 4px 0; }
+  .fk-vocal-edit input[type=text] { flex: 1; min-width: 180px; }
 
   /* ---- percussion plein écran ---- */
   .percfs {
@@ -1226,7 +1241,7 @@ swing 62
 
   // Identité du build affichée dans l'en-tête (5.3-bis). Bumper à chaque passe : elle sert à
   // savoir de quel build vient un enregistrement de validation.
-  const BUILD = 'metronomefunk-0.5.4-c1', BUILD_DATE = '2026-07-10';
+  const BUILD = 'metronomefunk-0.5.4-c2', BUILD_DATE = '2026-07-10';
 
   let audioCtx = null, masterGain = null, noiseBuf = null;
   let masterLimiter = null;                                   // 5.3-ter : limiteur de bus master
@@ -6707,15 +6722,17 @@ swing 62
   // table geste → routage timbre + affichage (spec impl §2.3). Sert le son en C1 et
   // l'animation en C2 (zone/main). Seuls les gestes-VOIX y figurent : les gestes qualité
   // (CJ-M4 dynamique, DJ-G5 rebond open, TR-*) sont pédagogiques, sans voix propre.
+  // u = position latérale (0 gauche … 1 droite), v = profondeur dans le plan de l'instrument
+  // (0 = arête proche du corps, en bas de l'image ; 1 = loin, en haut). Vue subjective (§3 bis).
   const FK_GESTES = {
-    'CJ-G1': { instr: 'cajon',  voiceKind: 'grave', label: 'Grave',  main: 'D',   zone: 'centre de la tapa' },
-    'CJ-G2': { instr: 'cajon',  voiceKind: 'tone',  label: 'Tone',   main: 'D',   zone: 'bord supérieur, doigts joints' },
-    'CJ-G3': { instr: 'cajon',  voiceKind: 'aigu',  label: 'Slap',   main: 'G',   zone: 'arête supérieure' },
-    'CJ-M1': { instr: 'cajon',  voiceKind: 'tone',  label: 'Ghost',  main: 'alt', zone: 'bord, effleurement' },
-    'DJ-G1': { instr: 'djembe', voiceKind: 'basse', label: 'Bass',   main: 'D',   zone: 'centre de la peau' },
-    'DJ-G2': { instr: 'djembe', voiceKind: 'tone',  label: 'Tone',   main: 'alt', zone: 'bord, doigts joints' },
-    'DJ-G3': { instr: 'djembe', voiceKind: 'slap',  label: 'Slap',   main: 'G',   zone: 'bord, doigts ouverts' },
-    'DJ-M1': { instr: 'djembe', voiceKind: 'tone',  label: 'Touche', main: 'alt', zone: 'bord, effleurement' }
+    'CJ-G1': { instr: 'cajon',  voiceKind: 'grave', label: 'Grave',  main: 'D',   zone: 'centre de la tapa',            u: 0.50, v: 0.58 },
+    'CJ-G2': { instr: 'cajon',  voiceKind: 'tone',  label: 'Tone',   main: 'D',   zone: 'bord supérieur, doigts joints', u: 0.50, v: 0.16 },
+    'CJ-G3': { instr: 'cajon',  voiceKind: 'aigu',  label: 'Slap',   main: 'G',   zone: 'arête supérieure',              u: 0.66, v: 0.12 },
+    'CJ-M1': { instr: 'cajon',  voiceKind: 'tone',  label: 'Ghost',  main: 'alt', zone: 'bord, effleurement',            u: 0.36, v: 0.18 },
+    'DJ-G1': { instr: 'djembe', voiceKind: 'basse', label: 'Bass',   main: 'D',   zone: 'centre de la peau',             u: 0.50, v: 0.50 },
+    'DJ-G2': { instr: 'djembe', voiceKind: 'tone',  label: 'Tone',   main: 'alt', zone: 'bord proche, doigts joints',    u: 0.38, v: 0.82 },
+    'DJ-G3': { instr: 'djembe', voiceKind: 'slap',  label: 'Slap',   main: 'G',   zone: 'bord proche, doigts ouverts',   u: 0.66, v: 0.82 },
+    'DJ-M1': { instr: 'djembe', voiceKind: 'tone',  label: 'Touche', main: 'alt', zone: 'bord proche, effleurement',     u: 0.50, v: 0.86 }
   };
 
   /* Données : copie embarquée de cours-funk-exercices-debutant.json (lot 1, 2026-07-10) —
@@ -6825,6 +6842,7 @@ swing 62
   }
   function fkUnload() {
     if (!FK.loaded) return;
+    if (typeof fkAnimStop === 'function') fkAnimStop();   // arrête la boucle d'animation (C2)
     FK.loaded = false; FK.exoId = '';
     fkSyncGrids();
     if (FK.saved) {
@@ -6899,14 +6917,32 @@ swing 62
         ' <span class="fk-badge">' + tsEsc(v.geste) + ' · ' + tsEsc(v.dyn) + '</span></span>' +
         '<div class="steps mini">' + cells + '</div></div>';
     }).join('');
+    // animation du geste (C2) : canvas + contrôles (ralenti, son du geste), lecture du geste courant
+    const anim =
+      '<div class="fk-anim-wrap">' +
+        '<canvas id="fkCanvas" width="400" height="240" aria-label="Animation du geste (boucle au ralenti)"></canvas>' +
+        '<div class="fk-geste-now" id="fkGesteNow" aria-live="polite"></div>' +
+        '<div class="fk-anim-ctl">' +
+          '<label style="min-width:auto;">Ralenti</label>' +
+          '<input type="range" id="fkSpeed" min="15" max="100" value="' + Math.round(fkAnim.speed * 100) + '" title="Vitesse de la boucle (×0,15 à ×1)">' +
+          '<label class="check"><input type="checkbox" id="fkAudio"' + (fkAnim.audio ? ' checked' : '') + '> son du geste</label>' +
+        '</div>' +
+      '</div>';
+    // vocalisation : chips surlignés + personnalisation (fm-funk-vocal, local uniquement)
     const voc = e.vocalisation
-      ? '<div class="fk-vocal" title="Vocalisation par défaut (' + tsEsc(e.vocalisation.systeme) + ')">🗣 ' +
-        tsEsc(e.vocalisation.defaut) + '</div>'
+      ? '<div class="fk-vocal" id="fkVocal" title="Vocalisation (' + tsEsc(e.vocalisation.systeme) + ')"></div>' +
+        '<div class="fk-vocal-edit">' +
+          '<button class="btn-sm" id="fkVocEditBtn">✎ Personnaliser</button>' +
+          '<label class="check"><input type="checkbox" id="fkVocHide"' + (fkVocalHidden(e) ? ' checked' : '') + '> masquer</label>' +
+          '<input type="text" id="fkVocInput" class="hide" value="' + tsEsc(fkVocalText(e)) + '" aria-label="Syllabes personnalisées">' +
+          '<button class="btn-sm hide" id="fkVocSave">Enregistrer</button>' +
+          '<button class="btn-sm hide" id="fkVocReset">Rétablir</button>' +
+        '</div>'
       : '';
     $('fkFiche').innerHTML =
       '<h4>' + tsEsc(e.titre) + ' <span class="fk-badge">' + tsEsc(e.id) + '</span></h4>' +
       '<div class="fk-objectif">' + tsEsc(e.objectif) + '</div>' +
-      rows + voc +
+      anim + rows + voc +
       '<div class="row" style="margin:8px 0;">' +
         '<label style="min-width:auto;">Tempo</label>' +
         '<button class="btn-sm" id="fkTempoBtn" title="Recaler sur le tempo conseillé">♩ ' + e.tempo.conseille + ' conseillé</button>' +
@@ -6926,6 +6962,307 @@ swing 62
     $('fkTempoBtn').addEventListener('click', () => { setTempo(e.tempo.conseille); });
     $('fkPlayBtn').addEventListener('click', () => $('startBtn').click());
     $('fkDoneBtn').addEventListener('click', fkMarkDone);
+    // contrôles animation
+    if ($('fkSpeed')) $('fkSpeed').addEventListener('input', ev => { fkAnim.speed = (+ev.target.value) / 100; fkAnim.t0 = (typeof performance !== 'undefined' && performance.now) ? performance.now() : 0; });
+    if ($('fkAudio')) $('fkAudio').addEventListener('change', ev => { fkAnim.audio = ev.target.checked; });
+    // contrôles vocalisation
+    if (e.vocalisation) {
+      fkRenderVocal(e);
+      $('fkVocHide').addEventListener('change', ev => fkHideVocal(e.id, ev.target.checked));
+      $('fkVocEditBtn').addEventListener('click', () => {
+        ['fkVocInput', 'fkVocSave', 'fkVocReset'].forEach(id => $(id).classList.toggle('hide'));
+      });
+      $('fkVocSave').addEventListener('click', () => { fkSetVocal(e.id, $('fkVocInput').value); });
+      $('fkVocReset').addEventListener('click', () => {
+        const all = fkVocalStore(); if (all[e.id]) { delete all[e.id].text; fkVocalSave(all); }
+        $('fkVocInput').value = fkVocalText(e); fkAnim.vocal = fkParseVocal(fkVocalText(e), 4, 16); fkRenderVocal(e);
+      });
+    }
+    fkAnimStart(e);   // (re)démarre la boucle d'animation sur cet exercice
+  }
+
+  // ============ COURS FUNK — ANIMATION & VOCALISATION (étape C2) ============
+  // Boucle du geste au ralenti, rendu génératif Canvas 2D piloté par pattern + FK_GESTES
+  // (spec impl §4, grille §3 bis). Horloge PROPRE (découplée du séquenceur), mini-rendu
+  // sonore hors scheduler quand le métronome ne joue pas. Vocalisation partagée : mêmes
+  // chips surlignés par la boucle d'anim OU, en lecture réelle, par la position du cycle.
+
+  // ---- vocalisation : parsing (convention meta du lot 1) ----
+  // « une syllabe par temps ; sous-syllabes séparées par '-' réparties dans le temps ;
+  //   '–' (tiret cadratin) = temps/sous-temps muet ; MAJUSCULES = accent ». Renvoie un
+  //   tableau de longueur count : chaque case = { syl, accent } ou null (pas muet).
+  function fkSylAccent(s) { return /[A-Za-zÀ-ÿ]/.test(s) && !/[a-zà-ÿ]/.test(s); }
+  function fkParseVocal(text, beats, count) {
+    const out = new Array(count).fill(null);
+    if (!text) return out;
+    const groups = String(text).trim().split(/\s+/);
+    const stepsPerBeat = count / beats;
+    for (let b = 0; b < beats; b++) {
+      const g = groups[b];
+      if (g == null || /^[–—]+$/.test(g)) continue;   // temps muet
+      const subs = g.split('-');
+      const nn = subs.length;
+      for (let k = 0; k < nn; k++) {
+        const sub = subs[k];
+        if (!sub || /^[–—]+$/.test(sub)) continue;      // sous-temps muet
+        const step = Math.round(b * stepsPerBeat + k * stepsPerBeat / nn);
+        if (step < count) out[step] = { syl: sub, accent: fkSylAccent(sub) };
+      }
+    }
+    return out;
+  }
+
+  // ---- timeline du geste : une frappe par pas actif (lot 1 = jeu à une main par pas) ----
+  function fkTimeline(e) {
+    const count = 16;
+    const tl = new Array(count).fill(null);
+    (e.pattern.voix || []).forEach(v => {
+      const gd = FK_GESTES[v.geste];
+      if (!gd) return;
+      for (let i = 0; i < v.grille16.length && i < count; i++) {
+        if (v.grille16[i] === '1' && !tl[i]) {
+          tl[i] = { step: i, geste: v.geste, gd, ghost: v.dyn === 'ghost',
+                    accent: v.dyn === 'F', voice: FK_PREFIX + v.geste };
+        }
+      }
+    });
+    // mains : main fixe du geste (D/G), sinon alternance pour les nappes (main 'alt')
+    let alt = 0;
+    for (let i = 0; i < count; i++) {
+      if (!tl[i]) continue;
+      const m = tl[i].gd.main;
+      tl[i].hand = (m === 'D' || m === 'G') ? m : (alt++ % 2 === 0 ? 'D' : 'G');
+    }
+    return tl;
+  }
+
+  // ---- projection plan de l'instrument → écran (vue subjective) ----
+  function fkProject(instr, u, v, W, H) {
+    if (instr === 'cajon') {
+      // tapa en plongée : trapèze, arête proche (v=0) large en bas, fond (v=1) resserré en haut
+      const hw = (0.42 - 0.18 * v) * W;
+      const cy = (0.90 - 0.60 * v) * H;
+      const cx = W / 2 + (u - 0.5) * 2 * hw;
+      return { x: cx, y: cy, depth: v };
+    }
+    // djembé : peau vue de dessus, légèrement inclinée
+    const x = W / 2 + (u - 0.5) * 0.80 * W;
+    const y = (0.30 + 0.50 * v) * H;
+    return { x, y, depth: v };
+  }
+
+  const FK_COL = { cajon: [255, 176, 74], djembe: [80, 208, 255] };
+  function fkRGBA(c, a) { return 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + a + ')'; }
+
+  const fkAnim = { raf: 0, running: false, exo: null, canvas: null, ctx: null,
+                   t0: 0, speed: 0.30, audio: true, timeline: [], vocal: [], step: -1, lastStep: -1 };
+
+  function fkAnimStart(e) {
+    fkAnimStop();
+    fkAnim.exo = e;
+    fkAnim.timeline = fkTimeline(e);
+    fkAnim.vocal = fkParseVocal(fkVocalText(e), 4, 16);
+    fkAnim.canvas = $('fkCanvas');
+    fkAnim.ctx = fkAnim.canvas ? fkAnim.canvas.getContext('2d') : null;
+    fkAnim.t0 = (typeof performance !== 'undefined' && performance.now) ? performance.now() : 0;
+    fkAnim.step = -1; fkAnim.lastStep = -1;
+    fkAnim.running = true;
+    fkAnim.raf = (window.requestAnimationFrame || function () { return 0; })(fkAnimLoop);
+  }
+  function fkAnimStop() {
+    fkAnim.running = false;
+    if (fkAnim.raf) { (window.cancelAnimationFrame || function () {})(fkAnim.raf); fkAnim.raf = 0; }
+  }
+  // phase [0,1) sur UNE mesure : issue de l'audio en lecture réelle, sinon de l'horloge propre
+  function fkPhase() {
+    if (isPlaying && audioCtx && cycleDur) {
+      const p = ((audioCtx.currentTime - cycleStart) / cycleDur) % 1;
+      return (p + 1) % 1;
+    }
+    const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : 0;
+    const realCycle = 4 * 60 / Math.max(1, S.tempo);         // une mesure de 4 temps
+    const animDur = realCycle / Math.max(0.05, fkAnim.speed);
+    return ((now - fkAnim.t0) / (animDur * 1000)) % 1;
+  }
+  function fkAnimLoop() {
+    if (!fkAnim.running) return;
+    const p = fkPhase();
+    const step = Math.floor(p * 16) % 16;
+    fkAnim.step = step;
+    if (step !== fkAnim.lastStep) {
+      fkAnim.lastStep = step;
+      const ev = fkAnim.timeline[step];
+      // mini-rendu sonore : seulement hors lecture réelle (sinon le scheduler sonne déjà la grille)
+      if (ev && fkAnim.audio && !isPlaying && audioCtx) {
+        try { playPerc(audioCtx.currentTime, ev.voice, ev.accent ? 2 : 0); } catch (err) {}
+      }
+      fkVocalHighlight(step);
+    }
+    fkAnimRender(p);
+    fkAnim.raf = (window.requestAnimationFrame || function () { return 0; })(fkAnimLoop);
+  }
+
+  // ---- rendu d'une frame ----
+  function fkAnimRender(phase) {
+    const cv = fkAnim.canvas, ctx = fkAnim.ctx, e = fkAnim.exo;
+    if (!cv || !ctx || !e) return;
+    const W = cv.width = (cv.clientWidth || 400);
+    const H = cv.height = 240;
+    const instr = FK_GESTES[e.pattern.voix[0].geste].instr;
+    const col = FK_COL[instr] || FK_COL.djembe;
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#05060a'; ctx.fillRect(0, 0, W, H);
+    // fond « circuits » discret
+    ctx.strokeStyle = fkRGBA(col, 0.05); ctx.lineWidth = 1;
+    for (let i = 0; i < 6; i++) {
+      ctx.beginPath(); const y = H * (i + 0.5) / 6; ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+    // maillage de l'instrument (alpha décroissant vers le loin = profondeur)
+    ctx.lineWidth = 1.2;
+    if (instr === 'cajon') {
+      for (let vi = 0; vi <= 5; vi++) {
+        const v = vi / 5; ctx.beginPath();
+        for (let ui = 0; ui <= 10; ui++) {
+          const pt = fkProject('cajon', ui / 10, v, W, H);
+          ui ? ctx.lineTo(pt.x, pt.y) : ctx.moveTo(pt.x, pt.y);
+        }
+        ctx.strokeStyle = fkRGBA(col, 0.10 + 0.22 * (1 - v)); ctx.stroke();
+      }
+      for (let ui = 0; ui <= 10; ui++) {
+        ctx.beginPath();
+        for (let vi = 0; vi <= 5; vi++) {
+          const pt = fkProject('cajon', ui / 10, vi / 5, W, H);
+          vi ? ctx.lineTo(pt.x, pt.y) : ctx.moveTo(pt.x, pt.y);
+        }
+        ctx.strokeStyle = fkRGBA(col, 0.14); ctx.stroke();
+      }
+    } else {
+      // peau : cerclage + anneaux concentriques + rayons
+      for (let r = 1; r <= 4; r++) {
+        ctx.beginPath();
+        for (let a = 0; a <= 32; a++) {
+          const ang = a / 32 * Math.PI * 2;
+          const u = 0.5 + Math.cos(ang) * 0.5 * (r / 4);
+          const v = 0.5 + Math.sin(ang) * 0.5 * (r / 4);
+          const pt = fkProject('djembe', u, v, W, H);
+          a ? ctx.lineTo(pt.x, pt.y) : ctx.moveTo(pt.x, pt.y);
+        }
+        ctx.closePath();
+        ctx.strokeStyle = fkRGBA(col, r === 4 ? 0.34 : 0.12); ctx.stroke();
+      }
+    }
+    // zones de frappe (repères faibles) + halo d'impact
+    const step = Math.floor(phase * 16) % 16;
+    const frac = phase * 16 - Math.floor(phase * 16);
+    (e.pattern.voix || []).forEach(v => {
+      const gd = FK_GESTES[v.geste]; if (!gd) return;
+      const pt = fkProject(gd.instr, gd.u, gd.v, W, H);
+      ctx.beginPath(); ctx.arc(pt.x, pt.y, 6, 0, Math.PI * 2);
+      ctx.strokeStyle = fkRGBA(col, 0.35); ctx.lineWidth = 1.5; ctx.stroke();
+    });
+    const ev = fkAnim.timeline[step];
+    if (ev && frac < 0.5) {
+      const pt = fkProject(ev.gd.instr, ev.gd.u, ev.gd.v, W, H);
+      const grow = frac / 0.5;
+      const rad = 8 + grow * (ev.ghost ? 14 : 30);
+      ctx.beginPath(); ctx.arc(pt.x, pt.y, rad, 0, Math.PI * 2);
+      ctx.strokeStyle = fkRGBA([255, 210, 140], (ev.ghost ? 0.3 : 0.7) * (1 - grow)); ctx.lineWidth = 2; ctx.stroke();
+      ctx.save(); ctx.shadowColor = fkRGBA([255, 200, 120], 0.9); ctx.shadowBlur = ev.ghost ? 8 : 20;
+      ctx.beginPath(); ctx.arc(pt.x, pt.y, ev.ghost ? 3 : 5, 0, Math.PI * 2);
+      ctx.fillStyle = fkRGBA([255, 230, 180], 0.9); ctx.fill(); ctx.restore();
+    }
+    // mains : silhouettes translucides, se portent vers la frappe suivante
+    fkDrawHands(ctx, W, H, instr, col, phase);
+    // halo général du contour
+    ctx.save(); ctx.shadowColor = fkRGBA(col, 0.5); ctx.shadowBlur = 12; ctx.restore();
+  }
+
+  // main dessinée comme une silhouette simple (paume + amorce de doigts), pouce côté interne
+  function fkDrawHand(ctx, x, y, size, side, col, lift) {
+    ctx.save();
+    ctx.translate(x, y);
+    if (side === 'G') ctx.scale(-1, 1);   // miroir : pouce vers l'intérieur
+    const s = size * (1 + 0.25 * lift);   // main levée = plus grande (plus proche de l'œil)
+    ctx.beginPath();
+    ctx.moveTo(-0.5 * s, 0.2 * s);
+    ctx.quadraticCurveTo(-0.6 * s, -0.7 * s, 0.0 * s, -0.9 * s);
+    ctx.quadraticCurveTo(0.55 * s, -0.7 * s, 0.5 * s, 0.1 * s);
+    ctx.quadraticCurveTo(0.55 * s, 0.55 * s, 0.0 * s, 0.6 * s);   // pouce (côté interne après miroir)
+    ctx.quadraticCurveTo(-0.4 * s, 0.55 * s, -0.5 * s, 0.2 * s);
+    ctx.closePath();
+    ctx.fillStyle = fkRGBA(col, 0.10);
+    ctx.fill();
+    ctx.strokeStyle = fkRGBA(col, 0.8); ctx.lineWidth = 1.6;
+    ctx.shadowColor = fkRGBA(col, 0.7); ctx.shadowBlur = 8; ctx.stroke();
+    // séparations de doigts suggérées
+    ctx.shadowBlur = 0; ctx.strokeStyle = fkRGBA(col, 0.35); ctx.lineWidth = 1;
+    for (let k = -1; k <= 2; k++) {
+      ctx.beginPath(); ctx.moveTo(k * 0.16 * s, -0.85 * s); ctx.lineTo(k * 0.16 * s, -0.2 * s); ctx.stroke();
+    }
+    ctx.restore();
+  }
+  function fkDrawHands(ctx, W, H, instr, col, phase) {
+    const tl = fkAnim.timeline;
+    const strikesFor = hand => { const a = []; for (let i = 0; i < 16; i++) if (tl[i] && tl[i].hand === hand) a.push(i); return a; };
+    const ptOf = step => (tl[step] ? fkProject(instr, tl[step].gd.u, tl[step].gd.v, W, H) : null);
+    ['D', 'G'].forEach(hand => {
+      const st = strikesFor(hand);
+      const home = { x: hand === 'D' ? W * 0.72 : W * 0.28, y: H * 0.94 };
+      if (!st.length) { fkDrawHand(ctx, home.x, home.y, W * 0.07, hand, col, 0.35); return; }
+      const pos = phase * 16;                         // 0 … 16 sur la mesure
+      let ni = st.findIndex(s => s > pos); if (ni === -1) ni = 0;   // frappe suivante (bouclage)
+      const pi = (ni - 1 + st.length) % st.length;    // frappe précédente
+      const nextStep = st[ni], prevStep = st[pi];
+      let nextT = nextStep, prevT = prevStep;
+      if (nextT <= pos) nextT += 16;                  // suivante appartient au cycle d'après
+      if (prevT > pos) prevT -= 16;                   // précédente au cycle d'avant
+      const seg = Math.max(0.0001, nextT - prevT);
+      const t = (pos - prevT) / seg;                  // 0 à la précédente, 1 à la suivante
+      const a = ptOf(prevStep) || home, b = ptOf(nextStep) || home;
+      const x = a.x + (b.x - a.x) * t;
+      const y = a.y + (b.y - a.y) * t;
+      const lift = Math.sin(Math.PI * t);             // levée maxi à mi-course, extension à la frappe
+      fkDrawHand(ctx, x, y - lift * H * 0.14, W * 0.07, hand, col, lift);
+    });
+  }
+
+  // ---- vocalisation : stockage local (fm-funk-vocal), effectif, rendu, surbrillance ----
+  function fkVocalStore() { try { return JSON.parse(store.get('fm-funk-vocal') || '{}'); } catch (e) { return {}; } }
+  function fkVocalSave(all) { store.set('fm-funk-vocal', JSON.stringify(all)); }
+  function fkVocalText(e) {
+    const u = fkVocalStore()[e.id];
+    if (u && typeof u.text === 'string' && u.text.trim()) return u.text;
+    return e.vocalisation ? e.vocalisation.defaut : '';
+  }
+  function fkVocalHidden(e) { const u = fkVocalStore()[e.id]; return !!(u && u.hidden); }
+  function fkSetVocal(id, text) {
+    const all = fkVocalStore(); all[id] = Object.assign({}, all[id], { text: text }); fkVocalSave(all);
+    if (FK.loaded && FK.exoId === id) { const e = fkExo(id); fkAnim.vocal = fkParseVocal(fkVocalText(e), 4, 16); fkRenderVocal(e); }
+  }
+  function fkHideVocal(id, hidden) {
+    const all = fkVocalStore(); all[id] = Object.assign({}, all[id], { hidden: !!hidden }); fkVocalSave(all);
+    if (FK.loaded && FK.exoId === id) fkRenderVocal(fkExo(id));
+  }
+  function fkRenderVocal(e) {
+    const line = $('fkVocal'); if (!line) return;
+    const parsed = fkParseVocal(fkVocalText(e), 4, 16);
+    line.classList.toggle('hidden', fkVocalHidden(e));
+    const chips = [];
+    for (let i = 0; i < 16; i++) {
+      if (!parsed[i]) continue;
+      chips.push('<span class="fk-syl' + (parsed[i].accent ? ' acc' : '') + '" data-step="' + i + '">' +
+        tsEsc(parsed[i].syl) + '</span>');
+    }
+    line.innerHTML = chips.join('');
+  }
+  function fkVocalHighlight(step) {
+    const line = $('fkVocal'); if (!line) return;
+    const now = $('fkGesteNow');
+    line.querySelectorAll('.fk-syl').forEach(c => c.classList.toggle('cur', +c.dataset.step === step));
+    if (now) {
+      const ev = fkAnim.timeline[step];
+      now.textContent = ev ? ('▸ ' + ev.geste + ' — ' + ev.gd.label + ' · main ' + ev.hand + ' · ' + ev.gd.zone) : '';
+    }
   }
 
   // ---- événements & init de la section ----
@@ -6946,7 +7283,15 @@ swing 62
       muted: function (v, brk) { return percLayerMuted('perc', v, !!brk); },
       gridFor: fkGridFor, offsetsFor: fkOffsetsFor,
       progress: fkProgress, onNewMeasure: fkOnNewMeasure,
-      play: function (voice, accent) { ensureCtx(); playPerc(0, voice, accent); }
+      play: function (voice, accent) { ensureCtx(); playPerc(0, voice, accent); },
+      // C2 : animation & vocalisation (diagnostics recette-cours-2.js)
+      anim: fkAnim,
+      animStart: fkAnimStart, animStop: fkAnimStop,
+      timeline: fkTimeline, parseVocal: fkParseVocal,
+      vocalText: fkVocalText, vocalHidden: fkVocalHidden,
+      setVocal: fkSetVocal, hideVocal: fkHideVocal,
+      vocalStore: fkVocalStore, phase: fkPhase,
+      highlight: fkVocalHighlight, renderVocal: fkRenderVocal
     };
   };
 

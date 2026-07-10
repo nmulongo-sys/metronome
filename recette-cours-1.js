@@ -177,7 +177,7 @@ boot(() => {
 
   // ---- [10] non-régression ---------------------------------------------------
   console.log('\n[10] Non-régression');
-  ok(html.indexOf('metronomefunk-0.5.4-c1') > -1, 'estampille build 0.5.4-c1');
+  ok(/metronomefunk-0\.5\.4-c[0-9]/.test(html), 'estampille build 0.5.4-c* (cours funk)');
   ok(!!F.grids()['basse'] && !!F.grids()['tone'] && !!F.grids()['slap'], 'percussion focale djembé par défaut intacte (3 voix)');
   ok(F.state.loaded === false, 'état FK déchargé en fin de recette');
 
