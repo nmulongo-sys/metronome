@@ -122,6 +122,7 @@ l'actuel mode expert, inchangé). En mode Jouer, la carte `#playScreen` montre *
 | `fm-metro-perc-presets` | `{ nom: {instr, count, grids, offsets, muted} }` |
 | `fm-metro-progress` | `{ instr: { break: 1..4, guide: n } }` — progression par niveau (étape 4) |
 | `fm-metro-play` | `{ who, learn, learnPaused, n, showBacking }` — écran de jeu (4.1) ; absent = premier lancement → écran d'accueil |
+| `fm-metro-bass` | `S.bass` complet (passe 5) : `{ on, pattern, prog, key, density, vel, vary, legato, space, swingFollow, drop:{on, everyN, lenBeats} }` |
 | `fm-metro-wizard-done` | posé quand l'assistant est utilisé (depuis 4.1 il ne s'ouvre plus automatiquement — l'écran d'accueil le remplace) |
 
 Les participants / assignations team spirit vivent en mémoire ; l'export JSON « ma ligne » est le vecteur
@@ -137,6 +138,49 @@ de partage.
 - **Substitution instrument** : compléter `TS_SUB[instr]` (rôle → voiceKind valide).
 
 ## Journal de développement
+
+### 2026-07-10 — Passe 5 étape 5.4 : drop-outs, écran de jeu, swing des 16es (fin de passe)
+- **Drop-outs de maintien du time** (§6 de la spec de passe) : la basse se tait sur les
+  `lenBeats` **derniers temps** de chaque période de `everyN` mesures et **re-rentre sur
+  The One** (FUNK-T1) — percussion, clave et pulsation continuent. **Écart assumé avec la
+  lettre du §4.4** (spec `metronome-passe5-5-4-spec.md` §2.1, validé) : la machine gap est
+  granulaire à la mesure et mono-cible → le drop est une **fonction pure de `measureCount`**
+  dans `bassRealize` (zéro état nouveau, machine gap intouchée d'un octet, gap utilisateur
+  cumulable avec le drop). Les queues legato qui déborderaient dans le trou sont
+  **raccourcies au bord** (plancher 20 ms) : le silence reste net malgré le legato 5.3c.
+  À l'arrêt (`measureCount = 0`), jamais de trou.
+- **Swing des 16es** (`S.bass.swingFollow`, FUNK-T3) : pas impairs décalés à
+  `(i−1+2·sw)/16` — même formule par paires que `subPositions` — **avant** le test de
+  drop (le trou s'évalue sur la position réellement sonnée). `sw = 50 %` ⇒ identité
+  stricte : non-régression des recettes antérieures par construction.
+- **Écran de jeu** : ligne « Basse : activer · densité · drop-outs · ♪ accord »
+  (`#playBassGroup`), synchro **bidirectionnelle** avec `secBass` (mêmes champs d'état,
+  `bassPlayRefresh`). La pastille d'accord fait office de **témoin d'activité** (§5 de la
+  spec de passe, dernier morceau non livré) : elle pulse sur chaque frappe via la boucle
+  rAF du curseur (`bassPulseCheck` — au moment sonné, pas au scheduling en avance de
+  lookahead). Groupe grisé/désactivé en famille ternaire (basse binaire v1).
+- **`secBass`** : ligne drop-outs (période 1–32 mesures, trou 1–8 temps) + case « La basse
+  suit le swing » ; hint réécrit (la mention « étape suivante » disparaît). i18n : la
+  section basse entière reste hors dictionnaires EN/PT — précédent établi depuis 5.1,
+  assumé, à traiter en lot dans une passe dédiée.
+- **Persistance** : les champs dormants `drop`/`swingFollow` (présents dans `fm-metro-bass`
+  depuis 5.0) deviennent actifs — **aucune migration**, garde-fous de bornes/types dans
+  `bassRestore` (everyN 1–32, lenBeats 1–8, booléens coercés).
+- **Diagnostics** `fmMetroBass` : `setMeasure(n)` (pose le compteur de mesures, même esprit
+  que `setRng`) et `cycleEvents()` (comptes d'événements par couche) pour la recette.
+- **Recette** `recette-5-4.js` **40/40** : défauts & no-op strict 5.3c, trou/périodicité/
+  re-entrée/arrêt, clamp au bord (0,25 temps exact), drop × swing sur position swinguée,
+  couches beat/sub/perc intactes pendant le trou, machine gap non réquisitionnée,
+  persistance + bornes, synchro écran de jeu dans les deux sens, grisage ternaire,
+  estampille. **Non-régression 7 recettes vertes** ; retouche documentée : estampilles
+  génériquées passe 5 (`0\.5\.`) dans 5-3-bis/-ter/-c — le build avance à chaque étape,
+  le motif exact `0\.5\.3x` ne matchait plus.
+- **Vérification navigateur** (preview mobile 375×812) : aucun débordement horizontal,
+  wrap propre du groupe basse, synchro réelle, grisage ternaire (opacité 0,45), animation
+  `bassPulse` définie. Estampille `metronomefunk-0.5.4 · 2026-07-10`. Branche
+  `metronomefunk-0.5.4` (depuis `metronomefunk-0.5.3c`). **Fin de la passe 5** — reste
+  ouvert : validation à l'oreille du legato 5.3c (défaut L=1,25 et haut de course) et des
+  drop-outs/swing 5.4.
 
 ### 2026-07-10 — Passe 5 étape 5.3c : recalibrage du curseur legato (verdict d'écoute)
 - **Nomenclature** : à partir de cette étape, les suffixes latins (bis/ter/quater) cèdent la
