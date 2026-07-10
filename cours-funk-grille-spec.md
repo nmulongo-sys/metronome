@@ -86,6 +86,18 @@ Contraintes de champ :
 - `feel` : `null` sauf tier Artiste — `{ "direction": "laid-back" | "pushed", "note": "…" }`. Direction, jamais cible (FUNK-P4).
 - `vocalisation` : `systeme` = `"syllabique"` (cajón) ou `"gun-go-pa"` (djembé) ; `defaut` = la vocalisation classique livrée. La personnalisation utilisateur vit dans `localStorage` (`fm-funk-vocal`, clé = `id` d'exercice) et n'est **pas** dans ce schéma. `null` autorisé aux niveaux 3–4.
 
+## 3 bis. Animation du geste (boucle au ralenti) — direction validée sur maquette
+
+Décisions du 2026-07-10, validées sur maquette interactive (maquette jetable, hors dépôt) :
+
+- Chaque exercice affiche une **boucle du geste au ralenti**, en **rendu vectoriel génératif** (Canvas 2D) piloté par le champ `pattern` — aucune vidéo, aucun asset par exercice. Poids : quelques Ko de code une fois pour toutes ; compatible fichier unique, offline, mobile.
+- **Style « hologramme fil de fer »** (réf. vidéo fournie par Jean) : cajón ambre, djembé cyan, fond sombre à motifs de circuits, halo `shadowBlur` sur les arêtes et le cerclage, **maillage estompé vers le loin** (hiérarchie d'alpha = profondeur), halo chaud au point d'impact + onde.
+- **Point de vue : toujours la vue subjective du joueur assis sur l'instrument** (décision pédagogique). Cajón : tapa en plongée — arête supérieure proche du corps en bas de l'image, compression perspective vers le bas de la tapa ; slap/tone près de l'arête, grave au centre-loin. Djembé : peau vue de dessus, grave au centre, tone/ghost et slap au bord proche. Les zones de frappe **épousent le plan de l'instrument** (transformation perspective, jamais plaquées à plat).
+- **Mains : silhouettes fines translucides** — contour lumineux, remplissage quasi transparent (l'instrument reste visible au travers), doigts suggérés par des séparations intérieures (pas de phalanges dessinées), cassure du poignet marquée, **pouces toujours côté interne** (contrainte anatomique explicite). Main levée = légèrement plus grande (plus proche de l'œil) et doigts ramenés ; frappe = extension complète.
+- **Vocalisation synchronisée à la boucle** : la syllabe du champ `vocalisation.defaut` s'allume au moment de la frappe (syllabique cajón, Gun-Go-Pa djembé). La ligne de lecture affiche le geste en cours (ID corpus + nom + main + zone).
+- **Ralenti** : simple échelle de temps (~×0,15 à ×1) sur une horloge propre à l'animation, avec un mini-rendu sonore des frappes (Web Audio). **Pas de synchronisation fine avec le séquenceur fm-metro** (décision) — la boucle est un support de visualisation du geste, pas un play-along.
+- **Données** : une table embarquée geste → {zone, main, type de son}, dérivée du corpus, suffit ; **aucun champ nouveau obligatoire** dans le schéma §3. Un champ optionnel `anim` pourra préciser les cas ambigus (main non standard, zone particulière, cimbalette).
+
 ## 4. Logique de promotion « trop difficile » (proposition)
 
 - **Vote** : sur l'écran d'exercice, un seul geste — « Trop difficile pour ce niveau ». Un vote par exercice et par appareil (garde `localStorage` `fm-funk-vote-{id}` ; pas de compte utilisateur).
