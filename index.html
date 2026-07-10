@@ -280,6 +280,18 @@
   #playScreen { display: none; margin-bottom: 14px; }
   body.mode-simple #playScreen { display: block; }
   .play-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  /* 5.4 : ligne basse de l'écran de jeu — commandes tactiles + pastille d'accord pulsante */
+  .play-bass select, .play-bass input[type="checkbox"] { min-height: 24px; }
+  .play-bass .check { min-height: 40px; }
+  .play-bass.bass-tern { opacity: .45; }
+  #playBassChord { display: inline-block; font-weight: 600; font-variant-numeric: tabular-nums;
+    padding: 2px 10px; border: 1px solid var(--fm-line); border-radius: 12px; min-width: 52px;
+    text-align: center; }
+  #playBassChord.pulse { animation: bassPulse .28s ease-out; }
+  @keyframes bassPulse {
+    0% { transform: scale(1.22); color: var(--fm-accent); border-color: var(--fm-accent); }
+    100% { transform: scale(1); }
+  }
   .play-line { height: 170px; }
   .pl-brick.mine {
     height: 20px; display: flex; align-items: center; justify-content: center;
@@ -528,6 +540,20 @@
       <label class="check"><input type="checkbox" id="playBacking" checked> Voir l'accompagnement</label>
       <span style="flex:1;"></span>
       <button class="btn-sm" id="playSetupBtn" title="Rouvrir l'écran d'accueil (seul / à plusieurs · apprentissage)">⟲ Setup</button>
+    </div>
+    <!-- 5.4 : commandes basse de l'écran de jeu (spec de passe §5) — mêmes champs d'état
+         que secBass, synchro bidirectionnelle ; l'accord courant pulse sur les frappes. -->
+    <div class="play-bar play-bass" id="playBassGroup">
+      <label style="min-width:auto;">Basse :</label>
+      <label class="check"><input type="checkbox" id="playBassOn"> activer</label>
+      <select id="playBassDensity" style="width:auto;">
+        <option value="1">1 — allégé</option>
+        <option value="2" selected>2 — normal</option>
+        <option value="3">3 — chargé</option>
+      </select>
+      <label class="check"><input type="checkbox" id="playBassDrop"> drop-outs</label>
+      <span style="flex:1;"></span>
+      <span id="playBassChord" aria-live="polite">♪ —</span>
     </div>
     <div class="perc-line play-line" id="playLine"></div>
     <div class="perc-line-legend" id="playLegend"></div>
@@ -905,6 +931,17 @@
         <input type="range" id="bassLegato" min="0" max="100" value="25" style="flex:1;min-width:120px;">
         <label class="check" style="min-width:auto;"><input type="checkbox" id="bassSpace" checked> Espace (réverb courte)</label>
       </div>
+      <div class="row">
+        <label class="check"><input type="checkbox" id="bassDropOn"> Drop-outs — la basse se tait</label>
+        <label style="min-width:auto;">toutes les</label>
+        <input type="number" id="bassDropEvery" min="1" max="32" value="4" style="width:70px;">
+        <label style="min-width:auto;">mesures, trou de</label>
+        <input type="number" id="bassDropLen" min="1" max="8" value="2" style="width:70px;">
+        <label style="min-width:auto;">temps</label>
+      </div>
+      <div class="row">
+        <label class="check"><input type="checkbox" id="bassSwingFollow" checked> La basse suit le swing</label>
+      </div>
       <div class="hint">Une voix de basse funk synthétisée qui accompagne le percussionniste — pour
       caler le jeu sur ses syncopes et ses silences (FUNK-I2). Choisis un <b>gabarit</b>, une
       <b>progression</b> (du vamp 1 accord au blues 12 mesures), une <b>tonalité</b>, la
@@ -914,7 +951,11 @@
       (tirage des ornements) ; désactivé, elle est régulière et prévisible. La ligne s'allège et se
       raccourcit d'elle-même quand le tempo monte. Le curseur <b>détaché ↔ lié</b> dose le liant
       entre les notes (les ghosts restent piqués) ; <b>Espace</b> ajoute une réverb très courte
-      sur la basse seule — l'attaque et le <i>time</i> restent nets. Drop-outs de maintien du <i>time</i> : étape suivante.</div>
+      sur la basse seule — l'attaque et le <i>time</i> restent nets. <b>Drop-outs</b> : la basse
+      se tait périodiquement (trou en fin de période) et re-rentre sur le 1 — tiens le <i>time</i>
+      pendant le silence, la re-entrée te confirme ou te corrige ; percussion et pulsation
+      continuent. <b>La basse suit le swing</b> cale ses doubles-croches sur le swing du métronome
+      (section Micro-timing).</div>
     </div>
   </details>
 
@@ -1135,15 +1176,15 @@ swing 62
       vary: false,         // variations probabilistes (5.2) ; 5.1 reste déterministe
       legato: 0.25,        // 5.3c : curseur « lié ↔ très lié » (fraction 0–1 → L = 1+f) — durées + release
       space: true,         // 5.3-ter : réverb courte sur la basse seule (off/discret)
-      swingFollow: true,   // 16es de la basse suivent S.swing (appliqué en 5.4)
-      drop: { on: false, everyN: 4, lenBeats: 2 }   // drop-outs (5.4)
+      swingFollow: true,   // 5.4 : les 16es de la basse suivent S.swing (pas impairs, FUNK-T3)
+      drop: { on: false, everyN: 4, lenBeats: 2 }   // 5.4 : trou de lenBeats temps en fin de période de everyN mesures
     },
     volume: 0.8
   };
 
   // Identité du build affichée dans l'en-tête (5.3-bis). Bumper à chaque passe : elle sert à
   // savoir de quel build vient un enregistrement de validation.
-  const BUILD = 'metronomefunk-0.5.3c', BUILD_DATE = '2026-07-10';
+  const BUILD = 'metronomefunk-0.5.4', BUILD_DATE = '2026-07-10';
 
   let audioCtx = null, masterGain = null, noiseBuf = null;
   let masterLimiter = null;                                   // 5.3-ter : limiteur de bus master
@@ -1228,6 +1269,7 @@ swing 62
     $('famBinBtn').classList.toggle('sel', bin);
     $('famTernBtn').classList.toggle('sel', !bin);
     store.set('fm-metro-family', S.family);
+    bassPlayRefresh();   // 5.4 : le groupe basse de l'écran de jeu se grise en ternaire
     if (rebuild === false) return;
     // clave : recompose les grilles des deux voix sur le nouveau count
     $('claveCount').value = String(count);
@@ -1840,6 +1882,19 @@ swing 62
     const durTempo   = 1.15 + (0.70 - 1.15) * k;                              // legato lent → sec rapide
     const ghostGainT = 1.20 + (0.64 - 1.20) * k;                              // ghost ≈ 0.30 → 0.16 (base mixte 0.25)
     const wGhostsT   = 1.20 + (0.65 - 1.20) * k;                              // proba des pas non-piliers (la ligne se dépouille)
+    // 5.4 : swing des 16es (FUNK-T3) — pas impairs décalés par la formule par paires de
+    // subPositions ; sw = 50 % ⇒ identité stricte (non-régression par construction).
+    const sw = S.swing / 100, swingOn = !!S.bass.swingFollow;
+    // 5.4 : drop-outs — fonction PURE du compteur de mesures global (measureCount), aucune
+    // seconde machine à états (spec 5.4 §2.1). Le trou couvre les lenBeats derniers temps de
+    // chaque période de everyN mesures ; re-entrée sur The One (FUNK-T1). À l'arrêt
+    // (measureCount = 0), jamais de trou. E = période en temps ; g = position globale en temps.
+    const dp = S.bass.drop || {};
+    const dropE = Math.max(1, (dp.everyN > 0 ? dp.everyN : 4) * S.beats);
+    const dropLen = Math.max(1, Math.min(dropE - 1, dp.lenBeats > 0 ? dp.lenBeats : 2));
+    const dropOn = !!dp.on && measureCount > 0;
+    const beat0 = (measureCount - 1) * S.beats;                               // temps global du 1 de la mesure
+    const beatDur = 60 / S.tempo;
     for (const h of pat.hits) {
       if (h.lvl > dens) continue;                                             // densité : le pas n'existe pas
       const pilier = h.w >= 1;
@@ -1854,13 +1909,22 @@ swing 62
       gain = bassVelShape(gain, prof);                                        // profil de vélocité (§2.2)
       if (h.art === 'ghost') gain *= ghostGainT;                             // adaptation tempo des ghosts (§2.3)
       gain = Math.max(0.02, Math.min(1, gain));
+      // 5.4 : position swinguée AVANT le test de drop — le trou s'évalue sur ce qui sonne.
+      const frac = (swingOn && h.i % 2 === 1) ? (h.i - 1 + 2 * sw) / pat.steps : h.i / pat.steps;
+      let dur = Math.max(stepDur * fill * durTempo, 0.02);                    // plancher audible 20 ms
+      if (dropOn) {
+        const gm = (beat0 + frac * S.beats) % dropE;                          // position dans la période (temps)
+        if (gm >= dropE - dropLen) continue;                                  // dans le trou : note supprimée
+        // bord du trou : la queue legato s'éteint au bord — le silence reste net
+        dur = Math.max(0.02, Math.min(dur, (dropE - dropLen - gm) * beatDur));
+      }
       bassRealized.push({
-        frac: h.i / pat.steps,
+        frac: frac,
         note: {
           freq: bassNoteFreq(S.bass.key, bar.deg, h.deg),
           art: h.art,
           gain: gain,
-          dur: Math.max(stepDur * fill * durTempo, 0.02)                      // plancher audible 20 ms
+          dur: dur
         }
       });
     }
@@ -1882,11 +1946,42 @@ swing 62
   // en cours (bassBarIdx). Sinon (à l'arrêt ou basse coupée) : le 1er accord de la progression
   // sélectionnée dans la tonalité choisie — l'élève voit d'avance ce qu'il obtiendra.
   function bassUpdateChordLabel() {
-    const el = $('bassChord'); if (!el) return;
     const prog = BASS_PROGS[S.bass.prog];
-    if (!prog) { el.textContent = '—'; return; }
-    const idx = (S.bass.on && isPlaying) ? (bassBarIdx % prog.bars.length) : 0;
-    el.textContent = bassChordName(S.bass.key, prog.bars[idx]) || '—';
+    const idx = (prog && S.bass.on && isPlaying) ? (bassBarIdx % prog.bars.length) : 0;
+    const name = prog ? (bassChordName(S.bass.key, prog.bars[idx]) || '—') : '—';
+    const el = $('bassChord'); if (el) el.textContent = name;
+    const pl = $('playBassChord'); if (pl) pl.textContent = '♪ ' + name;   // 5.4 : écran de jeu
+  }
+
+  // 5.4 : miroir des commandes basse de l'écran de jeu — mêmes champs d'état que secBass,
+  // synchro bidirectionnelle (les handlers de l'un rafraîchissent l'autre). En famille
+  // ternaire, le groupe est désactivé : la basse est binaire en v1 (spec de passe §2.1).
+  function bassPlayRefresh() {
+    if (!$('playBassOn')) return;
+    $('playBassOn').checked = !!S.bass.on;
+    $('playBassDensity').value = String(S.bass.density);
+    $('playBassDrop').checked = !!(S.bass.drop && S.bass.drop.on);
+    const tern = S.family !== 'bin';
+    const grp = $('playBassGroup');
+    if (grp) {
+      grp.classList.toggle('bass-tern', tern);
+      grp.title = tern ? 'Basse funk : famille binaire uniquement (v1)' : '';
+    }
+    ['playBassOn', 'playBassDensity', 'playBassDrop'].forEach(id => { $(id).disabled = tern; });
+    bassUpdateChordLabel();
+  }
+
+  // 5.4 : témoin d'activité de l'écran de jeu — la pastille d'accord pulse quand le curseur
+  // franchit une frappe réalisée (position sonnée : pas au scheduling, qui est en avance de
+  // lookahead). Relance l'animation CSS à chaque franchissement ; gère le retour de cycle.
+  let bassPulsePhase = 0;
+  function bassPulseCheck(phase) {
+    const el = $('playBassChord');
+    const a = bassPulsePhase; bassPulsePhase = phase;
+    if (!el || !S.bass.on || S.family !== 'bin' || !bassRealized.length) return;
+    const hit = bassRealized.some(n => a <= phase ? (n.frac > a && n.frac <= phase)
+                                                  : (n.frac > a || n.frac <= phase));
+    if (hit) { el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse'); }
   }
 
   // Seuil de diagnostic (même esprit que window.fmMetroAudio) : lecture + recalculs
@@ -1924,6 +2019,17 @@ swing 62
       // 5.2 : injection d'un RNG déterministe pour la recette headless du tirage probabiliste.
       // En prod, bassRng reste Math.random ; setRng(null) restaure ce défaut.
       setRng: function (fn) { bassRng = (typeof fn === 'function') ? fn : Math.random; return true; },
+      // 5.4 : diagnostic headless des drop-outs — pose le compteur de mesures global (même
+      // esprit que setRng ; en prod, seul le scheduler l'avance). Renvoie la valeur posée.
+      setMeasure: function (n) { measureCount = Math.max(0, n | 0); return measureCount; },
+      // 5.4 : recompute du cycle complet, comptes d'événements par couche — la recette
+      // vérifie que percussion et pulsation restent intactes pendant un trou de basse.
+      cycleEvents: function () {
+        computeCycle();
+        const by = {};
+        for (const e of events) by[e.layer] = (by[e.layer] || 0) + 1;
+        return by;
+      },
       // 5.3-ter : lecture des nœuds de bus (diagnostic headless — limiteur, HP 35 Hz, réverb).
       bus: function () {
         return { limiter: masterLimiter, bassBus: bassBus, bassHP: bassHP, bassWet: bassWet, wetLevel: BASS_WET };
@@ -1956,6 +2062,13 @@ swing 62
     if (typeof S.bass.legato !== 'number' || !isFinite(S.bass.legato)) S.bass.legato = 0.25;  // 5.3c : défaut curseur 25 (L=1,25)
     S.bass.legato = Math.max(0, Math.min(1, S.bass.legato));
     S.bass.space = S.bass.space !== false;                                                    // 5.3-ter
+    // 5.4 : drop-outs + suivi du swing — champs présents dans l'état depuis 5.0, AUCUNE
+    // migration ; seuls des garde-fous de bornes/types sur un stockage hérité ou corrompu.
+    if (!S.bass.drop || typeof S.bass.drop !== 'object') S.bass.drop = { on: false, everyN: 4, lenBeats: 2 };
+    S.bass.drop.on = !!S.bass.drop.on;
+    S.bass.drop.everyN = Math.max(1, Math.min(32, Math.round(+S.bass.drop.everyN) || 4));
+    S.bass.drop.lenBeats = Math.max(1, Math.min(8, Math.round(+S.bass.drop.lenBeats) || 2));
+    S.bass.swingFollow = S.bass.swingFollow !== false;
     $('bassOn').checked = !!S.bass.on;
     $('bassPattern').value = S.bass.pattern;
     $('bassProg').value = S.bass.prog;
@@ -1965,7 +2078,11 @@ swing 62
     $('bassVary').checked = !!S.bass.vary;
     $('bassLegato').value = String(Math.round(S.bass.legato * 100));                          // 5.3-ter
     $('bassSpace').checked = !!S.bass.space;                                                  // 5.3-ter
-    bassUpdateChordLabel();                                                     // 5.3 : accord de tête au chargement
+    $('bassDropOn').checked = !!S.bass.drop.on;                                               // 5.4
+    $('bassDropEvery').value = String(S.bass.drop.everyN);
+    $('bassDropLen').value = String(S.bass.drop.lenBeats);
+    $('bassSwingFollow').checked = !!S.bass.swingFollow;
+    bassPlayRefresh();                                          // 5.4 : miroir écran de jeu + accord de tête
   }
 
   // ============ SCRIPT ============
@@ -2235,6 +2352,7 @@ swing 62
     if (document.body.classList.contains('mode-simple')) {
       const pc = $('playLine') && $('playLine').querySelector('.pl-cursor');
       if (pc) { pc.style.display = 'block'; pc.style.left = ((phase < 0 ? 0 : phase) * 100) + '%'; }
+      bassPulseCheck(phase < 0 ? 0 : phase);   // 5.4 : témoin d'activité basse
     }
     $('statusLine').innerHTML = mutedThisCycle
       ? '<span class="mute">' + (S.gap.target === 'all'
@@ -6828,15 +6946,30 @@ swing 62
 
   // basse funk (passe 5) : on/off, gabarit, tonalité. Un changement prend effet à la
   // mesure suivante (réalisation par mesure) ; hors lecture, il est simplement mémorisé.
-  $('bassOn').addEventListener('change', e => { S.bass.on = e.target.checked; bassUpdateChordLabel(); bassPersist(); });
+  $('bassOn').addEventListener('change', e => { S.bass.on = e.target.checked; bassPlayRefresh(); bassPersist(); });
   $('bassPattern').addEventListener('change', e => { S.bass.pattern = e.target.value; bassPersist(); });
   $('bassProg').addEventListener('change', e => { S.bass.prog = e.target.value; bassResetCycle(); bassPersist(); });   // 5.3 : reprend la progression au début
   $('bassKey').addEventListener('change', e => { S.bass.key = e.target.value; bassUpdateChordLabel(); bassPersist(); });
-  $('bassDensity').addEventListener('change', e => { S.bass.density = +e.target.value; bassPersist(); });
+  $('bassDensity').addEventListener('change', e => { S.bass.density = +e.target.value; bassPlayRefresh(); bassPersist(); });
   $('bassVel').addEventListener('change', e => { S.bass.vel = e.target.value; bassPersist(); });
   $('bassVary').addEventListener('change', e => { S.bass.vary = e.target.checked; bassPersist(); });
   $('bassLegato').addEventListener('input', e => { S.bass.legato = (+e.target.value) / 100; bassPersist(); });   // 5.3-ter
   $('bassSpace').addEventListener('change', e => { S.bass.space = e.target.checked; if (bassWet) bassWet.gain.value = S.bass.space ? BASS_WET : 0; bassPersist(); });   // 5.3-ter
+  // 5.4 : drop-outs + suivi du swing (secBass) — bornes réappliquées à la saisie
+  $('bassDropOn').addEventListener('change', e => { S.bass.drop.on = e.target.checked; bassPlayRefresh(); bassPersist(); });
+  $('bassDropEvery').addEventListener('change', e => {
+    S.bass.drop.everyN = Math.max(1, Math.min(32, Math.round(+e.target.value) || 4));
+    e.target.value = String(S.bass.drop.everyN); bassPersist();
+  });
+  $('bassDropLen').addEventListener('change', e => {
+    S.bass.drop.lenBeats = Math.max(1, Math.min(8, Math.round(+e.target.value) || 2));
+    e.target.value = String(S.bass.drop.lenBeats); bassPersist();
+  });
+  $('bassSwingFollow').addEventListener('change', e => { S.bass.swingFollow = e.target.checked; bassPersist(); });
+  // 5.4 : écran de jeu — mêmes champs d'état, synchro miroir vers secBass
+  $('playBassOn').addEventListener('change', e => { S.bass.on = e.target.checked; $('bassOn').checked = S.bass.on; bassUpdateChordLabel(); bassPersist(); });
+  $('playBassDensity').addEventListener('change', e => { S.bass.density = +e.target.value; $('bassDensity').value = String(S.bass.density); bassPersist(); });
+  $('playBassDrop').addEventListener('change', e => { S.bass.drop.on = e.target.checked; $('bassDropOn').checked = S.bass.drop.on; bassPersist(); });
 
   $('pulseFreq').addEventListener('input', e => {
     S.sound.pulseFreq = +e.target.value; $('pulseFreqVal').textContent = S.sound.pulseFreq + ' Hz';
