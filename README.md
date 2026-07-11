@@ -30,7 +30,7 @@ Tout est dans `metronome.html` :
 | markup UI | carte **écran de jeu** `#playScreen` (visible en mode Jouer), sections `<details class="section">` (clave, percussion, **team spirit**, archet…), overlays `#wizOverlay` (assistant) et `#playSetup` (écran d'accueil) |
 | app | grand `<script>` en IIFE `(() => { 'use strict'; … })()`, divisé par des commentaires `// ==== NOM ====` |
 
-Sections JS principales : `ÉTAT` (l'objet `S`), `AUDIO`, `CALCUL DU CYCLE`, `GAP`, `ORDONNANCEUR`,
+Sections JS principales : `ÉTAT` (l'objet `S`), `AUDIO`, `CALCUL DU CYCLE`, `GAP`, `BASSE FUNK (passe 5)`, `ORDONNANCEUR`,
 `VISUALISATION`, `CLAVE MULTI-VOIX`, `PERCUSSION & INDÉPENDANCE`, `TEAM SPIRIT & RÉPERTOIRE`,
 `ÉCRAN DE JEU (passe 4, étape 4.1)`, `DSL PÉDAGOGIQUE`, `WIZARD`, `INIT`.
 
@@ -147,6 +147,7 @@ l'actuel mode expert, inchangé). En mode Jouer, la carte `#playScreen` montre *
 | `fm-metro-perc-presets` | `{ nom: {instr, count, grids, offsets, muted} }` |
 | `fm-metro-progress` | `{ instr: { break: 1..4, guide: n } }` — progression par niveau (étape 4) |
 | `fm-metro-play` | `{ who, learn, learnPaused, n, showBacking }` — écran de jeu (4.1) ; absent = premier lancement → écran d'accueil |
+| `fm-metro-bass` | `S.bass` complet (passe 5) : `{ on, pattern, prog, key, density, vel, vary, legato, space, swingFollow, drop:{on, everyN, lenBeats} }` |
 | `fm-metro-wizard-done` | posé quand l'assistant est utilisé (depuis 4.1 il ne s'ouvre plus automatiquement — l'écran d'accueil le remplace) |
 
 Les participants / assignations team spirit vivent en mémoire ; l'export JSON « ma ligne » est le vecteur
@@ -162,6 +163,20 @@ de partage.
 - **Substitution instrument** : compléter `TS_SUB[instr]` (rôle → voiceKind valide).
 
 ## Journal de développement
+
+
+### 2026-07-11 — Fusion : passe 5 (basse funk) refermée sur `main`
+
+Fusion de la branche `metronomefunk-0.5.4` (fin de passe 5) dans `main`, qui portait déjà
+i18n FR/EN/PT/BR, export libre et le rang de registre (chantier A). `index.html` fusionné
+**sans conflit** — basse et rang de registre occupent des zones disjointes du fichier ; seul le
+journal du README a été réconcilié (les deux historiques conservés).
+
+- **Non-régression** : 8 recettes de la passe 5 rejouées sur l'arbre fusionné — **206/206**,
+  zéro échec (5-1 20 · 5-1-bis 21 · 5-2 23 · 5-3 38 · 5-3-bis 15 · 5-3-ter 28 · 5-3c 21 · 5-4 40).
+- **Basse = instrument de référence (métronome musical)** : c'est bien un instrument, doté du **registre le plus grave** — mais **on ne l'imite jamais avec les instruments cibles**. Elle sert d'accompagnement sur lequel l'élève se **verrouille** (FUNK-I2), pas d'une ligne à reproduire sur le cajón/djembé. Concrètement, elle est exclue de la **projection des frappes sur les paliers d'un instrument cible** (chantier B, machinerie `REGISTER_RANK`/`voiceRank`) et de la **répartition entre joueurs** (`tsRank`) ; elle n'entre ni dans `percMeta` ni dans `percGrids`. Elle garde son témoin propre + l'accord courant affiché.
+- **`main` devient la version de référence** portant à la fois la percussion (passes 1–4 + rang
+  de registre) et la basse funk générative (passe 5 complète).
 
 ### 2026-07-11 — Chantier A : champ `rank` de registre sur les voix
 
@@ -184,6 +199,279 @@ le moteur audio et `tsHandsMerged` ne sont pas touchés ; `rank` s'ajoute au seu
   Contrôle de syntaxe du JS inline OK.
 - **Reste ouvert (chantier B)** : normalisation des rangs à trous (extrêmes vs collés) ; extension
   éventuelle de la table niveau 2 ; l'encart visuel `fingerViz` lui-même.
+
+### 2026-07-10 — Passe 5 étape 5.4 : drop-outs, écran de jeu, swing des 16es (fin de passe)
+- **Drop-outs de maintien du time** (§6 de la spec de passe) : la basse se tait sur les
+  `lenBeats` **derniers temps** de chaque période de `everyN` mesures et **re-rentre sur
+  The One** (FUNK-T1) — percussion, clave et pulsation continuent. **Écart assumé avec la
+  lettre du §4.4** (spec `metronome-passe5-5-4-spec.md` §2.1, validé) : la machine gap est
+  granulaire à la mesure et mono-cible → le drop est une **fonction pure de `measureCount`**
+  dans `bassRealize` (zéro état nouveau, machine gap intouchée d'un octet, gap utilisateur
+  cumulable avec le drop). Les queues legato qui déborderaient dans le trou sont
+  **raccourcies au bord** (plancher 20 ms) : le silence reste net malgré le legato 5.3c.
+  À l'arrêt (`measureCount = 0`), jamais de trou.
+- **Swing des 16es** (`S.bass.swingFollow`, FUNK-T3) : pas impairs décalés à
+  `(i−1+2·sw)/16` — même formule par paires que `subPositions` — **avant** le test de
+  drop (le trou s'évalue sur la position réellement sonnée). `sw = 50 %` ⇒ identité
+  stricte : non-régression des recettes antérieures par construction.
+- **Écran de jeu** : ligne « Basse : activer · densité · drop-outs · ♪ accord »
+  (`#playBassGroup`), synchro **bidirectionnelle** avec `secBass` (mêmes champs d'état,
+  `bassPlayRefresh`). La pastille d'accord fait office de **témoin d'activité** (§5 de la
+  spec de passe, dernier morceau non livré) : elle pulse sur chaque frappe via la boucle
+  rAF du curseur (`bassPulseCheck` — au moment sonné, pas au scheduling en avance de
+  lookahead). Groupe grisé/désactivé en famille ternaire (basse binaire v1).
+- **`secBass`** : ligne drop-outs (période 1–32 mesures, trou 1–8 temps) + case « La basse
+  suit le swing » ; hint réécrit (la mention « étape suivante » disparaît). i18n : la
+  section basse entière reste hors dictionnaires EN/PT — précédent établi depuis 5.1,
+  assumé, à traiter en lot dans une passe dédiée.
+- **Persistance** : les champs dormants `drop`/`swingFollow` (présents dans `fm-metro-bass`
+  depuis 5.0) deviennent actifs — **aucune migration**, garde-fous de bornes/types dans
+  `bassRestore` (everyN 1–32, lenBeats 1–8, booléens coercés).
+- **Diagnostics** `fmMetroBass` : `setMeasure(n)` (pose le compteur de mesures, même esprit
+  que `setRng`) et `cycleEvents()` (comptes d'événements par couche) pour la recette.
+- **Recette** `recette-5-4.js` **40/40** : défauts & no-op strict 5.3c, trou/périodicité/
+  re-entrée/arrêt, clamp au bord (0,25 temps exact), drop × swing sur position swinguée,
+  couches beat/sub/perc intactes pendant le trou, machine gap non réquisitionnée,
+  persistance + bornes, synchro écran de jeu dans les deux sens, grisage ternaire,
+  estampille. **Non-régression 7 recettes vertes** ; retouche documentée : estampilles
+  génériquées passe 5 (`0\.5\.`) dans 5-3-bis/-ter/-c — le build avance à chaque étape,
+  le motif exact `0\.5\.3x` ne matchait plus.
+- **Vérification navigateur** (preview mobile 375×812) : aucun débordement horizontal,
+  wrap propre du groupe basse, synchro réelle, grisage ternaire (opacité 0,45), animation
+  `bassPulse` définie. Estampille `metronomefunk-0.5.4 · 2026-07-10`. Branche
+  `metronomefunk-0.5.4` (depuis `metronomefunk-0.5.3c`). **Fin de la passe 5** — reste
+  ouvert : validation à l'oreille du legato 5.3c (défaut L=1,25 et haut de course) et des
+  drop-outs/swing 5.4.
+
+### 2026-07-10 — Passe 5 étape 5.3c : recalibrage du curseur legato (verdict d'écoute)
+- **Nomenclature** : à partir de cette étape, les suffixes latins (bis/ter/quater) cèdent la
+  place aux lettres — 5.3c succède à 5.3-ter. Les artefacts déjà livrés gardent leurs noms.
+- **Verdict d'écoute** (HP de bureau, 92 BPM) sur 5.3-ter : le bout droit du curseur (L=1 :
+  finger 1,30 · release 180 ms/×0,50) était le **minimum** acceptable de legato — « c'était
+  bien mais il ne fallait pas moins ». Toute la course couvrait une zone inutilisable.
+- **Recalibrage** (spec `metronome-passe5-5-3c-spec.md`, dosages tranchés en session) :
+  la fenêtre glisse d'un cran vers le lié — **`L = 1 + fraction` ∈ [1, 2]**, mêmes droites
+  -ter prolongées. **Plancher (curseur 0) = ancien max -ter** (finger 1,30 · rel ×0,50),
+  **défaut curseur 25** (L=1,25 : finger 1,40 · rel 210 ms/×0,55), **plafond L=2**
+  (finger 1,70 · slap 1,74 · pop 1,80 · rel 300 ms/×0,70). Libellé UI : « Détaché ↔ lié »
+  → **« Lié ↔ très lié »** (le pôle détaché n'existe plus, par décision d'oreille).
+  Ghost hors curseur (0,35), tirage/fracs/bus/limiteur/corps : intacts.
+- **Stockage inchangé** (`S.bass.legato` = fraction 0–1, clé `fm-metro-bass`) : aucune
+  migration — toute valeur héritée de -ter est relue comme position et atterrit
+  mécaniquement dans la zone validée (ex. 0,5 → L=1,5).
+- **Retouches documentées** (les dosages -ter figés en recette sont recalibrés par
+  construction) : `recette-5-3-ter.js` — blocs [1]/[2] alignés sur la nouvelle fenêtre
+  (le bloc [2] passe de « continuité 5.3-bis » à « plancher = ancien max -ter strict »),
+  estampille génériquée (`0\.5\.3`) ; `recette-5-3-bis.js` (3e retouche) — attendus de [1]
+  alignés sur le plancher 1,30/> stepDur (l'état -bis strict n'est plus atteignable),
+  invariant anti-staccato d'origine (> 100 ms) conservé, estampille génériquée sans tiret
+  (`0\.5\.3-` ne matchait pas `c`). Assertions mécaniques, ghost, bus, persistance : intactes.
+- **Recette** `recette-5-3c.js` **21/21** : défaut 25/L=1,25 sur état vierge, plancher
+  bit à bit = ancien max -ter (durées + release sur l'automation), plafond L=2, monotonie
+  stricte sur toute la course, ghost constant, persistance en fraction + héritage sans
+  migration, estampille, limiteur/bus toujours câblés. Non-régression : 5-1 (20), 5-1-bis
+  (21), 5-2 (23), 5-3 (38) **inchangées** ; 5-3-bis (15) et 5-3-ter (28) vertes avec les
+  seules retouches ci-dessus. Recettes exécutées en local (Node 22 portable + jsdom).
+- **À valider à l'oreille** : le défaut L=1,25 (léger cran au-dessus du son validé) et le
+  haut de la course. Estampille `metronomefunk-0.5.3c`. Branche `metronomefunk-0.5.3c`
+  (depuis `metronomefunk-0.5.3-ter`, `7a54a0a`).
+
+### 2026-07-10 — Passe 5 étape 5.3-ter : basse legato & respiration
+- **Curseur « détaché ↔ lié »** (`#bassLegato`, 0–100, défaut 50 ; `S.bass.legato` persisté) —
+  un seul geste pilote **deux** paramètres : les **durFill** des notes structurantes
+  (finger 0,90→1,10→1,30 · slap 0,82→1,05→1,28 · pop 0,80→1,05→1,30 ; à L ≳ 0,25 la queue
+  déborde sur l'attaque suivante = le liant) et le **release** (60 ms/×0,30 → 180 ms/×0,50 :
+  la note s'éteint au lieu de se couper). **L=0 = 5.3-bis strict** (continuité prouvée en
+  recette). **Ghost hors curseur** (0,35, toujours piqué) ; fracs et déterminisme intacts —
+  le curseur ne touche jamais le tirage.
+- **Corps soutenu** : le sweep de l'exciteur ne se referme plus pendant la tenue — descente
+  vers un **palier** (`floor + 0,35 × (ceil − floor)` à `dur×0,5`), maintien, fermeture vers
+  le plancher pendant le release seulement ; `bodyGain` 0,30 → 0,38 (ghost 0,22 → 0,28).
+  Cible : écart attaque→corps mesuré ~6 dB → ~3-4 dB.
+- **Bus basse** (créé au premier `bassVoice` — no-op strict si la basse reste coupée) :
+  voix → `bassBus` → **high-pass 35 Hz** (E1 = 41,2 Hz jamais touché, la boue sub-sonique
+  part) → chemin sec + **réverb courte** (`ConvolverNode`, impulsion générée : bruit ×
+  décroissance expo ~0,35 s, 2 canaux décorrélés, **wet 0,12**) → master. Case
+  **« Espace »** (`#bassSpace`, cochée par défaut, persistée) : décochée → wet 0.
+  Percussions jamais routées dans ce bus (netteté du métronome).
+- **Limiteur de bus master** (obligatoire — chevauchement + release + réverb s'additionnent,
+  +3 dBFS mesuré à 82 BPM) : `DynamicsCompressor` quasi-brickwall `masterGain → limiteur →
+  destination` — seuil −1,5 dB, knee 0, ratio 20:1, attaque 3 ms, release 120 ms. Pas de
+  sidechain (il casserait la référence rythmique). Défensif : si `createDynamicsCompressor`
+  ou `createConvolver` manquent (stubs headless), chemins directs — aucune recette antérieure
+  modifiée dans sa mécanique.
+- **Hook `fmMetroBass`** enrichi : `bus()` (limiteur, bassBus, HP, wet — diagnostic seul).
+  Estampille `metronomefunk-0.5.3-ter`.
+- **Recette** `recette-5-3-ter.js` **28/28** (stubs enrichis : AudioParam enregistreurs,
+  compressor/convolver présents, connexions tracées) : chevauchement au défaut, continuité
+  L=0, ghost constant aux trois positions, limiteur paramétré et câblé sans contournement,
+  HP 35 Hz, wet 0,12/0, routage exclusif de la voix dans le bus, non-régression fracs/
+  déterminisme/tempo/plancher, persistance, estampille. Non-régression : 5-1 (20), 5-1-bis
+  (21), 5-2 (23), 5-3 (38) **inchangées** ; `recette-5-3-bis` (15) : **2 retouches
+  documentées** — curseur legato ramené à 0 en tête (défensif, no-op sur un build -bis) car
+  ses dosages testés sont ceux de L=0, et estampille génériquée (`0.5.3-`), assertions
+  musicales intactes.
+- **À valider à l'oreille (HP de bureau)** : dose du liant au défaut, douceur du release,
+  présence du corps, discrétion de la traîne, absence de pompage du limiteur. Branche
+  `metronomefunk-0.5.3-ter` (depuis `metronomefunk-0.5.3-bis`).
+
+
+### 2026-07-09 — Passe 5 étape 5.3-bis : corps / tenue de la basse (anti-staccato) + estampille de build
+- **Diagnostic mesuré** (enregistrement WAV de la basse isolée, 92 BPM) : la basse ne sature pas
+  (crête −5,2 dBFS, zéro écrêtage — le +3 dBFS du mix venait des percussions), mais chaque note
+  ne dure que ~15 ms audibles, soit **9 % d'une double-croche** (163 ms à 92 BPM) → « extrême
+  staccato ». Cause : enveloppe en **pluck-vers-zéro** (`exponentialRampToValueAtTime(0.0001, t+dur)`,
+  attaque puis mort), aggravée par une durée plafonnée en dur.
+- **Enveloppe refondue** (`bassVoice`) : attaque → petite décroissance vers un **niveau de tenue**
+  (`sus = 0.78 × pic`) → **maintien** de ce niveau (le corps de la note) → **release** bref borné
+  (≤ 60 ms). La note existe pendant toute sa durée au lieu de s'éteindre aussitôt. Le piqué, quand
+  on le veut, vient maintenant de la **durée** (ghost court), pas de la forme.
+- **Durée calée sur la subdivision** : plafond absolu `dm[1]` retiré ; `dur = stepDur × fill × durTempo`
+  avec `fill` par articulation (`finger 0.90`, `slap 0.82`, `pop 0.80`, `ghost 0.35`) et plancher
+  audible 20 ms. finger/slap/pop tiennent l'essentiel du pas (léger détaché, pas d'empiètement sur
+  le pas suivant) ; ghost reste piqué. L'adaptation tempo (§2.3) est conservée.
+- **Estampille de build** : constante `BUILD` (+ `BUILD_DATE`) affichée dans l'en-tête (`#buildStamp`)
+  — sert à savoir de quel build vient un enregistrement de validation. À bumper à chaque passe.
+- **Recette** `recette-5-3-bis.js` **15/15** (+ non-régression `5-1` **20/20**, `5-1-bis` **21/21**,
+  `5-2` **23/23**, `5-3` **38/38**) : durée finger ≈ 0,90 × stepDur × facteur tempo et < stepDur ;
+  ghost < finger ; monotonie tempo + plancher 20 ms ; fracs et déterminisme intacts ; les 4
+  articulations se synthétisent sans exception ; estampille renseignée. **La forme de tenue
+  (le sustain) reste un critère d'oreille** — le headless prouve la durée, pas le corps ressenti.
+- **Ensuite** (non fait ici) : présence de la basse sur mobile (niveau + bas-médium/exciteur) et
+  limiteur de bus master contre l'écrêtage percussion — à réécouter après ce correctif d'enveloppe.
+  Branche `metronomefunk-0.5.3-bis` (depuis `metronomefunk-0.5.3`).
+
+### 2026-07-09 — Passe 5 étape 5.3 : progressions harmoniques + tonalités
+- **`BASS_PROGS` peuplé des 6 progressions** (§2.4) : `vamp1` (I⁷, James Brown), `vamp2` (I⁷→IV⁷,
+  Sex Machine), `dorien` (i⁷→IV⁷, Chameleon), `mixo` (I⁷→♭VII, rock-funk mixolydien), `blues`
+  (12 mesures), `jazzfunk` (ii⁷→V⁷). Une barre = `{deg, quality}` ; le degré fixe la fondamentale
+  (`CHORD_ROOT_SEMI`, déjà complet depuis 5.1), la **qualité n'est qu'un libellé d'affichage**.
+- **Blues 12 mesures** développé de la notation comprimée `I7-IV7-I7-V7-IV7-I7` en blocs
+  I(4)·IV(2)·I(2)·V(1)·IV(1)·I(2) → `I I I I IV IV I I V IV I I`. La fondamentale change aux
+  **mesures 5, 9, 11** (+ 7 et 10). `bassBarIdx` (posé dès 5.1) avance la barre par mesure et boucle.
+- **Nom d'accord** : `PC_NAME` (pc→nom) + `bassChordName(key, chord)` composent racine + suffixe
+  de qualité (`E7`, `Em7`, `F#m7`, `D`…). `bassUpdateChordLabel()` met à jour `#bassChord` — en
+  lecture, l'accord de la mesure courante ; à l'arrêt/basse coupée, la **tête** de la progression
+  dans la tonalité choisie (l'élève voit d'avance ce qu'il aura).
+- **UI `secBass`** : sélecteur **Progression** (`#bassProg`, 6 options) + **affichage de l'accord**
+  courant (`#bassChord`). Listener `bassProg` (reprend la progression au début), rafraîchissement de
+  l'accord sur changement de progression/tonalité/activation ; `bassRestore`/`bassPersist` gèrent
+  `prog` avec garde-fou (`vamp1` par défaut). Report sur l'écran de jeu → 5.4.
+- **Hook `fmMetroBass`** enrichi (diagnostic, prod inchangée) : `currentBar()` (lecture sans
+  mutation), `newMeasure()` (avance d'une mesure = même mutation que le scheduler), `chordName()`.
+- **Limite latente notée** : `DEG_SEMI['3']` est une tierce **majeure** fixe ; sans effet en 5.3
+  (aucun gabarit n'utilise le degré `3`), à traiter si un gabarit mineur arrive (dorien/jazzfunk).
+- **Recette** `recette-5-3.js` **38/38** (+ non-régression `recette-5-1.js` **20/20**,
+  `recette-5-1-bis.js` **21/21**, `recette-5-2.js` **23/23**) : vamp1 déterministe intact ; 6
+  progressions valides + wrap de boucle ; blues → séquence des 12 fondamentales et changements
+  5/9/11 ; transposition E→G ⇒ mêmes fracs, fréquences ×2^(3/12) ; libellés d'accord (E7, Em7,
+  F#m7, D, A7, G7).
+- **À valider à l'oreille (Android)** : rendu des progressions et de la transposition (le headless
+  prouve la mécanique harmonique, pas le goût). Branche `metronomefunk-0.5.3` (depuis
+  `metronomefunk-0.5.2`).
+
+### 2026-07-09 — Passe 5 étape 5.2 : générateur probabiliste + densité + vélocités + tempo
+- **`bassRealize()` devient génératif** sans casser le déterminisme 5.1. Deux chemins :
+  `vary=false` reproduit **exactement** 5.1 (piliers `w=1` + pas `w≥0.5`, aucun RNG) ; `vary=true`
+  **tire** chaque pas non-pilier selon sa proba `w` via `bassRng()`. Les **piliers ne sont jamais
+  tirés** (toujours joués) — l'ancre et The One restent.
+- **Densité 1/2/3** par filtre `lvl` : un pas n'existe qu'à `S.bass.density ≥ h.lvl`. Emboîtement
+  strict `1 ⊂ 2 ⊂ 3`, piliers (`lvl 1`) constants (vérifié sur `ghostPendule` : 2 ⊂ 4 ⊂ 8 pas).
+- **Profils de vélocité** (`bassVelShape`, §2.2) : écart des gains autour de l'ancre « normal »
+  (finger ≈ 0.7). `plat` comprime (×0.35, lisible débutant) · `mixte` = identité · `contraste`
+  élargit (×1.4, poche accents/ghosts). Gain borné `[0.02, 1]`.
+- **Adaptation continue au tempo** (§2.3), après le profil `vel`, `k = clamp((BPM−70)/80, 0, 1)` :
+  durée `×1.15 → ×0.70` (legato lent → sec rapide) ; gain des ghosts `≈0.30 → 0.16` (facteur
+  `1.20 → 0.64` sur la base mixte 0.25) ; proba des pas non-piliers `×1.20 → 0.65` (la ligne se
+  dépouille en montant). **Piliers immuables** (ni tirés, ni allégés en présence). Valeurs de la
+  spec figées comme définitives — pas de réglage d'oreille possible ici, la recette est le garde-fou.
+- **3 gabarits restants** ajoutés à `BASS_PATTERNS` : `syncopeGrave` (FUNK-B3, grave décalé autour
+  du 1), `octaves` (pompe fondamentale/octave disco-funk), `ghostPendule` (FUNK-D1, nappe de 16es +
+  piliers, densité strictement emboîtée). Sélecteur de gabarit UI étendu.
+- **UI `secBass`** : ajout densité (3 crans), profil de dynamique, case **Variations (jeu vivant)** ;
+  listeners + persistance (`bassRestore` reflète et garde `density/vel/vary`). Écran de jeu → 5.4.
+- **RNG injectable** : `bassRng` (module) = `Math.random` en prod ; le hook `fmMetroBass().setRng(fn)`
+  permet à la recette d'injecter un générateur déterministe (mulberry32) et `setRng(null)` restaure
+  le défaut. Aucune mutation nouvelle en prod.
+- **Recette** `recette-5-2.js` **23/23** (+ non-régression `recette-5-1.js` **20/20**,
+  `recette-5-1-bis.js` **21/21**) : déterminisme `vary=false` intact ; densité emboîtée + piliers
+  constants ; à 150 vs 70 BPM gain ghost, durée et nombre de pas non-piliers décroissants (RNG
+  constant 0.5) ; reproductibilité à graine fixe ; `vary=false` n'appelle jamais le RNG (RNG qui
+  jette ⇒ aucune exception) ; les 3 gabarits réalisent des notes valides.
+- **À valider à l'oreille (Android)** : rendu des profils de dynamique et de la respiration au tempo
+  (le headless prouve la mécanique, pas le goût). Branche `metronomefunk-0.5.2` (depuis
+  `metronomefunk-0.5.1-bis`).
+
+### 2026-07-09 — Passe 5 étape 5.1-bis : audibilité de la basse sur HP Android (exciteur harmonique)
+- **Problème** (retour utilisateur) : en E, `theOne` joue des fondamentales à ~41–62 Hz, sous le
+  plancher de restitution d'un haut-parleur de téléphone → basse quasi inaudible. Cause : `bassFinger`
+  reposait sur un **triangle** (harmoniques impaires seules, 1/n²) + un **sous-octave sinus à ~20 Hz**
+  (inaudible), et le passe-bas redescendait à 120 Hz, étranglant les 3f–8f porteuses.
+- **Refonte synthèse** (aucune note changée — fracs/degrés/articulations/déterminisme intacts) : les
+  trois fonctions `bassFinger`/`bassSlap`/`bassPop` fusionnent en **une voix paramétrée
+  `bassVoice(t, freq, vol, dur, opt)`**. Deux branches sommées : *corps* sawtooth (toutes harmoniques,
+  1/n) filtré doux pour la vraie fondamentale (bons HP/casque) ; *exciteur harmonique* =
+  `WaveShaperNode` (courbe tanh légèrement asymétrique, 2048 pts, `oversample:'4x'`) → passe-bas à
+  **plancher relevé** (~600–900 Hz) qui préserve les harmoniques que le petit HP restitue. On exploite
+  la **fondamentale virtuelle** : l'oreille reconstruit le grave à partir de ces harmoniques, et le même
+  « growl » porte le caractère funk. **Sous-octave 20 Hz retiré.**
+- **`opt` par articulation** (`BASS_ART_OPT` : drive, plafond/plancher de brillance, attaque, gains
+  corps/exciteur, transitoire slap) — **valeurs fixes ici**, points de départ à régler à l'oreille.
+  5.2 modulera ces `opt` par `vel`/tempo (la brillance = le même levier), d'où le choix de poser la
+  voix paramétrée dès maintenant.
+- **Sonde** : `window.fmMetroBass().probeVoice(art, t)` ajoutée au hook diagnostic (self-contained :
+  `ensureCtx()` idempotent + `playBass` ; aucune mutation d'état ; en prod, joue une note de contrôle).
+- **Recettes** : `recette-5-1.js` **20/20 inchangée** (non-régression logique : la recette ne touche pas
+  la synthèse). Nouveau `recette-5-1-bis.js` **21/21** (smoke-test : 4 articulations construites sans
+  exception, WaveShaper câblé + courbe 2048 + `4x`, corps sawtooth présent, plus aucun triangle ni
+  oscillateur < 30 Hz, fracs `[0, .375, .5, .875]` intactes).
+- **À valider à l'oreille (Android)** : timbres, dosage du growl, audibilité effective du grave ; ajuster
+  `BASS_ART_OPT` au besoin. Branche `metronomefunk-0.5.1-bis` (depuis `metronomefunk-0.5.1`).
+
+### 2026-07-09 — Passe 5 étape 5.1 : synthèse basse funk (theOne, déterministe)
+- **Synthèse maison** (section `AUDIO`, zéro échantillon) : `bassFinger` (triangle + sub sinus,
+  enveloppe de filtre passe-bas), `bassSlap` (corps + transitoire de bruit passe-haut = claquement
+  du pouce), `bassPop` (saw, enveloppe de filtre rapide = le « tiré »), ghost = doigté court/bas/mat.
+  Routeur `playBass(t, note)` par articulation. Audibilité de E1 (~41 Hz) sur HP Android portée par
+  les harmoniques du triangle/saw — **critère d'oreille**, à valider.
+- **Nouvelle couche `layer:'bass'`** dans le pipeline existant : `computeCycle` empile
+  `{frac, layer:'bass', note:{freq,art,gain,dur}}` (famille binaire seulement, v1) ; l'ordonnanceur
+  passe `ev.note` à `playClick` (argument **additif**, non-cassant) qui route vers `playBass`.
+- **Section `BASSE FUNK (passe 5)`** : gabarits d'intentions 16 pas `{i,deg,art,w,lvl}` (5.1 :
+  `theOne` seul), progression `vamp1` seule, résolveur chromatique `key`+degré→fréquence
+  (fondamentale repliée dans la tessiture E1–D2, table 12 tonalités). `bassRealize()` réalise la
+  mesure courante **déterministe** (piliers `w=1` + pas `w≥0.5`, aucun RNG → le probabiliste vient
+  en 5.2). Ancrage : `bassOnNewMeasure()` dans `startNewCycle` (indépendant de `S.perc.on`, ≠ hook
+  `percOnNewMeasure` qui court-circuite si la percussion est éteinte), amorçage `bassResetCycle()`
+  dans `start()`.
+- **État `S.bass`** (forme complète de la spec §2 posée dès 5.1 ; 5.1 exploite `on/pattern/prog/key`),
+  persistance `fm-metro-bass`, restauration `bassRestore()` à l'INIT.
+- **UI** : section `<details id="secBass">` autonome (Configurer) — activer la basse, gabarit,
+  tonalité (12). Écran de jeu : rien encore (→ 5.4).
+- **Recette** `recette-5-1.js` (jsdom + stubs Web Audio/canvas, pilotage DOM, hook de diagnostic
+  `window.fmMetroBass()` calqué sur `window.fmMetroAudio`) : **20/20** — no-op si off, fracs
+  `[0, .375, .5, .875]` (pas 10 `w=0.4` exclu), articulations finger/ghost/finger/ghost,
+  déterminisme bit-à-bit, résolveur E1=41,203 Hz + transposition E→F, garde famille binaire,
+  persistance.
+- **Reste à régler à l'oreille** (Android) : timbres de basse et audibilité du grave.
+
+### 2026-07-09 — Passe 5 validée : spec « Basse funk » (accompagnement génératif)
+- **Spec `metronome-passe5-basse-spec.md` validée (rév. 2)** : voix de basse électrique funk
+  générée à la volée, accompagnement des parcours cajón/djembé (principe FUNK-I2). Tone.js et
+  échantillons **écartés** (zéro dépendance, fichier unique) : synthèse Web Audio maison
+  (`bassFinger`/`bassSlap`/`bassPop`, ghost dérivé), nouvelle couche `layer:'bass'` dans le
+  pipeline `computeCycle → events → playClick`.
+- **Modèle** : gabarits d'intentions 16 pas `{deg, art, w, lvl}` réalisés une fois par mesure
+  (`bassRealize`, déterministe si `vary:false`) ; 3 profils de vélocités (plat/mixte/contraste)
+  + **adaptation continue au tempo** (gain ghost, durée, densité d'ornementation — les piliers
+  `w=1` ne bougent jamais) ; **6 progressions harmoniques** (vamp JB, I7→IV7, dorien, mixo,
+  blues 12, jazz-funk) × **12 tonalités** (défaut E, entraînement de l'oreille) ; drop-outs via
+  la machine gap ciblée (`layer==='bass'`), hors `tsMuted`.
+- **Découpe en 4 étapes** (une par session) : 5.1 synthèse + `theOne` déterministe + `secBass`
+  minimale ; 5.2 générateur probabiliste + densité + vélocités/tempo ; 5.3 progressions +
+  tonalités + accord courant affiché ; 5.4 drop-outs + commandes écran de jeu + swing des 16es.
+- **Workflow ajouté** : à chaque fin d'étape, livrer un md combiné **brief de reprise + README
+  à jour**, terminé par la reconduction de la consigne pour l'étape suivante.
 
 ### 2026-07-08 — Étape 4.1 : écran de jeu (setup, briques en grand, « Je suis »)
 - **Écran d'accueil** (`#playSetup`) au premier lancement : seul / à plusieurs (N) +
@@ -284,5 +572,5 @@ le moteur audio et `tsHandsMerged` ne sont pas touchés ; `rank` s'ajoute au seu
 
 - Spec d'abord, **une étape = une session**, fichier HTML complet. Aucune IA à l'exécution (moteur de règles
   embarqué). Grilles ouest-africaines encodées `uncertain` — à valider à l'oreille.
-- Specs/recettes : `metronome-passe3-spec.md`, `metronome-passe3-etape{1..4}-recette.md`,
+- Specs/recettes : `metronome-passe5-5-3-ter-spec.md`, `metronome-passe5-basse-spec.md`, `metronome-passe4-spec.md`, `metronome-passe3-spec.md`, `metronome-passe3-etape{1..4}-recette.md`,
   `metronome-passe2-spec.md`, corpus `grooves-*.md` + `convert-grooves.py`.
