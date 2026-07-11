@@ -250,7 +250,7 @@ boot(() => {
   // --- 9. Estampille ------------------------------------------------------------------------------
   console.log('\n[9] Estampille');
   const bs = $('buildStamp');
-  ok(bs && /metronomefunk-0\.5\.4/.test(bs.textContent), 'buildStamp : « ' + (bs ? bs.textContent : '(absent)') + ' »');
+  ok(bs && /metronomefunk-\d+\.\d+/.test(bs.textContent), 'buildStamp : « ' + (bs ? bs.textContent : '(absent)') + ' »');   // génériquée chantier B : motif metronomefunk-\d+\.\d+ (build 0.6 hors 0.5.x)
 
   console.log('\n----------------------------------------');
   console.log('  ' + pass + ' réussis, ' + fail + ' échoués sur ' + (pass + fail));
