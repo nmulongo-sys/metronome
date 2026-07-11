@@ -681,6 +681,7 @@
         <select id="percInstr" style="width:auto;">
           <option value="djembe" selected>Djembé (basse · tone · slap)</option>
           <option value="cajon">Cajón (grave · aigu)</option>
+          <option value="cajoncym">Cajón + cimbalette (grave · aigu · cimbalette)</option>
           <option value="dunduns">Dunduns &amp; cloche</option>
           <option value="agogo">Agogô (grave · aigu)</option>
           <option value="surdo">Surdo (grave · marcante)</option>
@@ -1210,7 +1211,7 @@ swing 62
 
   // Identité du build affichée dans l'en-tête (5.3-bis). Bumper à chaque passe : elle sert à
   // savoir de quel build vient un enregistrement de validation.
-  const BUILD = 'metronomefunk-0.6.1', BUILD_DATE = '2026-07-11';
+  const BUILD = 'metronomefunk-0.6.2', BUILD_DATE = '2026-07-11';
 
   let audioCtx = null, masterGain = null, noiseBuf = null;
   let masterLimiter = null;                                   // 5.3-ter : limiteur de bus master
@@ -1424,6 +1425,31 @@ swing 62
     }
   }
 
+  // cimbalette (0.6.2) : jingles métalliques d'un tambourin monté sur la tapa — souffle
+  // de bruit passe-haut (le « chh » des rondelles) + grappe de partiels aigus inharmoniques
+  // (l'éclat). Zéro dépendance (réutilise noiseBuf). Timbre à régler à l'oreille, comme
+  // percScrape et la basse : la recette headless n'en juge pas le son, seulement le routage.
+  function percJingle(t, vol, accent) {
+    // souffle métallique bref
+    const src = audioCtx.createBufferSource(), ng = audioCtx.createGain(), hp = audioCtx.createBiquadFilter();
+    src.buffer = noiseBuf;
+    hp.type = 'highpass'; hp.frequency.value = 5200; hp.Q.value = 0.7;
+    src.connect(hp); hp.connect(ng); ng.connect(masterGain);
+    ng.gain.setValueAtTime(vol * 0.9, t);
+    ng.gain.exponentialRampToValueAtTime(0.0008, t + (accent ? 0.13 : 0.075));
+    src.start(t); src.stop(t + 0.15);
+    // partiels aigus inharmoniques (rondelles qui tintent)
+    const parts = [6300, 8400, 9700, 11200];
+    for (let i = 0; i < parts.length; i++) {
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.type = 'square'; o.frequency.value = parts[i] * (1 + 0.012 * i);
+      o.connect(g); g.connect(masterGain);
+      g.gain.setValueAtTime(Math.max(0.02, vol * (0.15 - i * 0.025)), t);
+      g.gain.exponentialRampToValueAtTime(0.0006, t + (accent ? 0.12 : 0.065));
+      o.start(t); o.stop(t + 0.14);
+    }
+  }
+
   /* ---- basse funk (passe 5 §3 ; refonte 5.1-bis : audibilité HP Android) --------
      Le grave (~41 Hz en E) est INAUDIBLE sur un petit haut-parleur. On s'appuie sur
      la FONDAMENTALE VIRTUELLE : un exciteur harmonique (WaveShaper) génère 2f/3f/4f…
@@ -1601,6 +1627,10 @@ swing 62
       case 'djembe.slap':      percSnap(t, 2400, 1.2, v); percDrum(t, 420, 300, 0.05, v * 0.25); break;
       case 'cajon.grave':      percDrum(t, 115, 68, 0.17, v); break;
       case 'cajon.aigu':       percSnap(t, 1700, 0.9, v); percSnap(t, 3400, 2, v * 0.5); break;
+      // variante cajón + cimbalette (0.6.2) : grave/aigu = timbres cajón ; cimbalette = jingles métalliques
+      case 'cajoncym.grave':      percDrum(t, 115, 68, 0.17, v); break;
+      case 'cajoncym.aigu':       percSnap(t, 1700, 0.9, v); percSnap(t, 3400, 2, v * 0.5); break;
+      case 'cajoncym.cimbalette': percJingle(t, v * 0.8, accent === 2); break;
       case 'dunduns.dundunba': percDrum(t, 72, 48, 0.42, v * 1.1); break;
       case 'dunduns.sangban':  percDrum(t, 112, 78, 0.30, v); break;
       case 'dunduns.kenkeni':  percDrum(t, 175, 132, 0.20, v * 0.8); break;
@@ -2535,6 +2565,22 @@ swing 62
       base: {
         16: { grave: [0, 3, 8, 10], aigu: [4, 12] },
         12: { grave: [0, 5, 6], aigu: [3, 9] }
+      }
+    },
+    // variante « cajón + cimbalette » (0.6.2) : instrument focal distinct, 4 paliers.
+    // Cimbalette montée sur la tapa = 4e son réel (CJ-S4). Le médium (palier 1) reste un
+    // vide honnête — aucune voix de rang 1, comme le cajón classique.
+    cajoncym: {
+      label: 'Cajón + cimbalette', work: 'aigu',
+      voices: [
+        { id: 'grave',      label: 'Grave',      rank: 0 },
+        { id: 'aigu',       label: 'Aigu',       rank: 2 },
+        { id: 'cimbalette', label: 'Cimbalette', rank: 3 }
+      ],
+      base: {
+        // funk : basse sur 1 & 3, claqués sur 2 & 4, cimbalette (jingles) sur les « et »
+        16: { grave: [0, 8], aigu: [4, 12], cimbalette: [2, 6, 10, 14] },
+        12: { grave: [0, 6], aigu: [3, 9],  cimbalette: [2, 4, 8, 10] }
       }
     },
     dunduns: {
@@ -5673,7 +5719,7 @@ swing 62
       basse: 0, grave: 0, dundunba: 0,
       marcante: 1, sangban: 1, tone: 1,
       kenkeni: 2, slap: 2, aigu: 2,
-      cloche: 3
+      cloche: 3, cimbalette: 3
     },
     role: { basse: 0, medium: 1, aigu: 2 }   // repli grossier si voiceKind inconnu
   };
@@ -5694,13 +5740,14 @@ swing 62
   // ============ PROJECTION SUR PALIERS (chantier B) ============
   // fingerViz projette chaque frappe de MA ligne sur les paliers de l'instrument
   // cible (le focal S.perc.instr), du grave (0) vers l'aigu. Le nombre de paliers
-  // est propre à l'instrument. La variante « cajón + cymbalette » (4 paliers) attend
-  // l'accessoire cimbalette réel (non tranché) — absente de la table tant que non décidé.
-  const INSTR_TIERS = { djembe: 3, cajon: 3, dunduns: 4, agogo: 2, surdo: 2, recoreco: 1 };
+  // est propre à l'instrument. La variante « cajón + cimbalette » (4 paliers, 0.6.2)
+  // est un instrument focal distinct : cimbalette montée sur la tapa = 4e son réel.
+  const INSTR_TIERS = { djembe: 3, cajon: 3, cajoncym: 4, dunduns: 4, agogo: 2, surdo: 2, recoreco: 1 };
   function instrTiers(instr) { return INSTR_TIERS[instr] || 3; }
   const PALIER_LABELS = {
     djembe:   ['basse', 'tone', 'slap'],
     cajon:    ['grave', 'médium', 'aigu'],
+    cajoncym: ['grave', 'médium', 'aigu', 'cimbalette'],
     dunduns:  ['dundunba', 'sangban', 'kenkeni', 'cloche'],
     agogo:    ['grave', 'aigu'],
     surdo:    ['grave', 'marcante'],
