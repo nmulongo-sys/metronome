@@ -42,8 +42,33 @@ L'identité de timbre est **portée par la voix**, pas par un global :
 percGrids[voix]   = [0|1|2, …]          // 0 silence · 1 frappe · 2 accent
 percOffsets[voix] = [-0.45..0.45, …]    // micro-timing par pas
 percMuted[voix]   = bool
-percMeta[voix]    = { instr, voiceKind, freq? }   // clé de routage audio = instr + '.' + voiceKind
+percMeta[voix]    = { instr, voiceKind, freq?, rank? }   // clé de routage audio = instr + '.' + voiceKind
 ```
+
+### Rang de registre `rank` (chantier A, 2026-07-11)
+
+Chaque voix porte un **rang de registre** `rank` : sa position sur l'échelle grave→aigu,
+`0` = plus grave, croissant vers l'aigu (un rang élevé = son aigu = palier haut sur
+l'instrument cible). C'est une **donnée de rangement**, pas de la logique musicale ; elle
+sera consommée par le futur encart (chantier B) pour projeter les frappes sur les paliers
+d'un instrument (djembé 3 paliers, cajón 3, cajón + cymbalette 4). **Ne pas confondre avec
+`TS.order` / `tsRank*`**, qui est la *priorité de répartition* entre joueurs, sans rapport
+avec le registre.
+
+- `voiceRank(src, idx)` résout le rang par **repli à trois niveaux**, sans jamais d'état cassé :
+  1. `rank` explicite présent (voix maison `PERC_INSTR`, voix clave) → utilisé ;
+  2. voix reconnue → table `REGISTER_RANK` par `voiceKind`/`origKind` (précis), puis par `role`
+     (grossier) — c'est ainsi que les ~150 voix de `GROOVES` sont rangées sans taguer chacune ;
+  3. voix totalement inconnue → **ordre de déclaration** (sa position `idx` dans la liste).
+- `plVoiceList()` attache `rank` à chaque voix renvoyée (maison, Team Spirit, clave) ; c'est la
+  surface principale de consommation. `tsSyncGrids()` recopie aussi `rank` dans `percMeta` des
+  voix `ts.*` (surface moteur).
+- Rangs maison verrouillés : djembé basse 0 / tone 1 / slap 2 · dunduns dundunba 0 / sangban 1 /
+  kenkeni 2 / cloche 3 · surdo grave 0 / marcante 1 · cajón & agogô grave 0 / aigu 2 · reco-reco 2.
+  Clave grave 2 / aiguë 3 (provisoire). Table : `basse/grave/dundunba`→0, `marcante/sangban/tone`→1,
+  `kenkeni/slap/aigu`→2, `cloche`→3 ; `role` `basse/medium/aigu`→0/1/2.
+- **Point ouvert (chantier B)** : normalisation des rangs « à trous » (voix aux extrêmes vs collées)
+  quand un groove ne couvre pas tous les paliers de l'instrument cible.
 
 - `playPerc(t, voix, accent)` route sur `percMeta[voix].instr + '.' + voiceKind` → plusieurs instruments
   simultanés. Repli sur le focal `S.perc.instr` si une voix n'a pas de méta (= comportement passe 2).
@@ -137,6 +162,28 @@ de partage.
 - **Substitution instrument** : compléter `TS_SUB[instr]` (rôle → voiceKind valide).
 
 ## Journal de développement
+
+### 2026-07-11 — Chantier A : champ `rank` de registre sur les voix
+
+Ajout d'un **rang de registre `rank`** (grave→aigu, `0` = plus grave) sur **toutes** les voix —
+maison (`PERC_INSTR`) et répertoire (`GROOVES`/Team Spirit) — pour préparer l'encart du chantier B
+(projection des frappes sur les paliers d'un instrument cible). **Aucune logique musicale nouvelle** :
+le moteur audio et `tsHandsMerged` ne sont pas touchés ; `rank` s'ajoute au seul modèle de voix.
+
+- **Données** : `rank` explicite posé sur chaque voix de `PERC_INSTR` (djembé 0/1/2, dunduns 0/1/2/3,
+  surdo 0/1, cajón & agogô 0/2, reco-reco 2) et sur `CLAVE_VOICES` (2/3, provisoire).
+- **Résolveur** : nouveau `voiceRank(src, idx)` à **repli 3 niveaux** (explicite → table
+  `REGISTER_RANK` par `voiceKind`/`role` → ordre de déclaration). Les ~150 voix de `GROOVES` sont
+  rangées par table (elles portent déjà `voiceKind`+`role`), sans tag manuel voix par voix.
+- **Diffusion** : `plVoiceList()` attache `rank` à chaque voix (maison/TS/clave) ; `tsSyncGrids()`
+  recopie `rank` dans `percMeta` des voix `ts.*`.
+- **Nommage** : `rank` de registre distinct de `TS.order`/`tsRank*` (priorité de répartition) —
+  documenté pour éviter toute confusion en reprise.
+- **Recette headless** : 36 assertions vertes (chaque voix maison/clave/groove obtient un rang fini,
+  valeurs verrouillées du brief, niveau 2 sur samba batucada, repli niveau 3, priorité de l'explicite).
+  Contrôle de syntaxe du JS inline OK.
+- **Reste ouvert (chantier B)** : normalisation des rangs à trous (extrêmes vs collés) ; extension
+  éventuelle de la table niveau 2 ; l'encart visuel `fingerViz` lui-même.
 
 ### 2026-07-08 — Étape 4.1 : écran de jeu (setup, briques en grand, « Je suis »)
 - **Écran d'accueil** (`#playSetup`) au premier lancement : seul / à plusieurs (N) +
