@@ -81,7 +81,7 @@ boot(() => {
 
   // --- 1. Estampille + présence de la couche d'action -----------------------
   console.log('[1] Build & couche d\'action de recette');
-  ok(typeof R.build === 'string' && /0\.6\.1/.test(R.build), 'BUILD bumpé à 0.6.1 (' + R.build + ')');
+  ok(typeof R.build === 'string' && /metronomefunk-0\.6\.[1-9]\d*/.test(R.build), 'BUILD ≥ 0.6.1 (finition curseur ; ' + R.build + ')');
   ok(typeof window.fmMetroFvCursor === 'function', 'window.fmMetroFvCursor exposé (pilotage du curseur)');
 
   // --- 2. Un curseur par piste (djembé) -------------------------------------
