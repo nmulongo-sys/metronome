@@ -169,6 +169,40 @@ de partage.
 ## Journal de développement
 
 
+### 2026-07-11 — Chantier B (finition) : curseur temps réel sur `fingerViz`
+
+Finition du chantier B, branchée depuis `main`. Referme le point laissé ouvert par B.1
+(« statique v1 ») : l'encart `fingerViz` porte désormais un **curseur temps réel**, piloté par
+la **même `phase`** que le curseur de la ligne de jeu (`#playLine`). **Aucune logique musicale
+ni audio nouvelle**, projection Option A inchangée — pur rebranchement.
+
+- **Repère partagé** : les pastilles `.fv-hit` sont posées à `left = frac*100 %` (`frac = i/n`
+  sur la mesure) ; le curseur reprend `phase ∈ [0,1]` sur la même mesure → alignement natif avec
+  les pastilles et avec `#playLine`, sans nouveau calcul de temps.
+- **Un curseur par piste** : `fingerVizRender()` injecte un `<i class="fv-cursor">` en fin de
+  chaque `.fv-track` (recréé à chaque render, jamais orphelin). Les libellés faisant tous ≤ 70 px,
+  toutes les pistes démarrent au même x → les segments empilés se lisent comme une **ligne continue**
+  (curseur présent **même dans un couloir vide**, cajón médium).
+- **Pilotage** : `fingerVizCursor(phase)` appelée dans `draw()` (bloc `mode-simple`, juste après le
+  curseur `#playLine`, à côté de `bassPulseCheck`). Affiche + positionne si l'encart n'est pas
+  `.hide` ; sinon **masque** les curseurs. `drawStatic()` les masque à l'arrêt (cohérent avec
+  `#playLine`).
+- **CSS** `.fv-cursor` : barre 2 px pleine hauteur de piste, `--fm-ink` à 50 %, `display:none` par
+  défaut.
+- **Couche d'action de recette** `window.fmMetroFvCursor` (distincte du hook lecture seule
+  `fmMetroReg`) : expose `fingerVizCursor` pour piloter le curseur headless comme le fait `draw()`.
+- **Recette** `recette-chantier-B2.js` **22/22** : un `.fv-cursor` par `.fv-track` (djembé 3 /
+  agogô 2 / reco 1) ; positionnement `left = phase*100 %` (0 / 0.25 / 0.5 / 1) ; continuité du
+  cajón (médium vide porte le curseur) ; gating (encart `.hide` ⇒ curseurs cachés, réaffichage ⇒
+  de nouveau pilotables) ; survie au re-render (aucune accumulation d'orphelins).
+  **Non-régression 258/258** — chantier-B 52 + 8 recettes passe 5 (5-1 20 · 5-1-bis 21 · 5-2 23 ·
+  5-3 38 · 5-3-bis 15 · 5-3-ter 28 · 5-3c 21 · 5-4 40). Contrôle de syntaxe du JS inline OK.
+- **Estampille** `metronomefunk-0.6.1 · 2026-07-11`.
+- **Validé à l'œil (Android)** : encart `fingerViz` rendu, pastilles visibles, build `0.6.1` confirmé
+  à l'écran (après purge du cache Pages — le déploiement traînait sur `0.5.4`). **Reste ouvert** :
+  variante cajón + cymbalette (dépend de l'accessoire cimbalette, non tranché) ; extension éventuelle
+  de la table `REGISTER_RANK` niveau 2.
+
 ### 2026-07-11 — Chantier B.1 : encart `fingerViz` (projection sur paliers)
 
 Premier chantier post-passe-5, branché depuis `main`. **Encart `fingerViz`** : projette chaque
