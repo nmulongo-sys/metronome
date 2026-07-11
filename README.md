@@ -68,6 +68,15 @@ avec le registre.
   **cajón+cimbalette grave 0 / aigu 2 / cimbalette 3** (médium palier 1 vide honnête). Clave grave 2 /
   aiguë 3 (provisoire). Table : `basse/grave/dundunba`→0, `marcante/sangban/tone`→1,
   `kenkeni/slap/aigu`→2, `cloche/cimbalette`→3 ; `role` `basse/medium/aigu`→0/1/2.
+- **Couverture (vérifiée 2026-07-11)** : cette table niveau 2 couvre **100 % du corpus `GROOVES`
+  actuel** — les 10 `voiceKind` présents (`aigu, basse, slap, tone, grave, marcante, sangban,
+  kenkeni, dundunba, cloche`) et les 3 `role` (`aigu, basse, medium`) y figurent tous ; les voix
+  maison (`PERC_INSTR`) et clave passent par `rank` explicite (niveau 1). **Aucune voix ne tombe
+  en repli niveau 3.** Trous latents connus, laissés tels quels car sans effet : `raclement`
+  (reco-reco) absent de la table mais jamais porté par un groove (voix maison à `rank:2` explicite,
+  instrument à 1 palier) ; la table `role` plafonne à `2` alors que `kind` atteint `3` (code mort
+  tant que toute voix a un `voiceKind` reconnu). À rouvrir si un nouveau corpus introduit un
+  `voiceKind`/`role` inédit.
 - **Consommé par le chantier B** (livré, build 0.6.0) : `voicePalier(rank, T)` = **clamp absolu**
   du rang sur `[0, T−1]` (OPTION A). La normalisation des rangs « à trous » est donc tranchée
   en faveur du **registre honnête** : un couloir reste vide si le groove ne l'utilise pas
@@ -166,9 +175,39 @@ de partage.
 - **Nouveau groove** : ajouter un objet au tableau `GROOVES` (schéma §5.1 de `metronome-passe3-spec.md`),
   `grid.length === count`.
 - **Substitution instrument** : compléter `TS_SUB[instr]` (rôle → voiceKind valide).
+- **Nouveau `voiceKind` / `role`** : une clé absente de `REGISTER_RANK.kind/.role` fait tomber la
+  voix en **repli niveau 3** (ordre de déclaration → se colle au palier haut). Ajouter la clé à la
+  table pour un rang correct. La table couvre 100 % du corpus `GROOVES` actuel (vérifié 2026-07-11).
 
 ## Journal de développement
 
+
+### 2026-07-11 — Clôture : couverture de la table `REGISTER_RANK` niveau 2 (100 %)
+
+Ferme le point laissé ouvert par l'entrée « Chantier B (finition) » (« extension éventuelle de la
+table `REGISTER_RANK` niveau 2 »). **Aucun changement de code** — vérification d'état sur `main` :
+`index.html` reste à `0.6.3`, pas de bump, recettes **312/312** inchangées.
+
+Recensement des `voiceKind`/`role` réellement présents dans les données, croisé avec la table
+niveau 2 (`voiceRank`, repli n° 2) :
+
+- **`voiceKind` du corpus `GROOVES`** : `aigu, basse, slap, tone, grave, marcante, sangban, kenkeni,
+  dundunba, cloche` — **les 10 figurent dans `REGISTER_RANK.kind`** (11 clés au total, `cimbalette`
+  en réserve pour le `cajoncym` maison).
+- **`role`** : `aigu, basse, medium` — **les 3 figurent dans `REGISTER_RANK.role`**.
+- **Voix maison (`PERC_INSTR`) et clave** : `rank` explicite → repli **niveau 1**, ne touchent
+  jamais la table.
+- ⇒ **Aucune voix ne tombe en repli niveau 3** (ordre de déclaration). La table couvre 100 % du
+  corpus actuel ; « étendre » serait un no-op fonctionnel.
+
+**Trous latents connus, laissés tels quels** (sans effet aujourd'hui) : `raclement` (reco-reco)
+absent de la table — inoffensif car aucun groove ne le porte, la voix maison a `rank:2` explicite et
+le reco-reco n'a qu'un palier ; la table `role` plafonne à `2` (`aigu`) alors que `kind` atteint `3`
+— code mort tant que toute voix a un `voiceKind` reconnu, et rien à mapper faute d'un 4ᵉ `role` dans
+les données.
+
+**À rouvrir** seulement si un nouveau corpus (typiquement les voix du **parcours funk**) introduit un
+`voiceKind` ou `role` inédit : refaire alors ce recensement et compléter `REGISTER_RANK.kind/.role`.
 
 ### 2026-07-11 — Timbre cimbalette réglé à l'oreille (« tintant ») · build 0.6.3
 
