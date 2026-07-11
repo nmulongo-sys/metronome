@@ -64,9 +64,10 @@ avec le registre.
   surface principale de consommation. `tsSyncGrids()` recopie aussi `rank` dans `percMeta` des
   voix `ts.*` (surface moteur).
 - Rangs maison verrouillés : djembé basse 0 / tone 1 / slap 2 · dunduns dundunba 0 / sangban 1 /
-  kenkeni 2 / cloche 3 · surdo grave 0 / marcante 1 · cajón & agogô grave 0 / aigu 2 · reco-reco 2.
-  Clave grave 2 / aiguë 3 (provisoire). Table : `basse/grave/dundunba`→0, `marcante/sangban/tone`→1,
-  `kenkeni/slap/aigu`→2, `cloche`→3 ; `role` `basse/medium/aigu`→0/1/2.
+  kenkeni 2 / cloche 3 · surdo grave 0 / marcante 1 · cajón & agogô grave 0 / aigu 2 · reco-reco 2 ·
+  **cajón+cimbalette grave 0 / aigu 2 / cimbalette 3** (médium palier 1 vide honnête). Clave grave 2 /
+  aiguë 3 (provisoire). Table : `basse/grave/dundunba`→0, `marcante/sangban/tone`→1,
+  `kenkeni/slap/aigu`→2, `cloche/cimbalette`→3 ; `role` `basse/medium/aigu`→0/1/2.
 - **Consommé par le chantier B** (livré, build 0.6.0) : `voicePalier(rank, T)` = **clamp absolu**
   du rang sur `[0, T−1]` (OPTION A). La normalisation des rangs « à trous » est donc tranchée
   en faveur du **registre honnête** : un couloir reste vide si le groove ne l'utilise pas
@@ -81,7 +82,7 @@ avec le registre.
 - `computeCycle()` itère `percGrids` et empile les `events` (triés par `frac`) pour le scheduler.
 - `percLayerMuted(layer, voix, brk)` = **seul** point de décision de mute (voix, appel-réponse, team spirit).
 
-Timbres = `PERC_INSTR` (`djembe, cajon, dunduns, agogo, surdo, recoreco`), styles `PERC_STYLES`,
+Timbres = `PERC_INSTR` (`djembe, cajon, cajoncym, dunduns, agogo, surdo, recoreco`), styles `PERC_STYLES`,
 breaks `PERC_BREAKS`, bibliothèque de grooves `GROOVES` (28 grooves, 6 familles ; voix avec
 `instr/voiceKind/role/grid`, drapeaux `approx`/`uncertain`/`isBreak`).
 
@@ -167,6 +168,37 @@ de partage.
 - **Substitution instrument** : compléter `TS_SUB[instr]` (rôle → voiceKind valide).
 
 ## Journal de développement
+
+
+### 2026-07-11 — Variante « Cajón + cimbalette » (4 paliers)
+
+Nouvel **instrument focal distinct** `cajoncym`, branché depuis `main`. La cimbalette (jingles
+d'un tambourin **monté sur la tapa**) devient un **4ᵉ son réel** (CJ-S4), pas seulement un couloir
+de projection. Choix tranchés ce fil : instrument distinct (garde `INSTR_TIERS` **statique**) ·
+cimbalette = vrai son (audio + ligne de grille) · build `0.6.2`.
+
+- **Tables** : `INSTR_TIERS.cajoncym = 4` ; `PALIER_LABELS.cajoncym = ['grave','médium','aigu','cimbalette']` ;
+  `REGISTER_RANK.kind.cimbalette = 3`. Le **médium (palier 1) reste un vide honnête** — aucune voix
+  de rang 1, exactement comme le cajón classique (projection Option A inchangée).
+- **`PERC_INSTR.cajoncym`** : voix grave (rang 0) / aigu (rang 2) / cimbalette (rang 3). Groove de base
+  funk : basse sur 1 & 3, claqués sur 2 & 4, cimbalette sur les « et » (16 : `{grave:[0,8], aigu:[4,12],
+  cimbalette:[2,6,10,14]}` ; 12 : `{grave:[0,6], aigu:[3,9], cimbalette:[2,4,8,10]}`).
+- **Audio** : nouveau générateur `percJingle(t, vol, accent)` — souffle de bruit passe-haut (≈ 5,2 kHz)
+  + grappe de partiels aigus inharmoniques, **zéro dépendance** (réutilise `noiseBuf`). Routage
+  `switch(instr+'.'+voiceKind)` : `cajoncym.grave`/`cajoncym.aigu` **réutilisent les timbres du cajón**
+  (`percDrum`/`percSnap`), `cajoncym.cimbalette` → `percJingle`. **Timbre à régler à l'oreille** (la
+  recette n'en juge pas le son, comme `percScrape`/basse).
+- **UI** : option `cajoncym` dans `#percInstr`. Mute cimbalette (CJ-M5) = le **mute par-voix générique**,
+  rien de spécial. `fingerViz` affiche 4 couloirs (cimbalette en haut) sans code dédié — la mécanique
+  paliers + curseur (0.6.1) suit `INSTR_TIERS`/`PALIER_LABELS`.
+- **Recette** `recette-cajon-cymbalette.js` **32/32** : 4 paliers & libellés ; rang cimbalette 3 → palier 3
+  (clamp Option A) ; sélection `cajoncym` & rangs de voix ; `fingerViz` 4 couloirs (cimbalette haut, grave
+  bas), 4 curseurs ; groove de base (cimbalette sonne, **médium palier 1 vide honnête**) ; routage audio
+  reconnu (contrôle sur source) ; non-régression du cajón classique. **Non-régression 312/312** sur 11 suites
+  — passe 5 (206) + chantier-B (74) + variante (32). Assertion de build de `recette-chantier-B2.js`
+  assouplie (`0\.6\.[1-9]…` au lieu de `0\.6\.1` figé) pour tolérer les bumps de la ligne 0.6.x.
+- **Estampille** `metronomefunk-0.6.2 · 2026-07-11`.
+- **Reste à faire** : régler le **timbre cimbalette** à l'oreille (Android / HP Trust GXT).
 
 
 ### 2026-07-11 — Chantier B (finition) : curseur temps réel sur `fingerViz`
