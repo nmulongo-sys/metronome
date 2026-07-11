@@ -319,6 +319,11 @@
     transform: translateX(-50%); opacity: .92;
   }
   .fv-hit.acc { box-shadow: 0 0 0 1.5px var(--fm-ink); top: 1px; height: 12px; }
+  /* chantier B (finition 0.6.1) : curseur temps réel — un par piste, même phase que #playLine */
+  .fv-cursor {
+    position: absolute; top: 0; bottom: 0; width: 2px;
+    background: var(--fm-ink); opacity: .5; transform: translateX(-50%); display: none;
+  }
 
   /* ---- percussion ---- */
   .perc-voice { display: flex; align-items: center; gap: 10px; margin: 8px 0; flex-wrap: wrap; }
@@ -1205,7 +1210,7 @@ swing 62
 
   // Identité du build affichée dans l'en-tête (5.3-bis). Bumper à chaque passe : elle sert à
   // savoir de quel build vient un enregistrement de validation.
-  const BUILD = 'metronomefunk-0.6.0', BUILD_DATE = '2026-07-11';
+  const BUILD = 'metronomefunk-0.6.1', BUILD_DATE = '2026-07-11';
 
   let audioCtx = null, masterGain = null, noiseBuf = null;
   let masterLimiter = null;                                   // 5.3-ter : limiteur de bus master
@@ -2374,6 +2379,7 @@ swing 62
       const pc = $('playLine') && $('playLine').querySelector('.pl-cursor');
       if (pc) { pc.style.display = 'block'; pc.style.left = ((phase < 0 ? 0 : phase) * 100) + '%'; }
       bassPulseCheck(phase < 0 ? 0 : phase);   // 5.4 : témoin d'activité basse
+      fingerVizCursor(phase < 0 ? 0 : phase);  // chantier B 0.6.1 : curseur temps réel
     }
     $('statusLine').innerHTML = mutedThisCycle
       ? '<span class="mute">' + (S.gap.target === 'all'
@@ -2399,6 +2405,7 @@ swing 62
     if ($('percLine')) $('percLine').classList.remove('break-now');
     const pc = $('playLine') && $('playLine').querySelector('.pl-cursor');
     if (pc) pc.style.display = 'none';
+    document.querySelectorAll('#fingerViz .fv-cursor').forEach(c => c.style.display = 'none');
     drawBowStatic();
   }
 
@@ -6910,11 +6917,26 @@ swing 62
       });
       html += '<div class="fv-lane' + (lanes[t].length ? '' : ' empty') + '">' +
               '<span class="fv-label">' + palierLabel(instr, t, T) + '</span>' +
-              '<div class="fv-track">' + track + '</div></div>';
+              '<div class="fv-track">' + track + '<i class="fv-cursor"></i></div></div>';
     }
     box.innerHTML = html;
     box.classList.toggle('hide', !lanes.some(l => l.length));   // rien à montrer → masqué
   }
+  // chantier B (finition 0.6.1) : curseur temps réel, piloté par draw() avec la même
+  // phase que #playLine. frac des pastilles (i/n) et phase partagent le repère mesure ;
+  // un curseur par piste (toutes démarrent au même x, libellés ≤ 70 px) → ligne continue.
+  function fingerVizCursor(phase) {
+    const box = $('fingerViz');
+    if (!box) return;
+    const show = !box.classList.contains('hide');
+    box.querySelectorAll('.fv-cursor').forEach(c => {
+      c.style.display = show ? 'block' : 'none';
+      if (show) c.style.left = (phase * 100) + '%';
+    });
+  }
+  // Couche d'action de recette (distincte du hook de diagnostic lecture seule
+  // fmMetroReg) : pilote le curseur headless comme draw() le ferait en jeu.
+  window.fmMetroFvCursor = fingerVizCursor;
 
   // ---- écran d'accueil (setup) : 2 choix, mémorisés (fm-metro-play) ----
   let psMulti = false, psLearn = false;
