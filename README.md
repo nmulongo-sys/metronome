@@ -170,6 +170,24 @@ de partage.
 ## Journal de développement
 
 
+### 2026-07-11 — Timbre cimbalette réglé à l'oreille (« tintant ») · build 0.6.3
+
+Réglage du timbre de `percJingle` (le 4ᵉ son du `cajoncym`), validé à l'oreille sur Trust GXT via un
+banc d'essai A/B jetable (4 profils comparés en boucle à la densité réelle 2·6·10·14). Profil retenu :
+**« tintant »**. Les 4 partiels carrés `[6300, 8400, 9700, 11200]` deviennent **6 partiels triangle**
+plus hauts et plus étalés `[5400, 7300, 9100, 11300, 13200, 15100]` (désaccord inharmonique
+×(1+0,02·i)), décroissance allongée (0,14/0,22 s contre 0,065/0,12 s) → shimmer métallique, moins de
+buzz que les carrés. Souffle passe-haut abaissé 5200 → 5000 Hz, gain 0,9 → 0,7, queue 0,15 → 0,22 s.
+Aucune autre voix touchée ; câblage `cajoncym`, paliers et curseur inchangés.
+
+**Build bumpé 0.6.2 → 0.6.3.** L'assertion de build de `recette-cajon-cymbalette.js` (qui figeait
+`0.6.2`) est **assouplie** en `metronomefunk-0.6.([2-9]|\d{2,})` — même remède que le bump précédent
+sur `recette-chantier-B2.js` : l'intention (« variante cajoncym présente ⇒ build ≥ 0.6.2 ») est
+préservée et tolère les bumps de la ligne 0.6.x.
+
+Recettes : **non-régression 312/312 sur 11 suites** (inchangée ; le timbre est un jugement d'oreille,
+hors recette). Poussé sur `main` : `index.html`, `README.md`, `recette-cajon-cymbalette.js`.
+
 ### 2026-07-11 — Variante « Cajón + cimbalette » (4 paliers)
 
 Nouvel **instrument focal distinct** `cajoncym`, branché depuis `main`. La cimbalette (jingles
