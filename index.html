@@ -1716,8 +1716,8 @@ swing 62
   // La clave = deux voix cloche de la liste unique. Ids préfixés « clave » :
   // « grave »/« aigu » collisionnent avec les voix du cajón dans percGrids.
   const CLAVE_VOICES = [
-    { id: 'claveGrave', label: 'Clave grave', timbre: 'cloche', freq: 1400 },
-    { id: 'claveAigue', label: 'Clave aiguë', timbre: 'cloche', freq: 2200 }
+    { id: 'claveGrave', label: 'Clave grave', timbre: 'cloche', freq: 1400, rank: 2 },
+    { id: 'claveAigue', label: 'Clave aiguë', timbre: 'cloche', freq: 2200, rank: 3 }
   ];
   // source de vérité des grilles clave — survit aux reconstructions de percGrids
   // déclenchées par percSetInstr / applyPercStyle / percLoadPreset / applyKitProfile
@@ -1820,9 +1820,9 @@ swing 62
     djembe: {
       label: 'Djembé', work: 'slap',
       voices: [
-        { id: 'basse', label: 'Basse' },
-        { id: 'tone',  label: 'Tone' },
-        { id: 'slap',  label: 'Slap' }
+        { id: 'basse', label: 'Basse', rank: 0 },
+        { id: 'tone',  label: 'Tone',  rank: 1 },
+        { id: 'slap',  label: 'Slap',  rank: 2 }
       ],
       base: {
         16: { basse: [0, 8], tone: [4, 5, 12, 13], slap: [10] },
@@ -1832,8 +1832,8 @@ swing 62
     cajon: {
       label: 'Cajón', work: 'aigu',
       voices: [
-        { id: 'grave', label: 'Grave' },
-        { id: 'aigu',  label: 'Aigu' }
+        { id: 'grave', label: 'Grave', rank: 0 },
+        { id: 'aigu',  label: 'Aigu',  rank: 2 }
       ],
       base: {
         16: { grave: [0, 3, 8, 10], aigu: [4, 12] },
@@ -1843,10 +1843,10 @@ swing 62
     dunduns: {
       label: 'Dunduns & cloche', work: 'sangban',
       voices: [
-        { id: 'dundunba', label: 'Dundunba' },
-        { id: 'sangban',  label: 'Sangban' },
-        { id: 'kenkeni',  label: 'Kenkeni' },
-        { id: 'cloche',   label: 'Cloche' }
+        { id: 'dundunba', label: 'Dundunba', rank: 0 },
+        { id: 'sangban',  label: 'Sangban',  rank: 1 },
+        { id: 'kenkeni',  label: 'Kenkeni',  rank: 2 },
+        { id: 'cloche',   label: 'Cloche',   rank: 3 }
       ],
       base: {
         16: { dundunba: [0, 8], sangban: [4, 12], kenkeni: [2, 6, 10, 14], cloche: [0, 2, 4, 6, 8, 10, 12, 14] },
@@ -1858,8 +1858,8 @@ swing 62
     agogo: {
       label: 'Agogô (2 tons)', work: 'aigu',
       voices: [
-        { id: 'grave', label: 'Grave' },
-        { id: 'aigu',  label: 'Aigu' }
+        { id: 'grave', label: 'Grave', rank: 0 },
+        { id: 'aigu',  label: 'Aigu',  rank: 2 }
       ],
       base: {
         // interlock des deux cloches (Ijexá) : le grave ancre, l'aigu syncope
@@ -1870,8 +1870,8 @@ swing 62
     surdo: {
       label: 'Surdo (grave · marcante)', work: 'grave',
       voices: [
-        { id: 'grave',    label: 'Grave (fundo)' },
-        { id: 'marcante', label: 'Marcante' }
+        { id: 'grave',    label: 'Grave (fundo)', rank: 0 },
+        { id: 'marcante', label: 'Marcante',      rank: 1 }
       ],
       base: {
         // samba : surdo de primeira sur le temps 2, réponse (marcante) sur le temps 1
@@ -1882,7 +1882,7 @@ swing 62
     recoreco: {
       label: 'Reco-reco (raclement)', work: 'raclement',
       voices: [
-        { id: 'raclement', label: 'Raclement' }
+        { id: 'raclement', label: 'Raclement', rank: 2 }
       ],
       base: {
         // aller-retour continu en croches (« ida e volta »)
@@ -4964,13 +4964,43 @@ swing 62
   // la liste de voix affichables (id, libellé, couleur) — partagée entre la ligne de
   // réduction et l'écran de jeu (4.1) : voix du répertoire quand un groove est chargé
   // (le focal est alors en sourdine), voix du focal sinon — clave dans les deux cas.
+  // ============ RANG DE REGISTRE (chantier A) ============
+  // `rank` = position d'une voix sur l'échelle grave→aigu. 0 = plus grave ; un rang
+  // élevé = son aigu = palier haut sur l'instrument cible. NE PAS confondre avec
+  // TS.order / tsRank* (priorité de RÉPARTITION entre joueurs) : ici c'est du REGISTRE.
+  // Chantier A pose seulement la donnée + son repli ; l'encart (chantier B) la consomme.
+  // Table de correspondance (niveau 2) : les voix de la bibliothèque GROOVES portent
+  // déjà `voiceKind` (précis) et `role` (grossier) — on les mappe sans taguer chaque voix.
+  const REGISTER_RANK = {
+    kind: {                       // par voiceKind (le plus précis)
+      basse: 0, grave: 0, dundunba: 0,
+      marcante: 1, sangban: 1, tone: 1,
+      kenkeni: 2, slap: 2, aigu: 2,
+      cloche: 3
+    },
+    role: { basse: 0, medium: 1, aigu: 2 }   // repli grossier si voiceKind inconnu
+  };
+  // Résout le rang d'une voix par repli à trois niveaux — ne renvoie jamais d'état cassé.
+  //  1. rang explicite (voix maison PERC_INSTR, clave, ou futur tag sur un groove) ;
+  //  2. voix reconnue → table par voiceKind (ou origKind), puis par role ;
+  //  3. voix totalement inconnue → ordre de déclaration (sa position dans la liste).
+  function voiceRank(src, idx) {
+    if (src && Number.isFinite(src.rank)) return src.rank;                 // 1
+    if (src) {                                                            // 2
+      const vk = src.origKind != null ? src.origKind : src.voiceKind;
+      if (vk != null && REGISTER_RANK.kind[vk] != null) return REGISTER_RANK.kind[vk];
+      if (src.role != null && REGISTER_RANK.role[src.role] != null) return REGISTER_RANK.role[src.role];
+    }
+    return idx | 0;                                                       // 3
+  }
+
   function plVoiceList() {
     const def = PERC_INSTR[S.perc.instr];
     const base = (typeof TS !== 'undefined' && TS.loaded)
-      ? TS.voices.map((v, k) => ({ id: TS_PREFIX + v.gid, label: v.label, color: 'var(--fm-voice-' + (k % 6 + 1) + ')' }))
-      : def.voices.map((v, k) => ({ id: v.id, label: v.label, color: 'var(--fm-voice-' + (k % 4 + 1) + ')' }));
+      ? TS.voices.map((v, k) => ({ id: TS_PREFIX + v.gid, label: v.label, color: 'var(--fm-voice-' + (k % 6 + 1) + ')', rank: voiceRank(v, k) }))
+      : def.voices.map((v, k) => ({ id: v.id, label: v.label, color: 'var(--fm-voice-' + (k % 4 + 1) + ')', rank: voiceRank(v, k) }));
     return base
-      .concat(CLAVE_VOICES.map((v, k) => ({ id: v.id, label: v.label, color: 'var(--fm-voice-' + (k + 5) + ')' })));
+      .concat(CLAVE_VOICES.map((v, k) => ({ id: v.id, label: v.label, color: 'var(--fm-voice-' + (k + 5) + ')', rank: voiceRank(v, base.length + k) })));
   }
 
   // ---- ligne de réduction (solfège) : le groove qui SONNE, sur une seule ligne ----
@@ -5468,11 +5498,11 @@ swing 62
       delete percGrids[vid]; delete percOffsets[vid]; delete percMeta[vid]; delete percMuted[vid];
     }
     if (!TS.loaded) return;
-    TS.voices.forEach(v => {
+    TS.voices.forEach((v, i) => {
       const id = TS_PREFIX + v.gid;
       percGrids[id] = v.grid.slice();
       percOffsets[id] = new Array(v.grid.length).fill(0);
-      percMeta[id] = { instr: v.instr, voiceKind: v.voiceKind };
+      percMeta[id] = { instr: v.instr, voiceKind: v.voiceKind, rank: voiceRank(v, i) };
     });
   }
   // mute métier team spirit — appelé par percLayerMuted. Quand un groove est chargé, la
