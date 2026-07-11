@@ -67,8 +67,12 @@ avec le registre.
   kenkeni 2 / cloche 3 · surdo grave 0 / marcante 1 · cajón & agogô grave 0 / aigu 2 · reco-reco 2.
   Clave grave 2 / aiguë 3 (provisoire). Table : `basse/grave/dundunba`→0, `marcante/sangban/tone`→1,
   `kenkeni/slap/aigu`→2, `cloche`→3 ; `role` `basse/medium/aigu`→0/1/2.
-- **Point ouvert (chantier B)** : normalisation des rangs « à trous » (voix aux extrêmes vs collées)
-  quand un groove ne couvre pas tous les paliers de l'instrument cible.
+- **Consommé par le chantier B** (livré, build 0.6.0) : `voicePalier(rank, T)` = **clamp absolu**
+  du rang sur `[0, T−1]` (OPTION A). La normalisation des rangs « à trous » est donc tranchée
+  en faveur du **registre honnête** : un couloir reste vide si le groove ne l'utilise pas
+  (cajón médium), et les rangs au-dessus de `T−1` se collent au palier haut (agogô aigu 2→1,
+  reco-reco 2→0). Limite assumée : une voix en repli niveau 3 (rang = ordre de déclaration)
+  se colle au palier haut — quasi nul en pratique (les voix `GROOVES` résolvent en 0..3).
 
 - `playPerc(t, voix, accent)` route sur `percMeta[voix].instr + '.' + voiceKind` → plusieurs instruments
   simultanés. Repli sur le focal `S.perc.instr` si une voix n'a pas de méta (= comportement passe 2).
@@ -164,6 +168,48 @@ de partage.
 
 ## Journal de développement
 
+
+### 2026-07-11 — Chantier B.1 : encart `fingerViz` (projection sur paliers)
+
+Premier chantier post-passe-5, branché depuis `main`. **Encart `fingerViz`** : projette chaque
+frappe de **MA ligne** (écran de jeu) sur les **paliers de l'instrument cible** (le focal
+`S.perc.instr`), du grave (bas) vers l'aigu (haut). Consomme le champ `rank` posé par le
+chantier A ; **aucune logique musicale ni audio nouvelle** (le moteur, `tsHandsMerged` et la
+synthèse ne sont pas touchés).
+
+- **Paliers par instrument** (`INSTR_TIERS`) : djembé 3 (basse/tone/slap), cajón 3
+  (grave/médium/aigu), dunduns 4 (dundunba/sangban/kenkeni/cloche), agogô 2, surdo 2,
+  reco-reco 1. Instrument inconnu → repli 3. La variante **cajón + cymbalette (4 paliers)**
+  attend l'accessoire cimbalette réel (non tranché) — **hors table** tant que non décidé.
+- **Projection `voicePalier(rank, T)` — OPTION A (validée)** : `clamp(rank, 0, T−1)`. Honnête
+  sur le registre — laisse un couloir **vide** si le groove ne l'utilise pas (cajón médium),
+  clampe au palier haut les rangs qui dépassent (agogô aigu rang 2 → palier 1 ; reco-reco
+  rang 2 → palier 0). **Limite latente assumée** : une voix tombée en repli niveau 3 (voix
+  totalement inconnue, rang = ordre de déclaration) se colle au palier haut — quasi nul en
+  pratique (les ~150 voix `GROOVES` résolvent en 0..3 par table).
+- **Encart** `#fingerViz` dans `#playScreen`, sous `#playLine` : un couloir par palier,
+  **aigu en haut → grave en bas**, libellés propres à l'instrument (repli grave/médium/aigu),
+  repères colorés **par voix** (accent = liseré `--fm-ink`). Rafraîchi via `fingerVizRender()`
+  chaîné en fin de `playLineRender()` (**même chemin de mise à jour** que la ligne de jeu).
+  **Statique v1** (curseur temps réel reporté). **Masqué** (classe `hide`) si ma ligne est vide.
+- **Doctrine respectée** : la **basse funk** (`layer:'bass'`, hors `plVoiceList`/`percGrids`)
+  n'est **jamais** projetée — vérifié en recette (activer la basse ne change pas l'ensemble
+  projeté, aucun couloir « basse funk » ajouté).
+- **Hook `fmMetroReg`** (lecture seule, esprit `fmMetroBass`) : `tiers` / `palier` / `labels` /
+  `rankOf` / `mapping` / `build`.
+- **Recette** `recette-chantier-B.js` **52/52** : table `INSTR_TIERS`, clamp Option A (rangs
+  0..5, T=2/3/4, plancher/plafond), libellés, projection djembé (basse→0/tone→1/slap→2),
+  changements d'instrument (agogô/reco clampés, couloir médium vide honnête du cajón),
+  robustesse `palier ∈ [0, T−1]` tous instruments, exclusion basse, masquage si vide.
+  **Non-régression 206/206** — 8 recettes passe 5 vertes (5-1 20 · 5-1-bis 21 · 5-2 23 · 5-3 38 ·
+  5-3-bis 15 · 5-3-ter 28 · 5-3c 21 · 5-4 40). **Retouche documentée** : estampille génériquée
+  au motif `metronomefunk-\d+\.\d+` dans 5-3-bis/-ter/-3c/-4 (le bump `0.6.0` sort du motif
+  `0.5.x` — même nature que les génrifications d'estampille des étapes 5.3c/5.4).
+- **Estampille** `metronomefunk-0.6.0 · 2026-07-11` (nouvelle ligne post-passe-5). Contrôle de
+  syntaxe du JS inline OK.
+- **À valider à l'œil (Android)** : lisibilité des couloirs sur petit écran, hauteur de l'encart,
+  ordre aigu-en-haut. **Reste ouvert** : curseur temps réel sur `fingerViz` ; variante cajón +
+  cymbalette (dépend de l'accessoire cimbalette) ; extension éventuelle de la table niveau 2.
 
 ### 2026-07-11 — Fusion : passe 5 (basse funk) refermée sur `main`
 
