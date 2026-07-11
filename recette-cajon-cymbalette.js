@@ -80,7 +80,7 @@ boot(() => {
 
   // --- 1. Estampille de build ----------------------------------------------
   console.log('[1] Build');
-  ok(typeof R.build === 'string' && /0\.6\.2/.test(R.build), 'BUILD bumpé à 0.6.2 (' + R.build + ')');
+  ok(typeof R.build === 'string' && /metronomefunk-0\.6\.([2-9]|\d{2,})/.test(R.build), 'BUILD ≥ 0.6.2 (variante cajoncym présente ; ' + R.build + ')');
 
   // --- 2. Modèle de données (hook lecture seule) ---------------------------
   console.log('\n[2] Paliers & libellés (hook)');
