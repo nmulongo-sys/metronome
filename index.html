@@ -1211,7 +1211,7 @@ swing 62
 
   // Identité du build affichée dans l'en-tête (5.3-bis). Bumper à chaque passe : elle sert à
   // savoir de quel build vient un enregistrement de validation.
-  const BUILD = 'metronomefunk-0.6.2', BUILD_DATE = '2026-07-11';
+  const BUILD = 'metronomefunk-0.6.3', BUILD_DATE = '2026-07-11';
 
   let audioCtx = null, masterGain = null, noiseBuf = null;
   let masterLimiter = null;                                   // 5.3-ter : limiteur de bus master
@@ -1433,20 +1433,22 @@ swing 62
     // souffle métallique bref
     const src = audioCtx.createBufferSource(), ng = audioCtx.createGain(), hp = audioCtx.createBiquadFilter();
     src.buffer = noiseBuf;
-    hp.type = 'highpass'; hp.frequency.value = 5200; hp.Q.value = 0.7;
+    hp.type = 'highpass'; hp.frequency.value = 5000; hp.Q.value = 0.7;
     src.connect(hp); hp.connect(ng); ng.connect(masterGain);
-    ng.gain.setValueAtTime(vol * 0.9, t);
-    ng.gain.exponentialRampToValueAtTime(0.0008, t + (accent ? 0.13 : 0.075));
-    src.start(t); src.stop(t + 0.15);
-    // partiels aigus inharmoniques (rondelles qui tintent)
-    const parts = [6300, 8400, 9700, 11200];
+    ng.gain.setValueAtTime(vol * 0.7, t);
+    ng.gain.exponentialRampToValueAtTime(0.0008, t + (accent ? 0.15 : 0.09));
+    src.start(t); src.stop(t + 0.22);
+    // partiels aigus inharmoniques (rondelles qui tintent) — profil « tintant » (V1, réglé à
+    // l'oreille sur Trust GXT) : 6 partiels triangle plus hauts et plus étalés, décroissance
+    // longue → shimmer métallique, moins de buzz que les carrés.
+    const parts = [5400, 7300, 9100, 11300, 13200, 15100];
     for (let i = 0; i < parts.length; i++) {
       const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-      o.type = 'square'; o.frequency.value = parts[i] * (1 + 0.012 * i);
+      o.type = 'triangle'; o.frequency.value = parts[i] * (1 + 0.02 * i);
       o.connect(g); g.connect(masterGain);
-      g.gain.setValueAtTime(Math.max(0.02, vol * (0.15 - i * 0.025)), t);
-      g.gain.exponentialRampToValueAtTime(0.0006, t + (accent ? 0.12 : 0.065));
-      o.start(t); o.stop(t + 0.14);
+      g.gain.setValueAtTime(Math.max(0.015, vol * (0.13 - i * 0.018)), t);
+      g.gain.exponentialRampToValueAtTime(0.0006, t + (accent ? 0.22 : 0.14));
+      o.start(t); o.stop(t + 0.28);
     }
   }
 
