@@ -301,6 +301,25 @@
   .pl-brick.back { opacity: .25; }
   #playScreen.no-back .pl-brick.back { display: none; }
 
+  /* chantier B : encart fingerViz — paliers de l'instrument cible (grave→aigu) */
+  .finger-viz { margin: 6px 0 2px; display: flex; flex-direction: column; gap: 3px; }
+  .finger-viz.hide { display: none; }
+  .fv-lane { display: flex; align-items: center; gap: 8px; }
+  .fv-label {
+    min-width: 70px; font-size: .72rem; color: var(--fm-sub);
+    text-align: right; font-variant-numeric: tabular-nums;
+  }
+  .fv-lane.empty .fv-label { opacity: .4; }
+  .fv-track {
+    position: relative; flex: 1; height: 16px; border-radius: 4px;
+    background: var(--fm-panel-2); border: 1px solid var(--fm-line);
+  }
+  .fv-hit {
+    position: absolute; top: 2px; width: 6px; height: 10px; border-radius: 2px;
+    transform: translateX(-50%); opacity: .92;
+  }
+  .fv-hit.acc { box-shadow: 0 0 0 1.5px var(--fm-ink); top: 1px; height: 12px; }
+
   /* ---- percussion ---- */
   .perc-voice { display: flex; align-items: center; gap: 10px; margin: 8px 0; flex-wrap: wrap; }
   .perc-voice .pv-label { min-width: 92px; color: var(--fm-sub); font-size: .82rem; }
@@ -557,6 +576,8 @@
     </div>
     <div class="perc-line play-line" id="playLine"></div>
     <div class="perc-line-legend" id="playLegend"></div>
+    <!-- chantier B : projection des frappes de ma ligne sur les paliers de l'instrument cible -->
+    <div class="finger-viz hide" id="fingerViz" aria-hidden="true"></div>
     <div class="row hide" id="playHintRow" style="margin-bottom:0;">
       <span class="hint" style="margin:0;" id="playHintTxt">Ma ligne n'est pas encore répartie.</span>
       <button class="btn-sm primary" id="playDist1">Répartir selon priorités (1 joueur)</button>
@@ -1184,7 +1205,7 @@ swing 62
 
   // Identité du build affichée dans l'en-tête (5.3-bis). Bumper à chaque passe : elle sert à
   // savoir de quel build vient un enregistrement de validation.
-  const BUILD = 'metronomefunk-0.5.4', BUILD_DATE = '2026-07-10';
+  const BUILD = 'metronomefunk-0.6.0', BUILD_DATE = '2026-07-11';
 
   let audioCtx = null, masterGain = null, noiseBuf = null;
   let masterLimiter = null;                                   // 5.3-ter : limiteur de bus master
@@ -5663,6 +5684,63 @@ swing 62
     return idx | 0;                                                       // 3
   }
 
+  // ============ PROJECTION SUR PALIERS (chantier B) ============
+  // fingerViz projette chaque frappe de MA ligne sur les paliers de l'instrument
+  // cible (le focal S.perc.instr), du grave (0) vers l'aigu. Le nombre de paliers
+  // est propre à l'instrument. La variante « cajón + cymbalette » (4 paliers) attend
+  // l'accessoire cimbalette réel (non tranché) — absente de la table tant que non décidé.
+  const INSTR_TIERS = { djembe: 3, cajon: 3, dunduns: 4, agogo: 2, surdo: 2, recoreco: 1 };
+  function instrTiers(instr) { return INSTR_TIERS[instr] || 3; }
+  const PALIER_LABELS = {
+    djembe:   ['basse', 'tone', 'slap'],
+    cajon:    ['grave', 'médium', 'aigu'],
+    dunduns:  ['dundunba', 'sangban', 'kenkeni', 'cloche'],
+    agogo:    ['grave', 'aigu'],
+    surdo:    ['grave', 'marcante'],
+    recoreco: ['raclement']
+  };
+  const PALIER_GENERIC = ['grave', 'médium', 'aigu', 'très aigu'];
+  function palierLabel(instr, t, T) {
+    const named = PALIER_LABELS[instr];
+    if (named && named.length === T && named[t] != null) return named[t];
+    if (T === 1) return '—';
+    if (T === 2) return t === 0 ? 'grave' : 'aigu';
+    return PALIER_GENERIC[Math.min(t, PALIER_GENERIC.length - 1)];
+  }
+  // OPTION A (validée) : projection = clamp absolu du rang sur [0, T−1]. Honnête sur le
+  // registre ; laisse un palier vide si le groove ne l'utilise pas. Limite assumée : une
+  // voix tombée en repli niveau 3 (voix inconnue, rang = ordre de déclaration) se colle au
+  // palier haut — quasi nul en pratique (les voix de GROOVES résolvent en 0..3 par table).
+  function voicePalier(rank, T) {
+    const r = Number.isFinite(rank) ? (rank | 0) : 0;
+    return Math.max(0, Math.min(T - 1, r));
+  }
+
+  // Diagnostic headless (lecture seule, même esprit que fmMetroBass) — recette chantier B.
+  window.fmMetroReg = function () {
+    const audible = id => !percMuted[id] && !(typeof tsMuted === 'function' && tsMuted(id, false));
+    return {
+      tiers:  function (instr) { return instrTiers(instr == null ? S.perc.instr : instr); },
+      palier: function (rank, T) { return voicePalier(rank, T == null ? instrTiers(S.perc.instr) : T); },
+      labels: function (instr) { const i = instr == null ? S.perc.instr : instr, T = instrTiers(i); return Array.from({ length: T }, (_, t) => palierLabel(i, t, T)); },
+      rankOf: function (id) { const v = plVoiceList().find(x => x.id === id); return v ? v.rank : null; },
+      // projection courante de MA ligne sur les paliers de l'instrument focal.
+      mapping: function () {
+        const instr = S.perc.instr, T = instrTiers(instr), m = playMine();
+        const voices = [];
+        plVoiceList().forEach(v => {
+          if (!m.ids[v.id] || !audible(v.id)) return;
+          const g = percGrids[v.id]; if (!g) return;
+          const hits = [];
+          for (let i = 0; i < g.length; i++) if (g[i]) hits.push({ i: i, frac: i / g.length, acc: g[i] === 2 });
+          if (hits.length) voices.push({ id: v.id, rank: v.rank, palier: voicePalier(v.rank, T), hits: hits });
+        });
+        return { instr: instr, tiers: T, voices: voices };
+      },
+      build: BUILD
+    };
+  };
+
   function plVoiceList() {
     const def = PERC_INSTR[S.perc.instr];
     const base = (typeof TS !== 'undefined' && TS.loaded)
@@ -6803,6 +6881,39 @@ swing 62
     const need = TS.loaded && TS.on && S.play.who === 'solo' &&
       (TS.participants.length !== 1 || !TS.voices.some(v => v.participant != null));
     $('playHintRow').classList.toggle('hide', !need);
+    fingerVizRender();   // chantier B : même chemin de mise à jour que la ligne de jeu
+  }
+
+  // ---- encart fingerViz (chantier B) : MA ligne projetée sur les paliers de
+  //      l'instrument cible (focal), grave en bas → aigu en haut. Statique v1,
+  //      rafraîchi par playLineRender. La basse funk n'y entre jamais (instrument
+  //      de référence, jamais imité) : elle n'est pas dans plVoiceList/percGrids.
+  function fingerVizRender() {
+    const box = $('fingerViz');
+    if (!box) return;
+    const instr = S.perc.instr, T = instrTiers(instr);
+    const m = playMine();
+    const audible = id => !percMuted[id] && !(typeof tsMuted === 'function' && tsMuted(id, false));
+    const lanes = Array.from({ length: T }, () => []);
+    plVoiceList().forEach(v => {
+      if (!m.ids[v.id] || !audible(v.id)) return;   // seulement ce que l'élève joue
+      const g = percGrids[v.id]; if (!g) return;
+      const t = voicePalier(v.rank, T);              // OPTION A : clamp absolu
+      const n = g.length;
+      for (let i = 0; i < n; i++) if (g[i]) lanes[t].push({ frac: i / n, acc: g[i] === 2, color: v.color });
+    });
+    let html = '';
+    for (let t = T - 1; t >= 0; t--) {               // aigu en haut, grave en bas
+      let track = '';
+      lanes[t].forEach(h => {
+        track += '<i class="fv-hit' + (h.acc ? ' acc' : '') + '" style="left:' + (h.frac * 100) + '%;background:' + h.color + '"></i>';
+      });
+      html += '<div class="fv-lane' + (lanes[t].length ? '' : ' empty') + '">' +
+              '<span class="fv-label">' + palierLabel(instr, t, T) + '</span>' +
+              '<div class="fv-track">' + track + '</div></div>';
+    }
+    box.innerHTML = html;
+    box.classList.toggle('hide', !lanes.some(l => l.length));   // rien à montrer → masqué
   }
 
   // ---- écran d'accueil (setup) : 2 choix, mémorisés (fm-metro-play) ----
