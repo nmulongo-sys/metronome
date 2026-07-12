@@ -448,6 +448,33 @@
   .ts-rk-num { min-width: 1.4em; text-align: right; color: var(--fm-sub); }
   .ts-rk-hits { margin-left: auto; color: var(--fm-sub); font-size: .72rem; white-space: nowrap; }
   .ts-warn { color: var(--fm-accent-2); }
+
+  /* ===== Parcours funk (P-4) — surcouche additive ===== */
+  :root { --pf-cajon:#C8722E; --pf-djembe:#2E86C8; }
+  .pf-grid { display:grid; grid-template-columns:1fr; gap:14px; margin-top:6px; }
+  @media (min-width:640px){ .pf-grid { grid-template-columns:1fr 1fr; } }
+  .pf-col { border:1px solid var(--fm-line); border-radius:12px; padding:10px; background:var(--fm-panel-2); border-top:3px solid var(--pf-c); }
+  .pf-col-head { font-weight:700; font-size:.9rem; margin-bottom:8px; display:flex; align-items:center; gap:6px; color:var(--fm-ink); }
+  .pf-dot { width:10px; height:10px; border-radius:50%; background:var(--pf-c); display:inline-block; }
+  .pf-card { border:1px solid var(--fm-line); border-left:4px solid var(--pf-c); border-radius:10px; padding:8px 10px; margin:8px 0; background:var(--fm-panel); }
+  .pf-card.pf-shared { border-left:4px solid transparent; border-image:linear-gradient(var(--pf-cajon),var(--pf-djembe)) 1; }
+  .pf-card.pf-acq { box-shadow:inset 0 0 0 1px var(--fm-accent); }
+  .pf-card-top { display:flex; align-items:center; gap:8px; }
+  .pf-rang { min-width:1.5em; height:1.5em; border-radius:50%; background:var(--pf-c); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:.75rem; font-weight:700; }
+  .pf-objet { font-weight:600; font-size:.86rem; flex:1; }
+  .pf-badge-shared, .pf-badge-promo { font-size:.68rem; padding:1px 6px; border-radius:20px; white-space:nowrap; }
+  .pf-badge-shared { background:linear-gradient(90deg,var(--pf-cajon),var(--pf-djembe)); color:#fff; }
+  .pf-badge-promo { background:var(--fm-accent); color:var(--fm-accent-ink); }
+  .pf-consigne { font-size:.8rem; color:var(--fm-ink); margin:6px 0 2px; }
+  .pf-critere { font-size:.76rem; color:var(--fm-sub); font-style:italic; margin-bottom:6px; }
+  .pf-actions { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .pf-perso { margin-top:6px; font-size:.78rem; }
+  .pf-perso summary { cursor:pointer; color:var(--fm-sub); }
+  .pf-perso-body { display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; align-items:center; }
+  .pf-perso-body label { display:flex; align-items:center; gap:4px; }
+  .pf-vote { display:flex; align-items:center; gap:6px; margin-top:8px; font-size:.76rem; color:var(--fm-sub); flex-wrap:wrap; }
+  .pf-vote .pf-v { font-size:.74rem; padding:2px 8px; }
+  #pfStatus { font-size:.78rem; color:var(--fm-accent-2); margin-top:8px; min-height:1em; }
 </style>
 
 <script>
@@ -986,6 +1013,16 @@
     </div>
   </details>
 
+  <!-- Parcours funk (P-4) : surcouche pédagogique, module 6 (niveau Intermédiaire) -->
+  <details class="section" id="secCours" data-strate="couche">
+    <summary><span class="sec-title">Cours funk</span><span class="sec-sub">parcours · intermédiaire</span></summary>
+    <div class="section-body">
+      <div class="hint">Deux parcours parallèles — cajón et djembé. « Charger » installe l'accompagnement de basse de l'exercice ; tu joues par-dessus. Coche « acquis » quand le critère est atteint ; le vote de difficulté aide à recalibrer le niveau pour tout le monde.</div>
+      <div id="pfRoot"></div>
+      <div id="pfStatus" aria-live="polite"></div>
+    </div>
+  </details>
+
   <!-- 4. Gap clicks -->
   <details class="section" id="secGap" data-strate="enveloppe">
     <summary><span class="sec-title">Horloge interne</span><span class="sec-sub">gap clicks</span></summary>
@@ -1211,7 +1248,7 @@ swing 62
 
   // Identité du build affichée dans l'en-tête (5.3-bis). Bumper à chaque passe : elle sert à
   // savoir de quel build vient un enregistrement de validation.
-  const BUILD = 'metronomefunk-0.6.3', BUILD_DATE = '2026-07-11';
+  const BUILD = 'metronomefunk-0.6.4', BUILD_DATE = '2026-07-12';
 
   let audioCtx = null, masterGain = null, noiseBuf = null;
   let masterLimiter = null;                                   // 5.3-ter : limiteur de bus master
@@ -7913,6 +7950,237 @@ swing 62
   // l'état sauvegardé (fm-metro-play) ou s'ouvre au premier lancement. L'assistant
   // ne s'ouvre plus automatiquement ; il reste accessible via ✦ Assistant.
   playRestore();
+
+  // ============ PARCOURS FUNK (P-4) — surcouche additive, module 6 (Intermédiaire) ============
+  // Deux modules (cajón/djembé), preset d'un bloc, acquis local par position, double couleur pour
+  // les EX-SOCLE partagés, vote de fin → pf_vote/pf_promotion en réutilisant window.fmSupabase().
+  // Hors de l'écran « Cours funk », strictement no-op : ne lit/écrit que ses propres clés.
+  const PF_PARC = {
+    cajon:  { label: 'Cajón',  couleur: 'var(--pf-cajon)' },
+    djembe: { label: 'Djembé', couleur: 'var(--pf-djembe)' }
+  };
+  const PF_NIVEAUX = ['debutant', 'intermediaire', 'avance', 'artiste'];
+  const PF_EX = {
+    'EX-SOCLE-I2-01': { kind:'atome', objet:'Grave sur The One',
+      consigne:"Pose ton grave exactement sur le 1, en même temps que la fondamentale de la basse.",
+      critere:"quand ton grave et celui de la basse sonnent comme une seule frappe.",
+      preset:{ pattern:'theOne', prog:'vamp1', drop:{on:false} } },
+    'EX-CJ-I2-02': { kind:'atome', objet:'Se loger dans le trou (slap catapulte)',
+      consigne:"Place ton slap pile dans le trou laissé par la basse, sans la couvrir.",
+      critere:"quand ton slap tombe dans le vide de la basse sans jamais marcher dessus.",
+      preset:{ pattern:'syncopeGrave', prog:'vamp1', drop:{on:false} } },
+    'EX-DJ-I2-02': { kind:'atome', objet:'Se loger dans le trou (slap fouetté)',
+      consigne:"Place ton slap dans le trou de la basse, poignet fouetté, sans la couvrir.",
+      critere:"quand ton slap claque dans le vide de la basse sans marcher dessus.",
+      preset:{ pattern:'syncopeGrave', prog:'vamp1', drop:{on:false} } },
+    'EX-SOCLE-I2-03': { kind:'atome', objet:'Nappe de ghosts sous la basse',
+      consigne:"Tisse un tapis de ghosts en 16es sous la ligne de basse.",
+      critere:"quand tes ghosts font un tapis régulier sans jamais bousculer la basse.",
+      preset:{ pattern:'ghostPendule', prog:'vamp1', drop:{on:false} } },
+    'EX-SOCLE-I2-04': { kind:'atome', objet:'Drop-out : tenir le time',
+      consigne:"Quand la basse disparaît, garde ta pulsation intérieure et retombe pile à son retour.",
+      critere:"quand la basse revient et que tu es toujours exactement en place.",
+      preset:{ pattern:'theOne', prog:'vamp1', drop:{on:true, everyN:4, lenBeats:2} } },
+    'EX-CJ-I2-05': { kind:'synthese', objet:'Synthèse — groove 2 cellules',
+      consigne:"Enchaîne grave sur The One + slap dans le trou + nappe ghost, sur les deux mesures.",
+      critere:"quand tu tiens le groove entier détendu, même quand la basse change d'accord.",
+      preset:{ pattern:'theOne', prog:'vamp2', drop:{on:false} } },
+    'EX-DJ-I2-05': { kind:'synthese', objet:'Synthèse — groove 2 cellules',
+      consigne:"Enchaîne bass sur The One + slap fouetté dans le trou + nappe ghost, sur les deux mesures.",
+      critere:"quand tu tiens le groove entier détendu, même quand la basse change d'accord.",
+      preset:{ pattern:'theOne', prog:'vamp2', drop:{on:false} } }
+  };
+  const PF_MOD = {
+    'MOD-CJ-I-I2': { parcours:'cajon', niveau:'intermediaire', objet:'Verrouiller sur la basse funk',
+      exercices:['EX-SOCLE-I2-01','EX-CJ-I2-02','EX-SOCLE-I2-03','EX-SOCLE-I2-04','EX-CJ-I2-05'] },
+    'MOD-DJ-I-I2': { parcours:'djembe', niveau:'intermediaire', objet:'Verrouiller sur la basse funk',
+      exercices:['EX-SOCLE-I2-01','EX-DJ-I2-02','EX-SOCLE-I2-03','EX-SOCLE-I2-04','EX-DJ-I2-05'] }
+  };
+  function pfSharedSet(){
+    const c = {};
+    Object.keys(PF_MOD).forEach(mid => PF_MOD[mid].exercices.forEach(e => c[e] = (c[e]||0) + 1));
+    return Object.keys(c).filter(e => c[e] >= 2);
+  }
+  // ---- état local, jamais synchronisé ----
+  function pfAcquisAll(){ try { return JSON.parse(store.get('fm-metro-parcours')||'{}'); } catch(e){ return {}; } }
+  function pfIsAcquis(p, ex){ const a = pfAcquisAll()[p+'|'+ex]; return !!(a && a.acquis); }
+  function pfAcquisSet(p, ex, val){
+    const all = pfAcquisAll();
+    if (val) all[p+'|'+ex] = { acquis:true, ts:Date.now() }; else delete all[p+'|'+ex];
+    store.set('fm-metro-parcours', JSON.stringify(all));
+  }
+  function pfPromoAll(){ try { return JSON.parse(store.get('fm-metro-parcours-promo')||'{}'); } catch(e){ return {}; } }
+  function pfPromoGet(p, ex, c){ return pfPromoAll()[p+'|'+ex+'|'+c] || null; }
+  function pfPromoSet(p, ex, c, rec){
+    const all = pfPromoAll(); all[p+'|'+ex+'|'+c] = Object.assign({ ts:Date.now() }, rec);
+    store.set('fm-metro-parcours-promo', JSON.stringify(all));
+  }
+  function pfNiveauEffectif(p, ex, c){
+    const promo = pfPromoGet(p, ex, c); const base = PF_NIVEAUX.indexOf('intermediaire');
+    const eff = base + ((promo && promo.promu) ? 1 : 0);
+    return PF_NIVEAUX[Math.min(eff, PF_NIVEAUX.length - 1)];
+  }
+  // ---- file de votes offline-first ----
+  function pfQueueAll(){ try { return JSON.parse(store.get('pf_vote_queue')||'[]'); } catch(e){ return []; } }
+  function pfQueueWrite(arr){ store.set('pf_vote_queue', JSON.stringify(arr)); }
+  function pfVoteItem(p, ex, c, v){ return { parcours:p, exercise_id:ex, cible:c, verdict:v, ts:Date.now() }; }
+  function pfQueuePush(item){
+    const q = pfQueueAll().filter(x => !(x.parcours===item.parcours && x.exercise_id===item.exercise_id && x.cible===item.cible));
+    q.push(item); pfQueueWrite(q);
+  }
+  // ---- Supabase : réutilise le client existant (aucun second client, aucun jeton maison) ----
+  function pfSb(){ try { return (window.fmSupabase && window.fmSupabase()) || null; } catch(e){ return null; } }
+  async function pfEnsureUid(sb){
+    try {
+      if (window.fmCurrentUser && window.fmCurrentUser.id) return window.fmCurrentUser.id;
+      const s = await sb.auth.getSession();
+      const u = s && s.data && s.data.session && s.data.session.user;
+      if (u && u.id) return u.id;
+      const a = await sb.auth.signInAnonymously();
+      if (a && a.error) return null;
+      const au = a && a.data && a.data.user; return (au && au.id) || null;
+    } catch(e){ return null; }
+  }
+  let pfFlushing = false;
+  async function pfFlushVotes(){
+    if (pfFlushing) return; const sb = pfSb(); if (!sb) return;
+    const q = pfQueueAll(); if (!q.length) return;
+    pfFlushing = true;
+    try {
+      const uid = await pfEnsureUid(sb); if (!uid) return;
+      const remain = [], touched = {};
+      for (const it of q){
+        try {
+          const r = await sb.from('pf_vote').upsert(
+            { client_id:uid, parcours:it.parcours, exercise_id:it.exercise_id, cible:it.cible, verdict:it.verdict },
+            { onConflict:'client_id,parcours,exercise_id,cible' });
+          if (r && r.error) remain.push(it); else touched[it.parcours+'|'+it.exercise_id+'|'+it.cible] = it;
+        } catch(e){ remain.push(it); }
+      }
+      pfQueueWrite(remain);
+      for (const k in touched){ const it = touched[k]; await pfRefreshPromo(it.parcours, it.exercise_id, it.cible); }
+    } finally { pfFlushing = false; try { pfRender(); } catch(e){} }
+  }
+  async function pfRefreshPromo(p, ex, c){
+    const sb = pfSb(); if (!sb) return;
+    try {
+      const r = await sb.rpc('pf_promotion', { parcours:p, exercise_id:ex, cible:c });
+      if (r && r.error) return; let d = r && r.data; if (Array.isArray(d)) d = d[0];
+      if (d) pfPromoSet(p, ex, c, { promu:!!d.promu, part:d.part, n_votes:d.n_votes, dormant:!!d.dormant });
+    } catch(e){}
+  }
+  function pfVote(p, ex, c, v){ pfQueuePush(pfVoteItem(p, ex, c, v)); pfFlushVotes(); try { pfRender(); } catch(e){} }
+  // ---- application d'un preset d'un bloc (mute rien de l'existant : mêmes points d'ancrage que l'UI) ----
+  function pfSyncBassUI(){
+    const b = S.bass;
+    const set = (id, val) => { const el = $(id); if (el){ if (el.type==='checkbox') el.checked = !!val; else el.value = val; } };
+    set('bassOn', b.on); set('bassPattern', b.pattern); set('bassKey', b.key); set('bassProg', b.prog);
+    set('bassDensity', String(b.density)); set('bassVel', b.vel); set('bassVary', b.vary);
+    set('bassLegato', Math.round((b.legato!=null ? b.legato : 0.25) * 100));
+    set('bassSpace', b.space); set('bassSwingFollow', b.swingFollow);
+    set('bassDropOn', !!(b.drop && b.drop.on));
+    if (b.drop){ set('bassDropEvery', b.drop.everyN); set('bassDropLen', b.drop.lenBeats); }
+    try { bassUpdateChordLabel(); } catch(e){}
+  }
+  function pfLoadPreset(ex){
+    const E = PF_EX[ex]; if (!E) return; const P = E.preset;
+    setTempo(90); setSwing(50);
+    S.family = 'bin'; setFamily('bin', true);
+    S.perc.on = false;
+    S.bass.on = true; S.bass.key = 'E'; S.bass.density = 2; S.bass.vel = 'mixte'; S.bass.vary = false;
+    S.bass.pattern = P.pattern; S.bass.prog = P.prog;
+    S.bass.drop = Object.assign({ on:false, everyN:4, lenBeats:2 }, P.drop || {});
+    try { buildPercGrids(); } catch(e){}
+    try { bassResetCycle(); } catch(e){}
+    try { if (typeof bassPersist === 'function') bassPersist(); } catch(e){}
+    pfSyncBassUI();
+    pfStatus('Chargé : ' + E.objet + ' — lance le métronome.');
+  }
+  function pfStatus(msg){ const el = $('pfStatus'); if (el) el.textContent = msg || ''; }
+  // ---- rendu ----
+  function pfEsc(s){ const d = document.createElement('div'); d.textContent = (s==null ? '' : String(s)); return d.innerHTML; }
+  const PF_KEYS = ['E','F','F#','G','G#','A','A#','B','C','C#','D','D#'];
+  function pfRender(){
+    const root = $('pfRoot'); if (!root) return;
+    const shared = pfSharedSet();
+    let html = '<div class="pf-grid">';
+    ['cajon','djembe'].forEach(pk => {
+      const mid = pk === 'cajon' ? 'MOD-CJ-I-I2' : 'MOD-DJ-I-I2';
+      const M = PF_MOD[mid], parc = PF_PARC[pk];
+      html += '<div class="pf-col" style="--pf-c:' + parc.couleur + '">';
+      html += '<div class="pf-col-head"><span class="pf-dot"></span>' + pfEsc(parc.label) + ' · ' + pfEsc(M.objet) + '</div>';
+      M.exercices.forEach((ex, i) => {
+        const E = PF_EX[ex]; const isShared = shared.indexOf(ex) >= 0;
+        const acq = pfIsAcquis(pk, ex);
+        const promo = pfPromoGet(pk, ex, E.kind); const promu = !!(promo && promo.promu);
+        html += '<div class="pf-card' + (isShared ? ' pf-shared' : '') + (acq ? ' pf-acq' : '') + '" data-ex="' + ex + '" data-parc="' + pk + '">';
+        html += '<div class="pf-card-top"><span class="pf-rang">' + (E.kind === 'synthese' ? '★' : (i + 1)) + '</span>';
+        html += '<span class="pf-objet">' + pfEsc(E.objet) + '</span>';
+        if (isShared) html += '<span class="pf-badge-shared" title="Déjà rencontré dans l\'autre parcours">déjà rencontré</span>';
+        if (promu) html += '<span class="pf-badge-promo" title="Monté d\'un niveau par les votes">&#8593; niveau</span>';
+        html += '</div>';
+        html += '<div class="pf-consigne">' + pfEsc(E.consigne) + '</div>';
+        html += '<div class="pf-critere">&laquo; ' + pfEsc(E.critere) + ' &raquo;</div>';
+        html += '<div class="pf-actions"><button class="btn-sm primary pf-load">Charger</button>';
+        html += '<label class="check pf-acq-lbl"><input type="checkbox" class="pf-acquis"' + (acq ? ' checked' : '') + '> acquis</label></div>';
+        html += '<details class="pf-perso"><summary>Personnaliser</summary><div class="pf-perso-body">';
+        html += '<label>Tempo <input type="range" class="pf-tempo" min="70" max="110" value="90"></label>';
+        html += '<label>Densité <select class="pf-dens"><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option></select></label>';
+        html += '<label class="check"><input type="checkbox" class="pf-drop"' + (E.preset.drop && E.preset.drop.on ? ' checked' : '') + '> Drop-outs</label>';
+        html += '<label>Tonalité <select class="pf-key">' + PF_KEYS.map(k => '<option' + (k === 'E' ? ' selected' : '') + '>' + k + '</option>').join('') + '</select></label>';
+        html += '</div></details>';
+        html += '<div class="pf-vote"><span>Difficulté :</span>';
+        html += '<button class="btn-sm pf-v" data-v="facile">facile</button>';
+        html += '<button class="btn-sm pf-v" data-v="ok">ok</button>';
+        html += '<button class="btn-sm pf-v" data-v="difficile">difficile</button></div>';
+        html += '</div>';
+      });
+      html += '</div>';
+    });
+    html += '</div>';
+    root.innerHTML = html;
+    root.querySelectorAll('.pf-card').forEach(card => {
+      const ex = card.getAttribute('data-ex'), pk = card.getAttribute('data-parc'), E = PF_EX[ex];
+      card.querySelector('.pf-load').addEventListener('click', () => pfLoadPreset(ex));
+      card.querySelector('.pf-acquis').addEventListener('change', e => { pfAcquisSet(pk, ex, e.target.checked); card.classList.toggle('pf-acq', e.target.checked); });
+      card.querySelector('.pf-tempo').addEventListener('input', e => setTempo(+e.target.value));
+      card.querySelector('.pf-dens').addEventListener('change', e => { S.bass.density = +e.target.value; try { bassResetCycle(); } catch(_){} });
+      card.querySelector('.pf-drop').addEventListener('change', e => { S.bass.drop = S.bass.drop || { on:false, everyN:4, lenBeats:2 }; S.bass.drop.on = e.target.checked; try { bassResetCycle(); } catch(_){} });
+      card.querySelector('.pf-key').addEventListener('change', e => { S.bass.key = e.target.value; try { bassResetCycle(); bassUpdateChordLabel(); } catch(_){} });
+      card.querySelectorAll('.pf-v').forEach(b => b.addEventListener('click', () => { pfVote(pk, ex, E.kind, b.getAttribute('data-v')); pfStatus('Vote enregistré : ' + b.getAttribute('data-v') + '.'); }));
+    });
+  }
+  function pfInit(){
+    if (!$('pfRoot')) return;
+    pfRender();
+    try { document.addEventListener('fm-auth', () => pfFlushVotes()); } catch(e){}
+    try { window.addEventListener('online', () => pfFlushVotes()); } catch(e){}
+    setTimeout(() => { try { pfFlushVotes(); } catch(e){} }, 1200);
+  }
+  window.fmMetroParcours = function(){
+    return {
+      data: { PARC:PF_PARC, MODULES:PF_MOD, EXERCISES:PF_EX, NIVEAUX:PF_NIVEAUX },
+      shared: pfSharedSet(),
+      progress: pfAcquisAll,
+      promoCache: pfPromoAll,
+      voteQueue: pfQueueAll,
+      presetFor: function(ex){
+        const E = PF_EX[ex]; if (!E) return null;
+        return { tempo:90, family:'bin', swing:50, perc:{ on:false },
+          bass: Object.assign({ on:true, key:'E', density:2, vel:'mixte', vary:false },
+            { pattern:E.preset.pattern, prog:E.preset.prog, drop:Object.assign({ on:false, everyN:4, lenBeats:2 }, E.preset.drop || {}) }) };
+      },
+      buildVote: function(p, ex, c, v){ return pfVoteItem(p, ex, c, v); },
+      loadPreset: function(ex){ pfLoadPreset(ex); },
+      vote: function(p, ex, c, v){ pfVote(p, ex, c, v); },
+      flush: function(){ return pfFlushVotes(); },
+      isAcquis: pfIsAcquis,
+      setAcquis: pfAcquisSet,
+      niveauEffectif: pfNiveauEffectif
+    };
+  };
+
+  pfInit();
 })();
 </script>
 
