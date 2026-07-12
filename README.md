@@ -1,7 +1,12 @@
 # Métronome FM — README dev
 
-Métronome pédagogique du Portail Formation Musicale. **Application HTML fichier unique**, offline,
-sans dépendance JS, français, mobile-first. Livraison toujours en **fichier complet, jamais un patch**.
+Métronome pédagogique du Portail Formation Musicale. **Application HTML fichier unique**, français,
+mobile-first. Livraison toujours en **fichier complet, jamais un patch**.
+
+**Build courant** : `metronomefunk-0.6.4` (2026-07-12) — parcours funk **P-4** (UI parcours, module 6).
+**Dépendances** : aucune, **sauf** le SDK Supabase (`@supabase/supabase-js@2`, chargé par CDN depuis
+0.6.3) pour l'auth lien-magique et la persistance des votes du parcours funk. L'app reste utilisable
+**hors ligne** : les votes sont mis en file locale et partent au retour du réseau.
 
 ## Lancer / prévisualiser
 
@@ -27,12 +32,12 @@ Tout est dans `metronome.html` :
 |---|---|
 | `<style>` | jusqu'à la fin du bloc en tête ; variables `--fm-*`, classes `.step`, `.perc-voice`, `.ts-*` |
 | bootstrap thème | petit `<script>` avant l'IIFE (lit `?theme=`, applique avant peinture) |
-| markup UI | carte **écran de jeu** `#playScreen` (visible en mode Jouer), sections `<details class="section">` (clave, percussion, **team spirit**, archet…), overlays `#wizOverlay` (assistant) et `#playSetup` (écran d'accueil) |
+| markup UI | carte **écran de jeu** `#playScreen` (visible en mode Jouer), sections `<details class="section">` (clave, percussion, **team spirit**, **cours funk** `#secCours`, archet…), overlays `#wizOverlay` (assistant) et `#playSetup` (écran d'accueil) |
 | app | grand `<script>` en IIFE `(() => { 'use strict'; … })()`, divisé par des commentaires `// ==== NOM ====` |
 
 Sections JS principales : `ÉTAT` (l'objet `S`), `AUDIO`, `CALCUL DU CYCLE`, `GAP`, `BASSE FUNK (passe 5)`, `ORDONNANCEUR`,
 `VISUALISATION`, `CLAVE MULTI-VOIX`, `PERCUSSION & INDÉPENDANCE`, `TEAM SPIRIT & RÉPERTOIRE`,
-`ÉCRAN DE JEU (passe 4, étape 4.1)`, `DSL PÉDAGOGIQUE`, `WIZARD`, `INIT`.
+`ÉCRAN DE JEU (passe 4, étape 4.1)`, `DSL PÉDAGOGIQUE`, `PARCOURS FUNK (P-4)`, `WIZARD`, `INIT`.
 
 ## Modèle percussion (passe 3)
 
@@ -150,6 +155,41 @@ l'actuel mode expert, inchangé). En mode Jouer, la carte `#playScreen` montre *
   (constructeur voix + couleurs extrait de `percLineRender`, partagé). Aucune nouvelle logique
   musicale.
 
+## Parcours funk (P-4, build 0.6.4)
+
+**Surcouche strictement additive** au-dessus de fm-metro : hors de l'écran « Cours funk », le
+métronome (passes 1–5) est inchangé. Section JS `// ==== PARCOURS FUNK (P-4) ====`, section UI
+`<details id="secCours">` (mode Configurer). Hook diagnostic `window.fmMetroParcours()` (lecture
+seule + helpers **purs** `presetFor` / `buildVote` / `niveauEffectif`), calqué sur `fmMetroBass`.
+
+Contenu actuel : **module 6 seul**, deux parcours parallèles **cajón** (`MOD-CJ-I-I2`, couleur
+`#C8722E`) et **djembé** (`MOD-DJ-I-I2`, couleur `#2E86C8`) — 4 atomes + 1 synthèse chacun, figés
+d'après la spec mère §6.
+
+- **Preset par exercice** (`presetFor` → bouton `Charger`) : installe la basse funk
+  (`pattern`/`prog`/`drop`), tempo 90, famille binaire, grille percussion off (l'élève joue). Les 5
+  presets ne diffèrent que par `bass.prog` et `bass.drop`. Points d'ancrage réutilisés : `setTempo` /
+  `setFamily` / `buildPercGrids` / `bassResetCycle`. Tiroir `perso` (`<details>`) : tempo 70–110,
+  densité, drop-outs, tonalité (12).
+- **Acquis 100 % local**, jamais synchronisé : `localStorage['fm-metro-parcours']`, clé
+  `parcours|exerciseId`. Réussir un côté ne coche pas le jumeau. **Double code couleur** + marqueur
+  « déjà rencontré » pour les exercices socle partagés (`EX-SOCLE-…`, atomes 1/3/4), dérivés
+  automatiquement (présence de l'ID dans les deux modules).
+- **Vote de fin** (3 crans `facile`/`ok`/`difficile`, synthèse incluse) → file offline
+  `localStorage['pf_vote_queue']` → `upsert pf_vote` → RPC `pf_promotion` →
+  `niveau_effectif = base + promu`, **par position** (`parcours, exerciseId`), ce parcours seulement.
+  Cache promotion local `localStorage['fm-metro-parcours-promo']` (clé `parcours|exerciseId|cible`).
+- **Identité du vote** : réutilise la session Supabase **existante** (`window.fmSupabase()`, chargée
+  dès 0.6.3) — compte lien-magique si connecté, sinon `signInAnonymously()`. Table `pf_vote`, RPC
+  `pf_promotion` et RLS posées en P-3, inchangées (un anonyme signé porte le rôle `authenticated`,
+  passe la RLS et la RPC). Config Supabase (ref projet, clé *publishable*) dans le source, non
+  reproduite ici.
+
+> **Prérequis runtime** : les *anonymous sign-ins* Supabase doivent être activés
+> (*Auth → Providers → Anonymous*). Tant que le toggle n'est pas basculé, les votes des utilisateurs
+> **non connectés** restent en file locale (dormants, pas cassés) ; les comptes lien-magique votent
+> normalement.
+
 ## Persistance (localStorage)
 
 | clé | contenu |
@@ -162,6 +202,9 @@ l'actuel mode expert, inchangé). En mode Jouer, la carte `#playScreen` montre *
 | `fm-metro-progress` | `{ instr: { break: 1..4, guide: n } }` — progression par niveau (étape 4) |
 | `fm-metro-play` | `{ who, learn, learnPaused, n, showBacking }` — écran de jeu (4.1) ; absent = premier lancement → écran d'accueil |
 | `fm-metro-bass` | `S.bass` complet (passe 5) : `{ on, pattern, prog, key, density, vel, vary, legato, space, swingFollow, drop:{on, everyN, lenBeats} }` |
+| `fm-metro-parcours` | acquis du parcours funk (P-4), clé `parcours\|exerciseId` — **100 % local, jamais synchronisé** |
+| `fm-metro-parcours-promo` | cache de promotion du parcours, clé `parcours\|exerciseId\|cible` |
+| `pf_vote_queue` | file offline des votes de fin d'exercice → `upsert pf_vote` + RPC `pf_promotion` au flush |
 | `fm-metro-wizard-done` | posé quand l'assistant est utilisé (depuis 4.1 il ne s'ouvre plus automatiquement — l'écran d'accueil le remplace) |
 
 Les participants / assignations team spirit vivent en mémoire ; l'export JSON « ma ligne » est le vecteur
@@ -181,6 +224,35 @@ de partage.
 
 ## Journal de développement
 
+
+### 2026-07-12 — Parcours funk P-4 : UI parcours (premier code du parcours) · build 0.6.4
+
+**Surcouche additive** (passes 1–5 fm-metro inchangées derrière). Livré : écran **« Cours funk »**
+(`#secCours`, mode Configurer), **module 6 seul** des deux côtés — `MOD-CJ-I-I2` / `MOD-DJ-I-I2`
+(4 atomes + 1 synthèse), figé d'après la spec mère §6. Fonctionnel de bout en bout :
+- **Preset d'un bloc** par exercice (`Charger`) → basse funk (`pattern`/`prog`/`drop`), tempo 90,
+  binaire, percussion off ; les 5 presets ne diffèrent que par `bass.prog`/`bass.drop`. Tiroir
+  `perso` : tempo 70–110, densité, drop-outs, tonalité.
+- **Acquis 100 % local** (`fm-metro-parcours`, clé `parcours|exerciseId`), jamais synchronisé ;
+  double code couleur + « déjà rencontré » pour les `EX-SOCLE-…` partagés.
+- **Vote de fin** (facile/ok/difficile + synthèse) → file offline `pf_vote_queue` → `upsert pf_vote`
+  → RPC `pf_promotion` → `niveau_effectif = base + promu`, par position. Cache local
+  `fm-metro-parcours-promo`.
+- **Identité du vote** = session Supabase existante (`window.fmSupabase()`) : lien-magique si connecté,
+  sinon `signInAnonymously()`. **Rectification vs brief P-3** : « zéro dépendance / fetch pur / jeton
+  `pf_auth` » abandonné — la 0.6.3 embarquait déjà le SDK Supabase + auth lien-magique.
+  `pf_vote`/`pf_promotion`/RLS inchangés. Hook diagnostic `window.fmMetroParcours()`
+  (helpers purs `presetFor`/`buildVote`/`niveauEffectif`).
+
+**Recette** `recette-P4.js` : **44/44** (jsdom, Web Audio/canvas stubs, client Supabase mocké).
+**Non-régression** du périmètre parcours relancée contre la 0.6.4 : **11 suites, 304 assertions
+vertes**. Les 6 échecs initiaux étaient des estampilles de build épinglées à une version antérieure
+(`0.5.x`, `0.6.1`, `0.6.2`) ; **génériquées** (`metronomefunk-0\.\d+\.`) pour ne plus casser aux bumps,
+et repoussées sur la branche.
+
+**Prérequis runtime non satisfait** : *anonymous sign-ins* Supabase **désactivés** (testé live :
+`422 anonymous_provider_disabled`). Tant que *Auth → Providers → Anonymous* n'est pas activé, les votes
+des non-connectés restent en file (dormants, pas cassés) ; les comptes lien-magique partent normalement.
 
 ### 2026-07-11 — Clôture : couverture de la table `REGISTER_RANK` niveau 2 (100 %)
 
