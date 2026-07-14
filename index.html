@@ -484,6 +484,41 @@
   .pf-mod.open .pf-mod-chev { transform:rotate(180deg); }
   .pf-mod-body { display:none; padding:0 8px 6px; }
   .pf-mod.open .pf-mod-body { display:block; }
+
+  /* ==== Salve UX 0.6.6 (quick wins C2/C5/C6/C8/C15 du panel v0.6.5) ==== */
+  /* C2 — infobulle de vocabulaire : natif (title) au survol, bulle CSS au focus (tap mobile) */
+  .term { border-bottom:1px dotted var(--fm-sub); cursor:help; position:relative; }
+  .term::after { content:'?'; font-size:.62em; vertical-align:super; margin-left:2px;
+    color:var(--fm-accent); font-weight:700; opacity:.85; }
+  .term:focus { outline:none; }
+  .term:focus::before { content:attr(title); position:absolute; left:0; bottom:calc(100% + 7px);
+    z-index:60; width:max-content; max-width:min(280px, 74vw); white-space:normal;
+    text-transform:none; letter-spacing:0; background:var(--fm-panel); color:var(--fm-ink);
+    border:1px solid var(--fm-line); border-radius:8px; padding:7px 10px; font-size:.78rem;
+    line-height:1.4; box-shadow:0 4px 14px rgba(0,0,0,.18); }
+  .term-sub { display:block; font-size:.68rem; color:var(--fm-sub); margin-top:2px; }
+  /* C5 — rappel des raccourcis clavier près du transport (inutile au tactile) */
+  .kbd-top { margin-top:8px; font-size:.72rem; color:var(--fm-sub); text-align:center; }
+  @media (max-width:740px) { .kbd-top { display:none; } }
+  /* C5 — bouton plein écran en surimpression du canvas */
+  .cv-wrap { position:relative; }
+  .cv-wrap .cv-fs-overlay { position:absolute; top:6px; right:6px; z-index:5; opacity:.85; }
+  /* C6 — sommaire sticky du mode Configurer */
+  .toc-bar { position:sticky; top:0; z-index:40; display:flex; flex-wrap:wrap; gap:6px;
+    align-items:center; background:var(--fm-bg); padding:8px 2px; }
+  .toc-chip { font-size:.75rem; border:1px solid var(--fm-line); background:var(--fm-panel);
+    color:var(--fm-ink); border-radius:16px; padding:3px 10px; cursor:pointer; font:inherit; }
+  .toc-chip:hover { border-color:var(--fm-accent); color:var(--fm-accent); }
+  body.mode-simple .toc-bar { display:none; }
+  /* C8 — toast discret de confirmation de sauvegarde */
+  .fm-toast { position:fixed; left:50%; transform:translateX(-50%); bottom:18px; z-index:200;
+    background:var(--fm-panel); color:var(--fm-ink); border:1px solid var(--fm-line);
+    border-radius:10px; padding:8px 14px; font-size:.85rem; box-shadow:0 4px 14px rgba(0,0,0,.18);
+    opacity:0; transition:opacity .3s; pointer-events:none; }
+  .fm-toast.show { opacity:1; }
+  /* C15 — badge d'accord lisible en jouant (x2) */
+  #playBassChord { font-size:1.9rem; }
+  #bassChord { font-size:1.35rem; }
 </style>
 
 <script>
@@ -521,9 +556,10 @@
         <button id="modeSimpleBtn" class="sel">▶ Jouer</button>
         <button id="modeExpertBtn">Configurer</button>
       </div>
-      <button class="btn-ghost" id="wizardBtn">✦ Assistant</button>
-      <button class="btn-ghost" id="themeBtn">◐ Mode sombre</button>
-      <button class="btn-ghost" id="btnAccount" title="Se connecter par lien magique">Se connecter</button>
+      <button class="btn-ghost" id="wizardBtn" title="L'assistant règle le métronome pour toi en trois questions">✦ Guide-moi</button>
+      <button class="btn-ghost" id="themeBtn" title="Basculer entre thème clair et thème sombre">◐ Mode sombre</button>
+      <button class="btn-ghost" id="btnResetAll" title="Tout remettre par défaut — la langue, le thème et ton compte sont conservés">⟲ Tout réinitialiser</button>
+      <button class="btn-ghost" id="btnAccount" title="Recevoir un lien de connexion par e-mail">Se connecter</button>
       <span id="langSwitch" class="lang-switch" role="group" aria-label="Langue / Language / Idioma">
         <button type="button" class="lang-btn" data-lang="fr" title="Français" aria-label="Français"><svg class="flag" viewBox="0 0 3 2" aria-hidden="true"><rect width="3" height="2" fill="#fff"/><rect width="1" height="2" fill="#0055A4"/><rect x="2" width="1" height="2" fill="#EF4135"/></svg>FR</button>
         <button type="button" class="lang-btn" data-lang="en" title="English" aria-label="English"><svg class="flag" viewBox="0 0 60 30" aria-hidden="true"><clipPath id="ukc"><path d="M0,0 v30 h60 v-30 z"/></clipPath><g clip-path="url(#ukc)"><path d="M0,0 v30 h60 v-30 z" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M30,0 v30 M0,15 h60" stroke="#fff" stroke-width="10"/><path d="M30,0 v30 M0,15 h60" stroke="#C8102E" stroke-width="6"/></g></svg>EN</button>
@@ -546,13 +582,15 @@
         <button class="btn-start" id="startBtn">▶ Démarrer</button>
         <button class="btn-tap" id="tapBtn">Tap</button>
       </div>
+      <div class="kbd-top"><span aria-hidden="true">⌨</span> Espace : lecture · ↑↓ : tempo ±1 · T : tap tempo</div>
       <div class="mini-grid">
         <div>
-          <label class="small" for="beatsSel">Temps / cycle</label>
+          <label class="small" for="beatsSel"><span class="term" tabindex="0" title="Nombre de temps dans chaque mesure : 2 = 2/4, 3 = 3/4 (valse), 4 = 4/4…">Temps / cycle</span></label>
           <select id="beatsSel">
             <option>2</option><option>3</option><option selected>4</option>
             <option>5</option><option>6</option><option>7</option>
           </select>
+          <span class="term-sub">mesure : 2/4 · 3/4 (valse) · 4/4…</span>
         </div>
         <div>
           <label class="small" for="subdivSel">Subdivision</label>
@@ -564,8 +602,11 @@
           </select>
         </div>
         <div>
-          <label class="small">Volume</label>
-          <input type="range" id="volSlider" min="0" max="100" value="80" style="width:100%">
+          <label class="small">Volume <span id="volVal" style="font-variant-numeric:tabular-nums">· 80 %</span></label>
+          <div style="display:flex;align-items:center;gap:6px">
+            <input type="range" id="volSlider" min="0" max="100" value="80" style="flex:1;min-width:0">
+            <button class="btn-sm" id="volMuteBtn" title="Sourdine générale (coupe tout le son en un clic)" aria-pressed="false">🔊</button>
+          </div>
         </div>
         <div style="display:flex;flex-direction:column;justify-content:flex-end;gap:7px;">
           <label class="check"><input type="checkbox" id="accentCheck" checked> Accent 1er temps</label>
@@ -579,8 +620,8 @@
     <div class="card staff circle-wrap">
       <canvas id="wheel" width="320" height="320"></canvas>
       <div class="status-line" id="statusLine">Prêt</div>
-      <div class="exp-audio" style="margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center">
-        <span class="sec-sub" style="text-transform:none;letter-spacing:0">Export audio</span>
+      <div class="exp-audio" id="expAudio" style="margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center">
+        <span class="sec-sub" style="text-transform:none;letter-spacing:0">Export audio (WAV / MP3)</span>
         <label class="exp-dur" title="Durée à enregistrer (la boucle en cours)" style="display:inline-flex;align-items:center;gap:4px;color:var(--fm-sub);font-size:.8rem">Durée
           <input id="expMin" type="number" min="0" max="60" value="0" inputmode="numeric" aria-label="minutes" style="width:44px;text-align:right"> min
           <input id="expSec" type="number" min="0" max="59" value="30" inputmode="numeric" aria-label="secondes" style="width:44px;text-align:right"> s
@@ -595,9 +636,11 @@
   <!-- ============ ÉCRAN DE JEU (passe 4.1) ============ -->
   <div class="card" id="playScreen">
     <div class="play-bar">
-      <label style="min-width:auto;">Je suis :</label>
-      <select id="playWho" style="width:auto;"><option value="solo">Solo</option></select>
-      <label class="check"><input type="checkbox" id="playBacking" checked> Voir l'accompagnement</label>
+      <span id="playWhoWrap" style="display:none;align-items:center;gap:8px">
+        <label style="min-width:auto;">Je suis :</label>
+        <select id="playWho" style="width:auto;"><option value="solo">Solo</option></select>
+      </span>
+      <label class="check" title="L'accompagnement (backing track) : les voix que l'appli joue à ta place"><input type="checkbox" id="playBacking" checked> Voir l'accompagnement</label>
       <span style="flex:1;"></span>
       <button class="btn-sm" id="playSetupBtn" title="Rouvrir l'écran d'accueil (seul / à plusieurs · apprentissage)">⟲ Setup</button>
     </div>
@@ -611,7 +654,7 @@
         <option value="2" selected>2 — normal</option>
         <option value="3">3 — chargé</option>
       </select>
-      <label class="check"><input type="checkbox" id="playBassDrop"> drop-outs</label>
+      <label class="check" title="Drop-outs : la basse se tait quelques mesures puis revient — garde le tempo pendant le silence"><input type="checkbox" id="playBassDrop"> silences (drop-outs)</label>
       <span style="flex:1;"></span>
       <span id="playBassChord" aria-live="polite">♪ —</span>
     </div>
@@ -626,8 +669,26 @@
   </div>
 
   <!-- 1. Groove -->
+  <!-- C6 (salve UX 0.6.6) : sommaire sticky du mode Configurer — ancres vers les sections -->
+  <nav class="toc-bar" id="tocBar" aria-label="Sommaire des sections">
+    <button class="toc-chip" data-toc="secGroove">Groove</button>
+    <button class="toc-chip" data-toc="secClave">Claves</button>
+    <button class="toc-chip" data-toc="secPerc">Percussion</button>
+    <button class="toc-chip" data-toc="secRepertoire">Répertoire</button>
+    <button class="toc-chip" data-toc="secTeam">Team Spirit</button>
+    <button class="toc-chip" data-toc="secArchet">Archet</button>
+    <button class="toc-chip" data-toc="secBass">Basse</button>
+    <button class="toc-chip" data-toc="secCours">Cours funk</button>
+    <button class="toc-chip" data-toc="secGap">Horloge</button>
+    <button class="toc-chip" data-toc="secSon">Son</button>
+    <button class="toc-chip" data-toc="secScript">Script</button>
+    <button class="toc-chip" data-toc="secBiblio">Bibliothèque</button>
+    <button class="toc-chip" data-toc="expAudio">Export</button>
+    <button class="toc-chip" data-toc="__top" title="Revenir en haut de la page">↑ Haut</button>
+  </nav>
+
   <details class="section" id="secGroove" data-strate="socle">
-    <summary><span class="sec-title">Micro-timing &amp; groove</span><span class="sec-sub">swing · placement</span></summary>
+    <summary><span class="sec-title"><span class="term" tabindex="0" title="Micro-timing : décaler certaines frappes de quelques millisecondes autour du temps — c'est ce qui fait « groover »">Micro-timing &amp; groove</span></span><span class="sec-sub"><span class="term" tabindex="0" title="Swing : on retarde une croche sur deux — 50 % = binaire droit, 66 % = ternaire. Placement : jouer un peu avant ou après le clic">swing · placement</span></span></summary>
     <div class="section-body">
       <div class="row">
         <label>Swing (asymétrique, libre)</label>
@@ -667,7 +728,7 @@
 
   <!-- 2. Claves -->
   <details class="section" id="secClave" data-strate="couche">
-    <summary><span class="sec-title">Claves &amp; cellules rythmiques</span><span class="sec-sub">séquenceur · polyrythmie</span></summary>
+    <summary><span class="sec-title"><span class="term" tabindex="0" title="Une clave est une courte cellule rythmique qui se répète et sert de repère à tout le morceau (son, rumba, tresillo…)">Claves &amp; cellules rythmiques</span></span><span class="sec-sub">séquenceur · polyrythmie</span></summary>
     <div class="section-body">
       <div class="preset-row">
         <select id="clavePreset">
@@ -855,7 +916,7 @@
           <label style="min-width:auto;">Joueurs</label>
           <input type="number" id="tsWizN" min="1" max="12" value="1" style="width:64px;">
           <button class="btn-sm primary" id="tsWizRun">Répartir selon priorités</button>
-          <label class="check"><input type="checkbox" id="tsBacking" checked> Backing track (l'app joue les lignes écartées)</label>
+          <label class="check" title="L'accompagnement (backing track) : les voix que l'appli joue à ta place"><input type="checkbox" id="tsBacking" checked> Accompagnement (backing track) — l'app joue les lignes écartées</label>
         </div>
         <div class="hint" style="margin-top:4px;">Classe les lignes par priorité — glisse la poignée ⠿ pour
         réordonner. Les premières sont garanties : chaque ligne est attribuée <b>entière ou pas du tout</b>,
@@ -919,7 +980,10 @@
         <button class="btn-sm" id="bowApply">Appliquer</button>
         <button class="btn-sm primary" id="bowFsBtn">⛶ Plein écran</button>
       </div>
-      <canvas id="bowCv" width="760" height="150"></canvas>
+      <div class="cv-wrap">
+        <canvas id="bowCv" width="760" height="150"></canvas>
+        <button class="btn-sm cv-fs-overlay" id="bowFsBtn2" title="Agrandir l'archet en plein écran">⛶</button>
+      </div>
       <div class="script-status" id="bowStatus"></div>
       <div class="hint" id="bowNote">Archet léger et agile — les coups rapides (spiccato, sautillé) vivent autour du point d'équilibre ◆.</div>
       <div class="hint">Syntaxe : <code>T50x1</code> = tirer 50 % d'archet sur 1 temps · <code>P20x0.5</code> = pousser 20 % sur une croche ·
@@ -995,7 +1059,7 @@
         <label class="check" style="min-width:auto;"><input type="checkbox" id="bassSpace" checked> Espace (réverb courte)</label>
       </div>
       <div class="row">
-        <label class="check"><input type="checkbox" id="bassDropOn"> Drop-outs — la basse se tait</label>
+        <label class="check" title="Drop-outs : la basse se tait quelques mesures puis revient — garde le tempo pendant le silence"><input type="checkbox" id="bassDropOn"> Silences (drop-outs) — la basse se tait</label>
         <label style="min-width:auto;">toutes les</label>
         <input type="number" id="bassDropEvery" min="1" max="32" value="4" style="width:70px;">
         <label style="min-width:auto;">mesures, trou de</label>
@@ -1034,7 +1098,7 @@
 
   <!-- 4. Gap clicks -->
   <details class="section" id="secGap" data-strate="enveloppe">
-    <summary><span class="sec-title">Horloge interne</span><span class="sec-sub">gap clicks</span></summary>
+    <summary><span class="sec-title">Horloge interne</span><span class="sec-sub"><span class="term" tabindex="0" title="Gap clicks : le métronome se tait quelques mesures puis revient — à toi de tenir le tempo pendant le silence">coupures de clic (gap clicks)</span></span></summary>
     <div class="section-body">
       <div class="row">
         <label>Mode</label>
@@ -1057,6 +1121,10 @@
         <label>Probabilité de coupure (aléatoire)</label>
         <input type="range" id="gapProb" min="5" max="80" value="25">
         <span class="val" id="gapProbVal">25 %</span>
+      </div>
+      <div class="row">
+        <label title="Nombre de coupures traversées depuis le dernier départ — chaque silence tenu jusqu'au bout compte pour un">Coupures traversées</label>
+        <span class="val" id="gapCrossed">0</span>
       </div>
       <div class="hint">La cible se coupe, l'aiguille continue de tourner. <b>Cible</b> : tout le son
       (gap classique), la pulsation seule, ou une seule voix (clave ou percussion) — les autres continuent,
@@ -1257,7 +1325,7 @@ swing 62
 
   // Identité du build affichée dans l'en-tête (5.3-bis). Bumper à chaque passe : elle sert à
   // savoir de quel build vient un enregistrement de validation.
-  const BUILD = 'metronomefunk-0.6.5', BUILD_DATE = '2026-07-14';
+  const BUILD = 'metronomefunk-0.6.6', BUILD_DATE = '2026-07-14';
 
   let audioCtx = null, masterGain = null, noiseBuf = null;
   let masterLimiter = null;                                   // 5.3-ter : limiteur de bus master
@@ -1269,6 +1337,8 @@ swing 62
   let cycleStart = 0, cycleDur = 1, events = [], evIdx = 0, totalBeats = 0;
   let measureCount = 0, mutedThisCycle = false;
   let gapRemainPlay = 0, gapRemainMute = 0, gapProgSize = 1;
+  let gapMuteTotal = 0, gapMuteDone = 0, gapCrossed = 0;      // 0.6.6 (C15) : position dans la coupure + coupures traversées
+  let volMuted = false;                                       // 0.6.6 (C15) : sourdine générale 1-clic
   let bassBarIdx = 0, bassRealized = [];   // passe 5 : position dans la progression + notes réalisées de la mesure
   let bassRng = Math.random;               // 5.2 : RNG du tirage probabiliste. Prod = Math.random ;
                                            // la recette headless injecte un générateur déterministe via fmMetroBass().setRng.
@@ -1278,8 +1348,31 @@ swing 62
   const $ = id => document.getElementById(id);
   const store = {
     get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
-    set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+    set(k, v) {
+      try {
+        localStorage.setItem(k, v);
+        // 0.6.6 (C8) : premier enregistrement d'un réglage après l'init → toast unique de la session
+        if (!store._toasted && window.__fmReady && String(k).indexOf('fm-metro-') === 0) {
+          store._toasted = true; fmToast('✓ Réglages enregistrés automatiquement');
+        }
+      } catch (e) {}
+    }
   };
+
+  // 0.6.6 (C8) : toast discret non bloquant (aria-live, disparaît seul)
+  let toastTimer = null;
+  function fmToast(msg) {
+    let el = document.getElementById('fmToast');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'fmToast'; el.className = 'fm-toast'; el.setAttribute('aria-live', 'polite');
+      document.body.appendChild(el);
+    }
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
+  }
 
   // ============ THÈME ============
   function currentTheme() {
@@ -1361,7 +1454,7 @@ swing 62
     if (!audioCtx) {
       audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       masterGain = audioCtx.createGain();
-      masterGain.gain.value = S.volume;
+      masterGain.gain.value = volMuted ? 0 : S.volume;
       // 5.3-ter : limiteur quasi-brickwall avant destination. Chevauchement legato + release
       // long + réverb s'additionnent → sans garde-fou, écrêtage garanti (+3 dBFS mesuré à
       // 82 BPM). Pas de sidechain : la basse doit rester une référence rythmique stable.
@@ -1831,23 +1924,38 @@ swing 62
     $('gapTarget').value = S.gap.target;
   }
 
-  function resetGap() { gapProgSize = 1; gapRemainPlay = S.gap.playN; gapRemainMute = 0; }
+  function resetGap() {
+    gapProgSize = 1; gapRemainPlay = S.gap.playN; gapRemainMute = 0;
+    gapMuteTotal = 0; gapMuteDone = 0; gapCrossed = 0; gapCrossedRender();   // 0.6.6 (C15)
+  }
+
+  // 0.6.6 (C15) : feedback gap — affiche le nombre de coupures traversées depuis le départ
+  function gapCrossedRender() {
+    const el = $('gapCrossed'); if (el) el.textContent = gapCrossed;
+  }
 
   function updateGapForNewMeasure() {
     const g = S.gap;
     if (g.mode === 'off') { mutedThisCycle = false; return; }
-    if (g.mode === 'rand') { mutedThisCycle = Math.random() * 100 < g.prob; return; }
+    if (g.mode === 'rand') {
+      mutedThisCycle = Math.random() * 100 < g.prob;
+      // 0.6.6 (C15) : en aléatoire, chaque mesure coupée est une coupure d'une mesure
+      if (mutedThisCycle) { gapMuteTotal = 1; gapMuteDone = 1; gapCrossed++; gapCrossedRender(); }
+      return;
+    }
     if (gapRemainPlay > 0) {
       mutedThisCycle = false; gapRemainPlay--;
     } else if (gapRemainMute > 0) {
       mutedThisCycle = true; gapRemainMute--;
-      if (gapRemainMute === 0) gapRemainPlay = g.playN;
+      gapMuteDone++;                                                          // 0.6.6 (C15)
+      if (gapRemainMute === 0) { gapRemainPlay = g.playN; gapCrossed++; gapCrossedRender(); }
     } else {
       const m = g.mode === 'prog' ? gapProgSize : g.muteM;
       if (g.mode === 'prog') gapProgSize = Math.min(16, gapProgSize * 2);
       gapRemainMute = m - 1;
       mutedThisCycle = true;
-      if (gapRemainMute === 0) gapRemainPlay = g.playN;
+      gapMuteTotal = m; gapMuteDone = 1;                                      // 0.6.6 (C15)
+      if (gapRemainMute === 0) { gapRemainPlay = g.playN; gapCrossed++; gapCrossedRender(); }
     }
   }
 
@@ -2462,7 +2570,8 @@ swing 62
     $('statusLine').innerHTML = mutedThisCycle
       ? '<span class="mute">' + (S.gap.target === 'all'
           ? '● COUPÉ — tiens le tempo !'
-          : '● GAP — ' + gapTargetLabel() + ' en silence, le reste continue') + '</span>'
+          : '● GAP — ' + gapTargetLabel() + ' en silence, le reste continue')
+        + (gapMuteTotal > 1 ? ' · mesure ' + gapMuteDone + '/' + gapMuteTotal : '') + '</span>'
       : (S.perc.on && percBreakActive
         ? '<span class="mute">◆ BREAK — niveau ' + S.perc.breakLevel + '/4</span>'
         : (S.perc.on && percBreakEchoNow
@@ -6874,6 +6983,9 @@ swing 62
       S.play.who = 'solo'; playSave();
     }
     sel.value = S.play.who;
+    // 0.6.6 (C15) : à option unique (Solo), le sélecteur n'apporte rien — on le masque
+    const wrap = $('playWhoWrap');
+    if (wrap) wrap.style.display = sel.options.length > 1 ? 'inline-flex' : 'none';
   }
 
   // MES voix selon S.play.who : { ids: {voiceId:1}, hands: {voiceId: mains[]} }.
@@ -7159,9 +7271,21 @@ swing 62
   $('plusBtn').addEventListener('click', () => setTempo(S.tempo + 1));
   $('startBtn').addEventListener('click', toggle);
   $('tapBtn').addEventListener('click', tap);
+  // 0.6.6 (C15) : valeur affichée + sourdine générale 1-clic ; bouger le curseur lève la sourdine
+  function volRender() {
+    const v = $('volVal'); if (v) v.textContent = '· ' + Math.round(S.volume * 100) + ' %' + (volMuted ? ' · muet' : '');
+    const b = $('volMuteBtn');
+    if (b) { b.textContent = volMuted ? '🔇' : '🔊'; b.setAttribute('aria-pressed', volMuted ? 'true' : 'false'); }
+  }
+  function volApply() { if (masterGain) masterGain.gain.value = volMuted ? 0 : S.volume; }
   $('volSlider').addEventListener('input', e => {
     S.volume = e.target.value / 100;
-    if (masterGain) masterGain.gain.value = S.volume;
+    volMuted = false;
+    volApply(); volRender();
+  });
+  $('volMuteBtn').addEventListener('click', () => {
+    volMuted = !volMuted;
+    volApply(); volRender();
   });
   $('beatsSel').addEventListener('change', e => { S.beats = +e.target.value; buildStepGrid(); refreshPercGrids(); if (!isPlaying) drawStatic(); });
   $('subdivSel').addEventListener('change', e => { S.subdiv = +e.target.value; if (!isPlaying) drawStatic(); });
@@ -7960,6 +8084,36 @@ swing 62
   // ne s'ouvre plus automatiquement ; il reste accessible via ✦ Assistant.
   playRestore();
 
+  // ============ SALVE UX 0.6.6 — câblages (C5 ⛶ / C6 sommaire / C8 réinitialisation / C15) ============
+  // C5 : le bouton ⛶ posé sur le canvas archet relaie le bouton plein écran existant.
+  { const b2 = $('bowFsBtn2'); if (b2) b2.addEventListener('click', () => $('bowFsBtn').click()); }
+  // C6 : sommaire sticky — ouvre la section visée et s'y rend ; « ↑ Haut » remonte la page.
+  document.querySelectorAll('#tocBar .toc-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const id = chip.getAttribute('data-toc');
+      if (id === '__top') { window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+      const el = $(id); if (!el) return;
+      if (el.tagName === 'DETAILS') el.open = true;
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+  // C8 : tout remettre par défaut — n'efface que les réglages de l'appli (fm-metro-*) ;
+  // la langue, le thème, la file de votes et la session de compte sont conservés.
+  $('btnResetAll').addEventListener('click', () => {
+    if (!confirm('Tout remettre par défaut ?\n(La langue, le thème et ton compte sont conservés.)')) return;
+    try {
+      const del = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.indexOf('fm-metro-') === 0) del.push(k);
+      }
+      del.forEach(k => localStorage.removeItem(k));
+    } catch (e) {}
+    try { location.reload(); } catch (e) {}
+  });
+  volRender();          // C15 : valeur de volume affichée dès le chargement
+  playWhoRender();      // C15 : masque « Je suis » tant qu'il n'a que Solo
+
   // ============ PARCOURS FUNK (P-4) — surcouche additive, module 6 (Intermédiaire) ============
   // Deux modules (cajón/djembé), preset d'un bloc, acquis local par position, double couleur pour
   // les EX-SOCLE partagés, vote de fin → pf_vote/pf_promotion en réutilisant window.fmSupabase().
@@ -8388,6 +8542,10 @@ swing 62
   };
 
   pfInit();
+
+  // 0.6.6 (C8) : l'init est terminée — les prochains enregistrements viennent d'un geste
+  // utilisateur, le toast « réglages enregistrés » peut se montrer (une fois par session).
+  window.__fmReady = true;
 })();
 </script>
 
@@ -8445,7 +8603,8 @@ swing 62
   function showLogin(){
     titleEl.textContent="Se connecter";
     bodyEl.innerHTML=
-      '<p>Reçois un lien magique par e-mail — aucun mot de passe à retenir.</p>'+
+      '<p>Reçois un lien de connexion par e-mail — aucun mot de passe à retenir.</p>'+
+      '<p style="opacity:.75;font-size:.85rem">L\'application fonctionne aussi sans compte : la connexion sert seulement à partager tes routines et suivre ta progression.</p>'+
       '<input id="acctEmail" type="email" inputmode="email" autocomplete="email" placeholder="ton@email.fr">'+
       '<div id="acctFb"></div>'+
       '<div class="acct-actions">'+
@@ -8469,8 +8628,16 @@ swing 62
       if(res.error){ fb('Erreur : '+res.error.message,false); return; }
       titleEl.textContent="Vérifie tes e-mails";
       bodyEl.innerHTML='<p>Un lien de connexion a été envoyé à <b>'+esc(email)+'</b>. Ouvre-le sur cet appareil pour te connecter.</p>'+
-        '<div class="acct-actions"><button class="acct-primary" id="acctOk">Fermer</button></div>';
+        '<p style="opacity:.75;font-size:.85rem">Pas reçu au bout d\'une minute ? Vérifie tes indésirables (spams), ou renvoie le lien.</p>'+
+        '<div class="acct-actions">'+
+          '<button id="acctResend">Renvoyer le lien</button>'+
+          '<button class="acct-primary" id="acctOk">Fermer</button>'+
+        '</div>';
       document.getElementById('acctOk').onclick=closeModal;
+      document.getElementById('acctResend').onclick=function(){
+        showLogin();
+        var e2=document.getElementById('acctEmail'); if(e2){ e2.value=email; }
+      };
     }catch(e){ fb('Échec : '+(e&&e.message||e),false); }
   }
 
@@ -8539,7 +8706,7 @@ swing 62
       var name=(currentProfil&&currentProfil.pseudo)||currentUser.email||'Compte';
       btn.textContent='👤 '+name; btn.title='Ton compte';
     }else{
-      btn.textContent='Se connecter'; btn.title='Se connecter par lien magique';
+      btn.textContent='Se connecter'; btn.title='Recevoir un lien de connexion par e-mail';
     }
   }
   if(btn){ btn.addEventListener('click', function(){ openModal(); if(currentUser) showAccount(); else showLogin(); }); }
@@ -8759,7 +8926,7 @@ window.__I18N = { "en": {
   "Formation musicale · Groove & horloge interne": "Music training · Groove & internal clock",
   "▶ Jouer": "▶ Play",
   "Configurer": "Configure",
-  "✦ Assistant": "✦ Assistant",
+  "✦ Guide-moi": "✦ Guide me",
   "◐ Mode sombre": "◐ Dark mode",
   "Se connecter": "Log in",
   "BPM ·": "BPM ·",
@@ -8776,7 +8943,7 @@ window.__I18N = { "en": {
   "Accent 1er temps": "Accent on beat 1",
   "Clic muet (couches seules)": "Muted click (layers only)",
   "Prêt": "Ready",
-  "Export audio": "Audio export",
+  "Export audio (WAV / MP3)": "Audio export (WAV / MP3)",
   "Durée": "Length",
   "10 s": "10 s",
   "20 s": "20 s",
@@ -8944,7 +9111,7 @@ window.__I18N = { "en": {
   "Qui joue quoi ?": "Who plays what?",
   "Joueurs": "Players",
   "Répartir selon priorités": "Distribute by priority",
-  "Backing track (l'app joue les lignes écartées)": "Backing track (app plays excluded lines)",
+  "Accompagnement (backing track) — l'app joue les lignes écartées": "Backing track — the app plays the excluded lines",
   "Classe les lignes par priorité — glisse la poignée ⠿ pour réordonner. Les premières sont garanties : chaque ligne est attribuée": "Rank lines by priority — drag the ⠿ handle to reorder. The first ones are guaranteed: each line is assigned",
   "entière ou pas du tout": "whole or not at all",
   ", deux mains par joueur (jamais plus de 2 frappes ni deux fois la même main au même instant). Cumuler des instruments différents n'arrive qu'en dernier recours. Avec": ", two hands per player (never more than 2 hits or the same hand twice at the same time). Combining different instruments only happens as a last resort. With",
@@ -8998,7 +9165,7 @@ window.__I18N = { "en": {
   "T80x2n4": "T80x2n4",
   "). Jauge : talon à gauche, pointe à droite. Si le curseur vire au rouge, la séquence te fait « manquer d'archet ».": "). Gauge: frog on the left, tip on the right. If the cursor turns red, the sequence makes you \"run out of bow\".",
   "Horloge interne": "Internal clock",
-  "gap clicks": "gap clicks",
+  "coupures de clic (gap clicks)": "gap clicks",
   "Mode": "Mode",
   "Désactivé": "Disabled",
   "Fixe (jouer N, couper M)": "Fixed (play N, mute M)",
@@ -9075,7 +9242,7 @@ window.__I18N = { "en": {
   "Non": "No",
   "je joue la ligne complète": "I play the full line",
   "C'est parti →": "Let's go →",
-  "Se connecter par lien magique": "Log in with a magic link",
+  "Recevoir un lien de connexion par e-mail": "Get a sign-in link by e-mail",
   "English / Français": "English / Français",
   "Langue / Language": "Langue / Language",
   "Tempo -1": "Tempo -1",
@@ -9095,13 +9262,47 @@ window.__I18N = { "en": {
   "◐ Mode clair": "◐ Light mode",
   "Ton compte": "Your account",
   "Se déconnecter": "Log out",
-  "■ Arrêter": "■ Stop"
+  "■ Arrêter": "■ Stop",
+  "⟲ Tout réinitialiser": "⟲ Reset all",
+  "Tout remettre par défaut — la langue, le thème et ton compte sont conservés": "Restore all defaults — language, theme and your account are kept",
+  "L'assistant règle le métronome pour toi en trois questions": "The assistant sets up the metronome for you in three questions",
+  "Basculer entre thème clair et thème sombre": "Switch between light and dark theme",
+  "mesure : 2/4 · 3/4 (valse) · 4/4…": "time signature: 2/4 · 3/4 (waltz) · 4/4…",
+  "Nombre de temps dans chaque mesure : 2 = 2/4, 3 = 3/4 (valse), 4 = 4/4…": "Number of beats per bar: 2 = 2/4, 3 = 3/4 (waltz), 4 = 4/4…",
+  "Sourdine générale (coupe tout le son en un clic)": "Master mute (cuts all sound in one click)",
+  "Sommaire des sections": "Section index",
+  "Groove": "Groove",
+  "Claves": "Claves",
+  "Cours funk": "Funk course",
+  "Horloge": "Clock",
+  "Son": "Sound",
+  "Script": "Script",
+  "Bibliothèque": "Library",
+  "Export": "Export",
+  "↑ Haut": "↑ Top",
+  "Revenir en haut de la page": "Back to the top of the page",
+  "Micro-timing : décaler certaines frappes de quelques millisecondes autour du temps — c'est ce qui fait « groover »": "Micro-timing: shifting some hits a few milliseconds around the beat — that's what makes it groove",
+  "Swing : on retarde une croche sur deux — 50 % = binaire droit, 66 % = ternaire. Placement : jouer un peu avant ou après le clic": "Swing: every other eighth note is delayed — 50% = straight, 66% = ternary. Placement: playing slightly before or after the click",
+  "Une clave est une courte cellule rythmique qui se répète et sert de repère à tout le morceau (son, rumba, tresillo…)": "A clave is a short repeating rhythmic cell that anchors the whole piece (son, rumba, tresillo…)",
+  "Gap clicks : le métronome se tait quelques mesures puis revient — à toi de tenir le tempo pendant le silence": "Gap clicks: the metronome goes silent for a few bars then returns — keep the tempo through the silence",
+  "L'accompagnement (backing track) : les voix que l'appli joue à ta place": "The backing track: the voices the app plays for you",
+  "Drop-outs : la basse se tait quelques mesures puis revient — garde le tempo pendant le silence": "Drop-outs: the bass goes silent for a few bars then returns — keep the tempo through the silence",
+  "silences (drop-outs)": "drop-outs",
+  "Silences (drop-outs) — la basse se tait": "Drop-outs — the bass goes silent",
+  "Coupures traversées": "Gaps crossed",
+  "Nombre de coupures traversées depuis le dernier départ — chaque silence tenu jusqu'au bout compte pour un": "Number of gaps crossed since the last start — each silence held to the end counts as one",
+  "✓ Réglages enregistrés automatiquement": "✓ Settings saved automatically",
+  "Agrandir l'archet en plein écran": "Enlarge the bow view to full screen",
+  "Reçois un lien de connexion par e-mail — aucun mot de passe à retenir.": "Get a sign-in link by e-mail — no password to remember.",
+  "L'application fonctionne aussi sans compte : la connexion sert seulement à partager tes routines et suivre ta progression.": "The app also works without an account: signing in is only for sharing your routines and tracking your progress.",
+  "Pas reçu au bout d'une minute ? Vérifie tes indésirables (spams), ou renvoie le lien.": "Nothing after a minute? Check your spam folder, or resend the link.",
+  "Renvoyer le lien": "Resend the link"
 }, "pt": {
   "Métronome": "Metrônomo",
   "Formation musicale · Groove & horloge interne": "Treinamento musical · Groove & relógio interno",
   "▶ Jouer": "▶ Tocar",
   "Configurer": "Configurar",
-  "✦ Assistant": "✦ Assistente",
+  "✦ Guide-moi": "✦ Guie-me",
   "◐ Mode sombre": "◐ Modo escuro",
   "Se connecter": "Entrar",
   "BPM ·": "BPM ·",
@@ -9118,7 +9319,7 @@ window.__I18N = { "en": {
   "Accent 1er temps": "Acento no 1º tempo",
   "Clic muet (couches seules)": "Clique mudo (apenas camadas)",
   "Prêt": "Pronto",
-  "Export audio": "Exportação de áudio",
+  "Export audio (WAV / MP3)": "Exportação de áudio (WAV / MP3)",
   "Durée": "Duração",
   "10 s": "10 s",
   "20 s": "20 s",
@@ -9286,7 +9487,7 @@ window.__I18N = { "en": {
   "Qui joue quoi ?": "Quem toca o quê?",
   "Joueurs": "Jogadores",
   "Répartir selon priorités": "Distribuir por prioridades",
-  "Backing track (l'app joue les lignes écartées)": "Backing track (o app toca as linhas excluídas)",
+  "Accompagnement (backing track) — l'app joue les lignes écartées": "Acompanhamento (backing track) — o app toca as linhas excluídas",
   "Classe les lignes par priorité — glisse la poignée ⠿ pour réordonner. Les premières sont garanties : chaque ligne est attribuée": "Classifique as linhas por prioridade — arraste a alça ⠿ para reordenar. As primeiras são garantidas: cada linha é atribuída",
   "entière ou pas du tout": "inteira ou não é atribuída",
   ", deux mains par joueur (jamais plus de 2 frappes ni deux fois la même main au même instant). Cumuler des instruments différents n'arrive qu'en dernier recours. Avec": ", duas mãos por jogador (nunca mais de 2 toques ou a mesma mão no mesmo instante). Acumular instrumentos diferentes acontece apenas como último recurso. Com",
@@ -9340,7 +9541,7 @@ window.__I18N = { "en": {
   "T80x2n4": "T80x2n4",
   "). Jauge : talon à gauche, pointe à droite. Si le curseur vire au rouge, la séquence te fait « manquer d'archet ».": "). Medidor: talão à esquerda, ponta à direita. Se o cursor ficar vermelho, a sequência faz você \"ficar sem arco\".",
   "Horloge interne": "Relógio interno",
-  "gap clicks": "gap clicks",
+  "coupures de clic (gap clicks)": "cortes de clique (gap clicks)",
   "Mode": "Modo",
   "Désactivé": "Desativado",
   "Fixe (jouer N, couper M)": "Fixo (tocar N, cortar M)",
@@ -9417,7 +9618,7 @@ window.__I18N = { "en": {
   "Non": "Não",
   "je joue la ligne complète": "eu toco a linha completa",
   "C'est parti →": "Vamos lá →",
-  "Se connecter par lien magique": "Entrar com link mágico",
+  "Recevoir un lien de connexion par e-mail": "Receber um link de acesso por e-mail",
   "English / Français": "Inglês / Francês",
   "Langue / Language": "Idioma / Language",
   "Tempo -1": "Tempo -1",
@@ -9437,7 +9638,41 @@ window.__I18N = { "en": {
   "◐ Mode clair": "◐ Modo claro",
   "Ton compte": "Sua conta",
   "Se déconnecter": "Sair",
-  "■ Arrêter": "■ Parar"
+  "■ Arrêter": "■ Parar",
+  "⟲ Tout réinitialiser": "⟲ Redefinir tudo",
+  "Tout remettre par défaut — la langue, le thème et ton compte sont conservés": "Restaurar os padrões — o idioma, o tema e sua conta são mantidos",
+  "L'assistant règle le métronome pour toi en trois questions": "O assistente configura o metrônomo para você em três perguntas",
+  "Basculer entre thème clair et thème sombre": "Alternar entre tema claro e tema escuro",
+  "mesure : 2/4 · 3/4 (valse) · 4/4…": "compasso: 2/4 · 3/4 (valsa) · 4/4…",
+  "Nombre de temps dans chaque mesure : 2 = 2/4, 3 = 3/4 (valse), 4 = 4/4…": "Número de tempos por compasso: 2 = 2/4, 3 = 3/4 (valsa), 4 = 4/4…",
+  "Sourdine générale (coupe tout le son en un clic)": "Mudo geral (corta todo o som em um clique)",
+  "Sommaire des sections": "Índice das seções",
+  "Groove": "Groove",
+  "Claves": "Claves",
+  "Cours funk": "Curso de funk",
+  "Horloge": "Relógio",
+  "Son": "Som",
+  "Script": "Script",
+  "Bibliothèque": "Biblioteca",
+  "Export": "Exportar",
+  "↑ Haut": "↑ Topo",
+  "Revenir en haut de la page": "Voltar ao topo da página",
+  "Micro-timing : décaler certaines frappes de quelques millisecondes autour du temps — c'est ce qui fait « groover »": "Micro-timing: deslocar alguns toques por alguns milissegundos ao redor do tempo — é isso que faz o groove",
+  "Swing : on retarde une croche sur deux — 50 % = binaire droit, 66 % = ternaire. Placement : jouer un peu avant ou après le clic": "Swing: uma colcheia em cada duas é atrasada — 50% = reto, 66% = ternário. Posicionamento: tocar um pouco antes ou depois do clique",
+  "Une clave est une courte cellule rythmique qui se répète et sert de repère à tout le morceau (son, rumba, tresillo…)": "Uma clave é uma célula rítmica curta que se repete e serve de referência para toda a música (son, rumba, tresillo…)",
+  "Gap clicks : le métronome se tait quelques mesures puis revient — à toi de tenir le tempo pendant le silence": "Gap clicks: o metrônomo silencia por alguns compassos e depois volta — mantenha o tempo durante o silêncio",
+  "L'accompagnement (backing track) : les voix que l'appli joue à ta place": "O acompanhamento (backing track): as vozes que o app toca no seu lugar",
+  "Drop-outs : la basse se tait quelques mesures puis revient — garde le tempo pendant le silence": "Drop-outs: o baixo silencia por alguns compassos e depois volta — mantenha o tempo durante o silêncio",
+  "silences (drop-outs)": "silêncios (drop-outs)",
+  "Silences (drop-outs) — la basse se tait": "Silêncios (drop-outs) — o baixo se cala",
+  "Coupures traversées": "Cortes atravessados",
+  "Nombre de coupures traversées depuis le dernier départ — chaque silence tenu jusqu'au bout compte pour un": "Número de cortes atravessados desde a última partida — cada silêncio mantido até o fim conta como um",
+  "✓ Réglages enregistrés automatiquement": "✓ Configurações salvas automaticamente",
+  "Agrandir l'archet en plein écran": "Ampliar o arco em tela cheia",
+  "Reçois un lien de connexion par e-mail — aucun mot de passe à retenir.": "Receba um link de acesso por e-mail — nenhuma senha para lembrar.",
+  "L'application fonctionne aussi sans compte : la connexion sert seulement à partager tes routines et suivre ta progression.": "O app também funciona sem conta: entrar serve apenas para compartilhar suas rotinas e acompanhar seu progresso.",
+  "Pas reçu au bout d'une minute ? Vérifie tes indésirables (spams), ou renvoie le lien.": "Nada depois de um minuto? Verifique sua caixa de spam, ou reenvie o link.",
+  "Renvoyer le lien": "Reenviar o link"
 } };
 (function(){
   var DICTS = window.__I18N || {};
