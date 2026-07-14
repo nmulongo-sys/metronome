@@ -124,11 +124,11 @@
   }
   .tempo-label em { font-family: var(--fm-font-display); font-style: italic; font-size: 1.05rem; letter-spacing: 0; text-transform: none; color: var(--fm-accent); }
   .slider-row { display: flex; align-items: center; gap: 10px; margin: 10px 0; }
-  .slider-row button {
+  .slider-row button, .nudge {
     background: var(--fm-panel-2); border: 1px solid var(--fm-line); color: var(--fm-ink);
     width: 38px; height: 38px; border-radius: 50%; font-size: 1.25rem; cursor: pointer; flex-shrink: 0;
   }
-  .slider-row button:hover { border-color: var(--fm-accent); }
+  .slider-row button:hover, .nudge:hover { border-color: var(--fm-accent); }
   input[type=range] { flex: 1; -webkit-appearance: none; height: 4px; border-radius: 2px; background: var(--fm-line); outline: none; }
   input[type=range]::-webkit-slider-thumb {
     -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
@@ -335,8 +335,11 @@
   #percVoices .step, #percFsVoices .step {
     font-family: var(--fm-font-ui); font-size: .6rem; font-weight: 600;
     color: var(--fm-sub); padding: 0; line-height: 1;
-    touch-action: none;
+    /* pan-y : le doigt peut faire défiler la page sur la grille ; le drag
+       micro-timing (horizontal) reste géré par les pointer events (0.6.8, C3) */
+    touch-action: pan-y;
   }
+  .step.timing-armed { outline: 3px solid var(--fm-accent); outline-offset: 1px; }
   #percVoices .step.on, #percVoices .step.acc,
   #percFsVoices .step.on, #percFsVoices .step.acc { color: var(--fm-accent-ink); }
   .percfs .step { font-size: 1.1rem; }
@@ -534,6 +537,27 @@
   /* C15 — badge d'accord lisible en jouant (x2) */
   #playBassChord { font-size:1.9rem; }
   #bassChord { font-size:1.35rem; }
+
+  /* ============ SALVE UX 0.6.8 — C3 mobile & tactile ============ */
+  /* M1 — petits écrans (≤ 480 px) : reflow seulement, aucun contenu masqué */
+  @media (max-width: 480px) {
+    body { padding: 18px 8px 32px; }
+    .card { padding: 14px; }
+    details.section summary { padding: 12px 14px; }
+    .section-body { padding: 2px 14px 16px; }
+    .family-bar { padding: 10px 14px; }
+    .tempo-value { font-size: 3.4rem; }
+    .row > label:first-child { min-width: 0; flex-basis: 100%; }
+  }
+  /* M2 — cibles tactiles ≥ 44 px (pointeur grossier uniquement : le bureau ne change pas) */
+  @media (pointer: coarse) {
+    .slider-row button, .nudge { width: 44px; height: 44px; }
+    .btn-sm { min-height: 44px; }
+    input[type=range]::-webkit-slider-thumb { width: 28px; height: 28px; }
+    input[type=range]::-moz-range-thumb { width: 26px; height: 26px; }
+    .check, .play-bass .check { min-height: 44px; }
+    .steps.mini .step { width: 32px; height: 44px; }
+  }
 </style>
 
 <script>
@@ -715,7 +739,9 @@
     <div class="section-body">
       <div class="row">
         <label>Swing (asymétrique, libre)</label>
+        <button class="nudge" id="swingMinus" aria-label="Swing -1 %">−</button>
         <input type="range" id="swingSlider" min="50" max="85" value="50">
+        <button class="nudge" id="swingPlus" aria-label="Swing +1 %">+</button>
         <span class="val" id="swingVal">50 %</span>
       </div>
       <div class="hint">50 % = binaire droit · 66 % = ternaire parfait · valeurs intermédiaires = swing « humain ».
@@ -725,7 +751,9 @@
       </div>
       <div class="row">
         <label>Décalage</label>
+        <button class="nudge" id="shiftMinus" aria-label="Décalage -1 ms">−</button>
         <input type="range" id="shiftSlider" min="-80" max="80" value="25">
+        <button class="nudge" id="shiftPlus" aria-label="Décalage +1 ms">+</button>
         <span class="val" id="shiftVal">+25 ms</span>
       </div>
       <div class="row">
@@ -883,6 +911,7 @@
       <ul>
         <li><b>Micro-timing</b> : glisse une case active vers la droite (en retard, laid back) ou la gauche (en avance)
       pour visualiser et entendre le swing de cette frappe — double-clic pour la recentrer.</li>
+        <li><b>Sur écran tactile</b> : appui long (une demi-seconde) sur la case, puis glisse — un simple toucher fait défiler la page.</li>
         <li><b>Mes séquences</b> : sauvegarde tes grooves (grilles, accents, micro-décalages) et recharge-les plus tard.</li>
         <li><b>Ajout progressif</b> : la voix travaillée gagne
       une frappe à la fois — contretemps d'abord, jamais sur les temps.</li>
@@ -1372,7 +1401,7 @@ swing 62
 
   // Identité du build affichée dans l'en-tête (5.3-bis). Bumper à chaque passe : elle sert à
   // savoir de quel build vient un enregistrement de validation.
-  const BUILD = 'metronomefunk-0.6.7', BUILD_DATE = '2026-07-14';
+  const BUILD = 'metronomefunk-0.6.8', BUILD_DATE = '2026-07-14';
 
   let audioCtx = null, masterGain = null, noiseBuf = null;
   let masterLimiter = null;                                   // 5.3-ter : limiteur de bus master
@@ -5821,15 +5850,40 @@ swing 62
             percStatusSet('Micro-décalage remis à zéro (pas ' + (i + 1) + ').');
           }
         });
-        // glisser la case à gauche/droite = avancer/retarder la frappe (micro-timing)
+        // glisser la case à gauche/droite = avancer/retarder la frappe (micro-timing).
+        // 0.6.8 (C3, M3) : à la souris le drag reste immédiat ; au doigt il faut un
+        // appui long (~400 ms) pour l'armer — avant ça, bouger = défilement normal
+        // (touch-action: pan-y) et un tap reste le cycle silence/frappe/accent.
         b.addEventListener('pointerdown', e => {
           if (!percGrids[v.id] || percGrids[v.id][i] === 0) return;
           if (!percOffsets[v.id]) percOffsets[v.id] = new Array(n).fill(0);
-          const startX = e.clientX, w = b.offsetWidth || 26;
+          const w = b.offsetWidth || 26;
           const startOff = percOffsets[v.id][i] || 0;
-          let moved = false;
+          const touch = e.pointerType === 'touch';
+          let armed = !touch;
+          let startX = e.clientX, lastX = e.clientX;
+          let moved = false, holdTimer = 0;
+          const cleanup = () => {
+            clearTimeout(holdTimer);
+            b.classList.remove('timing-armed');
+            window.removeEventListener('pointermove', onMove);
+            window.removeEventListener('pointerup', onUp);
+            window.removeEventListener('pointercancel', cleanup);
+          };
+          const arm = () => {
+            armed = true;
+            startX = lastX;
+            b.classList.add('timing-armed');
+            try { b.setPointerCapture(e.pointerId); } catch (_) {}
+            percStatusSet('Micro-timing armé — glisse à gauche/droite');
+          };
           const onMove = ev => {
+            lastX = ev.clientX;
             const dx = ev.clientX - startX;
+            if (!armed) {
+              if (Math.abs(dx) > 8) cleanup();
+              return;
+            }
             if (Math.abs(dx) > 3) moved = true;
             if (!moved) return;
             const off = Math.max(-0.45, Math.min(0.45, startOff + dx / w));
@@ -5841,12 +5895,16 @@ swing 62
             refreshPercGrids();
           };
           const onUp = () => {
-            window.removeEventListener('pointermove', onMove);
-            window.removeEventListener('pointerup', onUp);
-            if (moved) b.dataset.dragged = '1';
+            const wasArmed = armed;
+            cleanup();
+            // au doigt : l'appui long a « consommé » le geste, on avale le clic
+            // qui suit pour ne pas cycler la case en relâchant
+            if (moved || (touch && wasArmed)) b.dataset.dragged = '1';
           };
+          if (touch) holdTimer = setTimeout(arm, 400);
           window.addEventListener('pointermove', onMove);
           window.addEventListener('pointerup', onUp);
+          window.addEventListener('pointercancel', cleanup);
         });
         steps.appendChild(b);
       }
@@ -7296,9 +7354,15 @@ swing 62
   }
 
   function setSwing(v) {
-    S.swing = v;
-    $('swingSlider').value = v;
-    $('swingVal').textContent = v + ' %';
+    S.swing = Math.min(85, Math.max(50, v));
+    $('swingSlider').value = S.swing;
+    $('swingVal').textContent = S.swing + ' %';
+  }
+
+  function setShiftMs(v) {
+    S.shift.ms = Math.min(80, Math.max(-80, v));
+    $('shiftSlider').value = S.shift.ms;
+    $('shiftVal').textContent = (S.shift.ms >= 0 ? '+' : '') + S.shift.ms + ' ms';
   }
 
   function tap() {
@@ -7340,11 +7404,13 @@ swing 62
   $('pulseMuteCheck').addEventListener('change', e => S.sound.pulseMuted = e.target.checked);
 
   $('swingSlider').addEventListener('input', e => setSwing(+e.target.value));
+  // 0.6.8 (C3, M4) : ±1 sur les sliders fins — réglage précis au doigt
+  $('swingMinus').addEventListener('click', () => setSwing(S.swing - 1));
+  $('swingPlus').addEventListener('click', () => setSwing(S.swing + 1));
   $('shiftCheck').addEventListener('change', e => S.shift.on = e.target.checked);
-  $('shiftSlider').addEventListener('input', e => {
-    S.shift.ms = +e.target.value;
-    $('shiftVal').textContent = (S.shift.ms >= 0 ? '+' : '') + S.shift.ms + ' ms';
-  });
+  $('shiftSlider').addEventListener('input', e => setShiftMs(+e.target.value));
+  $('shiftMinus').addEventListener('click', () => setShiftMs(S.shift.ms - 1));
+  $('shiftPlus').addEventListener('click', () => setShiftMs(S.shift.ms + 1));
   $('shiftFreq').addEventListener('input', e => {
     S.shift.freq = +e.target.value;
     $('shiftFreqVal').textContent = S.shift.freq + ' Hz';
@@ -8186,6 +8252,15 @@ swing 62
       });
     });
   }
+  // 0.6.8 (C3, M5) : taper un terme « ? » dans un titre de section montre l'infobulle
+  // (focus) SANS déplier/replier la section — les dépliages involontaires venaient de là.
+  document.querySelectorAll('details.section summary .term').forEach(t => {
+    t.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      t.focus();
+    });
+  });
 
   // ============ PARCOURS FUNK (P-4) — surcouche additive, module 6 (Intermédiaire) ============
   // Deux modules (cajón/djembé), preset d'un bloc, acquis local par position, double couleur pour
@@ -9130,6 +9205,8 @@ window.__I18N = { "en": {
   "Clic sur un pas : silence → frappe → accent.": "Click on a step: rest → hit → accent.",
   "Micro-timing": "Micro-timing",
   ": glisse une case active vers la droite (en retard, laid back) ou la gauche (en avance) pour visualiser et entendre le swing de cette frappe — double-clic pour la recentrer.": ": slide an active box right (late, laid back) or left (early) to visualize and hear the swing of this hit — double-click to center it.",
+  "Sur écran tactile": "On a touch screen",
+  ": appui long (une demi-seconde) sur la case, puis glisse — un simple toucher fait défiler la page.": ": long-press the box (half a second), then slide — a simple touch scrolls the page.",
   ": sauvegarde tes grooves (grilles, accents, micro-décalages) et recharge-les plus tard.": ": save your grooves (grids, accents, micro-offsets) and load them later.",
   "Ajout progressif": "Progressive addition",
   ": la voix travaillée gagne une frappe à la fois — contretemps d'abord, jamais sur les temps.": ": the focused voice gains one hit at a time — offbeats first, never on the beats.",
@@ -9514,6 +9591,8 @@ window.__I18N = { "en": {
   "Clic sur un pas : silence → frappe → accent.": "Clique num passo: silêncio → toque → acento.",
   "Micro-timing": "Micro-timing",
   ": glisse une case active vers la droite (en retard, laid back) ou la gauche (en avance) pour visualiser et entendre le swing de cette frappe — double-clic pour la recentrer.": ": arraste uma caixa ativa para a direita (atrasado, laid back) ou esquerda (adiantado) para visualizar e ouvir o swing deste toque — clique duplo para centralizar.",
+  "Sur écran tactile": "Em tela sensível ao toque",
+  ": appui long (une demi-seconde) sur la case, puis glisse — un simple toucher fait défiler la page.": ": toque longo na caixa (meio segundo), depois arraste — um toque simples rola a página.",
   ": sauvegarde tes grooves (grilles, accents, micro-décalages) et recharge-les plus tard.": ": salve seus grooves (grades, acentos, micro-deslocamentos) e carregue-os depois.",
   "Ajout progressif": "Adição progressiva",
   ": la voix travaillée gagne une frappe à la fois — contretemps d'abord, jamais sur les temps.": ": a voz focada ganha um toque por vez — contratempos primeiro, nunca nos tempos.",

@@ -172,9 +172,11 @@ async function runTests() {
   ok('3.3 chaque repli s\'ouvre par « En savoir plus »', mores.every(d => txt(d.querySelector('summary')) === 'En savoir plus'));
   ok('3.4 chaque repli vit dans un hint', mores.every(d => !!d.closest('.hint')));
   const hintOf = (sel) => D.querySelector(sel);
-  // percussion : phrase clé + 9 rubriques en liste
+  // percussion : phrase clé + rubriques en liste — « ≥ 9 » et non « = 9 » : les salves
+  // suivantes peuvent AJOUTER des rubriques (0.6.8 : appui long mobile) sans rien perdre
+  // du contenu 0.6.7, que 3.6/3.7 continuent de vérifier (même motif que le tampon de build).
   const percHint = hintOf('#secPerc .hint-more');
-  eq('3.5 percussion : 9 rubriques en liste', percHint.querySelectorAll('li').length, 9);
+  ok('3.5 percussion : au moins 9 rubriques en liste', percHint.querySelectorAll('li').length >= 9);
   ok('3.6 percussion : phrase clé visible avant le repli', /^Clic sur un pas : silence → frappe → accent\./.test(txt(percHint.closest('.hint'))));
   ok('3.7 percussion : rien n\'est perdu (fin du pavé présente)', /édite-les selon ta référence\./.test(txt(percHint)));
   // basse : intro + 5 rubriques
