@@ -95,7 +95,11 @@ async function runTests() {
   const realErrors = jsdomErrors.filter(m => !/resources?|Could not load|external script|net::|ERR_|Not implemented/i.test(m));
   ok('0.1 aucun jsdomError hors ressource externe / navigation', realErrors.length === 0);
   if (realErrors.length) realErrors.forEach(m => console.log('     ! ' + m));
-  ok('0.2 tampon de build 0.6.6', /metronomefunk-0\.6\.6/.test(txt(D.getElementById('buildStamp'))));
+  // 0.6.7 : le tampon avance à chaque salve — on vérifie « 0.6.6 ou plus récent »,
+  // pas l'égalité stricte (les acquis 0.6.6 restent couverts par les tests 1–7).
+  const bm = txt(D.getElementById('buildStamp')).match(/metronomefunk-(\d+)\.(\d+)\.(\d+)/);
+  const bnum = bm ? (+bm[1]) * 1e6 + (+bm[2]) * 1e3 + (+bm[3]) : 0;
+  ok('0.2 tampon de build ≥ 0.6.6', bnum >= 6006);
 
   // ---- 1. C2 — terminologie ----
   const beatsLabel = D.querySelector('label[for="beatsSel"] .term');
