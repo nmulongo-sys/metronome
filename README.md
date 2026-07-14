@@ -3,7 +3,8 @@
 Métronome pédagogique du Portail Formation Musicale. **Application HTML fichier unique**, français,
 mobile-first. Livraison toujours en **fichier complet, jamais un patch**.
 
-**Build courant** : `metronomefunk-0.6.4` (2026-07-12) — parcours funk **P-4** (UI parcours, module 6).
+**Build courant** : `metronomefunk-0.6.6` (2026-07-14) — salve **UX 0.6.6** (quick wins du panel v0.6.5),
+sur la base 0.6.5 (parcours funk P-2 complet, PR #14).
 **Dépendances** : aucune, **sauf** le SDK Supabase (`@supabase/supabase-js@2`, chargé par CDN depuis
 0.6.3) pour l'auth lien-magique et la persistance des votes du parcours funk. L'app reste utilisable
 **hors ligne** : les votes sont mis en file locale et partent au retour du réseau.
@@ -210,6 +211,11 @@ d'après la spec mère §6.
 Les participants / assignations team spirit vivent en mémoire ; l'export JSON « ma ligne » est le vecteur
 de partage.
 
+Depuis 0.6.6 : le bouton « ⟲ Tout réinitialiser » (header) purge, après confirmation, **uniquement les
+clés `fm-metro-*`** — `fm-theme`, `fm-lang`, `pf_vote_queue` et la session de compte sont conservés — puis
+recharge la page. Un toast « ✓ Réglages enregistrés automatiquement » apparaît une fois par session à la
+première persistance postérieure à l'init (`window.__fmReady`).
+
 ## Étendre
 
 - **Nouveau timbre** : ajouter une ligne au `switch` de `playPerc` (`instr.voiceKind`) + entrée `PERC_INSTR`
@@ -223,6 +229,41 @@ de partage.
   table pour un rang correct. La table couvre 100 % du corpus `GROOVES` actuel (vérifié 2026-07-11).
 
 ## Journal de développement
+
+### 2026-07-14 — Salve UX 0.6.6 : quick wins du panel (C2 C5 C6 C7 C8 C15) · build 0.6.6
+
+- **Origine** : panel UX simulé v0.6.5 (30 personas, `panel-ux-0.6.5-synthese-roadmap.html`, désormais
+  dans le dépôt) — salve « quick wins » de la roadmap (les salves 0.6.7 onboarding, 0.6.8 mobile,
+  0.6.9 accessibilité et 0.7.0 atelier/exports restent à venir).
+- **C2 Terminologie** : infobulles `.term` (tooltip natif `title` + bulle CSS `attr(title)` au focus,
+  `tabindex="0"` pour le tactile) sur micro-timing, swing, clave, gap clicks, backing track, drop-outs
+  et « Temps / cycle » ; sous-titre visible « mesure : 2/4 · 3/4 (valse) · 4/4… » sous le sélecteur ;
+  termes anglais doublés en français : « coupures de clic (gap clicks) », « Accompagnement (backing
+  track) — l'app joue les lignes écartées », « Silences (drop-outs) — la basse se tait ».
+- **C5 Découvrabilité** : « ✦ Assistant » → « ✦ Guide-moi » ; rappel des raccourcis clavier sous les
+  boutons du transport (`.kbd-top`, masqué ≤ 740 px) ; bouton ⛶ en surimpression du canvas archet
+  (`#bowFsBtn2`, relaie `bowFsBtn`) ; « Export audio (WAV / MP3) » + ancre `#expAudio`.
+- **C6 Navigation** : sommaire sticky `#tocBar` (mode Configurer uniquement — masqué par
+  `body.mode-simple`) : 12 sections + Export + « ↑ Haut » ; le clic ouvre la `<details>` visée puis
+  `scrollIntoView`.
+- **C7 Connexion** : « lien magique » abandonné partout → « Recevoir un lien de connexion par
+  e-mail » ; mention explicite que l'app fonctionne sans compte ; écran d'attente avec « Renvoyer le
+  lien » (e-mail prérempli au retour) et rappel « vérifie tes indésirables ».
+- **C8 Filet de sécurité** : bouton « ⟲ Tout réinitialiser » + toast de sauvegarde (voir section
+  « Persistance »).
+- **C15 Petits irritants** : sélecteur « Je suis » masqué tant qu'il n'a que Solo (`#playWhoWrap`,
+  géré par `playWhoRender`) ; volume avec % affiché + sourdine 1-clic (`volMuted` — bouger le curseur
+  lève la sourdine ; appliquée aussi à la création du `masterGain`) ; badge d'accord ×2
+  (`#playBassChord` 1.9 rem, `#bassChord` 1.35 rem) ; compteur « Coupures traversées » (`gapCrossed`,
+  remis à zéro par `resetGap`) + position « mesure k/n » dans `statusLine` pendant une coupure
+  multi-mesures.
+- **i18n** : le moteur traduit par correspondance exacte des chaînes FR → toutes les clés modifiées
+  ont été **déplacées** dans les deux dictionnaires (EN, PT) et toutes les nouvelles chaînes ajoutées ;
+  la recette (bloc 7.x) verrouille la parité et l'absence de clés orphelines. Limites connues,
+  volontaires : le texte du `confirm()` de réinitialisation et le suffixe dynamique « · muet » restent
+  en FR sur UI EN/PT.
+- **Recette** : `recette-ux-0.6.6.js` — **48/48**. **Non-régression complète (13 suites) : 398/398**
+  contre le build 0.6.6.
 
 
 ### 2026-07-12 — Parcours funk P-4 : UI parcours (premier code du parcours) · build 0.6.4
