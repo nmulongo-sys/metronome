@@ -1,0 +1,4 @@
+# Outillage local des recettes headless (jsdom) — jamais dans le dépôt
+node_modules/
+package.json
+package-lock.json
