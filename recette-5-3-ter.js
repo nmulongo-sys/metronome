@@ -209,7 +209,7 @@ boot(() => {
   ok(Math.abs(saved.legato - 0.3) < 1e-9 && saved.space === false, 'fm-metro-bass : legato 0,30 + space false persistés');
   setLegato(50); setSpace(true);
   const bs = $('buildStamp');
-  ok(bs && /metronomefunk-\d+\.\d+/.test(bs.textContent), 'buildStamp : « ' + (bs ? bs.textContent : '(absent)') + ' »');   // génériquée : motif metronomefunk-\d+\.\d+ (retouche chantier B, build 0.6 hors 0.5.x)
+  ok(bs && /metronomefunk-0\.\d+\./.test(bs.textContent), 'buildStamp : « ' + (bs ? bs.textContent : '(absent)') + ' »');   // génériquée passe 5 (retouches 5.3c puis 5.4)
 
   console.log('\n----------------------------------------');
   console.log('  ' + pass + ' réussis, ' + fail + ' échoués sur ' + (pass + fail));
