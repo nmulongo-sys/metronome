@@ -3,8 +3,8 @@
 Métronome pédagogique du Portail Formation Musicale. **Application HTML fichier unique**, français,
 mobile-first. Livraison toujours en **fichier complet, jamais un patch**.
 
-**Build courant** : `metronomefunk-0.6.7` (2026-07-14) — salve **UX 0.6.7 onboarding** (C1, C9 du
-panel v0.6.5), sur la base 0.6.6 (quick wins, PR #15).
+**Build courant** : `metronomefunk-0.6.8` (2026-07-14) — salve **UX 0.6.8 mobile & tactile** (C3 du
+panel v0.6.5), sur la base 0.6.7 (onboarding, PR #16).
 **Dépendances** : aucune, **sauf** le SDK Supabase (`@supabase/supabase-js@2`, chargé par CDN depuis
 0.6.3) pour l'auth lien-magique et la persistance des votes du parcours funk. L'app reste utilisable
 **hors ligne** : les votes sont mis en file locale et partent au retour du réseau.
@@ -231,6 +231,36 @@ première persistance postérieure à l'init (`window.__fmReady`).
   table pour un rang correct. La table couvre 100 % du corpus `GROOVES` actuel (vérifié 2026-07-11).
 
 ## Journal de développement
+
+### 2026-07-14 — Salve UX 0.6.8 : mobile & tactile (C3) · build 0.6.8
+
+- **Origine** : roadmap du panel UX v0.6.5 — troisième salve (« mobile & tactile »), spec
+  `metronome-salve-ux-0.6.8-mobile-spec.md` validée avant code.
+- **M1 — breakpoint ≤ 480 px** : reflow seulement (padding resserrés, libellés de `.row` en pleine
+  largeur, tempo 3.4 rem) — aucun contenu masqué ; le breakpoint 740 px historique est conservé.
+- **M2 — cibles tactiles ≥ 44 px** sous `@media (pointer: coarse)` (le rendu bureau ne change pas) :
+  boutons −/+ 44 px, `.btn-sm` min-height 44 px, pouces de slider 28 px, zones des cases à cocher
+  44 px, cases mini percussion 32×44.
+- **M3 — micro-timing à l'appui long** : au doigt, le drag micro-timing s'arme après **~400 ms
+  d'appui long** (halo accent + statut « Micro-timing armé ») ; avant ça, bouger = défilement normal
+  (`touch-action: pan-y` remplace `none` — le doigt ne bloque plus le scroll sur la grille) et un
+  tap reste le cycle silence/frappe/accent, double-tap de remise à zéro conservé. À la souris,
+  drag immédiat inchangé (0.6.7). Écart assumé avec la reco « poignée dédiée » du panel : une
+  poignée par case serait illisible sur la grille mini (décision Jean, spec §2 M3).
+- **M4 — ±1 sur les sliders fins** : boutons −/+ sur **Swing** (±1 %) et **Décalage de placement**
+  (±1 ms), bornés ; les autres sliders inchangés (pas « fins » au sens du panel).
+- **M5 — `summary` plus stricts** : taper un terme « ? » dans un titre de section montre
+  l'infobulle **sans** déplier/replier la section (cause principale des dépliages involontaires).
+- **i18n** : salve **purement additive** (aucune clé existante scindée ni re-clée) : une rubrique
+  d'aide « Sur écran tactile : appui long… » ajoutée au hint percussion, traduite EN et PT. Le
+  nouveau message de statut « Micro-timing armé… » est dynamique donc non traduit, comme tous les
+  statuts percussion (limite C10 connue, salve 0.6.9).
+- **Recettes** : nouvelle suite `recette-mobile-0.6.8.js` — **56/56** (breakpoint, cibles coarse,
+  appui long armement/annulation/tap/double-tap, drag souris intact, bornes des ±1, garde des
+  termes, parité i18n). Le test « 9 rubriques » de la suite 0.6.7 devient « **≥ 9** » (même motif
+  que le tampon de build : l'ajout d'une rubrique ne doit pas casser mécaniquement ; 3.6/3.7
+  vérifient toujours le contenu). **Non-régression complète (16 suites) : 551/551, 0 rouge**
+  contre 0.6.8 (13 historiques 398 + UX 0.6.6 48 + onboarding 49 + mobile 56).
 
 ### 2026-07-14 — Salve UX 0.6.7 : onboarding (C1 C9) · build 0.6.7
 
