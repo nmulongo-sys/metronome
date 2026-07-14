@@ -115,16 +115,19 @@ async function runTests() {
 
   // 1. rendu
   const cols = D.querySelectorAll('#pfRoot .pf-col');
-  const cards = D.querySelectorAll('#pfRoot .pf-card');
   eq('1.1 deux colonnes (cajón/djembé)', cols.length, 2);
-  eq('1.2 dix cartes (2×5)', cards.length, 10);
-  const lastCajon = D.querySelectorAll('#pfRoot .pf-col')[0].querySelectorAll('.pf-card');
-  ok('1.3 dernière carte cajón = synthèse (★)', lastCajon[4].querySelector('.pf-rang').textContent === '★');
+  // P-2 : l'UI affiche désormais les 6 modules de l'Intermédiaire en accordéon ; on recentre
+  // les assertions structurelles de P-4 sur le module 6 (son périmètre d'origine).
+  const m6cards = D.querySelectorAll('.pf-mod[data-mid="MOD-CJ-I-I2"] .pf-card, .pf-mod[data-mid="MOD-DJ-I-I2"] .pf-card');
+  eq('1.2 module 6 : dix cartes (2×5)', m6cards.length, 10);
+  const m6cj = D.querySelector('.pf-mod[data-mid="MOD-CJ-I-I2"]').querySelectorAll('.pf-card');
+  ok('1.3 dernière carte cajón (module 6) = synthèse (★)', m6cj[4].querySelector('.pf-rang').textContent === '★');
 
   // 2. partage / double couleur
-  const shared = P.shared.slice().sort();
-  eq('2.1 ensemble partagé exact', JSON.stringify(shared),
-     JSON.stringify(['EX-SOCLE-I2-01','EX-SOCLE-I2-03','EX-SOCLE-I2-04']));
+  // P-2 : l'ensemble partagé couvre maintenant tous les EX-SOCLE (modules 1,2,5,6) ; P-4 vérifie
+  // que le socle du module 6 y figure toujours (l'ensemble exact est vérifié par recette-P2).
+  ok('2.1 socle module 6 dans l\'ensemble partagé',
+     ['EX-SOCLE-I2-01','EX-SOCLE-I2-03','EX-SOCLE-I2-04'].every(e => P.shared.indexOf(e) >= 0));
   const cardOf = (parc, ex) => D.querySelector('.pf-card[data-parc="'+parc+'"][data-ex="'+ex+'"]');
   ok('2.2 EX-SOCLE-I2-01 marqué partagé (double couleur)', cardOf('cajon','EX-SOCLE-I2-01').classList.contains('pf-shared'));
   ok('2.3 EX-SOCLE-I2-01 badge « déjà rencontré »', !!cardOf('djembe','EX-SOCLE-I2-01').querySelector('.pf-badge-shared'));
