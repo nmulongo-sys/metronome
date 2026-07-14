@@ -510,6 +510,21 @@
     color:var(--fm-ink); border-radius:16px; padding:3px 10px; cursor:pointer; font:inherit; }
   .toc-chip:hover { border-color:var(--fm-accent); color:var(--fm-accent); }
   body.mode-simple .toc-bar { display:none; }
+  /* ============ SALVE UX 0.6.7 — C1 onboarding · C9 aides repliables ============ */
+  .onboard-banner { display:flex; flex-wrap:wrap; align-items:center; gap:8px;
+    border:1px solid var(--fm-accent); border-radius:10px; padding:8px 12px; margin-bottom:10px;
+    background:var(--fm-panel); font-size:.85rem; }
+  .onboard-banner .ob-txt { flex:1; min-width:200px; }
+  .toc-focus { font-size:.75rem; margin-left:auto; white-space:nowrap; }
+  details.hint-more { display:inline; }
+  details.hint-more > summary { display:inline; cursor:pointer; color:var(--fm-accent);
+    text-decoration:underline dotted; list-style:none; }
+  details.hint-more > summary::-webkit-details-marker { display:none; }
+  details.hint-more > summary::after { content:" ▾"; font-size:.8em; }
+  details.hint-more[open] > summary::after { content:" ▴"; }
+  details.hint-more .hm-body { display:block; margin-top:4px; }
+  .hint-more ul { margin:6px 0 2px 18px; padding:0; }
+  .hint-more li { margin:2px 0; }
   /* C8 — toast discret de confirmation de sauvegarde */
   .fm-toast { position:fixed; left:50%; transform:translateX(-50%); bottom:18px; z-index:200;
     background:var(--fm-panel); color:var(--fm-ink); border:1px solid var(--fm-line);
@@ -635,6 +650,13 @@
 
   <!-- ============ ÉCRAN DE JEU (passe 4.1) ============ -->
   <div class="card" id="playScreen">
+    <!-- 0.6.7 (C1) : bandeau d'invitation à la première visite — disparaît après « ✦ Guide-moi »
+         (le wizard pose fm-metro-wizard-done) ou « Plus tard » (fm-metro-onboard-dismissed). -->
+    <div class="onboard-banner hide" id="onboardBanner">
+      <span class="ob-txt"><b>Débutant ? Laisse-toi guider</b> — l'assistant règle le métronome pour toi en trois questions.</span>
+      <button class="btn-sm primary" id="obGuide">✦ Guide-moi</button>
+      <button class="btn-sm" id="obLater">Plus tard</button>
+    </div>
     <div class="play-bar">
       <span id="playWhoWrap" style="display:none;align-items:center;gap:8px">
         <label style="min-width:auto;">Je suis :</label>
@@ -685,6 +707,7 @@
     <button class="toc-chip" data-toc="secBiblio">Bibliothèque</button>
     <button class="toc-chip" data-toc="expAudio">Export</button>
     <button class="toc-chip" data-toc="__top" title="Revenir en haut de la page">↑ Haut</button>
+    <label class="check toc-focus" title="Ouvrir une section referme les autres"><input type="checkbox" id="focusMode"> Une section à la fois</label>
   </nav>
 
   <details class="section" id="secGroove" data-strate="socle">
@@ -750,9 +773,10 @@
       </div>
       <div id="claveSteps"></div>
       <div class="hint">Clic sur un pas : silence → frappe → accent. Les points au-dessus marquent les temps.
+      <details class="hint-more"><summary>En savoir plus</summary><span class="hm-body">
       <b>Deux voix</b> — cloche grave et cloche aiguë — comme n'importe quelle voix de percussion :
       les presets se posent sur la grave, la seconde voix est libre (contre-clave, bombo…).
-      Le cercle montre comment la cellule se résout sur le 1 du cycle suivant.</div>
+      Le cercle montre comment la cellule se résout sur le 1 du cycle suivant.</span></details></div>
       <div class="row" style="margin-top:14px;">
         <label>Polyrythmie superposée</label>
         <select id="polySel" style="width:auto;">
@@ -855,20 +879,28 @@
       </div>
       <div class="script-status" id="percStatus"></div>
       <div class="hint">Clic sur un pas : silence → frappe → accent.
-      <b>Micro-timing</b> : glisse une case active vers la droite (en retard, laid back) ou la gauche (en avance)
-      pour visualiser et entendre le swing de cette frappe — double-clic pour la recentrer.
-      <b>Mes séquences</b> : sauvegarde tes grooves (grilles, accents, micro-décalages) et recharge-les plus tard. <b>Ajout progressif</b> : la voix travaillée gagne
-      une frappe à la fois — contretemps d'abord, jamais sur les temps. <b>Soustraction</b> : le groove s'allège,
-      les ancres (frappes sur les temps) restent. <b>Appel-réponse</b> : l'app joue la variation une mesure,
-      tu la répètes la mesure suivante pendant que la voix se tait. <b>Break programmé</b> : toutes les N mesures,
+      <details class="hint-more"><summary>En savoir plus</summary><span class="hm-body">
+      <ul>
+        <li><b>Micro-timing</b> : glisse une case active vers la droite (en retard, laid back) ou la gauche (en avance)
+      pour visualiser et entendre le swing de cette frappe — double-clic pour la recentrer.</li>
+        <li><b>Mes séquences</b> : sauvegarde tes grooves (grilles, accents, micro-décalages) et recharge-les plus tard.</li>
+        <li><b>Ajout progressif</b> : la voix travaillée gagne
+      une frappe à la fois — contretemps d'abord, jamais sur les temps.</li>
+        <li><b>Soustraction</b> : le groove s'allège,
+      les ancres (frappes sur les temps) restent.</li>
+        <li><b>Appel-réponse</b> : l'app joue la variation une mesure,
+      tu la répètes la mesure suivante pendant que la voix se tait.</li>
+        <li><b>Break programmé</b> : toutes les N mesures,
       le groove s'interrompt et l'app joue le break au niveau choisi — la phrase s'étoffe du niveau 1 au niveau 4
-      (« progression auto » monte d'un niveau à chaque break, « réponse après » te laisse une mesure pour le rejouer).
-      <b>Couper une seule voix</b> : section Horloge interne, cible sur la voix — les autres continuent.
-      <b>Mains</b> : chaque frappe affiche sa main (D/G). <b>Progression guidée</b> : tu démarres par le squelette
+      (« progression auto » monte d'un niveau à chaque break, « réponse après » te laisse une mesure pour le rejouer).</li>
+        <li><b>Couper une seule voix</b> : section Horloge interne, cible sur la voix — les autres continuent.</li>
+        <li><b>Mains</b> : chaque frappe affiche sa main (D/G).</li>
+        <li><b>Progression guidée</b> : tu démarres par le squelette
       du groove — qui dépend du style : alternance sur les temps pour le passeport, backbeat 2-4 pour le funk,
       kick/caisse claire pour le rock, la basse pour le Kuku — puis l'app ajoute une frappe à la fois, toutes les
       N mesures ou avec les boutons ← →, en t'expliquant à chaque étape quelle main va où, jusqu'au groove complet.
-      Les patterns marqués <i>adaptation</i> sont des approximations pédagogiques : édite-les selon ta référence.</div>
+      Les patterns marqués <i>adaptation</i> sont des approximations pédagogiques : édite-les selon ta référence.</li>
+      </ul></span></details></div>
     </div>
   </details>
 
@@ -894,8 +926,9 @@
       <div class="script-status" id="tsStatus"></div>
       <div class="hint">Charge un groove de la bibliothèque puis choisis <b>l'instrument de jeu</b> :
       rien n'oblige à rester sur l'instrument « authentique » — joue le répertoire du djembé au cajón si tu veux
-      (les voix sont replacées par <b>tessiture</b>, marquées <i>adapté</i>). Le répertoire s'écoute librement,
-      seul ou en groupe — la répartition entre participants se fait dans la section <b>Team Spirit</b>.</div>
+      (les voix sont replacées par <b>tessiture</b>, marquées <i>adapté</i>).
+      <details class="hint-more"><summary>En savoir plus</summary><span class="hm-body">Le répertoire s'écoute librement,
+      seul ou en groupe — la répartition entre participants se fait dans la section <b>Team Spirit</b>.</span></details></div>
     </div>
   </details>
 
@@ -919,11 +952,12 @@
           <label class="check" title="L'accompagnement (backing track) : les voix que l'appli joue à ta place"><input type="checkbox" id="tsBacking" checked> Accompagnement (backing track) — l'app joue les lignes écartées</label>
         </div>
         <div class="hint" style="margin-top:4px;">Classe les lignes par priorité — glisse la poignée ⠿ pour
-        réordonner. Les premières sont garanties : chaque ligne est attribuée <b>entière ou pas du tout</b>,
+        réordonner.
+        <details class="hint-more"><summary>En savoir plus</summary><span class="hm-body">Les premières sont garanties : chaque ligne est attribuée <b>entière ou pas du tout</b>,
         deux mains par joueur (jamais plus de 2 frappes ni deux fois la même main au même instant). Cumuler des
         instruments différents n'arrive qu'en dernier recours. Avec <b>1 joueur</b> : la combinaison de lignes
         que tu peux tenir seul. Les lignes écartées passent en <b>backing track</b> si la case est cochée,
-        en sourdine sinon.</div>
+        en sourdine sinon.</span></details></div>
         <div id="tsRank" class="ts-rank"></div>
         <div class="script-status" id="tsWizOut"></div>
       </div>
@@ -933,10 +967,11 @@
       </div>
       <div class="hint">Charge d'abord un groove dans la section <b>Répertoire de grooves</b>, puis assigne
       chaque voix à un participant — menu sur chaque voix du répertoire, ou <b>Répartir auto</b> qui équilibre
-      la charge de jeu (nombre de frappes) en mélangeant les tessitures. La carte de chacun affiche <b>sa ligne
+      la charge de jeu (nombre de frappes) en mélangeant les tessitures.
+      <details class="hint-more"><summary>En savoir plus</summary><span class="hm-body">La carte de chacun affiche <b>sa ligne
       rythmique</b> ; écoute la part de chacun (<b>solo</b>/<b>muet</b>) et exporte sa <b>ligne en JSON</b> pour
       la travailler chez soi. <b>Vérifier les doigtés</b> signale quand une même main est demandée deux fois au
-      même instant pour un même participant (physiquement impossible).</div>
+      même instant pour un même participant (physiquement impossible).</span></details></div>
     </div>
   </details>
 
@@ -986,9 +1021,14 @@
       </div>
       <div class="script-status" id="bowStatus"></div>
       <div class="hint" id="bowNote">Archet léger et agile — les coups rapides (spiccato, sautillé) vivent autour du point d'équilibre ◆.</div>
-      <div class="hint">Syntaxe : <code>T50x1</code> = tirer 50 % d'archet sur 1 temps · <code>P20x0.5</code> = pousser 20 % sur une croche ·
-      <code>Rx1</code> = reprise (retour au talon, archet levé) · <code>n4</code> = 4 notes liées sur l'archet (<code>T80x2n4</code>).
-      Jauge : talon à gauche, pointe à droite. Si le curseur vire au rouge, la séquence te fait « manquer d'archet ».</div>
+      <div class="hint">Syntaxe : <code>T50x1</code> = tirer 50 % d'archet sur 1 temps
+      <details class="hint-more"><summary>En savoir plus</summary><span class="hm-body">
+      <ul>
+        <li><code>P20x0.5</code> = pousser 20 % sur une croche</li>
+        <li><code>Rx1</code> = reprise (retour au talon, archet levé)</li>
+        <li><code>n4</code> = 4 notes liées sur l'archet (<code>T80x2n4</code>).</li>
+      </ul>
+      Jauge : talon à gauche, pointe à droite. Si le curseur vire au rouge, la séquence te fait « manquer d'archet ».</span></details></div>
     </div>
   </details>
 
@@ -1070,19 +1110,25 @@
         <label class="check"><input type="checkbox" id="bassSwingFollow" checked> La basse suit le swing</label>
       </div>
       <div class="hint">Une voix de basse funk synthétisée qui accompagne le percussionniste — pour
-      caler le jeu sur ses syncopes et ses silences (FUNK-I2). Choisis un <b>gabarit</b>, une
+      caler le jeu sur ses syncopes et ses silences (FUNK-I2).
+      <details class="hint-more"><summary>En savoir plus</summary><span class="hm-body">Choisis un <b>gabarit</b>, une
       <b>progression</b> (du vamp 1 accord au blues 12 mesures), une <b>tonalité</b>, la
       <b>densité</b> (allégé → chargé) et le profil de <b>dynamique</b>. L'<b>accord</b> courant
       s'affiche pour travailler l'oreille : rejoue la même progression dans une autre tonalité et
-      tu entends la transposition. <b>Variations</b> activé, la ligne se joue de façon vivante
-      (tirage des ornements) ; désactivé, elle est régulière et prévisible. La ligne s'allège et se
-      raccourcit d'elle-même quand le tempo monte. Le curseur <b>détaché ↔ lié</b> dose le liant
-      entre les notes (les ghosts restent piqués) ; <b>Espace</b> ajoute une réverb très courte
-      sur la basse seule — l'attaque et le <i>time</i> restent nets. <b>Drop-outs</b> : la basse
-      se tait périodiquement (trou en fin de période) et re-rentre sur le 1 — tiens le <i>time</i>
-      pendant le silence, la re-entrée te confirme ou te corrige ; percussion et pulsation
-      continuent. <b>La basse suit le swing</b> cale ses doubles-croches sur le swing du métronome
-      (section Micro-timing).</div>
+      tu entends la transposition.
+      <ul>
+        <li><b>Variations</b> activé, la ligne se joue de façon vivante (tirage des ornements) ;
+          désactivé, elle est régulière et prévisible. La ligne s'allège et se raccourcit
+          d'elle-même quand le tempo monte.</li>
+        <li>Le curseur <b>détaché ↔ lié</b> dose le liant entre les notes (les ghosts restent piqués).</li>
+        <li><b>Espace</b> ajoute une réverb très courte sur la basse seule — l'attaque et le
+          <i>time</i> restent nets.</li>
+        <li><b>Drop-outs</b> : la basse se tait périodiquement (trou en fin de période) et re-rentre
+          sur le 1 — tiens le <i>time</i> pendant le silence, la re-entrée te confirme ou te corrige ;
+          percussion et pulsation continuent.</li>
+        <li><b>La basse suit le swing</b> cale ses doubles-croches sur le swing du métronome
+          (section Micro-timing).</li>
+      </ul></span></details></div>
     </div>
   </details>
 
@@ -1126,10 +1172,11 @@
         <label title="Nombre de coupures traversées depuis le dernier départ — chaque silence tenu jusqu'au bout compte pour un">Coupures traversées</label>
         <span class="val" id="gapCrossed">0</span>
       </div>
-      <div class="hint">La cible se coupe, l'aiguille continue de tourner. <b>Cible</b> : tout le son
+      <div class="hint">La cible se coupe, l'aiguille continue de tourner.
+      <details class="hint-more"><summary>En savoir plus</summary><span class="hm-body"><b>Cible</b> : tout le son
       (gap classique), la pulsation seule, ou une seule voix (clave ou percussion) — les autres continuent,
       pour tester la solidité de chaque voix. En mode progressif, la durée des
-      coupures double à chaque cycle (1, 2, 4, 8 mesures, plafonné à 16) : aucun filet de sécurité.</div>
+      coupures double à chaque cycle (1, 2, 4, 8 mesures, plafonné à 16) : aucun filet de sécurité.</span></details></div>
     </div>
   </details>
 
@@ -1325,7 +1372,7 @@ swing 62
 
   // Identité du build affichée dans l'en-tête (5.3-bis). Bumper à chaque passe : elle sert à
   // savoir de quel build vient un enregistrement de validation.
-  const BUILD = 'metronomefunk-0.6.6', BUILD_DATE = '2026-07-14';
+  const BUILD = 'metronomefunk-0.6.7', BUILD_DATE = '2026-07-14';
 
   let audioCtx = null, masterGain = null, noiseBuf = null;
   let masterLimiter = null;                                   // 5.3-ter : limiteur de bus master
@@ -8114,6 +8161,32 @@ swing 62
   volRender();          // C15 : valeur de volume affichée dès le chargement
   playWhoRender();      // C15 : masque « Je suis » tant qu'il n'a que Solo
 
+  // ============ SALVE UX 0.6.7 — câblages (C1 bandeau première visite + mode focus) ============
+  // C1 : bandeau « Débutant ? » — première visite seulement (ni état de jeu, ni wizard fait,
+  // ni bandeau déjà écarté). « ⟲ Tout réinitialiser » (C8) le fait naturellement réapparaître.
+  {
+    const ob = $('onboardBanner');
+    if (!store.get('fm-metro-play') && !store.get('fm-metro-wizard-done') &&
+        !store.get('fm-metro-onboard-dismissed')) ob.classList.remove('hide');
+    $('obGuide').addEventListener('click', () => { ob.classList.add('hide'); openWizard(); });
+    $('obLater').addEventListener('click', () => {
+      ob.classList.add('hide'); store.set('fm-metro-onboard-dismissed', '1');
+    });
+  }
+  // C1 : mode focus « une section à la fois » — ouvrir une section referme les autres ;
+  // le sommaire C6 reste fonctionnel (il ouvre la section visée). Décoché par défaut, persistant.
+  {
+    const cb = $('focusMode');
+    cb.checked = store.get('fm-metro-focus-mode') === '1';
+    cb.addEventListener('change', () => store.set('fm-metro-focus-mode', cb.checked ? '1' : ''));
+    document.querySelectorAll('details.section').forEach(d => {
+      d.addEventListener('toggle', () => {
+        if (!cb.checked || !d.open) return;
+        document.querySelectorAll('details.section[open]').forEach(o => { if (o !== d) o.open = false; });
+      });
+    });
+  }
+
   // ============ PARCOURS FUNK (P-4) — surcouche additive, module 6 (Intermédiaire) ============
   // Deux modules (cajón/djembé), preset d'un bloc, acquis local par position, double couleur pour
   // les EX-SOCLE partagés, vote de fin → pf_vote/pf_promotion en réutilisant window.fmSupabase().
@@ -9101,7 +9174,7 @@ window.__I18N = { "en": {
   "tessiture": "pitch",
   ", marquées": ", marked",
   "adapté": "adapted",
-  "). Le répertoire s'écoute librement, seul ou en groupe — la répartition entre participants se fait dans la section": "). The repertoire can be listened to freely, alone or in a group — distribution among participants is done in the",
+  "Le répertoire s'écoute librement, seul ou en groupe — la répartition entre participants se fait dans la section": "The repertoire can be listened to freely, alone or in a group — distribution among participants is done in the",
   "Team Spirit": "Team Spirit",
   "une ligne par personne · solo/muet · export": "one part per person · solo/mute · export",
   "Mode team spirit (répartir entre participants)": "Team spirit mode (distribute among participants)",
@@ -9112,7 +9185,8 @@ window.__I18N = { "en": {
   "Joueurs": "Players",
   "Répartir selon priorités": "Distribute by priority",
   "Accompagnement (backing track) — l'app joue les lignes écartées": "Backing track — the app plays the excluded lines",
-  "Classe les lignes par priorité — glisse la poignée ⠿ pour réordonner. Les premières sont garanties : chaque ligne est attribuée": "Rank lines by priority — drag the ⠿ handle to reorder. The first ones are guaranteed: each line is assigned",
+  "Classe les lignes par priorité — glisse la poignée ⠿ pour réordonner.": "Rank lines by priority — drag the ⠿ handle to reorder.",
+  "Les premières sont garanties : chaque ligne est attribuée": "The first ones are guaranteed: each line is assigned",
   "entière ou pas du tout": "whole or not at all",
   ", deux mains par joueur (jamais plus de 2 frappes ni deux fois la même main au même instant). Cumuler des instruments différents n'arrive qu'en dernier recours. Avec": ", two hands per player (never more than 2 hits or the same hand twice at the same time). Combining different instruments only happens as a last resort. With",
   "1 joueur": "1 player",
@@ -9122,7 +9196,8 @@ window.__I18N = { "en": {
   "↓ Exporter tout (JSON)": "↓ Export all (JSON)",
   "Charge d'abord un groove dans la section": "First load a groove in the",
   ", puis assigne chaque voix à un participant — menu sur chaque voix du répertoire, ou": "section, then assign each voice to a participant — menu on each repertoire voice, or",
-  "qui équilibre la charge de jeu (nombre de frappes) en mélangeant les tessitures. La carte de chacun affiche": "which balances the playing load (number of hits) by mixing pitches. Everyone's card displays",
+  "qui équilibre la charge de jeu (nombre de frappes) en mélangeant les tessitures.": "which balances the playing load (number of hits) by mixing pitches.",
+  "La carte de chacun affiche": "Everyone's card displays",
   "sa ligne rythmique": "their rhythmic line",
   "; écoute la part de chacun (": "; listen to each part (",
   "solo": "solo",
@@ -9155,15 +9230,15 @@ window.__I18N = { "en": {
   "Archet léger et agile — les coups rapides (spiccato, sautillé) vivent autour du point d'équilibre ◆.": "Light and agile bow — fast strokes (spiccato, sautillé) live around the balance point ◆.",
   "Syntaxe :": "Syntax:",
   "T50x1": "T50x1",
-  "= tirer 50 % d'archet sur 1 temps ·": "= down-bow 50 % on 1 beat ·",
+  "= tirer 50 % d'archet sur 1 temps": "= down-bow 50 % on 1 beat",
   "P20x0.5": "P20x0.5",
-  "= pousser 20 % sur une croche ·": "= up-bow 20 % on an eighth note ·",
+  "= pousser 20 % sur une croche": "= up-bow 20 % on an eighth note",
   "Rx1": "Rx1",
-  "= reprise (retour au talon, archet levé) ·": "= retake (return to the frog, bow lifted) ·",
+  "= reprise (retour au talon, archet levé)": "= retake (return to the frog, bow lifted)",
   "n4": "n4",
   "= 4 notes liées sur l'archet (": "= 4 slurred notes on the bow (",
   "T80x2n4": "T80x2n4",
-  "). Jauge : talon à gauche, pointe à droite. Si le curseur vire au rouge, la séquence te fait « manquer d'archet ».": "). Gauge: frog on the left, tip on the right. If the cursor turns red, the sequence makes you \"run out of bow\".",
+  "Jauge : talon à gauche, pointe à droite. Si le curseur vire au rouge, la séquence te fait « manquer d'archet ».": "Gauge: frog on the left, tip on the right. If the cursor turns red, the sequence makes you \"run out of bow\".",
   "Horloge interne": "Internal clock",
   "coupures de clic (gap clicks)": "gap clicks",
   "Mode": "Mode",
@@ -9296,7 +9371,13 @@ window.__I18N = { "en": {
   "Reçois un lien de connexion par e-mail — aucun mot de passe à retenir.": "Get a sign-in link by e-mail — no password to remember.",
   "L'application fonctionne aussi sans compte : la connexion sert seulement à partager tes routines et suivre ta progression.": "The app also works without an account: signing in is only for sharing your routines and tracking your progress.",
   "Pas reçu au bout d'une minute ? Vérifie tes indésirables (spams), ou renvoie le lien.": "Nothing after a minute? Check your spam folder, or resend the link.",
-  "Renvoyer le lien": "Resend the link"
+  "Renvoyer le lien": "Resend the link",
+  "En savoir plus": "Learn more",
+  "Débutant ? Laisse-toi guider": "Beginner? Let us guide you",
+  "— l'assistant règle le métronome pour toi en trois questions.": "— the assistant sets up the metronome for you in three questions.",
+  "Plus tard": "Later",
+  "Une section à la fois": "One section at a time",
+  "Ouvrir une section referme les autres": "Opening a section closes the others"
 }, "pt": {
   "Métronome": "Metrônomo",
   "Formation musicale · Groove & horloge interne": "Treinamento musical · Groove & relógio interno",
@@ -9477,7 +9558,7 @@ window.__I18N = { "en": {
   "tessiture": "tessitura",
   ", marquées": ", marcadas",
   "adapté": "adaptado",
-  "). Le répertoire s'écoute librement, seul ou en groupe — la répartition entre participants se fait dans la section": "). O repertório pode ser ouvido livremente, sozinho ou em grupo — a distribuição entre os participantes é feita na seção",
+  "Le répertoire s'écoute librement, seul ou en groupe — la répartition entre participants se fait dans la section": "O repertório pode ser ouvido livremente, sozinho ou em grupo — a distribuição entre os participantes é feita na seção",
   "Team Spirit": "Team Spirit",
   "une ligne par personne · solo/muet · export": "uma linha por pessoa · solo/mudo · exportar",
   "Mode team spirit (répartir entre participants)": "Modo team spirit (distribuir entre os participantes)",
@@ -9488,7 +9569,8 @@ window.__I18N = { "en": {
   "Joueurs": "Jogadores",
   "Répartir selon priorités": "Distribuir por prioridades",
   "Accompagnement (backing track) — l'app joue les lignes écartées": "Acompanhamento (backing track) — o app toca as linhas excluídas",
-  "Classe les lignes par priorité — glisse la poignée ⠿ pour réordonner. Les premières sont garanties : chaque ligne est attribuée": "Classifique as linhas por prioridade — arraste a alça ⠿ para reordenar. As primeiras são garantidas: cada linha é atribuída",
+  "Classe les lignes par priorité — glisse la poignée ⠿ pour réordonner.": "Classifique as linhas por prioridade — arraste a alça ⠿ para reordenar.",
+  "Les premières sont garanties : chaque ligne est attribuée": "As primeiras são garantidas: cada linha é atribuída",
   "entière ou pas du tout": "inteira ou não é atribuída",
   ", deux mains par joueur (jamais plus de 2 frappes ni deux fois la même main au même instant). Cumuler des instruments différents n'arrive qu'en dernier recours. Avec": ", duas mãos por jogador (nunca mais de 2 toques ou a mesma mão no mesmo instante). Acumular instrumentos diferentes acontece apenas como último recurso. Com",
   "1 joueur": "1 jogador",
@@ -9498,7 +9580,8 @@ window.__I18N = { "en": {
   "↓ Exporter tout (JSON)": "↓ Exportar tudo (JSON)",
   "Charge d'abord un groove dans la section": "Primeiro carregue um groove na seção",
   ", puis assigne chaque voix à un participant — menu sur chaque voix du répertoire, ou": ", depois atribua cada voz a um participante — menu em cada voz do repertório, ou",
-  "qui équilibre la charge de jeu (nombre de frappes) en mélangeant les tessitures. La carte de chacun affiche": "que equilibra a carga de tocar (número de toques) misturando as tessituras. O cartão de cada um exibe",
+  "qui équilibre la charge de jeu (nombre de frappes) en mélangeant les tessitures.": "que equilibra a carga de tocar (número de toques) misturando as tessituras.",
+  "La carte de chacun affiche": "O cartão de cada um exibe",
   "sa ligne rythmique": "sua linha rítmica",
   "; écoute la part de chacun (": "; ouça a parte de cada um (",
   "solo": "solo",
@@ -9531,15 +9614,15 @@ window.__I18N = { "en": {
   "Archet léger et agile — les coups rapides (spiccato, sautillé) vivent autour du point d'équilibre ◆.": "Arco leve e ágil — os golpes rápidos (spiccato, sautillé) vivem em torno do ponto de equilíbrio ◆.",
   "Syntaxe :": "Sintaxe:",
   "T50x1": "T50x1",
-  "= tirer 50 % d'archet sur 1 temps ·": "= puxar 50 % do arco em 1 tempo ·",
+  "= tirer 50 % d'archet sur 1 temps": "= puxar 50 % do arco em 1 tempo",
   "P20x0.5": "P20x0.5",
-  "= pousser 20 % sur une croche ·": "= empurrar 20 % numa colcheia ·",
+  "= pousser 20 % sur une croche": "= empurrar 20 % numa colcheia",
   "Rx1": "Rx1",
-  "= reprise (retour au talon, archet levé) ·": "= retomada (retorno ao talão, arco levantado) ·",
+  "= reprise (retour au talon, archet levé)": "= retomada (retorno ao talão, arco levantado)",
   "n4": "n4",
   "= 4 notes liées sur l'archet (": "= 4 notas ligadas no arco (",
   "T80x2n4": "T80x2n4",
-  "). Jauge : talon à gauche, pointe à droite. Si le curseur vire au rouge, la séquence te fait « manquer d'archet ».": "). Medidor: talão à esquerda, ponta à direita. Se o cursor ficar vermelho, a sequência faz você \"ficar sem arco\".",
+  "Jauge : talon à gauche, pointe à droite. Si le curseur vire au rouge, la séquence te fait « manquer d'archet ».": "Medidor: talão à esquerda, ponta à direita. Se o cursor ficar vermelho, a sequência faz você \"ficar sem arco\".",
   "Horloge interne": "Relógio interno",
   "coupures de clic (gap clicks)": "cortes de clique (gap clicks)",
   "Mode": "Modo",
@@ -9672,7 +9755,13 @@ window.__I18N = { "en": {
   "Reçois un lien de connexion par e-mail — aucun mot de passe à retenir.": "Receba um link de acesso por e-mail — nenhuma senha para lembrar.",
   "L'application fonctionne aussi sans compte : la connexion sert seulement à partager tes routines et suivre ta progression.": "O app também funciona sem conta: entrar serve apenas para compartilhar suas rotinas e acompanhar seu progresso.",
   "Pas reçu au bout d'une minute ? Vérifie tes indésirables (spams), ou renvoie le lien.": "Nada depois de um minuto? Verifique sua caixa de spam, ou reenvie o link.",
-  "Renvoyer le lien": "Reenviar o link"
+  "Renvoyer le lien": "Reenviar o link",
+  "En savoir plus": "Saiba mais",
+  "Débutant ? Laisse-toi guider": "Iniciante? Deixe-se guiar",
+  "— l'assistant règle le métronome pour toi en trois questions.": "— o assistente ajusta o metrônomo para você em três perguntas.",
+  "Plus tard": "Mais tarde",
+  "Une section à la fois": "Uma seção de cada vez",
+  "Ouvrir une section referme les autres": "Abrir uma seção fecha as outras"
 } };
 (function(){
   var DICTS = window.__I18N || {};

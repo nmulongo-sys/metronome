@@ -3,8 +3,8 @@
 Métronome pédagogique du Portail Formation Musicale. **Application HTML fichier unique**, français,
 mobile-first. Livraison toujours en **fichier complet, jamais un patch**.
 
-**Build courant** : `metronomefunk-0.6.6` (2026-07-14) — salve **UX 0.6.6** (quick wins du panel v0.6.5),
-sur la base 0.6.5 (parcours funk P-2 complet, PR #14).
+**Build courant** : `metronomefunk-0.6.7` (2026-07-14) — salve **UX 0.6.7 onboarding** (C1, C9 du
+panel v0.6.5), sur la base 0.6.6 (quick wins, PR #15).
 **Dépendances** : aucune, **sauf** le SDK Supabase (`@supabase/supabase-js@2`, chargé par CDN depuis
 0.6.3) pour l'auth lien-magique et la persistance des votes du parcours funk. L'app reste utilisable
 **hors ligne** : les votes sont mis en file locale et partent au retour du réseau.
@@ -207,6 +207,8 @@ d'après la spec mère §6.
 | `fm-metro-parcours-promo` | cache de promotion du parcours, clé `parcours\|exerciseId\|cible` |
 | `pf_vote_queue` | file offline des votes de fin d'exercice → `upsert pf_vote` + RPC `pf_promotion` au flush |
 | `fm-metro-wizard-done` | posé quand l'assistant est utilisé (depuis 4.1 il ne s'ouvre plus automatiquement — l'écran d'accueil le remplace) |
+| `fm-metro-onboard-dismissed` | posé par « Plus tard » sur le bandeau « Débutant ? » (0.6.7 — le bandeau ne revient plus) |
+| `fm-metro-focus-mode` | `1` si « Une section à la fois » est cochée (0.6.7 — accordéon en mode Configurer) |
 
 Les participants / assignations team spirit vivent en mémoire ; l'export JSON « ma ligne » est le vecteur
 de partage.
@@ -229,6 +231,32 @@ première persistance postérieure à l'init (`window.__fmReady`).
   table pour un rang correct. La table couvre 100 % du corpus `GROOVES` actuel (vérifié 2026-07-11).
 
 ## Journal de développement
+
+### 2026-07-14 — Salve UX 0.6.7 : onboarding (C1 C9) · build 0.6.7
+
+- **Origine** : roadmap du panel UX v0.6.5 — deuxième salve (« onboarding »), spec
+  `metronome-salve-ux-0.6.7-onboarding-spec.md` validée avant code.
+- **C1 (critique) — parcours progressif** : bandeau « **Débutant ? Laisse-toi guider** » en tête de
+  l'écran « Je joue » à la **première visite** seulement (ni `fm-metro-play`, ni `fm-metro-wizard-done`,
+  ni `fm-metro-onboard-dismissed`) : « ✦ Guide-moi » ouvre l'assistant existant, « Plus tard » l'écarte
+  définitivement. Pas de réouverture automatique du wizard (décision 4.1 maintenue). « ⟲ Tout
+  réinitialiser » (C8) ramène l'état première visite — voulu. **Mode focus** : case « Une section à la
+  fois » dans le sommaire sticky (C6) — ouvrir une section referme les autres, sommaire compatible,
+  décoché par défaut, persistant (`fm-metro-focus-mode`).
+- **C9 (majeur) — aides hiérarchisées** : les **8 hints ≥ 300 caractères** (percussion 1508 c,
+  basse 1088 c, team ×2, répertoire, horloge, claves, archet) passent en « **phrase clé visible +
+  “En savoir plus” repliable** » (`details.hint-more`, fermé par défaut) ; les énumérations des trois
+  plus gros (percussion, basse, archet) deviennent des listes. **Aucun contenu supprimé ni réécrit.**
+- **i18n** : découpage fait **aux frontières des nœuds texte** partout où possible (les clés EN/PT
+  existantes restent valides) ; 4 fragments scindés et 3 re-clés (les « · » séparateurs de l'archet
+  quittent les clés) — dictionnaires EN **et** PT ajustés à l'identique ; 6 nouvelles chaînes
+  traduites (bandeau, « Plus tard », « Une section à la fois », « En savoir plus »…). Le hint basse
+  reste non traduit comme avant 0.6.7 (limite C10 connue, salve 0.6.9).
+- **Recettes** : nouvelle suite `recette-onboarding-0.6.7.js` — **49/49** (bandeau, mode focus,
+  découpage C9 sans perte, reset C8, parité i18n, second DOM amorcé pour l'utilisateur installé).
+  Le test « tampon de build » des suites 0.6.6 et 0.6.7 devient « **build ≥ N** » (l'égalité stricte
+  cassait à chaque salve). **Non-régression complète (15 suites) : 495/495, 0 rouge** contre 0.6.7
+  (13 historiques 398 + UX 0.6.6 48 + onboarding 49).
 
 ### 2026-07-14 — Salve UX 0.6.6 : quick wins du panel (C2 C5 C6 C7 C8 C15) · build 0.6.6
 
