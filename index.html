@@ -22,6 +22,8 @@
     --fm-line:       rgba(107,74,46,.16);
     --fm-accent:     #b3763b;
     --fm-accent-2:   #6b4a2e;
+    --fm-accent-text:#875627;   /* A2 0.6.9 : accent lisible en texte (>= 4.5:1) */
+    --fm-danger-text:#b23530;
     --fm-accent-ink: #f7f1e6;
     --fm-staff:      rgba(107,74,46,.06);
     --fm-font-display: 'Cormorant Garamond', Georgia, serif;
@@ -35,6 +37,7 @@
     --fm-bg:#efe7d8; --fm-panel:#f7f1e6; --fm-panel-2:#f0e7d6;
     --fm-ink:#2a221b; --fm-sub:#6b5d4c; --fm-line:rgba(107,74,46,.16);
     --fm-accent:#b3763b; --fm-accent-2:#6b4a2e; --fm-accent-ink:#f7f1e6;
+    --fm-accent-text:#875627; --fm-danger-text:#b23530;
     --fm-staff:rgba(107,74,46,.06);
     --fm-voice-1:#6b4a2e; --fm-voice-2:#b3763b; --fm-voice-3:#7a8b4a; --fm-voice-4:#4a6b8b;
     --fm-voice-5:#a04a4a; --fm-voice-6:#8b6ba0;
@@ -43,6 +46,7 @@
     --fm-bg:#0e0e10; --fm-panel:#17151a; --fm-panel-2:#1c1a1f;
     --fm-ink:#f5f0e6; --fm-sub:#b5aea2; --fm-line:rgba(201,162,75,.18);
     --fm-accent:#c9a24b; --fm-accent-2:#7a6a3a; --fm-accent-ink:#0e0e10;
+    --fm-accent-text:#c9a24b; --fm-danger-text:#d9534f;
     --fm-staff:rgba(201,162,75,.05);
     --fm-voice-1:#a5824a; --fm-voice-2:#c9a24b; --fm-voice-3:#9bab6a; --fm-voice-4:#6a9bbb;
     --fm-voice-5:#c06a6a; --fm-voice-6:#a58bc0;
@@ -71,15 +75,15 @@
     line-height: 1.05;
   }
   .kicker {
-    font-size: .68rem; letter-spacing: .16em; text-transform: uppercase;
-    color: var(--fm-accent); font-weight: 600; margin-top: 4px;
+    font-size: .8125rem; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--fm-accent-text); font-weight: 600; margin-top: 4px;
   }
   .header-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
   .lang-switch { display: inline-flex; gap: 4px; align-items: center; }
   .lang-btn {
     display: inline-flex; align-items: center; gap: 5px; cursor: pointer;
     background: var(--fm-panel); border: 1px solid var(--fm-line); color: var(--fm-sub);
-    padding: 5px 8px; border-radius: 7px; font-family: var(--fm-font-ui); font-size: .72rem;
+    padding: 5px 8px; border-radius: 7px; font-family: var(--fm-font-ui); font-size: .8125rem;
     font-weight: 600; letter-spacing: .04em; transition: border-color .12s, color .12s, background .12s;
   }
   .lang-btn:hover { color: var(--fm-ink); border-color: var(--fm-accent); }
@@ -88,14 +92,14 @@
   .seg { display: flex; border: 1px solid var(--fm-line); border-radius: 7px; overflow: hidden; background: var(--fm-panel); }
   .seg button {
     background: transparent; border: none; color: var(--fm-sub);
-    padding: 8px 16px; font-family: var(--fm-font-ui); font-size: .8rem;
+    padding: 8px 16px; font-family: var(--fm-font-ui); font-size: .8125rem;
     letter-spacing: .08em; text-transform: uppercase; cursor: pointer; font-weight: 500;
   }
   .seg button.sel { background: var(--fm-accent); color: var(--fm-accent-ink); }
   .btn-ghost {
     background: var(--fm-panel); border: 1px solid var(--fm-line); color: var(--fm-ink);
     padding: 8px 14px; border-radius: 7px; cursor: pointer;
-    font-family: var(--fm-font-ui); font-size: .8rem; letter-spacing: .04em;
+    font-family: var(--fm-font-ui); font-size: .8125rem; letter-spacing: .04em;
   }
   .btn-ghost:hover { border-color: var(--fm-accent); }
 
@@ -119,10 +123,10 @@
     font-size: 4.2rem; line-height: 1; text-align: center; font-variant-numeric: tabular-nums;
   }
   .tempo-label {
-    text-align: center; color: var(--fm-sub); font-size: .72rem;
+    text-align: center; color: var(--fm-sub); font-size: .8125rem;
     letter-spacing: .14em; text-transform: uppercase; margin: 6px 0 10px;
   }
-  .tempo-label em { font-family: var(--fm-font-display); font-style: italic; font-size: 1.05rem; letter-spacing: 0; text-transform: none; color: var(--fm-accent); }
+  .tempo-label em { font-family: var(--fm-font-display); font-style: italic; font-size: 1.05rem; letter-spacing: 0; text-transform: none; color: var(--fm-accent-text); }
   .slider-row { display: flex; align-items: center; gap: 10px; margin: 10px 0; }
   .slider-row button, .nudge {
     background: var(--fm-panel-2); border: 1px solid var(--fm-line); color: var(--fm-ink);
@@ -130,6 +134,10 @@
   }
   .slider-row button:hover, .nudge:hover { border-color: var(--fm-accent); }
   input[type=range] { flex: 1; -webkit-appearance: none; height: 4px; border-radius: 2px; background: var(--fm-line); outline: none; }
+  /* A4 0.6.9 — focus clavier visible partout (le .term:focus garde sa bulle : remplacement visible) */
+  :focus-visible { outline: 2px solid var(--fm-accent); outline-offset: 2px; }
+  input[type=range]:focus-visible { outline: 2px solid var(--fm-accent); outline-offset: 2px; }
+  .i18n-miss { outline: 1px dashed var(--fm-danger-text); outline-offset: 1px; } /* I5 0.6.9 — ?i18ndebug=1 */
   input[type=range]::-webkit-slider-thumb {
     -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
     background: var(--fm-accent); border: 2px solid var(--fm-panel); cursor: pointer;
@@ -153,7 +161,7 @@
   .btn-tap:active { background: var(--fm-accent); color: var(--fm-accent-ink); }
   .mini-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
   label.small {
-    display: block; color: var(--fm-sub); font-size: .64rem;
+    display: block; color: var(--fm-sub); font-size: .8125rem;
     text-transform: uppercase; letter-spacing: .14em; margin-bottom: 4px; font-weight: 600;
   }
   select, input[type=number], input[type=text], textarea {
@@ -165,8 +173,8 @@
   /* ---- cercle ---- */
   .circle-wrap { display: flex; flex-direction: column; align-items: center; }
   canvas { max-width: 100%; }
-  .status-line { color: var(--fm-sub); font-size: .8rem; margin-top: 6px; min-height: 1.2em; text-align: center; }
-  .status-line .mute { color: var(--fm-accent); font-weight: 600; letter-spacing: .08em; }
+  .status-line { color: var(--fm-sub); font-size: .8125rem; margin-top: 6px; min-height: 1.2em; text-align: center; }
+  .status-line .mute { color: var(--fm-accent-text); font-weight: 600; letter-spacing: .08em; }
 
   /* ============ SECTIONS EXPERT ============ */
   details.section {
@@ -179,9 +187,9 @@
     display: flex; align-items: baseline; gap: 12px; user-select: none;
   }
   details.section summary::-webkit-details-marker { display: none; }
-  details.section summary::before { content: '◆'; font-size: .6rem; color: var(--fm-accent); }
+  details.section summary::before { content: '◆'; font-size: .6rem; color: var(--fm-accent); } /* ornement décoratif — exclusion A1 (spec 0.6.9) */
   .sec-title { font-family: var(--fm-font-display); font-weight: 600; font-size: 1.25rem; }
-  .sec-sub { color: var(--fm-sub); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; }
+  .sec-sub { color: var(--fm-sub); font-size: .8125rem; letter-spacing: .1em; text-transform: uppercase; }
   .section-body { padding: 2px 22px 20px; }
   body.mode-simple details.section { display: none; }
   body.mode-simple .kbd-hint { display: none; }
@@ -206,16 +214,16 @@
     font-family: var(--fm-font-display); font-weight: 600; font-size: 1.05rem;
     color: var(--fm-ink);
   }
-  .family-bar .fb-hint { color: var(--fm-sub); font-size: .78rem; flex: 1; min-width: 160px; }
+  .family-bar .fb-hint { color: var(--fm-sub); font-size: .8125rem; flex: 1; min-width: 160px; }
   body.mode-simple .family-bar { display: none; }
   body.ctx-archet .family-bar { display: none; }
 
   .row { display: flex; align-items: center; gap: 12px; margin: 10px 0; flex-wrap: wrap; }
   .row > label:first-child { min-width: 195px; color: var(--fm-sub); font-size: .86rem; }
-  .val { min-width: 64px; text-align: right; font-variant-numeric: tabular-nums; font-size: .88rem; color: var(--fm-accent); font-weight: 600; }
+  .val { min-width: 64px; text-align: right; font-variant-numeric: tabular-nums; font-size: .88rem; color: var(--fm-accent-text); font-weight: 600; }
   .check { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: .88rem; }
   .check input { accent-color: var(--fm-accent); width: 16px; height: 16px; }
-  .hint { color: var(--fm-sub); font-size: .78rem; line-height: 1.55; margin-top: 6px; }
+  .hint { color: var(--fm-sub); font-size: .8125rem; line-height: 1.55; margin-top: 6px; }
   code { background: var(--fm-panel-2); border: 1px solid var(--fm-line); padding: 1px 5px; border-radius: 4px; font-size: .85em; }
 
   /* ---- séquenceur ---- */
@@ -266,7 +274,7 @@
     position: absolute; top: 0; bottom: 0; width: 2px;
     background: var(--fm-ink); opacity: .65; transform: translateX(-50%); display: none;
   }
-  .perc-line-legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 8px; font-size: .74rem; color: var(--fm-sub); }
+  .perc-line-legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 8px; font-size: .8125rem; color: var(--fm-sub); }
   .perc-line-legend .chip {
     display: inline-block; width: 10px; height: 10px; border-radius: 2px;
     margin-right: 5px; vertical-align: -1px;
@@ -295,7 +303,7 @@
   .play-line { height: 170px; }
   .pl-brick.mine {
     height: 20px; display: flex; align-items: center; justify-content: center;
-    font-size: .68rem; font-weight: 700; color: #fff;
+    font-size: .8125rem; font-weight: 700; color: #fff;
     text-shadow: 0 1px 2px rgba(20,15,8,.55); border-radius: 3px;
   }
   .pl-brick.back { opacity: .25; }
@@ -306,7 +314,7 @@
   .finger-viz.hide { display: none; }
   .fv-lane { display: flex; align-items: center; gap: 8px; }
   .fv-label {
-    min-width: 70px; font-size: .72rem; color: var(--fm-sub);
+    min-width: 70px; font-size: .8125rem; color: var(--fm-sub);
     text-align: right; font-variant-numeric: tabular-nums;
   }
   .fv-lane.empty .fv-label { opacity: .4; }
@@ -330,10 +338,10 @@
   .perc-voice .pv-label { min-width: 92px; color: var(--fm-sub); font-size: .82rem; }
   .perc-voice .steps { margin: 0; flex: 1; }
   .steps.mini .step { width: 26px; height: 34px; }
-  .pv-mute { font-size: .78rem; color: var(--fm-sub); }
+  .pv-mute { font-size: .8125rem; color: var(--fm-sub); }
   .step.var { box-shadow: 0 0 0 2px var(--fm-accent-2); }
   #percVoices .step, #percFsVoices .step {
-    font-family: var(--fm-font-ui); font-size: .6rem; font-weight: 600;
+    font-family: var(--fm-font-ui); font-size: .8125rem; font-weight: 600;
     color: var(--fm-sub); padding: 0; line-height: 1;
     /* pan-y : le doigt peut faire défiler la page sur la grille ; le drag
        micro-timing (horizontal) reste géré par les pointer events (0.6.8, C3) */
@@ -364,12 +372,12 @@
   .percfs .pv-mute { display: none; }
   .percfs-status {
     text-align: center; font-size: 1.2rem; font-weight: 600;
-    color: var(--fm-accent); min-height: 1.5em; margin-top: 18px;
+    color: var(--fm-accent-text); min-height: 1.5em; margin-top: 18px;
   }
 
   textarea { min-height: 150px; font-family: 'Consolas', 'Menlo', monospace; font-size: .85rem; line-height: 1.6; resize: vertical; }
-  .script-status { font-size: .84rem; color: var(--fm-accent); margin-top: 8px; min-height: 1.2em; }
-  .kbd-hint { text-align: center; color: var(--fm-sub); font-size: .74rem; margin-top: 14px; }
+  .script-status { font-size: .84rem; color: var(--fm-accent-text); margin-top: 8px; min-height: 1.2em; }
+  .kbd-hint { text-align: center; color: var(--fm-sub); font-size: .8125rem; margin-top: 14px; }
 
   /* ============ ARCHET PLEIN ÉCRAN ============ */
   .bowfs {
@@ -419,21 +427,21 @@
   .wiz-opt:hover { border-color: var(--fm-accent); }
   .wiz-opt.sel { border-color: var(--fm-accent); box-shadow: inset 0 0 0 1px var(--fm-accent); }
   .wiz-opt b { display: block; font-size: .95rem; font-weight: 600; }
-  .wiz-opt small { color: var(--fm-sub); font-size: .8rem; }
+  .wiz-opt small { color: var(--fm-sub); font-size: .8125rem; }
   .wiz-nav { display: flex; justify-content: space-between; gap: 10px; margin-top: 22px; }
   .wiz-recap { background: var(--fm-panel-2); border: 1px solid var(--fm-line); border-radius: 10px; padding: 14px 16px; font-size: .9rem; line-height: 1.7; }
-  .wiz-recap b { color: var(--fm-accent); }
+  .wiz-recap b { color: var(--fm-accent-text); }
   /* Team Spirit & répertoire (passe 3, étape 4) */
   .ts-parts { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 12px; }
   .ts-part { border: 1px solid var(--fm-line); border-radius: 10px; padding: 8px 10px; background: var(--fm-panel-2); min-width: 190px; flex: 1 1 320px; }
   .ts-part.solo { border-color: var(--fm-accent); box-shadow: inset 0 0 0 1px var(--fm-accent); }
   .ts-part .ts-part-head { display: flex; align-items: center; gap: 6px; }
   .ts-part input.ts-name { flex: 1; min-width: 60px; }
-  .ts-part .ts-line { color: var(--fm-sub); font-size: .78rem; margin-top: 5px; line-height: 1.5; }
+  .ts-part .ts-line { color: var(--fm-sub); font-size: .8125rem; margin-top: 5px; line-height: 1.5; }
   .ts-pline { margin-top: 7px; }
-  .ts-pline .ts-pline-label { color: var(--fm-sub); font-size: .78rem; }
+  .ts-pline .ts-pline-label { color: var(--fm-sub); font-size: .8125rem; }
   .ts-pline .steps { margin: 3px 0 0; }
-  .ts-chip { display: inline-block; font-size: .68rem; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--fm-line); color: var(--fm-sub); }
+  .ts-chip { display: inline-block; font-size: .8125rem; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--fm-line); color: var(--fm-sub); }
   .ts-chip.basse { background: var(--fm-voice-1, rgba(120,120,200,.18)); }
   .ts-chip.medium { background: var(--fm-voice-2, rgba(120,200,140,.18)); }
   .ts-chip.aigu { background: var(--fm-voice-3, rgba(210,170,90,.18)); }
@@ -449,7 +457,7 @@
   .ts-rk-handle { cursor: grab; touch-action: none; user-select: none; color: var(--fm-sub);
     font-size: 1.05rem; padding: 0 4px; }
   .ts-rk-num { min-width: 1.4em; text-align: right; color: var(--fm-sub); }
-  .ts-rk-hits { margin-left: auto; color: var(--fm-sub); font-size: .72rem; white-space: nowrap; }
+  .ts-rk-hits { margin-left: auto; color: var(--fm-sub); font-size: .8125rem; white-space: nowrap; }
   .ts-warn { color: var(--fm-accent-2); }
 
   /* ===== Parcours funk (P-4) — surcouche additive ===== */
@@ -463,26 +471,26 @@
   .pf-card.pf-shared { border-left:4px solid transparent; border-image:linear-gradient(var(--pf-cajon),var(--pf-djembe)) 1; }
   .pf-card.pf-acq { box-shadow:inset 0 0 0 1px var(--fm-accent); }
   .pf-card-top { display:flex; align-items:center; gap:8px; }
-  .pf-rang { min-width:1.5em; height:1.5em; border-radius:50%; background:var(--pf-c); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:.75rem; font-weight:700; }
+  .pf-rang { min-width:1.5em; height:1.5em; border-radius:50%; background:var(--pf-c); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size: .8125rem; font-weight:700; }
   .pf-objet { font-weight:600; font-size:.86rem; flex:1; }
-  .pf-badge-shared, .pf-badge-promo { font-size:.68rem; padding:1px 6px; border-radius:20px; white-space:nowrap; }
+  .pf-badge-shared, .pf-badge-promo { font-size: .8125rem; padding:1px 6px; border-radius:20px; white-space:nowrap; }
   .pf-badge-shared { background:linear-gradient(90deg,var(--pf-cajon),var(--pf-djembe)); color:#fff; }
   .pf-badge-promo { background:var(--fm-accent); color:var(--fm-accent-ink); }
-  .pf-consigne { font-size:.8rem; color:var(--fm-ink); margin:6px 0 2px; }
-  .pf-critere { font-size:.76rem; color:var(--fm-sub); font-style:italic; margin-bottom:6px; }
+  .pf-consigne { font-size: .8125rem; color:var(--fm-ink); margin:6px 0 2px; }
+  .pf-critere { font-size: .8125rem; color:var(--fm-sub); font-style:italic; margin-bottom:6px; }
   .pf-actions { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
-  .pf-perso { margin-top:6px; font-size:.78rem; }
+  .pf-perso { margin-top:6px; font-size: .8125rem; }
   .pf-perso summary { cursor:pointer; color:var(--fm-sub); }
   .pf-perso-body { display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; align-items:center; }
   .pf-perso-body label { display:flex; align-items:center; gap:4px; }
-  .pf-vote { display:flex; align-items:center; gap:6px; margin-top:8px; font-size:.76rem; color:var(--fm-sub); flex-wrap:wrap; }
-  .pf-vote .pf-v { font-size:.74rem; padding:2px 8px; }
-  #pfStatus { font-size:.78rem; color:var(--fm-accent-2); margin-top:8px; min-height:1em; }
+  .pf-vote { display:flex; align-items:center; gap:6px; margin-top:8px; font-size: .8125rem; color:var(--fm-sub); flex-wrap:wrap; }
+  .pf-vote .pf-v { font-size: .8125rem; padding:2px 8px; }
+  #pfStatus { font-size: .8125rem; color:var(--fm-accent-2); margin-top:8px; min-height:1em; }
   .pf-mod { border:1px solid var(--fm-line); border-radius:10px; margin:8px 0; overflow:hidden; background:var(--fm-panel); }
   .pf-mod-head { width:100%; display:flex; align-items:center; gap:8px; padding:9px 10px; background:transparent; border:none; cursor:pointer; color:var(--fm-ink); font:inherit; text-align:left; }
-  .pf-mod-idx { min-width:1.6em; height:1.6em; border-radius:50%; background:var(--pf-c); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:.72rem; font-weight:700; }
+  .pf-mod-idx { min-width:1.6em; height:1.6em; border-radius:50%; background:var(--pf-c); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size: .8125rem; font-weight:700; }
   .pf-mod-objet { flex:1; font-weight:700; font-size:.85rem; }
-  .pf-mod-count { font-size:.72rem; color:var(--fm-sub); font-variant-numeric:tabular-nums; }
+  .pf-mod-count { font-size: .8125rem; color:var(--fm-sub); font-variant-numeric:tabular-nums; }
   .pf-mod-chev { color:var(--fm-sub); transition:transform .18s ease; }
   .pf-mod.open .pf-mod-chev { transform:rotate(180deg); }
   .pf-mod-body { display:none; padding:0 8px 6px; }
@@ -492,16 +500,16 @@
   /* C2 — infobulle de vocabulaire : natif (title) au survol, bulle CSS au focus (tap mobile) */
   .term { border-bottom:1px dotted var(--fm-sub); cursor:help; position:relative; }
   .term::after { content:'?'; font-size:.62em; vertical-align:super; margin-left:2px;
-    color:var(--fm-accent); font-weight:700; opacity:.85; }
+    color:var(--fm-accent-text); font-weight:700; opacity:.85; }
   .term:focus { outline:none; }
   .term:focus::before { content:attr(title); position:absolute; left:0; bottom:calc(100% + 7px);
     z-index:60; width:max-content; max-width:min(280px, 74vw); white-space:normal;
     text-transform:none; letter-spacing:0; background:var(--fm-panel); color:var(--fm-ink);
-    border:1px solid var(--fm-line); border-radius:8px; padding:7px 10px; font-size:.78rem;
+    border:1px solid var(--fm-line); border-radius:8px; padding:7px 10px; font-size: .8125rem;
     line-height:1.4; box-shadow:0 4px 14px rgba(0,0,0,.18); }
-  .term-sub { display:block; font-size:.68rem; color:var(--fm-sub); margin-top:2px; }
+  .term-sub { display:block; font-size: .8125rem; color:var(--fm-sub); margin-top:2px; }
   /* C5 — rappel des raccourcis clavier près du transport (inutile au tactile) */
-  .kbd-top { margin-top:8px; font-size:.72rem; color:var(--fm-sub); text-align:center; }
+  .kbd-top { margin-top:8px; font-size: .8125rem; color:var(--fm-sub); text-align:center; }
   @media (max-width:740px) { .kbd-top { display:none; } }
   /* C5 — bouton plein écran en surimpression du canvas */
   .cv-wrap { position:relative; }
@@ -509,18 +517,18 @@
   /* C6 — sommaire sticky du mode Configurer */
   .toc-bar { position:sticky; top:0; z-index:40; display:flex; flex-wrap:wrap; gap:6px;
     align-items:center; background:var(--fm-bg); padding:8px 2px; }
-  .toc-chip { font-size:.75rem; border:1px solid var(--fm-line); background:var(--fm-panel);
+  .toc-chip { font-size: .8125rem; border:1px solid var(--fm-line); background:var(--fm-panel);
     color:var(--fm-ink); border-radius:16px; padding:3px 10px; cursor:pointer; font:inherit; }
-  .toc-chip:hover { border-color:var(--fm-accent); color:var(--fm-accent); }
+  .toc-chip:hover { border-color:var(--fm-accent); color:var(--fm-accent-text); }
   body.mode-simple .toc-bar { display:none; }
   /* ============ SALVE UX 0.6.7 — C1 onboarding · C9 aides repliables ============ */
   .onboard-banner { display:flex; flex-wrap:wrap; align-items:center; gap:8px;
     border:1px solid var(--fm-accent); border-radius:10px; padding:8px 12px; margin-bottom:10px;
     background:var(--fm-panel); font-size:.85rem; }
   .onboard-banner .ob-txt { flex:1; min-width:200px; }
-  .toc-focus { font-size:.75rem; margin-left:auto; white-space:nowrap; }
+  .toc-focus { font-size: .8125rem; margin-left:auto; white-space:nowrap; }
   details.hint-more { display:inline; }
-  details.hint-more > summary { display:inline; cursor:pointer; color:var(--fm-accent);
+  details.hint-more > summary { display:inline; cursor:pointer; color:var(--fm-accent-text);
     text-decoration:underline dotted; list-style:none; }
   details.hint-more > summary::-webkit-details-marker { display:none; }
   details.hint-more > summary::after { content:" ▾"; font-size:.8em; }
@@ -581,6 +589,1035 @@
   })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ===== i18n (0.6.9 I1) : dictionnaires EN/PT hoistés + helper fmTr() pour les chaînes
+   composées en JS (statuts dynamiques, confirm, aria-labels construits). Le walker de
+   bas de page traduit le reste par correspondance du texte source français. ===== */
+window.__I18N = { "en": {
+  "Métronome": "Metronome",
+  "Formation musicale · Groove & horloge interne": "Music training · Groove & internal clock",
+  "▶ Jouer": "▶ Play",
+  "Configurer": "Configure",
+  "✦ Guide-moi": "✦ Guide me",
+  "◐ Mode sombre": "◐ Dark mode",
+  "Se connecter": "Log in",
+  "BPM ·": "BPM ·",
+  "Moderato": "Moderato",
+  "▶ Démarrer": "▶ Start",
+  "Tap": "Tap",
+  "Temps / cycle": "Beats / bar",
+  "Subdivision": "Subdivision",
+  "Noires": "Quarter notes",
+  "Croches": "Eighth notes",
+  "Triolets": "Triplets",
+  "Doubles": "Sixteenth notes",
+  "Volume": "Volume",
+  "Accent 1er temps": "Accent on beat 1",
+  "Clic muet (couches seules)": "Muted click (layers only)",
+  "Prêt": "Ready",
+  "Export audio (WAV / MP3)": "Audio export (WAV / MP3)",
+  "Durée": "Length",
+  "10 s": "10 s",
+  "20 s": "20 s",
+  "30 s": "30 s",
+  "60 s": "60 s",
+  "WAV": "WAV",
+  "MP3": "MP3",
+  "Je suis :": "I am:",
+  "Solo": "Solo",
+  "Voir l'accompagnement": "View accompaniment",
+  "⟲ Setup": "⟲ Setup",
+  "Basse": "Bass",
+  "Tone": "Tone",
+  "Slap": "Slap",
+  "Ma ligne n'est pas encore répartie.": "My part is not distributed yet.",
+  "Répartir selon priorités (1 joueur)": "Distribute by priority (1 player)",
+  "Micro-timing & groove": "Micro-timing & groove",
+  "swing · placement": "swing · placement",
+  "Swing (asymétrique, libre)": "Swing (asymmetrical, free)",
+  "50 % = binaire droit · 66 % = ternaire parfait · valeurs intermédiaires = swing « humain ». S'applique aux croches et aux doubles-croches (par paires) — ex. ~58–62 % pour le placement samba/choro.": "50 % = straight binary · 66 % = perfect ternary · intermediate values = \"human\" swing. Applies to eighth and sixteenth notes (in pairs) — e.g. ~58–62 % for samba/choro placement.",
+  "Clic de placement (behind/ahead the beat)": "Placement click (behind/ahead the beat)",
+  "Décalage": "Offset",
+  "+25 ms": "+25 ms",
+  "Fréquence du clic décalé": "Offset click frequency",
+  "220 Hz": "220 Hz",
+  "Un second clic grave, décalé du clic de référence. Décalage positif = au fond du temps (contrebasse, surdo, dundun) · négatif = en avant du temps.": "A second low click, offset from the reference click. Positive offset = laid back/behind the beat (double bass, surdo, dundun) · negative = ahead of the beat.",
+  "Grille rythmique": "Rhythmic grid",
+  "Binaire · 16": "Binary · 16",
+  "Ternaire · 12": "Ternary · 12",
+  "Clave et percussion partagent cette grille — pour rester carré, on ne mélange pas binaire et ternaire (le mélange volontaire = polyrythmie superposée).": "Clave and percussion share this grid — to stay tight, do not mix binary and ternary (intentional mixing = superimposed polyrhythm).",
+  "Claves & cellules rythmiques": "Claves & rhythmic cells",
+  "séquenceur · polyrythmie": "sequencer · polyrhythm",
+  "— Presets —": "— Presets —",
+  "Son clave 3-2 (16)": "Son clave 3-2 (16)",
+  "Son clave 2-3 (16)": "Son clave 2-3 (16)",
+  "Rumba clave 3-2 (16)": "Rumba clave 3-2 (16)",
+  "Bossa (16)": "Bossa (16)",
+  "Partido alto (variante, 16)": "Partido alto (variant, 16)",
+  "Tresillo (8)": "Tresillo (8)",
+  "Cinquillo (8)": "Cinquillo (8)",
+  "8 pas": "8 steps",
+  "12 pas": "12 steps",
+  "16 pas": "16 steps",
+  "Effacer": "Clear",
+  "Clave grave": "Low clave",
+  "muet": "mute",
+  "Clave aiguë": "High clave",
+  "Clic sur un pas : silence → frappe → accent. Les points au-dessus marquent les temps.": "Click on a step: rest → hit → accent. Dots above mark the beats.",
+  "Deux voix": "Two voices",
+  "— cloche grave et cloche aiguë — comme n'importe quelle voix de percussion : les presets se posent sur la grave, la seconde voix est libre (contre-clave, bombo…). Le cercle montre comment la cellule se résout sur le 1 du cycle suivant.": "— low and high bell — like any percussion voice: presets are applied to the low one, the second voice is free (counter-clave, bombo…). The circle shows how the cell resolves on beat 1 of the next cycle.",
+  "Polyrythmie superposée": "Superimposed polyrhythm",
+  "Aucune": "None",
+  "2 par cycle": "2 per cycle",
+  "3 par cycle": "3 per cycle",
+  "4 par cycle": "4 per cycle",
+  "5 par cycle": "5 per cycle",
+  "7 par cycle": "7 per cycle",
+  "n frappes également réparties (ex. 3 sur 4 temps)": "n evenly distributed hits (e.g., 3 over 4 beats)",
+  "Percussion & indépendance": "Percussion & independence",
+  "groove · variations · appel-réponse": "groove · variations · call-response",
+  "Activer": "Enable",
+  "Instrument": "Instrument",
+  "Djembé (basse · tone · slap)": "Djembe (bass · tone · slap)",
+  "Cajón (grave · aigu)": "Cajon (low · high)",
+  "Dunduns & cloche": "Dunduns & bell",
+  "Agogô (grave · aigu)": "Agogo (low · high)",
+  "Surdo (grave · marcante)": "Surdo (low · marcante)",
+  "Reco-reco (raclement)": "Reco-reco (scrape)",
+  "12 pas (ternaire)": "12 steps (ternary)",
+  "16 pas (binaire)": "16 steps (binary)",
+  "Groove de base": "Basic groove",
+  "⛶ Plein écran": "⛶ Full screen",
+  "Style": "Style",
+  "— Styles —": "— Styles —",
+  "Passeport — base 4/4 (documenté)": "Passeport — 4/4 base (documented)",
+  "Kuku — accompagnement 1 (documenté)": "Kuku — accompaniment 1 (documented)",
+  "Kassa (adaptation)": "Kassa (adaptation)",
+  "Djolé (adaptation)": "Djole (adaptation)",
+  "Ternaire 12/8 — Soli/Soko (adaptation)": "Ternary 12/8 — Soli/Soko (adaptation)",
+  "Exercice": "Exercise",
+  "Libre (groove seul)": "Free (groove only)",
+  "Ajout progressif (une frappe à la fois)": "Progressive addition (one hit at a time)",
+  "Soustraction (le groove s'allège)": "Subtraction (lighter groove)",
+  "Appel-réponse (1 mesure app · 1 mesure toi)": "Call-response (1 bar app · 1 bar you)",
+  "Progression guidée (mains expliquées)": "Guided progression (hands explained)",
+  "Break programmé (toutes les N mesures)": "Programmed break (every N bars)",
+  "Voix travaillée": "Focused voice",
+  "Toutes les voix": "All voices",
+  "Mains": "Hands",
+  "Alternance stricte D-G": "Strict R-L alternation",
+  "Main directrice sur les temps": "Lead hand on beats",
+  "gaucher (inverser)": "left-handed (invert)",
+  "← Étape": "← Step",
+  "Étape →": "Step →",
+  "Break / phrase": "Break / phrase",
+  "Appel standard 4/4 (documenté)": "Standard 4/4 call (documented)",
+  "Appel ternaire 12/8 (documenté)": "Ternary 12/8 call (documented)",
+  "Échauffement — roulement (adaptation)": "Warm-up — roll (adaptation)",
+  "Break dununba « sstsss » 12/8 (documenté)": "Dununba break \"sstsss\" 12/8 (documented)",
+  "Niveau": "Level",
+  "1 (début de phrase)": "1 (phrase start)",
+  "4 (phrase complète)": "4 (full phrase)",
+  "progression auto": "auto progression",
+  "réponse après": "response after",
+  "Variation toutes les": "Variation every",
+  "mesures (paires en appel-réponse)": "bars (even in call-response)",
+  "Mes séquences": "My sequences",
+  "💾 Sauver": "💾 Save",
+  "— aucune séquence sauvée —": "— no sequences saved —",
+  "Charger": "Load",
+  "Clic sur un pas : silence → frappe → accent.": "Click on a step: rest → hit → accent.",
+  "Micro-timing": "Micro-timing",
+  ": glisse une case active vers la droite (en retard, laid back) ou la gauche (en avance) pour visualiser et entendre le swing de cette frappe — double-clic pour la recentrer.": ": slide an active box right (late, laid back) or left (early) to visualize and hear the swing of this hit — double-click to center it.",
+  "Sur écran tactile": "On a touch screen",
+  ": appui long (une demi-seconde) sur la case, puis glisse — un simple toucher fait défiler la page.": ": long-press the box (half a second), then slide — a simple touch scrolls the page.",
+  ": sauvegarde tes grooves (grilles, accents, micro-décalages) et recharge-les plus tard.": ": save your grooves (grids, accents, micro-offsets) and load them later.",
+  "Ajout progressif": "Progressive addition",
+  ": la voix travaillée gagne une frappe à la fois — contretemps d'abord, jamais sur les temps.": ": the focused voice gains one hit at a time — offbeats first, never on the beats.",
+  "Soustraction": "Subtraction",
+  ": le groove s'allège, les ancres (frappes sur les temps) restent.": ": the groove lightens, anchors (hits on the beats) remain.",
+  "Appel-réponse": "Call-response",
+  ": l'app joue la variation une mesure, tu la répètes la mesure suivante pendant que la voix se tait.": ": the app plays the variation for one bar, you repeat it the next bar while the voice mutes.",
+  "Break programmé": "Programmed break",
+  ": toutes les N mesures, le groove s'interrompt et l'app joue le break au niveau choisi — la phrase s'étoffe du niveau 1 au niveau 4 (« progression auto » monte d'un niveau à chaque break, « réponse après » te laisse une mesure pour le rejouer).": ": every N bars, the groove pauses and the app plays the break at the chosen level — the phrase builds from level 1 to 4 (\"auto progression\" levels up each break, \"response after\" gives you a bar to play it back).",
+  "Couper une seule voix": "Mute a single voice",
+  ": section Horloge interne, cible sur la voix — les autres continuent.": ": Internal clock section, target the voice — others continue playing.",
+  ": chaque frappe affiche sa main (D/G).": ": each hit displays its hand (R/L).",
+  "Progression guidée": "Guided progression",
+  ": tu démarres par le squelette du groove — qui dépend du style : alternance sur les temps pour le passeport, backbeat 2-4 pour le funk, kick/caisse claire pour le rock, la basse pour le Kuku — puis l'app ajoute une frappe à la fois, toutes les N mesures ou avec les boutons ← →, en t'expliquant à chaque étape quelle main va où, jusqu'au groove complet. Les patterns marqués": ": you start with the groove's skeleton — which depends on the style: alternation on beats for passeport, 2-4 backbeat for funk, kick/snare for rock, bass for Kuku — then the app adds one hit at a time, every N bars or using ← → buttons, explaining which hand goes where at each step, until the full groove. Patterns marked",
+  "adaptation": "adaptation",
+  "sont des approximations pédagogiques : édite-les selon ta référence.": "are pedagogical approximations: edit them to match your reference.",
+  "Répertoire de grooves": "Groove repertoire",
+  "choisis un groove · puis l'instrument de jeu": "choose a groove · then the playing instrument",
+  "Répertoire": "Repertoire",
+  "bresil": "brazil",
+  "ouest-africain": "west-african",
+  "funk": "funk",
+  "reggae": "reggae",
+  "hiphop": "hiphop",
+  "rock": "rock",
+  "Samba Batucada": "Samba Batucada",
+  "Maracatu Nação (baque virado)": "Maracatu Nação (baque virado)",
+  "Baião": "Baião",
+  "Ijexá / Afoxé": "Ijexá / Afoxé",
+  "Samba-Reggae": "Samba-Reggae",
+  "Décharger": "Unload",
+  "Jouer tout à": "Play all at",
+  "Instruments authentiques": "Authentic instruments",
+  "Djembé": "Djembe",
+  "Cajón": "Cajon",
+  "Agogô": "Agogo",
+  "Surdo": "Surdo",
+  "Reco-reco": "Reco-reco",
+  "Charge un groove de la bibliothèque puis choisis": "Load a groove from the library then choose",
+  "l'instrument de jeu": "the playing instrument",
+  ": rien n'oblige à rester sur l'instrument « authentique » — joue le répertoire du djembé au cajón si tu veux (les voix sont replacées par": ": you don't have to stick to the \"authentic\" instrument — play the djembe repertoire on a cajon if you like (voices are remapped by",
+  "tessiture": "pitch",
+  ", marquées": ", marked",
+  "adapté": "adapted",
+  "Le répertoire s'écoute librement, seul ou en groupe — la répartition entre participants se fait dans la section": "The repertoire can be listened to freely, alone or in a group — distribution among participants is done in the",
+  "Team Spirit": "Team Spirit",
+  "une ligne par personne · solo/muet · export": "one part per person · solo/mute · export",
+  "Mode team spirit (répartir entre participants)": "Team spirit mode (distribute among participants)",
+  "+ Participant": "+ Participant",
+  "Répartir auto": "Auto-distribute",
+  "Vérifier les doigtés": "Check fingerings",
+  "Qui joue quoi ?": "Who plays what?",
+  "Joueurs": "Players",
+  "Répartir selon priorités": "Distribute by priority",
+  "Accompagnement (backing track) — l'app joue les lignes écartées": "Backing track — the app plays the excluded lines",
+  "Classe les lignes par priorité — glisse la poignée ⠿ pour réordonner.": "Rank lines by priority — drag the ⠿ handle to reorder.",
+  "Les premières sont garanties : chaque ligne est attribuée": "The first ones are guaranteed: each line is assigned",
+  "entière ou pas du tout": "whole or not at all",
+  ", deux mains par joueur (jamais plus de 2 frappes ni deux fois la même main au même instant). Cumuler des instruments différents n'arrive qu'en dernier recours. Avec": ", two hands per player (never more than 2 hits or the same hand twice at the same time). Combining different instruments only happens as a last resort. With",
+  "1 joueur": "1 player",
+  ": la combinaison de lignes que tu peux tenir seul. Les lignes écartées passent en": ": the combination of lines you can handle alone. Excluded lines become a",
+  "backing track": "backing track",
+  "si la case est cochée, en sourdine sinon.": "if checked, muted otherwise.",
+  "↓ Exporter tout (JSON)": "↓ Export all (JSON)",
+  "Charge d'abord un groove dans la section": "First load a groove in the",
+  ", puis assigne chaque voix à un participant — menu sur chaque voix du répertoire, ou": "section, then assign each voice to a participant — menu on each repertoire voice, or",
+  "qui équilibre la charge de jeu (nombre de frappes) en mélangeant les tessitures.": "which balances the playing load (number of hits) by mixing pitches.",
+  "La carte de chacun affiche": "Everyone's card displays",
+  "sa ligne rythmique": "their rhythmic line",
+  "; écoute la part de chacun (": "; listen to each part (",
+  "solo": "solo",
+  ") et exporte sa": ") and export their",
+  "ligne en JSON": "line as JSON",
+  "pour la travailler chez soi.": "to practice at home.",
+  "signale quand une même main est demandée deux fois au même instant pour un même participant (physiquement impossible).": "flags when the same hand is required twice at the same time for the same participant (physically impossible).",
+  "Archet": "Bow",
+  "tirer · pousser · dérive": "down-bow · up-bow · drift",
+  "Violon / Alto": "Violin / Viola",
+  "Violoncelle": "Cello",
+  "Contrebasse — archet français": "Double bass — French bow",
+  "Contrebasse — archet allemand": "Double bass — German bow",
+  "Coup d'archet": "Bowing",
+  "Détaché (vitesse constante)": "Détaché (constant speed)",
+  "Legato / liaisons (souple)": "Legato / slurs (smooth)",
+  "Martelé (mordant, arrêt net)": "Martelé (biting, clean stop)",
+  "Spiccato (rebond)": "Spiccato (bouncing)",
+  "Débutant — chaque noire = archet complet": "Beginner — each quarter note = whole bow",
+  "Détaché — noires (moitié d'archet)": "Détaché — quarter notes (half bow)",
+  "Grand détaché — blanches (tout l'archet)": "Grand détaché — half notes (whole bow)",
+  "Détaché — croches au milieu": "Détaché — eighth notes in the middle",
+  "Liaisons — 4 croches par archet": "Slurs — 4 eighth notes per bow",
+  "Asymétrie — dérive vers la pointe (démo)": "Asymmetry — drift to the tip (demo)",
+  "Asymétrie corrigée — avec reprise": "Corrected asymmetry — with retake",
+  "Martelé — noires": "Martelé — quarter notes",
+  "Spiccato — croches au point d'équilibre": "Spiccato — eighth notes at balance point",
+  "Séquence (éditable)": "Sequence (editable)",
+  "Appliquer": "Apply",
+  "Archet léger et agile — les coups rapides (spiccato, sautillé) vivent autour du point d'équilibre ◆.": "Light and agile bow — fast strokes (spiccato, sautillé) live around the balance point ◆.",
+  "Syntaxe :": "Syntax:",
+  "T50x1": "T50x1",
+  "= tirer 50 % d'archet sur 1 temps": "= down-bow 50 % on 1 beat",
+  "P20x0.5": "P20x0.5",
+  "= pousser 20 % sur une croche": "= up-bow 20 % on an eighth note",
+  "Rx1": "Rx1",
+  "= reprise (retour au talon, archet levé)": "= retake (return to the frog, bow lifted)",
+  "n4": "n4",
+  "= 4 notes liées sur l'archet (": "= 4 slurred notes on the bow (",
+  "T80x2n4": "T80x2n4",
+  "Jauge : talon à gauche, pointe à droite. Si le curseur vire au rouge, la séquence te fait « manquer d'archet ».": "Gauge: frog on the left, tip on the right. If the cursor turns red, the sequence makes you \"run out of bow\".",
+  "Horloge interne": "Internal clock",
+  "coupures de clic (gap clicks)": "gap clicks",
+  "Mode": "Mode",
+  "Désactivé": "Disabled",
+  "Fixe (jouer N, couper M)": "Fixed (play N, mute M)",
+  "Progressif (coupures 1, 2, 4, 8…)": "Progressive (mutes 1, 2, 4, 8…)",
+  "Aléatoire": "Random",
+  "Cible": "Target",
+  "Tout (comportement classique)": "All (classic behavior)",
+  "Pulsation (clic)": "Pulse (click)",
+  "Mesures jouées (N)": "Bars played (N)",
+  "Mesures coupées (M)": "Bars muted (M)",
+  "Probabilité de coupure (aléatoire)": "Mute probability (random)",
+  "La cible se coupe, l'aiguille continue de tourner.": "The target is muted, the needle keeps turning.",
+  ": tout le son (gap classique), la pulsation seule, ou une seule voix (clave ou percussion) — les autres continuent, pour tester la solidité de chaque voix. En mode progressif, la durée des coupures double à chaque cycle (1, 2, 4, 8 mesures, plafonné à 16) : aucun filet de sécurité.": ": all sound (classic gap), pulse only, or a single voice (clave or percussion) — others continue, to test each voice's solidness. In progressive mode, mute duration doubles every cycle (1, 2, 4, 8 bars, capped at 16): no safety net.",
+  "Son du clic": "Click sound",
+  "fréquence · caractère": "frequency · character",
+  "Fréquence pulsation": "Pulse frequency",
+  "1000 Hz": "1000 Hz",
+  "Caractère": "Character",
+  "Tonal (ping)": "Tonal (ping)",
+  "Sec (bruit, type rimshot)": "Dry (noise, rimshot type)",
+  "Clic grave et sourd pour trancher avec un agogô · clic sec et brillant pour percer face à une contrebasse ou des dunduns.": "Deep and dull click to cut through an agogo · dry and bright click to pierce through a double bass or dunduns.",
+  "Routine programmée": "Programmed routine",
+  "script": "script",
+  "# Exemple de routine # 5 min à 80 BPM 80bpm 5min # accelerando : 80 → 120 en 10 min 80->120bpm 10min # gap : couper 2 mesures toutes les 16 gap 2/16 120bpm 32mes gap off swing 62 100bpm 16mes": "# Routine example # 5 min at 80 BPM 80bpm 5min # accelerando: 80 → 120 in 10 min 80->120bpm 10min # gap: mute 2 bars every 16 gap 2/16 120bpm 32bars gap off swing 62 100bpm 16bars",
+  "▶ Lancer la routine": "▶ Run routine",
+  "■ Arrêter la routine": "■ Stop routine",
+  "80bpm 5min": "80bpm 5min",
+  "80->120bpm 10min": "80->120bpm 10min",
+  "(rampe) ·": "(ramp) ·",
+  "100bpm 16mes": "100bpm 16bars",
+  "gap 2/16": "gap 2/16",
+  "gap off": "gap off",
+  "swing 62": "swing 62",
+  "· lignes": "· lines",
+  "= commentaires. Les changements s'appliquent à la mesure suivante.": "= comments. Changes apply to the next bar.",
+  "Bibliothèque partagée": "Shared library",
+  "routines · Supabase": "routines · Supabase",
+  "Publier la routine": "Publish routine",
+  "Charger la bibliothèque": "Load library",
+  "Le": "The",
+  "canon": "canon",
+  "(routines de référence) est visible sans connexion.": "(reference routines) is visible without logging in.",
+  "Connecte-toi": "Log in",
+  "(en haut) pour voir les routines de la classe et publier les tiennes. « Importer » place la routine dans l'éditeur ci-dessus.": "(top) to see class routines and publish your own. \"Import\" places the routine in the editor above.",
+  "Espace : lecture · ↑↓ : tempo ±1 · T : tap tempo": "Space: play · ↑↓: tempo ±1 · T: tap tempo",
+  "92 BPM": "92 BPM",
+  "✕ Fermer": "✕ Close",
+  "Percussion": "Percussion",
+  "Assistant de réglage": "Setup assistant",
+  "Que veux-tu travailler ?": "What do you want to practice?",
+  "Choisis un contexte — tu poseras tout le reste à la main, en direct.": "Choose a context — you'll set everything else manually, live.",
+  "Un tempo, un clic": "One tempo, one click",
+  "Métronome nu — tempo, mesure, subdivision. Rien d’autre.": "Bare metronome — tempo, meter, subdivision. Nothing else.",
+  "Pile rythmique": "Rhythm stack",
+  "Pulsation, claves et percussions se posent ensemble sur le même cycle.": "Pulse, claves and percussion sit together on the same cycle.",
+  "Coups d’archet": "Bowing",
+  "Aller-retour de l’archet visualisés — du violon à la contrebasse. Mode à part.": "Bow back-and-forth visualized — from violin to double bass. Separate mode.",
+  "← Retour": "← Back",
+  "Passer l'assistant": "Skip assistant",
+  "Continuer →": "Continue →",
+  "Écran d'accueil": "Home screen",
+  "Prêt à jouer ?": "Ready to play?",
+  "Deux choix — tout le reste s'ajuste ensuite derrière « Configurer ».": "Two choices — everything else is adjusted behind \"Configure\".",
+  "On joue…": "We are playing…",
+  "Seul": "Alone",
+  "toute la ligne jouable est à moi": "the whole playable line is mine",
+  "À plusieurs": "Together",
+  "chacun sa ligne — même groove, même classement, même répartition sur chaque appareil": "each their own line — same groove, same ranking, same distribution on every device",
+  "Nombre de joueurs": "Number of players",
+  "Apprentissage": "Learning",
+  "(ajout progressif sur ma ligne)": "(progressive addition on my line)",
+  "Oui": "Yes",
+  "ma ligne se construira frappe par frappe — choix mémorisé, l'exercice arrive à la prochaine étape": "my line will build hit by hit — choice saved, the exercise arrives at the next step",
+  "Non": "No",
+  "je joue la ligne complète": "I play the full line",
+  "C'est parti →": "Let's go →",
+  "Recevoir un lien de connexion par e-mail": "Get a sign-in link by e-mail",
+  "English / Français": "English / Français",
+  "Langue / Language": "Langue / Language",
+  "Tempo -1": "Tempo -1",
+  "Tempo +1": "Tempo +1",
+  "Coupe le clic (pulsation, subdivisions, clic décalé) — clave et percussion continuent": "Mutes the click (pulse, subdivisions, offset click) — clave and percussion continue",
+  "Durée enregistrée de ce qui joue": "Recorded length of what's playing",
+  "Rouvrir l'écran d'accueil (seul / à plusieurs · apprentissage)": "Reopen home screen (alone / together · learning)",
+  "Famille": "Family",
+  "Nombre de pas du cycle — 12 ou 16 bascule la famille (clave + percussion) ; 8 = cellule courte propre à la clave": "Number of cycle steps — 12 or 16 switches the family (clave + percussion); 8 = short cell specific to the clave",
+  "Pas du cycle — asservi à la famille : bascule clave + percussion ensemble": "Cycle step — linked to the family: switches clave + percussion together",
+  "nom de la séquence…": "sequence name…",
+  "Supprimer la séquence sélectionnée": "Delete selected sequence",
+  "Revenir à la percussion focale": "Return to focal percussion",
+  "Répartir les voix en équilibrant la charge de jeu (frappes) et les tessitures": "Distribute voices by balancing the playing load (hits) and pitches",
+  "Titre de la routine à publier": "Title of the routine to publish",
+  "Connecte-toi (en haut) pour publier": "Log in (top) to publish",
+  "◐ Mode clair": "◐ Light mode",
+  "Ton compte": "Your account",
+  "Se déconnecter": "Log out",
+  "■ Arrêter": "■ Stop",
+  "⟲ Tout réinitialiser": "⟲ Reset all",
+  "Tout remettre par défaut — la langue, le thème et ton compte sont conservés": "Restore all defaults — language, theme and your account are kept",
+  "L'assistant règle le métronome pour toi en trois questions": "The assistant sets up the metronome for you in three questions",
+  "Basculer entre thème clair et thème sombre": "Switch between light and dark theme",
+  "mesure : 2/4 · 3/4 (valse) · 4/4…": "time signature: 2/4 · 3/4 (waltz) · 4/4…",
+  "Nombre de temps dans chaque mesure : 2 = 2/4, 3 = 3/4 (valse), 4 = 4/4…": "Number of beats per bar: 2 = 2/4, 3 = 3/4 (waltz), 4 = 4/4…",
+  "Sourdine générale (coupe tout le son en un clic)": "Master mute (cuts all sound in one click)",
+  "Sommaire des sections": "Section index",
+  "Groove": "Groove",
+  "Claves": "Claves",
+  "Cours funk": "Funk course",
+  "Horloge": "Clock",
+  "Son": "Sound",
+  "Script": "Script",
+  "Bibliothèque": "Library",
+  "Export": "Export",
+  "↑ Haut": "↑ Top",
+  "Revenir en haut de la page": "Back to the top of the page",
+  "Micro-timing : décaler certaines frappes de quelques millisecondes autour du temps — c'est ce qui fait « groover »": "Micro-timing: shifting some hits a few milliseconds around the beat — that's what makes it groove",
+  "Swing : on retarde une croche sur deux — 50 % = binaire droit, 66 % = ternaire. Placement : jouer un peu avant ou après le clic": "Swing: every other eighth note is delayed — 50% = straight, 66% = ternary. Placement: playing slightly before or after the click",
+  "Une clave est une courte cellule rythmique qui se répète et sert de repère à tout le morceau (son, rumba, tresillo…)": "A clave is a short repeating rhythmic cell that anchors the whole piece (son, rumba, tresillo…)",
+  "Gap clicks : le métronome se tait quelques mesures puis revient — à toi de tenir le tempo pendant le silence": "Gap clicks: the metronome goes silent for a few bars then returns — keep the tempo through the silence",
+  "L'accompagnement (backing track) : les voix que l'appli joue à ta place": "The backing track: the voices the app plays for you",
+  "Drop-outs : la basse se tait quelques mesures puis revient — garde le tempo pendant le silence": "Drop-outs: the bass goes silent for a few bars then returns — keep the tempo through the silence",
+  "silences (drop-outs)": "drop-outs",
+  "Silences (drop-outs) — la basse se tait": "Drop-outs — the bass goes silent",
+  "Coupures traversées": "Gaps crossed",
+  "Nombre de coupures traversées depuis le dernier départ — chaque silence tenu jusqu'au bout compte pour un": "Number of gaps crossed since the last start — each silence held to the end counts as one",
+  "✓ Réglages enregistrés automatiquement": "✓ Settings saved automatically",
+  "Agrandir l'archet en plein écran": "Enlarge the bow view to full screen",
+  "Reçois un lien de connexion par e-mail — aucun mot de passe à retenir.": "Get a sign-in link by e-mail — no password to remember.",
+  "L'application fonctionne aussi sans compte : la connexion sert seulement à partager tes routines et suivre ta progression.": "The app also works without an account: signing in is only for sharing your routines and tracking your progress.",
+  "Pas reçu au bout d'une minute ? Vérifie tes indésirables (spams), ou renvoie le lien.": "Nothing after a minute? Check your spam folder, or resend the link.",
+  "Renvoyer le lien": "Resend the link",
+  "En savoir plus": "Learn more",
+  "Débutant ? Laisse-toi guider": "Beginner? Let us guide you",
+  "— l'assistant règle le métronome pour toi en trois questions.": "— the assistant sets up the metronome for you in three questions.",
+  "Plus tard": "Later",
+  "Une section à la fois": "One section at a time",
+  "Ouvrir une section referme les autres": "Opening a section closes the others",
+  /* ===== 0.6.9 (C4+C10) : statuts dynamiques, aria-labels, hint basse, libellés UI (audit I4) ===== */
+  "Arrêté": "Stopped",
+  "Groove vide — choisis un style ou ajoute des frappes, puis relance le mode guidé.": "Empty groove — pick a style or add hits, then restart guided mode.",
+  "Il ne restait que les ancres — groove de base restauré.": "Only the anchors were left — base groove restored.",
+  "À toi : rejoue le break !": "Your turn: play the break back!",
+  "Appel : écoute…": "Call: listen…",
+  "Micro-timing armé — glisse à gauche/droite": "Micro-timing armed — slide left/right",
+  "pas": "step",
+  "+ frappe ajoutée :": "+ hit added:",
+  "− frappe retirée :": "− hit removed:",
+  "Continue à la jouer dans ta tête !": "Keep playing it in your head!",
+  "Appel : écoute la variation": "Call: listen to the variation",
+  "BREAK — niveau": "BREAK — level",
+  "Groove — break dans": "Groove — break in",
+  "mesure": "measure",
+  "mesures": "measures",
+  "Mesure": "Measure",
+  "gap actif": "gap active",
+  "ajout": "addition",
+  "ajouts": "additions",
+  "Réponse : à toi ! La voix": "Response: your turn! The voice",
+  "se tait": "goes silent",
+  "Micro-décalage remis à zéro": "Micro-offset reset to zero",
+  "% du pas": "% of the step",
+  "droite = laid back, gauche = en avance": "right = laid back, left = ahead",
+  "Séquence": "Sequence",
+  "chargée": "loaded",
+  "sauvegardée": "saved",
+  "supprimée": "deleted",
+  "Kit généré :": "Kit generated:",
+  "● COUPÉ — tiens le tempo !": "● MUTED — hold the tempo!",
+  "en silence, le reste continue": "in silence, the rest continues",
+  "◆ BREAK — niveau": "◆ BREAK — level",
+  "◆ À toi — rejoue le break !": "◆ Your turn — play the break back!",
+  "Tout remettre par défaut ? (La langue, le thème et ton compte sont conservés.)": "Restore all defaults? (Language, theme and your account are kept.)",
+  "Densité de la basse": "Bass density",
+  "Décalage de placement (ms)": "Placement offset (ms)",
+  "Presets de clave": "Clave presets",
+  "Séquences sauvegardées": "Saved sequences",
+  "Groove du répertoire": "Repertoire groove",
+  "Script de routine": "Routine script",
+  "Roue du métronome — les temps du cycle": "Metronome wheel — the beats of the cycle",
+  "Réglage du tempo": "Tempo control",
+  "Une voix de basse funk synthétisée qui accompagne le percussionniste — pour caler le jeu sur ses syncopes et ses silences (FUNK-I2).": "A synthesized funk bass voice that accompanies the percussionist — to lock your playing onto its syncopations and silences (FUNK-I2).",
+  "Choisis un": "Choose a",
+  "gabarit": "template",
+  ", une": ", a",
+  "progression": "progression",
+  "(du vamp 1 accord au blues 12 mesures), une": "(from the 1-chord vamp to the 12-bar blues), a",
+  "tonalité": "key",
+  ", la": ", the",
+  "densité": "density",
+  "(allégé → chargé) et le profil de": "(light → busy) and the profile of",
+  "dynamique": "dynamics",
+  ". L'": ". The ",
+  "accord": "chord",
+  "courant s'affiche pour travailler l'oreille : rejoue la même progression dans une autre tonalité et tu entends la transposition.": "in play is displayed to train your ear: replay the same progression in another key and you'll hear the transposition.",
+  "Variations": "Variations",
+  "activé, la ligne se joue de façon vivante (tirage des ornements) ; désactivé, elle est régulière et prévisible. La ligne s'allège et se raccourcit d'elle-même quand le tempo monte.": "enabled, the line plays in a lively way (ornaments drawn at random); disabled, it is regular and predictable. The line lightens and shortens by itself as the tempo rises.",
+  "Le curseur": "The",
+  "détaché ↔ lié": "detached ↔ legato",
+  "dose le liant entre les notes (les ghosts restent piqués).": "slider sets how bound the notes are (ghost notes stay staccato).",
+  "Espace": "Space",
+  "ajoute une réverb très courte sur la basse seule — l'attaque et le": "adds a very short reverb on the bass alone — the attack and the",
+  "restent nets.": "stay clean.",
+  ": la basse se tait périodiquement (trou en fin de période) et re-rentre sur le 1 — tiens le": ": the bass goes silent periodically (a hole at the end of the period) and comes back on the 1 — hold the",
+  "pendant le silence, la re-entrée te confirme ou te corrige ; percussion et pulsation continuent.": "during the silence; the re-entry confirms or corrects you — percussion and pulse keep going.",
+  "La basse suit le swing": "The bass follows the swing",
+  "cale ses doubles-croches sur le swing du métronome (section Micro-timing).": "locks its sixteenth notes onto the metronome's swing (Micro-timing section).",
+  "Basse :": "Bass:",
+  "activer": "enable",
+  "1 — allégé": "1 — light",
+  "2 — normal": "2 — normal",
+  "3 — chargé": "3 — busy",
+  "basse": "bass",
+  "Cajón + cimbalette (grave · aigu · cimbalette)": "Cajón + jingles (bass · high · jingles)",
+  "Cajón + cimbalette": "Cajón + jingles",
+  "Basse funk": "Funk bass",
+  "accompagnement génératif": "generative accompaniment",
+  "Activer la basse": "Enable the bass",
+  "Gabarit": "Template",
+  "The One — ancre sur le 1": "The One — anchored on the 1",
+  "Syncope grave — décalé autour du 1": "Low syncopation — shifted around the 1",
+  "Octaves — pompe disco-funk": "Octaves — disco-funk pump",
+  "Ghost pendule — nappe de 16es": "Ghost pendulum — 16th-note carpet",
+  "Tonalité": "Key",
+  "Do (C)": "C",
+  "Do♯ (C#)": "C♯",
+  "Ré (D)": "D",
+  "Ré♯ (D#)": "D♯",
+  "Mi (E)": "E",
+  "Fa (F)": "F",
+  "Fa♯ (F#)": "F♯",
+  "Sol (G)": "G",
+  "Sol♯ (G#)": "G♯",
+  "La (A)": "A",
+  "La♯ (A#)": "A♯",
+  "Si (B)": "B",
+  "Progression": "Progression",
+  "Vamp 1 accord — James Brown": "1-chord vamp — James Brown",
+  "i⁷ → IV⁷ — Chameleon (dorien)": "i⁷ → IV⁷ — Chameleon (Dorian)",
+  "I⁷ → ♭VII — mixolydien (War)": "I⁷ → ♭VII — Mixolydian (War)",
+  "Blues funk — 12 mesures": "Funk blues — 12 bars",
+  "Accord": "Chord",
+  "Densité": "Density",
+  "Dynamique": "Dynamics",
+  "Plate — peu de contraste": "Flat — little contrast",
+  "Mixte": "Mixed",
+  "Contrastée — poche accents/ghosts": "Contrasted — accents/ghosts pocket",
+  "Variations (jeu vivant)": "Variations (lively playing)",
+  "Lié ↔ très lié": "Legato ↔ very legato",
+  "Espace (réverb courte)": "Space (short reverb)",
+  "toutes les": "every",
+  "mesures, trou de": "measures, hole of",
+  "temps": "beats",
+  "parcours · intermédiaire": "path · intermediate",
+  "Deux parcours parallèles — cajón et djembé. « Charger » installe l'accompagnement de basse de l'exercice ; tu joues par-dessus. Coche « acquis » quand le critère est atteint ; le vote de difficulté aide à recalibrer le niveau pour tout le monde.": "Two parallel paths — cajón and djembé. “Load” installs the exercise's bass accompaniment; you play on top. Tick “done” when the criterion is met; the difficulty vote helps recalibrate the level for everyone.",
+  "L'assistant règle le métronome pour toi — tu pourras tout ajuster ensuite.": "The assistant sets the metronome for you — you can adjust everything afterwards.",
+  "Durée à enregistrer (la boucle en cours)": "Duration to record (the current loop)",
+  "minutes": "minutes",
+  "secondes": "seconds",
+  "Décalage -1 ms": "Offset -1 ms",
+  "Décalage +1 ms": "Offset +1 ms",
+}, "pt": {
+  "Métronome": "Metrônomo",
+  "Formation musicale · Groove & horloge interne": "Treinamento musical · Groove & relógio interno",
+  "▶ Jouer": "▶ Tocar",
+  "Configurer": "Configurar",
+  "✦ Guide-moi": "✦ Guie-me",
+  "◐ Mode sombre": "◐ Modo escuro",
+  "Se connecter": "Entrar",
+  "BPM ·": "BPM ·",
+  "Moderato": "Moderato",
+  "▶ Démarrer": "▶ Iniciar",
+  "Tap": "Tap",
+  "Temps / cycle": "Tempos / compasso",
+  "Subdivision": "Subdivisão",
+  "Noires": "Semínimas",
+  "Croches": "Colcheias",
+  "Triolets": "Tercinas",
+  "Doubles": "Semicolcheias",
+  "Volume": "Volume",
+  "Accent 1er temps": "Acento no 1º tempo",
+  "Clic muet (couches seules)": "Clique mudo (apenas camadas)",
+  "Prêt": "Pronto",
+  "Export audio (WAV / MP3)": "Exportação de áudio (WAV / MP3)",
+  "Durée": "Duração",
+  "10 s": "10 s",
+  "20 s": "20 s",
+  "30 s": "30 s",
+  "60 s": "60 s",
+  "WAV": "WAV",
+  "MP3": "MP3",
+  "Je suis :": "Eu sou:",
+  "Solo": "Solo",
+  "Voir l'accompagnement": "Ver acompanhamento",
+  "⟲ Setup": "⟲ Setup",
+  "Basse": "Grave",
+  "Tone": "Tom",
+  "Slap": "Slap",
+  "Ma ligne n'est pas encore répartie.": "Minha linha ainda não foi distribuída.",
+  "Répartir selon priorités (1 joueur)": "Distribuir por prioridades (1 jogador)",
+  "Micro-timing & groove": "Micro-timing & groove",
+  "swing · placement": "swing · posicionamento",
+  "Swing (asymétrique, libre)": "Swing (assimétrico, livre)",
+  "50 % = binaire droit · 66 % = ternaire parfait · valeurs intermédiaires = swing « humain ». S'applique aux croches et aux doubles-croches (par paires) — ex. ~58–62 % pour le placement samba/choro.": "50 % = binário reto · 66 % = ternário perfeito · valores intermediários = swing \"humano\". Aplica-se a colcheias e semicolcheias (em pares) — ex. ~58–62 % para o posicionamento samba/choro.",
+  "Clic de placement (behind/ahead the beat)": "Clique de posicionamento (behind/ahead the beat)",
+  "Décalage": "Deslocamento",
+  "+25 ms": "+25 ms",
+  "Fréquence du clic décalé": "Frequência do clique deslocado",
+  "220 Hz": "220 Hz",
+  "Un second clic grave, décalé du clic de référence. Décalage positif = au fond du temps (contrebasse, surdo, dundun) · négatif = en avant du temps.": "Um segundo clique grave, deslocado do clique de referência. Deslocamento positivo = no fundo do tempo (contrabaixo, surdo, dundun) · negativo = à frente do tempo.",
+  "Grille rythmique": "Grade rítmica",
+  "Binaire · 16": "Binário · 16",
+  "Ternaire · 12": "Ternário · 12",
+  "Clave et percussion partagent cette grille — pour rester carré, on ne mélange pas binaire et ternaire (le mélange volontaire = polyrythmie superposée).": "Clave e percussão compartilham esta grade — para manter a precisão, não misture binário e ternário (a mistura intencional = polirritmia sobreposta).",
+  "Claves & cellules rythmiques": "Claves & células rítmicas",
+  "séquenceur · polyrythmie": "sequenciador · polirritmia",
+  "— Presets —": "— Presets —",
+  "Son clave 3-2 (16)": "Clave Son 3-2 (16)",
+  "Son clave 2-3 (16)": "Clave Son 2-3 (16)",
+  "Rumba clave 3-2 (16)": "Clave Rumba 3-2 (16)",
+  "Bossa (16)": "Bossa (16)",
+  "Partido alto (variante, 16)": "Partido alto (variante, 16)",
+  "Tresillo (8)": "Tresillo (8)",
+  "Cinquillo (8)": "Cinquillo (8)",
+  "8 pas": "8 passos",
+  "12 pas": "12 passos",
+  "16 pas": "16 passos",
+  "Effacer": "Apagar",
+  "Clave grave": "Clave grave",
+  "muet": "mudo",
+  "Clave aiguë": "Clave aguda",
+  "Clic sur un pas : silence → frappe → accent. Les points au-dessus marquent les temps.": "Clique num passo: silêncio → toque → acento. Os pontos acima marcam os tempos.",
+  "Deux voix": "Duas vozes",
+  "— cloche grave et cloche aiguë — comme n'importe quelle voix de percussion : les presets se posent sur la grave, la seconde voix est libre (contre-clave, bombo…). Le cercle montre comment la cellule se résout sur le 1 du cycle suivant.": "— campana grave e campana aguda — como qualquer voz de percussão: os presets aplicam-se à grave, a segunda voz é livre (contra-clave, bombo…). O círculo mostra como a célula se resolve no 1 do ciclo seguinte.",
+  "Polyrythmie superposée": "Polirritmia sobreposta",
+  "Aucune": "Nenhuma",
+  "2 par cycle": "2 por ciclo",
+  "3 par cycle": "3 por ciclo",
+  "4 par cycle": "4 por ciclo",
+  "5 par cycle": "5 por ciclo",
+  "7 par cycle": "7 por ciclo",
+  "n frappes également réparties (ex. 3 sur 4 temps)": "n toques igualmente distribuídos (ex. 3 sobre 4 tempos)",
+  "Percussion & indépendance": "Percussão & independência",
+  "groove · variations · appel-réponse": "groove · variações · pergunta e resposta",
+  "Activer": "Ativar",
+  "Instrument": "Instrumento",
+  "Djembé (basse · tone · slap)": "Djembê (grave · tom · slap)",
+  "Cajón (grave · aigu)": "Cajón (grave · agudo)",
+  "Dunduns & cloche": "Dunduns & campana",
+  "Agogô (grave · aigu)": "Agogô (grave · agudo)",
+  "Surdo (grave · marcante)": "Surdo (grave · marcante)",
+  "Reco-reco (raclement)": "Reco-reco (raspagem)",
+  "12 pas (ternaire)": "12 passos (ternário)",
+  "16 pas (binaire)": "16 passos (binário)",
+  "Groove de base": "Groove básico",
+  "⛶ Plein écran": "⛶ Tela cheia",
+  "Style": "Estilo",
+  "— Styles —": "— Estilos —",
+  "Passeport — base 4/4 (documenté)": "Passeport — base 4/4 (documentado)",
+  "Kuku — accompagnement 1 (documenté)": "Kuku — acompanhamento 1 (documentado)",
+  "Kassa (adaptation)": "Kassa (adaptação)",
+  "Djolé (adaptation)": "Djolé (adaptação)",
+  "Ternaire 12/8 — Soli/Soko (adaptation)": "Ternário 12/8 — Soli/Soko (adaptação)",
+  "Exercice": "Exercício",
+  "Libre (groove seul)": "Livre (apenas groove)",
+  "Ajout progressif (une frappe à la fois)": "Adição progressiva (um toque por vez)",
+  "Soustraction (le groove s'allège)": "Subtração (o groove fica mais leve)",
+  "Appel-réponse (1 mesure app · 1 mesure toi)": "Pergunta e resposta (1 compasso app · 1 compasso você)",
+  "Progression guidée (mains expliquées)": "Progressão guiada (mãos explicadas)",
+  "Break programmé (toutes les N mesures)": "Break programado (a cada N compassos)",
+  "Voix travaillée": "Voz focada",
+  "Toutes les voix": "Todas as vozes",
+  "Mains": "Mãos",
+  "Alternance stricte D-G": "Alternância estrita D-E",
+  "Main directrice sur les temps": "Mão guia nos tempos",
+  "gaucher (inverser)": "canhoto (inverter)",
+  "← Étape": "← Etapa",
+  "Étape →": "Etapa →",
+  "Break / phrase": "Break / frase",
+  "Appel standard 4/4 (documenté)": "Chamada padrão 4/4 (documentado)",
+  "Appel ternaire 12/8 (documenté)": "Chamada ternária 12/8 (documentado)",
+  "Échauffement — roulement (adaptation)": "Aquecimento — rufo (adaptação)",
+  "Break dununba « sstsss » 12/8 (documenté)": "Break dununba \"sstsss\" 12/8 (documentado)",
+  "Niveau": "Nível",
+  "1 (début de phrase)": "1 (início da frase)",
+  "4 (phrase complète)": "4 (frase completa)",
+  "progression auto": "progressão automática",
+  "réponse après": "resposta depois",
+  "Variation toutes les": "Variação a cada",
+  "mesures (paires en appel-réponse)": "compassos (pares em pergunta-resposta)",
+  "Mes séquences": "Minhas sequências",
+  "💾 Sauver": "💾 Salvar",
+  "— aucune séquence sauvée —": "— nenhuma sequência salva —",
+  "Charger": "Carregar",
+  "Clic sur un pas : silence → frappe → accent.": "Clique num passo: silêncio → toque → acento.",
+  "Micro-timing": "Micro-timing",
+  ": glisse une case active vers la droite (en retard, laid back) ou la gauche (en avance) pour visualiser et entendre le swing de cette frappe — double-clic pour la recentrer.": ": arraste uma caixa ativa para a direita (atrasado, laid back) ou esquerda (adiantado) para visualizar e ouvir o swing deste toque — clique duplo para centralizar.",
+  "Sur écran tactile": "Em tela sensível ao toque",
+  ": appui long (une demi-seconde) sur la case, puis glisse — un simple toucher fait défiler la page.": ": toque longo na caixa (meio segundo), depois arraste — um toque simples rola a página.",
+  ": sauvegarde tes grooves (grilles, accents, micro-décalages) et recharge-les plus tard.": ": salve seus grooves (grades, acentos, micro-deslocamentos) e carregue-os depois.",
+  "Ajout progressif": "Adição progressiva",
+  ": la voix travaillée gagne une frappe à la fois — contretemps d'abord, jamais sur les temps.": ": a voz focada ganha um toque por vez — contratempos primeiro, nunca nos tempos.",
+  "Soustraction": "Subtração",
+  ": le groove s'allège, les ancres (frappes sur les temps) restent.": ": o groove fica mais leve, as âncoras (toques nos tempos) permanecem.",
+  "Appel-réponse": "Pergunta e resposta",
+  ": l'app joue la variation une mesure, tu la répètes la mesure suivante pendant que la voix se tait.": ": o app toca a variação por um compasso, você repete no compasso seguinte enquanto a voz fica muda.",
+  "Break programmé": "Break programado",
+  ": toutes les N mesures, le groove s'interrompt et l'app joue le break au niveau choisi — la phrase s'étoffe du niveau 1 au niveau 4 (« progression auto » monte d'un niveau à chaque break, « réponse après » te laisse une mesure pour le rejouer).": ": a cada N compassos, o groove é interrompido e o app toca o break no nível escolhido — a frase se constrói do nível 1 ao 4 (\"progressão automática\" sobe um nível a cada break, \"resposta depois\" te dá um compasso para tocar de volta).",
+  "Couper une seule voix": "Silenciar uma única voz",
+  ": section Horloge interne, cible sur la voix — les autres continuent.": ": seção Relógio interno, foque na voz — as outras continuam.",
+  ": chaque frappe affiche sa main (D/G).": ": cada toque exibe a sua mão (D/E).",
+  "Progression guidée": "Progressão guiada",
+  ": tu démarres par le squelette du groove — qui dépend du style : alternance sur les temps pour le passeport, backbeat 2-4 pour le funk, kick/caisse claire pour le rock, la basse pour le Kuku — puis l'app ajoute une frappe à la fois, toutes les N mesures ou avec les boutons ← →, en t'expliquant à chaque étape quelle main va où, jusqu'au groove complet. Les patterns marqués": ": você começa pelo esqueleto do groove — que depende do estilo: alternância nos tempos para o passeport, backbeat 2-4 para o funk, bumbo/caixa para o rock, o grave para o Kuku — depois o app adiciona um toque por vez, a cada N compassos ou com os botões ← →, explicando a cada etapa qual mão vai onde, até o groove completo. Os padrões marcados",
+  "adaptation": "adaptação",
+  "sont des approximations pédagogiques : édite-les selon ta référence.": "são aproximações pedagógicas: edite-os de acordo com a sua referência.",
+  "Répertoire de grooves": "Repertório de grooves",
+  "choisis un groove · puis l'instrument de jeu": "escolha um groove · depois o instrumento para tocar",
+  "Répertoire": "Repertório",
+  "bresil": "brasil",
+  "ouest-africain": "oeste-africano",
+  "funk": "funk",
+  "reggae": "reggae",
+  "hiphop": "hip-hop",
+  "rock": "rock",
+  "Samba Batucada": "Samba Batucada",
+  "Maracatu Nação (baque virado)": "Maracatu Nação (baque virado)",
+  "Baião": "Baião",
+  "Ijexá / Afoxé": "Ijexá / Afoxé",
+  "Samba-Reggae": "Samba-Reggae",
+  "Décharger": "Descarregar",
+  "Jouer tout à": "Tocar tudo a",
+  "Instruments authentiques": "Instrumentos autênticos",
+  "Djembé": "Djembê",
+  "Cajón": "Cajón",
+  "Agogô": "Agogô",
+  "Surdo": "Surdo",
+  "Reco-reco": "Reco-reco",
+  "Charge un groove de la bibliothèque puis choisis": "Carregue um groove da biblioteca e escolha",
+  "l'instrument de jeu": "o instrumento para tocar",
+  ": rien n'oblige à rester sur l'instrument « authentique » — joue le répertoire du djembé au cajón si tu veux (les voix sont replacées par": ": não é obrigatório ficar no instrumento \"autêntico\" — toque o repertório do djembê no cajón se quiser (as vozes são remapeadas por",
+  "tessiture": "tessitura",
+  ", marquées": ", marcadas",
+  "adapté": "adaptado",
+  "Le répertoire s'écoute librement, seul ou en groupe — la répartition entre participants se fait dans la section": "O repertório pode ser ouvido livremente, sozinho ou em grupo — a distribuição entre os participantes é feita na seção",
+  "Team Spirit": "Team Spirit",
+  "une ligne par personne · solo/muet · export": "uma linha por pessoa · solo/mudo · exportar",
+  "Mode team spirit (répartir entre participants)": "Modo team spirit (distribuir entre os participantes)",
+  "+ Participant": "+ Participante",
+  "Répartir auto": "Distribuir auto",
+  "Vérifier les doigtés": "Verificar dedilhados",
+  "Qui joue quoi ?": "Quem toca o quê?",
+  "Joueurs": "Jogadores",
+  "Répartir selon priorités": "Distribuir por prioridades",
+  "Accompagnement (backing track) — l'app joue les lignes écartées": "Acompanhamento (backing track) — o app toca as linhas excluídas",
+  "Classe les lignes par priorité — glisse la poignée ⠿ pour réordonner.": "Classifique as linhas por prioridade — arraste a alça ⠿ para reordenar.",
+  "Les premières sont garanties : chaque ligne est attribuée": "As primeiras são garantidas: cada linha é atribuída",
+  "entière ou pas du tout": "inteira ou não é atribuída",
+  ", deux mains par joueur (jamais plus de 2 frappes ni deux fois la même main au même instant). Cumuler des instruments différents n'arrive qu'en dernier recours. Avec": ", duas mãos por jogador (nunca mais de 2 toques ou a mesma mão no mesmo instante). Acumular instrumentos diferentes acontece apenas como último recurso. Com",
+  "1 joueur": "1 jogador",
+  ": la combinaison de lignes que tu peux tenir seul. Les lignes écartées passent en": ": a combinação de linhas que você consegue tocar sozinho. As linhas excluídas tornam-se um",
+  "backing track": "backing track",
+  "si la case est cochée, en sourdine sinon.": "se a caixa estiver marcada, mudas caso contrário.",
+  "↓ Exporter tout (JSON)": "↓ Exportar tudo (JSON)",
+  "Charge d'abord un groove dans la section": "Primeiro carregue um groove na seção",
+  ", puis assigne chaque voix à un participant — menu sur chaque voix du répertoire, ou": ", depois atribua cada voz a um participante — menu em cada voz do repertório, ou",
+  "qui équilibre la charge de jeu (nombre de frappes) en mélangeant les tessitures.": "que equilibra a carga de tocar (número de toques) misturando as tessituras.",
+  "La carte de chacun affiche": "O cartão de cada um exibe",
+  "sa ligne rythmique": "sua linha rítmica",
+  "; écoute la part de chacun (": "; ouça a parte de cada um (",
+  "solo": "solo",
+  ") et exporte sa": ") e exporte sua",
+  "ligne en JSON": "linha em JSON",
+  "pour la travailler chez soi.": "para praticar em casa.",
+  "signale quand une même main est demandée deux fois au même instant pour un même participant (physiquement impossible).": "avisa quando a mesma mão é exigida duas vezes no mesmo instante para um mesmo participante (fisicamente impossível).",
+  "Archet": "Arco",
+  "tirer · pousser · dérive": "puxar · empurrar · deriva",
+  "Violon / Alto": "Violino / Viola",
+  "Violoncelle": "Violoncelo",
+  "Contrebasse — archet français": "Contrabaixo — arco francês",
+  "Contrebasse — archet allemand": "Contrabaixo — arco alemão",
+  "Coup d'archet": "Golpe de arco",
+  "Détaché (vitesse constante)": "Détaché (velocidade constante)",
+  "Legato / liaisons (souple)": "Legato / ligaduras (suave)",
+  "Martelé (mordant, arrêt net)": "Martelé (mordente, parada brusca)",
+  "Spiccato (rebond)": "Spiccato (salteado)",
+  "Débutant — chaque noire = archet complet": "Iniciante — cada semínima = arco completo",
+  "Détaché — noires (moitié d'archet)": "Détaché — semínimas (metade do arco)",
+  "Grand détaché — blanches (tout l'archet)": "Grand détaché — mínimas (todo o arco)",
+  "Détaché — croches au milieu": "Détaché — colcheias no meio",
+  "Liaisons — 4 croches par archet": "Ligaduras — 4 colcheias por arco",
+  "Asymétrie — dérive vers la pointe (démo)": "Assimetria — deriva para a ponta (demo)",
+  "Asymétrie corrigée — avec reprise": "Assimetria corrigida — com retomada",
+  "Martelé — noires": "Martelé — semínimas",
+  "Spiccato — croches au point d'équilibre": "Spiccato — colcheias no ponto de equilíbrio",
+  "Séquence (éditable)": "Sequência (editável)",
+  "Appliquer": "Aplicar",
+  "Archet léger et agile — les coups rapides (spiccato, sautillé) vivent autour du point d'équilibre ◆.": "Arco leve e ágil — os golpes rápidos (spiccato, sautillé) vivem em torno do ponto de equilíbrio ◆.",
+  "Syntaxe :": "Sintaxe:",
+  "T50x1": "T50x1",
+  "= tirer 50 % d'archet sur 1 temps": "= puxar 50 % do arco em 1 tempo",
+  "P20x0.5": "P20x0.5",
+  "= pousser 20 % sur une croche": "= empurrar 20 % numa colcheia",
+  "Rx1": "Rx1",
+  "= reprise (retour au talon, archet levé)": "= retomada (retorno ao talão, arco levantado)",
+  "n4": "n4",
+  "= 4 notes liées sur l'archet (": "= 4 notas ligadas no arco (",
+  "T80x2n4": "T80x2n4",
+  "Jauge : talon à gauche, pointe à droite. Si le curseur vire au rouge, la séquence te fait « manquer d'archet ».": "Medidor: talão à esquerda, ponta à direita. Se o cursor ficar vermelho, a sequência faz você \"ficar sem arco\".",
+  "Horloge interne": "Relógio interno",
+  "coupures de clic (gap clicks)": "cortes de clique (gap clicks)",
+  "Mode": "Modo",
+  "Désactivé": "Desativado",
+  "Fixe (jouer N, couper M)": "Fixo (tocar N, cortar M)",
+  "Progressif (coupures 1, 2, 4, 8…)": "Progressivo (cortes 1, 2, 4, 8…)",
+  "Aléatoire": "Aleatório",
+  "Cible": "Alvo",
+  "Tout (comportement classique)": "Tudo (comportamento clássico)",
+  "Pulsation (clic)": "Pulsação (clique)",
+  "Mesures jouées (N)": "Compassos tocados (N)",
+  "Mesures coupées (M)": "Compassos cortados (M)",
+  "Probabilité de coupure (aléatoire)": "Probabilidade de corte (aleatório)",
+  "La cible se coupe, l'aiguille continue de tourner.": "O alvo é cortado, a agulha continua girando.",
+  ": tout le son (gap classique), la pulsation seule, ou une seule voix (clave ou percussion) — les autres continuent, pour tester la solidité de chaque voix. En mode progressif, la durée des coupures double à chaque cycle (1, 2, 4, 8 mesures, plafonné à 16) : aucun filet de sécurité.": ": todo o som (gap clássico), apenas a pulsação, ou uma única voz (clave ou percussão) — os outros continuam, para testar a solidez de cada voz. No modo progressivo, a duração dos cortes dobra a cada ciclo (1, 2, 4, 8 compassos, limitado a 16): sem rede de segurança.",
+  "Son du clic": "Som do clique",
+  "fréquence · caractère": "frequência · caráter",
+  "Fréquence pulsation": "Frequência da pulsação",
+  "1000 Hz": "1000 Hz",
+  "Caractère": "Caráter",
+  "Tonal (ping)": "Tonal (ping)",
+  "Sec (bruit, type rimshot)": "Seco (ruído, tipo rimshot)",
+  "Clic grave et sourd pour trancher avec un agogô · clic sec et brillant pour percer face à une contrebasse ou des dunduns.": "Clique grave e surdo para contrastar com um agogô · clique seco e brilhante para perfurar através de um contrabaixo ou dunduns.",
+  "Routine programmée": "Rotina programada",
+  "script": "script",
+  "# Exemple de routine # 5 min à 80 BPM 80bpm 5min # accelerando : 80 → 120 en 10 min 80->120bpm 10min # gap : couper 2 mesures toutes les 16 gap 2/16 120bpm 32mes gap off swing 62 100bpm 16mes": "# Exemplo de rotina # 5 min a 80 BPM 80bpm 5min # accelerando : 80 → 120 em 10 min 80->120bpm 10min # gap : cortar 2 compassos a cada 16 gap 2/16 120bpm 32comp gap off swing 62 100bpm 16comp",
+  "▶ Lancer la routine": "▶ Iniciar rotina",
+  "■ Arrêter la routine": "■ Parar rotina",
+  "80bpm 5min": "80bpm 5min",
+  "80->120bpm 10min": "80->120bpm 10min",
+  "(rampe) ·": "(rampa) ·",
+  "100bpm 16mes": "100bpm 16comp",
+  "gap 2/16": "gap 2/16",
+  "gap off": "gap off",
+  "swing 62": "swing 62",
+  "· lignes": "· linhas",
+  "= commentaires. Les changements s'appliquent à la mesure suivante.": "= comentários. As mudanças aplicam-se ao compasso seguinte.",
+  "Bibliothèque partagée": "Biblioteca compartilhada",
+  "routines · Supabase": "rotinas · Supabase",
+  "Publier la routine": "Publicar rotina",
+  "Charger la bibliothèque": "Carregar biblioteca",
+  "Le": "O",
+  "canon": "cânone",
+  "(routines de référence) est visible sans connexion.": "(rotinas de referência) é visível sem login.",
+  "Connecte-toi": "Entre",
+  "(en haut) pour voir les routines de la classe et publier les tiennes. « Importer » place la routine dans l'éditeur ci-dessus.": "(no topo) para ver as rotinas da turma e publicar as suas. \"Importar\" coloca a rotina no editor acima.",
+  "Espace : lecture · ↑↓ : tempo ±1 · T : tap tempo": "Espaço: tocar · ↑↓: tempo ±1 · T: tap tempo",
+  "92 BPM": "92 BPM",
+  "✕ Fermer": "✕ Fechar",
+  "Percussion": "Percussão",
+  "Assistant de réglage": "Assistente de configuração",
+  "Que veux-tu travailler ?": "O que você quer praticar?",
+  "Choisis un contexte — tu poseras tout le reste à la main, en direct.": "Escolha um contexto — você configurará todo o resto manualmente, ao vivo.",
+  "Un tempo, un clic": "Um tempo, um clique",
+  "Métronome nu — tempo, mesure, subdivision. Rien d’autre.": "Metrônomo nu — tempo, compasso, subdivisão. Nada mais.",
+  "Pile rythmique": "Pilha rítmica",
+  "Pulsation, claves et percussions se posent ensemble sur le même cycle.": "Pulsação, claves e percussões assentam juntas no mesmo ciclo.",
+  "Coups d’archet": "Golpes de arco",
+  "Aller-retour de l’archet visualisés — du violon à la contrebasse. Mode à part.": "Movimento do arco visualizado — do violino ao contrabaixo. Modo à parte.",
+  "← Retour": "← Voltar",
+  "Passer l'assistant": "Pular assistente",
+  "Continuer →": "Continuar →",
+  "Écran d'accueil": "Tela inicial",
+  "Prêt à jouer ?": "Pronto para tocar?",
+  "Deux choix — tout le reste s'ajuste ensuite derrière « Configurer ».": "Duas opções — todo o resto se ajusta depois em \"Configurar\".",
+  "On joue…": "Nós tocamos…",
+  "Seul": "Sozinho",
+  "toute la ligne jouable est à moi": "toda a linha tocável é minha",
+  "À plusieurs": "Em grupo",
+  "chacun sa ligne — même groove, même classement, même répartition sur chaque appareil": "cada um com sua linha — mesmo groove, mesma classificação, mesma distribuição em cada dispositivo",
+  "Nombre de joueurs": "Número de jogadores",
+  "Apprentissage": "Aprendizado",
+  "(ajout progressif sur ma ligne)": "(adição progressiva na minha linha)",
+  "Oui": "Sim",
+  "ma ligne se construira frappe par frappe — choix mémorisé, l'exercice arrive à la prochaine étape": "minha linha será construída toque por toque — escolha salva, o exercício chega à próxima etapa",
+  "Non": "Não",
+  "je joue la ligne complète": "eu toco a linha completa",
+  "C'est parti →": "Vamos lá →",
+  "Recevoir un lien de connexion par e-mail": "Receber um link de acesso por e-mail",
+  "English / Français": "Inglês / Francês",
+  "Langue / Language": "Idioma / Language",
+  "Tempo -1": "Tempo -1",
+  "Tempo +1": "Tempo +1",
+  "Coupe le clic (pulsation, subdivisions, clic décalé) — clave et percussion continuent": "Corta o clique (pulsação, subdivisões, clique deslocado) — clave e percussão continuam",
+  "Durée enregistrée de ce qui joue": "Duração gravada do que está tocando",
+  "Rouvrir l'écran d'accueil (seul / à plusieurs · apprentissage)": "Reabrir a tela inicial (sozinho / em grupo · aprendizado)",
+  "Famille": "Família",
+  "Nombre de pas du cycle — 12 ou 16 bascule la famille (clave + percussion) ; 8 = cellule courte propre à la clave": "Número de passos do ciclo — 12 ou 16 alterna a família (clave + percussão); 8 = célula curta própria da clave",
+  "Pas du cycle — asservi à la famille : bascule clave + percussion ensemble": "Passo do ciclo — vinculado à família: alterna clave + percussão juntas",
+  "nom de la séquence…": "nome da sequência…",
+  "Supprimer la séquence sélectionnée": "Excluir a sequência selecionada",
+  "Revenir à la percussion focale": "Voltar à percussão focal",
+  "Répartir les voix en équilibrant la charge de jeu (frappes) et les tessitures": "Distribuir as vozes equilibrando a carga de tocar (toques) e as tessituras",
+  "Titre de la routine à publier": "Título da rotina a publicar",
+  "Connecte-toi (en haut) pour publier": "Entre (no topo) para publicar",
+  "◐ Mode clair": "◐ Modo claro",
+  "Ton compte": "Sua conta",
+  "Se déconnecter": "Sair",
+  "■ Arrêter": "■ Parar",
+  "⟲ Tout réinitialiser": "⟲ Redefinir tudo",
+  "Tout remettre par défaut — la langue, le thème et ton compte sont conservés": "Restaurar os padrões — o idioma, o tema e sua conta são mantidos",
+  "L'assistant règle le métronome pour toi en trois questions": "O assistente configura o metrônomo para você em três perguntas",
+  "Basculer entre thème clair et thème sombre": "Alternar entre tema claro e tema escuro",
+  "mesure : 2/4 · 3/4 (valse) · 4/4…": "compasso: 2/4 · 3/4 (valsa) · 4/4…",
+  "Nombre de temps dans chaque mesure : 2 = 2/4, 3 = 3/4 (valse), 4 = 4/4…": "Número de tempos por compasso: 2 = 2/4, 3 = 3/4 (valsa), 4 = 4/4…",
+  "Sourdine générale (coupe tout le son en un clic)": "Mudo geral (corta todo o som em um clique)",
+  "Sommaire des sections": "Índice das seções",
+  "Groove": "Groove",
+  "Claves": "Claves",
+  "Cours funk": "Curso de funk",
+  "Horloge": "Relógio",
+  "Son": "Som",
+  "Script": "Script",
+  "Bibliothèque": "Biblioteca",
+  "Export": "Exportar",
+  "↑ Haut": "↑ Topo",
+  "Revenir en haut de la page": "Voltar ao topo da página",
+  "Micro-timing : décaler certaines frappes de quelques millisecondes autour du temps — c'est ce qui fait « groover »": "Micro-timing: deslocar alguns toques por alguns milissegundos ao redor do tempo — é isso que faz o groove",
+  "Swing : on retarde une croche sur deux — 50 % = binaire droit, 66 % = ternaire. Placement : jouer un peu avant ou après le clic": "Swing: uma colcheia em cada duas é atrasada — 50% = reto, 66% = ternário. Posicionamento: tocar um pouco antes ou depois do clique",
+  "Une clave est une courte cellule rythmique qui se répète et sert de repère à tout le morceau (son, rumba, tresillo…)": "Uma clave é uma célula rítmica curta que se repete e serve de referência para toda a música (son, rumba, tresillo…)",
+  "Gap clicks : le métronome se tait quelques mesures puis revient — à toi de tenir le tempo pendant le silence": "Gap clicks: o metrônomo silencia por alguns compassos e depois volta — mantenha o tempo durante o silêncio",
+  "L'accompagnement (backing track) : les voix que l'appli joue à ta place": "O acompanhamento (backing track): as vozes que o app toca no seu lugar",
+  "Drop-outs : la basse se tait quelques mesures puis revient — garde le tempo pendant le silence": "Drop-outs: o baixo silencia por alguns compassos e depois volta — mantenha o tempo durante o silêncio",
+  "silences (drop-outs)": "silêncios (drop-outs)",
+  "Silences (drop-outs) — la basse se tait": "Silêncios (drop-outs) — o baixo se cala",
+  "Coupures traversées": "Cortes atravessados",
+  "Nombre de coupures traversées depuis le dernier départ — chaque silence tenu jusqu'au bout compte pour un": "Número de cortes atravessados desde a última partida — cada silêncio mantido até o fim conta como um",
+  "✓ Réglages enregistrés automatiquement": "✓ Configurações salvas automaticamente",
+  "Agrandir l'archet en plein écran": "Ampliar o arco em tela cheia",
+  "Reçois un lien de connexion par e-mail — aucun mot de passe à retenir.": "Receba um link de acesso por e-mail — nenhuma senha para lembrar.",
+  "L'application fonctionne aussi sans compte : la connexion sert seulement à partager tes routines et suivre ta progression.": "O app também funciona sem conta: entrar serve apenas para compartilhar suas rotinas e acompanhar seu progresso.",
+  "Pas reçu au bout d'une minute ? Vérifie tes indésirables (spams), ou renvoie le lien.": "Nada depois de um minuto? Verifique sua caixa de spam, ou reenvie o link.",
+  "Renvoyer le lien": "Reenviar o link",
+  "En savoir plus": "Saiba mais",
+  "Débutant ? Laisse-toi guider": "Iniciante? Deixe-se guiar",
+  "— l'assistant règle le métronome pour toi en trois questions.": "— o assistente ajusta o metrônomo para você em três perguntas.",
+  "Plus tard": "Mais tarde",
+  "Une section à la fois": "Uma seção de cada vez",
+  "Ouvrir une section referme les autres": "Abrir uma seção fecha as outras",
+  /* ===== 0.6.9 (C4+C10) : statuts dynamiques, aria-labels, hint basse, libellés UI (audit I4) ===== */
+  "Arrêté": "Parado",
+  "Groove vide — choisis un style ou ajoute des frappes, puis relance le mode guidé.": "Groove vazio — escolha um estilo ou adicione toques, depois reinicie o modo guiado.",
+  "Il ne restait que les ancres — groove de base restauré.": "Só restavam as âncoras — groove de base restaurado.",
+  "À toi : rejoue le break !": "Sua vez: toque o break!",
+  "Appel : écoute…": "Chamada: escute…",
+  "Micro-timing armé — glisse à gauche/droite": "Micro-timing armado — deslize para a esquerda/direita",
+  "pas": "passo",
+  "+ frappe ajoutée :": "+ toque adicionado:",
+  "− frappe retirée :": "− toque removido:",
+  "Continue à la jouer dans ta tête !": "Continue tocando na sua cabeça!",
+  "Appel : écoute la variation": "Chamada: escute a variação",
+  "BREAK — niveau": "BREAK — nível",
+  "Groove — break dans": "Groove — break em",
+  "mesure": "compasso",
+  "mesures": "compassos",
+  "Mesure": "Compasso",
+  "gap actif": "gap ativo",
+  "ajout": "adição",
+  "ajouts": "adições",
+  "Réponse : à toi ! La voix": "Resposta: sua vez! A voz",
+  "se tait": "se cala",
+  "Micro-décalage remis à zéro": "Micro-deslocamento zerado",
+  "% du pas": "% do passo",
+  "droite = laid back, gauche = en avance": "direita = laid back, esquerda = adiantado",
+  "Séquence": "Sequência",
+  "chargée": "carregada",
+  "sauvegardée": "salva",
+  "supprimée": "excluída",
+  "Kit généré :": "Kit gerado:",
+  "● COUPÉ — tiens le tempo !": "● CORTADO — segure o tempo!",
+  "en silence, le reste continue": "em silêncio, o resto continua",
+  "◆ BREAK — niveau": "◆ BREAK — nível",
+  "◆ À toi — rejoue le break !": "◆ Sua vez — toque o break!",
+  "Tout remettre par défaut ? (La langue, le thème et ton compte sont conservés.)": "Restaurar os padrões? (O idioma, o tema e sua conta são mantidos.)",
+  "Densité de la basse": "Densidade do baixo",
+  "Décalage de placement (ms)": "Deslocamento de posicionamento (ms)",
+  "Presets de clave": "Presets de clave",
+  "Séquences sauvegardées": "Sequências salvas",
+  "Groove du répertoire": "Groove do repertório",
+  "Script de routine": "Script de rotina",
+  "Roue du métronome — les temps du cycle": "Roda do metrônomo — os tempos do ciclo",
+  "Réglage du tempo": "Ajuste do tempo",
+  "Une voix de basse funk synthétisée qui accompagne le percussionniste — pour caler le jeu sur ses syncopes et ses silences (FUNK-I2).": "Uma voz de baixo funk sintetizada que acompanha o percussionista — para encaixar o toque nas suas síncopes e silêncios (FUNK-I2).",
+  "Choisis un": "Escolha um",
+  "gabarit": "modelo",
+  ", une": ", uma",
+  "progression": "progressão",
+  "(du vamp 1 accord au blues 12 mesures), une": "(do vamp de 1 acorde ao blues de 12 compassos), uma",
+  "tonalité": "tonalidade",
+  ", la": ", a",
+  "densité": "densidade",
+  "(allégé → chargé) et le profil de": "(leve → carregado) e o perfil de",
+  "dynamique": "dinâmica",
+  ". L'": ". O ",
+  "accord": "acorde",
+  "courant s'affiche pour travailler l'oreille : rejoue la même progression dans une autre tonalité et tu entends la transposition.": "atual é exibido para treinar o ouvido: toque a mesma progressão em outra tonalidade e você ouve a transposição.",
+  "Variations": "Variações",
+  "activé, la ligne se joue de façon vivante (tirage des ornements) ; désactivé, elle est régulière et prévisible. La ligne s'allège et se raccourcit d'elle-même quand le tempo monte.": "ativado, a linha é tocada de forma viva (sorteio dos ornamentos); desativado, ela é regular e previsível. A linha fica mais leve e mais curta sozinha quando o andamento sobe.",
+  "Le curseur": "O cursor",
+  "détaché ↔ lié": "destacado ↔ ligado",
+  "dose le liant entre les notes (les ghosts restent piqués).": "dosa a ligação entre as notas (os ghosts continuam picados).",
+  "Espace": "Espaço",
+  "ajoute une réverb très courte sur la basse seule — l'attaque et le": "adiciona uma reverberação bem curta apenas no baixo — o ataque e o",
+  "restent nets.": "continuam nítidos.",
+  ": la basse se tait périodiquement (trou en fin de période) et re-rentre sur le 1 — tiens le": ": o baixo silencia periodicamente (buraco no fim do período) e volta no 1 — segure o",
+  "pendant le silence, la re-entrée te confirme ou te corrige ; percussion et pulsation continuent.": "durante o silêncio; a reentrada confirma ou corrige você — percussão e pulsação continuam.",
+  "La basse suit le swing": "O baixo segue o swing",
+  "cale ses doubles-croches sur le swing du métronome (section Micro-timing).": "encaixa as semicolcheias no swing do metrônomo (seção Micro-timing).",
+  "Basse :": "Baixo:",
+  "activer": "ativar",
+  "1 — allégé": "1 — leve",
+  "2 — normal": "2 — normal",
+  "3 — chargé": "3 — carregado",
+  "basse": "baixo",
+  "Cajón + cimbalette (grave · aigu · cimbalette)": "Cajón + platinelas (grave · agudo · platinelas)",
+  "Cajón + cimbalette": "Cajón + platinelas",
+  "Basse funk": "Baixo funk",
+  "accompagnement génératif": "acompanhamento generativo",
+  "Activer la basse": "Ativar o baixo",
+  "Gabarit": "Modelo",
+  "The One — ancre sur le 1": "The One — âncora no 1",
+  "Syncope grave — décalé autour du 1": "Síncope grave — deslocada ao redor do 1",
+  "Octaves — pompe disco-funk": "Oitavas — pulso disco-funk",
+  "Ghost pendule — nappe de 16es": "Ghost pêndulo — tapete de semicolcheias",
+  "Tonalité": "Tonalidade",
+  "Do (C)": "Dó (C)",
+  "Do♯ (C#)": "Dó♯ (C#)",
+  "Ré (D)": "Ré (D)",
+  "Ré♯ (D#)": "Ré♯ (D#)",
+  "Mi (E)": "Mi (E)",
+  "Fa (F)": "Fá (F)",
+  "Fa♯ (F#)": "Fá♯ (F#)",
+  "Sol (G)": "Sol (G)",
+  "Sol♯ (G#)": "Sol♯ (G#)",
+  "La (A)": "Lá (A)",
+  "La♯ (A#)": "Lá♯ (A#)",
+  "Si (B)": "Si (B)",
+  "Progression": "Progressão",
+  "Vamp 1 accord — James Brown": "Vamp de 1 acorde — James Brown",
+  "i⁷ → IV⁷ — Chameleon (dorien)": "i⁷ → IV⁷ — Chameleon (dórico)",
+  "I⁷ → ♭VII — mixolydien (War)": "I⁷ → ♭VII — mixolídio (War)",
+  "Blues funk — 12 mesures": "Blues funk — 12 compassos",
+  "Accord": "Acorde",
+  "Densité": "Densidade",
+  "Dynamique": "Dinâmica",
+  "Plate — peu de contraste": "Plana — pouco contraste",
+  "Mixte": "Mista",
+  "Contrastée — poche accents/ghosts": "Contrastada — pocket de acentos/ghosts",
+  "Variations (jeu vivant)": "Variações (toque vivo)",
+  "Lié ↔ très lié": "Ligado ↔ muito ligado",
+  "Espace (réverb courte)": "Espaço (reverb curta)",
+  "toutes les": "a cada",
+  "mesures, trou de": "compassos, buraco de",
+  "temps": "tempos",
+  "parcours · intermédiaire": "percurso · intermediário",
+  "Deux parcours parallèles — cajón et djembé. « Charger » installe l'accompagnement de basse de l'exercice ; tu joues par-dessus. Coche « acquis » quand le critère est atteint ; le vote de difficulté aide à recalibrer le niveau pour tout le monde.": "Dois percursos paralelos — cajón e djembê. « Carregar » instala o acompanhamento de baixo do exercício; você toca por cima. Marque « adquirido » quando o critério for atingido; o voto de dificuldade ajuda a recalibrar o nível para todos.",
+  "L'assistant règle le métronome pour toi — tu pourras tout ajuster ensuite.": "O assistente ajusta o metrônomo para você — depois você pode ajustar tudo.",
+  "Durée à enregistrer (la boucle en cours)": "Duração a gravar (o loop atual)",
+  "minutes": "minutos",
+  "secondes": "segundos",
+  "Décalage -1 ms": "Deslocamento -1 ms",
+  "Décalage +1 ms": "Deslocamento +1 ms"
+} };
+window.fmTr = (function(){
+  function norm(t){ return (t||'').replace(/\s+/g,' ').trim(); }
+  function lang(){ try{ var q=new URLSearchParams(location.search).get('lang'); var l=q||localStorage.getItem('fm-lang')||'fr'; return ['fr','en','pt'].indexOf(l)>=0?l:'fr'; }catch(e){ return 'fr'; } }
+  return function(fr){ var l=lang(); if(l==='fr') return fr; var D=(window.__I18N||{})[l]; return (D && D[norm(fr)]) || fr; };
+})();
+</script>
 </head>
 <body>
 <div class="app">
@@ -588,7 +1625,7 @@
     <div class="brand">
       <h1>Métronome</h1>
       <div class="kicker">Formation musicale · Groove &amp; horloge interne</div>
-      <div class="build-stamp" id="buildStamp" style="font-size:11px;opacity:.5;margin-top:2px;font-variant-numeric:tabular-nums;"></div>
+      <div class="build-stamp" id="buildStamp" style="font-size:13px;opacity:.75;margin-top:2px;font-variant-numeric:tabular-nums;"></div>
     </div>
     <div class="header-actions">
       <div class="seg" role="group" aria-label="Mode">
@@ -612,9 +1649,9 @@
     <div class="card">
       <div class="tempo-value" id="tempoValue">92</div>
       <div class="tempo-label">BPM · <em id="tempoName">Moderato</em></div>
-      <div class="slider-row">
+      <div class="slider-row" role="group" aria-label="Réglage du tempo">
         <button id="minusBtn" aria-label="Tempo -1">−</button>
-        <input type="range" id="tempoSlider" min="30" max="260" value="92">
+        <input type="range" id="tempoSlider" min="30" max="260" value="92" aria-label="Tempo (BPM)">
         <button id="plusBtn" aria-label="Tempo +1">+</button>
       </div>
       <div class="main-buttons">
@@ -641,7 +1678,7 @@
           </select>
         </div>
         <div>
-          <label class="small">Volume <span id="volVal" style="font-variant-numeric:tabular-nums">· 80 %</span></label>
+          <label for="volSlider" class="small">Volume <span id="volVal" style="font-variant-numeric:tabular-nums">· 80 %</span></label>
           <div style="display:flex;align-items:center;gap:6px">
             <input type="range" id="volSlider" min="0" max="100" value="80" style="flex:1;min-width:0">
             <button class="btn-sm" id="volMuteBtn" title="Sourdine générale (coupe tout le son en un clic)" aria-pressed="false">🔊</button>
@@ -657,17 +1694,17 @@
 
     <!-- Cercle -->
     <div class="card staff circle-wrap">
-      <canvas id="wheel" width="320" height="320"></canvas>
-      <div class="status-line" id="statusLine">Prêt</div>
-      <div class="exp-audio" id="expAudio" style="margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center">
+      <canvas id="wheel" width="320" height="320" role="img" aria-label="Roue du métronome — les temps du cycle"></canvas>
+      <div class="status-line" id="statusLine" role="status" aria-live="polite">Prêt</div>
+      <div class="exp-audio" id="expAudio" role="group" aria-label="Export audio (WAV / MP3)" style="margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center">
         <span class="sec-sub" style="text-transform:none;letter-spacing:0">Export audio (WAV / MP3)</span>
-        <label class="exp-dur" title="Durée à enregistrer (la boucle en cours)" style="display:inline-flex;align-items:center;gap:4px;color:var(--fm-sub);font-size:.8rem">Durée
+        <label class="exp-dur" title="Durée à enregistrer (la boucle en cours)" style="display:inline-flex;align-items:center;gap:4px;color:var(--fm-sub);font-size: .8125rem">Durée
           <input id="expMin" type="number" min="0" max="60" value="0" inputmode="numeric" aria-label="minutes" style="width:44px;text-align:right"> min
           <input id="expSec" type="number" min="0" max="59" value="30" inputmode="numeric" aria-label="secondes" style="width:44px;text-align:right"> s
         </label>
         <button class="btn-sm" id="btnExpWav">WAV</button>
         <button class="btn-sm" id="btnExpMp3">MP3</button>
-        <span class="script-status" id="expFb"></span>
+        <span class="script-status" id="expFb" role="status" aria-live="polite"></span>
       </div>
     </div>
   </div>
@@ -683,7 +1720,7 @@
     </div>
     <div class="play-bar">
       <span id="playWhoWrap" style="display:none;align-items:center;gap:8px">
-        <label style="min-width:auto;">Je suis :</label>
+        <label for="playWho" style="min-width:auto;">Je suis :</label>
         <select id="playWho" style="width:auto;"><option value="solo">Solo</option></select>
       </span>
       <label class="check" title="L'accompagnement (backing track) : les voix que l'appli joue à ta place"><input type="checkbox" id="playBacking" checked> Voir l'accompagnement</label>
@@ -695,7 +1732,7 @@
     <div class="play-bar play-bass" id="playBassGroup">
       <label style="min-width:auto;">Basse :</label>
       <label class="check"><input type="checkbox" id="playBassOn"> activer</label>
-      <select id="playBassDensity" style="width:auto;">
+      <select id="playBassDensity" style="width:auto;" aria-label="Densité de la basse">
         <option value="1">1 — allégé</option>
         <option value="2" selected>2 — normal</option>
         <option value="3">3 — chargé</option>
@@ -740,7 +1777,7 @@
       <div class="row">
         <label>Swing (asymétrique, libre)</label>
         <button class="nudge" id="swingMinus" aria-label="Swing -1 %">−</button>
-        <input type="range" id="swingSlider" min="50" max="85" value="50">
+        <input type="range" id="swingSlider" min="50" max="85" value="50" aria-label="Swing (%)">
         <button class="nudge" id="swingPlus" aria-label="Swing +1 %">+</button>
         <span class="val" id="swingVal">50 %</span>
       </div>
@@ -752,12 +1789,12 @@
       <div class="row">
         <label>Décalage</label>
         <button class="nudge" id="shiftMinus" aria-label="Décalage -1 ms">−</button>
-        <input type="range" id="shiftSlider" min="-80" max="80" value="25">
+        <input type="range" id="shiftSlider" min="-80" max="80" value="25" aria-label="Décalage de placement (ms)">
         <button class="nudge" id="shiftPlus" aria-label="Décalage +1 ms">+</button>
         <span class="val" id="shiftVal">+25 ms</span>
       </div>
       <div class="row">
-        <label>Fréquence du clic décalé</label>
+        <label for="shiftFreq">Fréquence du clic décalé</label>
         <input type="range" id="shiftFreq" min="80" max="800" value="220">
         <span class="val" id="shiftFreqVal">220 Hz</span>
       </div>
@@ -782,7 +1819,7 @@
     <summary><span class="sec-title"><span class="term" tabindex="0" title="Une clave est une courte cellule rythmique qui se répète et sert de repère à tout le morceau (son, rumba, tresillo…)">Claves &amp; cellules rythmiques</span></span><span class="sec-sub">séquenceur · polyrythmie</span></summary>
     <div class="section-body">
       <div class="preset-row">
-        <select id="clavePreset">
+        <select id="clavePreset" aria-label="Presets de clave">
           <option value="">— Presets —</option>
           <option value="son32">Son clave 3-2 (16)</option>
           <option value="son23">Son clave 2-3 (16)</option>
@@ -806,7 +1843,7 @@
       les presets se posent sur la grave, la seconde voix est libre (contre-clave, bombo…).
       Le cercle montre comment la cellule se résout sur le 1 du cycle suivant.</span></details></div>
       <div class="row" style="margin-top:14px;">
-        <label>Polyrythmie superposée</label>
+        <label for="polySel">Polyrythmie superposée</label>
         <select id="polySel" style="width:auto;">
           <option value="0" selected>Aucune</option>
           <option value="2">2 par cycle</option>
@@ -826,7 +1863,7 @@
     <div class="section-body">
       <div class="row">
         <label class="check"><input type="checkbox" id="percOn"> Activer</label>
-        <label style="min-width:auto;">Instrument</label>
+        <label for="percInstr" style="min-width:auto;">Instrument</label>
         <select id="percInstr" style="width:auto;">
           <option value="djembe" selected>Djembé (basse · tone · slap)</option>
           <option value="cajon">Cajón (grave · aigu)</option>
@@ -844,7 +1881,7 @@
         <button class="btn-sm primary" id="percFsBtn">⛶ Plein écran</button>
       </div>
       <div class="row">
-        <label>Style</label>
+        <label for="percStyle">Style</label>
         <select id="percStyle" style="flex:1;min-width:200px;"></select>
       </div>
       <div class="perc-line-wrap">
@@ -853,7 +1890,7 @@
       </div>
       <div id="percVoices"></div>
       <div class="row" style="margin-top:14px;">
-        <label>Exercice</label>
+        <label for="percMode">Exercice</label>
         <select id="percMode" style="width:auto;">
           <option value="off" selected>Libre (groove seul)</option>
           <option value="add">Ajout progressif (une frappe à la fois)</option>
@@ -863,12 +1900,12 @@
           <option value="break">Break programmé (toutes les N mesures)</option>
         </select>
         <span id="percWorkWrap" style="display:flex;align-items:center;gap:12px;">
-          <label style="min-width:auto;">Voix travaillée</label>
+          <label for="percWork" style="min-width:auto;">Voix travaillée</label>
           <select id="percWork" style="width:auto;"></select>
         </span>
       </div>
       <div class="row">
-        <label>Mains</label>
+        <label for="percHandRule">Mains</label>
         <select id="percHandRule" style="width:auto;">
           <option value="alt" selected>Alternance stricte D-G</option>
           <option value="lead">Main directrice sur les temps</option>
@@ -880,9 +1917,9 @@
         </span>
       </div>
       <div class="row" id="percBreakRow">
-        <label>Break / phrase</label>
+        <label for="percBreakSel">Break / phrase</label>
         <select id="percBreakSel" style="flex:1;min-width:180px;"></select>
-        <label style="min-width:auto;">Niveau</label>
+        <label for="percBreakLvl" style="min-width:auto;">Niveau</label>
         <select id="percBreakLvl" style="width:auto;">
           <option value="1">1 (début de phrase)</option>
           <option value="2">2</option>
@@ -893,19 +1930,19 @@
         <label class="check"><input type="checkbox" id="percBreakEcho"> réponse après</label>
       </div>
       <div class="row" id="percPeriodRow">
-        <label>Variation toutes les</label>
+        <label for="percPeriod">Variation toutes les</label>
         <input type="number" id="percPeriod" min="1" max="16" value="2" style="width:70px;">
         <span class="hint" style="margin:0;">mesures (paires en appel-réponse)</span>
       </div>
       <div class="row" style="margin-top:12px;">
-        <label>Mes séquences</label>
+        <label for="percSaveName">Mes séquences</label>
         <input type="text" id="percSaveName" placeholder="nom de la séquence…" style="width:150px;">
         <button class="btn-sm" id="percSaveBtn">💾 Sauver</button>
-        <select id="percSavedSel" style="flex:1;min-width:140px;"></select>
+        <select id="percSavedSel" style="flex:1;min-width:140px;" aria-label="Séquences sauvegardées"></select>
         <button class="btn-sm" id="percLoadBtn">Charger</button>
         <button class="btn-sm" id="percDelBtn" title="Supprimer la séquence sélectionnée">✕</button>
       </div>
-      <div class="script-status" id="percStatus"></div>
+      <div class="script-status" id="percStatus" role="status" aria-live="polite"></div>
       <div class="hint">Clic sur un pas : silence → frappe → accent.
       <details class="hint-more"><summary>En savoir plus</summary><span class="hm-body">
       <ul>
@@ -938,14 +1975,14 @@
     <summary><span class="sec-title">Répertoire de grooves</span><span class="sec-sub">choisis un groove · puis l'instrument de jeu</span></summary>
     <div class="section-body">
       <div class="row">
-        <label>Répertoire</label>
+        <label for="tsFamily">Répertoire</label>
         <select id="tsFamily" style="width:auto;"></select>
-        <select id="tsGroove" style="flex:1;min-width:200px;"></select>
+        <select id="tsGroove" style="flex:1;min-width:200px;" aria-label="Groove du répertoire"></select>
         <button class="btn-sm primary" id="tsLoad">Charger</button>
         <button class="btn-sm" id="tsUnload" title="Revenir à la percussion focale">Décharger</button>
       </div>
       <div class="row">
-        <label>Jouer tout à</label>
+        <label for="tsOverride">Jouer tout à</label>
         <select id="tsOverride" style="width:auto;">
           <option value="authentique" selected>Instruments authentiques</option>
         </select>
@@ -975,7 +2012,7 @@
       <div class="ts-wizbox">
         <div class="row">
           <label>Qui joue quoi ?</label>
-          <label style="min-width:auto;">Joueurs</label>
+          <label for="tsWizN" style="min-width:auto;">Joueurs</label>
           <input type="number" id="tsWizN" min="1" max="12" value="1" style="width:64px;">
           <button class="btn-sm primary" id="tsWizRun">Répartir selon priorités</button>
           <label class="check" title="L'accompagnement (backing track) : les voix que l'appli joue à ta place"><input type="checkbox" id="tsBacking" checked> Accompagnement (backing track) — l'app joue les lignes écartées</label>
@@ -1009,14 +2046,14 @@
     <summary><span class="sec-title">Archet</span><span class="sec-sub">tirer · pousser · dérive</span></summary>
     <div class="section-body">
       <div class="row">
-        <label>Instrument</label>
+        <label for="bowInstr">Instrument</label>
         <select id="bowInstr" style="width:auto;">
           <option value="violon" selected>Violon / Alto</option>
           <option value="cello">Violoncelle</option>
           <option value="cbfr">Contrebasse — archet français</option>
           <option value="cbde">Contrebasse — archet allemand</option>
         </select>
-        <label style="min-width:auto;">Coup d'archet</label>
+        <label for="bowTech" style="min-width:auto;">Coup d'archet</label>
         <select id="bowTech" style="width:auto;">
           <option value="detache" selected>Détaché (vitesse constante)</option>
           <option value="legato">Legato / liaisons (souple)</option>
@@ -1025,7 +2062,7 @@
         </select>
       </div>
       <div class="row">
-        <label>Exercice</label>
+        <label for="bowPreset">Exercice</label>
         <select id="bowPreset" style="flex:1;min-width:220px;">
           <option value="debutant" selected>Débutant — chaque noire = archet complet</option>
           <option value="det_noires">Détaché — noires (moitié d'archet)</option>
@@ -1039,7 +2076,7 @@
         </select>
       </div>
       <div class="row">
-        <label>Séquence (éditable)</label>
+        <label for="bowSeqInput">Séquence (éditable)</label>
         <input type="text" id="bowSeqInput" value="T92x1, P92x1" style="flex:1;min-width:220px;font-family:Consolas,Menlo,monospace;">
         <button class="btn-sm" id="bowApply">Appliquer</button>
         <button class="btn-sm primary" id="bowFsBtn">⛶ Plein écran</button>
@@ -1069,14 +2106,14 @@
         <label class="check"><input type="checkbox" id="bassOn"> Activer la basse</label>
       </div>
       <div class="row">
-        <label>Gabarit</label>
+        <label for="bassPattern">Gabarit</label>
         <select id="bassPattern" style="width:auto;">
           <option value="theOne" selected>The One — ancre sur le 1</option>
           <option value="syncopeGrave">Syncope grave — décalé autour du 1</option>
           <option value="octaves">Octaves — pompe disco-funk</option>
           <option value="ghostPendule">Ghost pendule — nappe de 16es</option>
         </select>
-        <label style="min-width:auto;">Tonalité</label>
+        <label for="bassKey" style="min-width:auto;">Tonalité</label>
         <select id="bassKey" style="width:auto;">
           <option value="C">Do (C)</option>
           <option value="C#">Do♯ (C#)</option>
@@ -1093,7 +2130,7 @@
         </select>
       </div>
       <div class="row">
-        <label>Progression</label>
+        <label for="bassProg">Progression</label>
         <select id="bassProg" style="width:auto;">
           <option value="vamp1" selected>Vamp 1 accord — James Brown</option>
           <option value="vamp2">I⁷ → IV⁷ — Sex Machine</option>
@@ -1106,13 +2143,13 @@
         <span id="bassChord" aria-live="polite" style="font-weight:600;font-variant-numeric:tabular-nums;padding:2px 8px;">E7</span>
       </div>
       <div class="row">
-        <label>Densité</label>
+        <label for="bassDensity">Densité</label>
         <select id="bassDensity" style="width:auto;">
           <option value="1">1 — allégé</option>
           <option value="2" selected>2 — normal</option>
           <option value="3">3 — chargé</option>
         </select>
-        <label style="min-width:auto;">Dynamique</label>
+        <label for="bassVel" style="min-width:auto;">Dynamique</label>
         <select id="bassVel" style="width:auto;">
           <option value="plat">Plate — peu de contraste</option>
           <option value="mixte" selected>Mixte</option>
@@ -1129,9 +2166,9 @@
       </div>
       <div class="row">
         <label class="check" title="Drop-outs : la basse se tait quelques mesures puis revient — garde le tempo pendant le silence"><input type="checkbox" id="bassDropOn"> Silences (drop-outs) — la basse se tait</label>
-        <label style="min-width:auto;">toutes les</label>
+        <label for="bassDropEvery" style="min-width:auto;">toutes les</label>
         <input type="number" id="bassDropEvery" min="1" max="32" value="4" style="width:70px;">
-        <label style="min-width:auto;">mesures, trou de</label>
+        <label for="bassDropLen" style="min-width:auto;">mesures, trou de</label>
         <input type="number" id="bassDropLen" min="1" max="8" value="2" style="width:70px;">
         <label style="min-width:auto;">temps</label>
       </div>
@@ -1176,24 +2213,24 @@
     <summary><span class="sec-title">Horloge interne</span><span class="sec-sub"><span class="term" tabindex="0" title="Gap clicks : le métronome se tait quelques mesures puis revient — à toi de tenir le tempo pendant le silence">coupures de clic (gap clicks)</span></span></summary>
     <div class="section-body">
       <div class="row">
-        <label>Mode</label>
+        <label for="gapMode">Mode</label>
         <select id="gapMode" style="width:auto;">
           <option value="off" selected>Désactivé</option>
           <option value="fixed">Fixe (jouer N, couper M)</option>
           <option value="prog">Progressif (coupures 1, 2, 4, 8…)</option>
           <option value="rand">Aléatoire</option>
         </select>
-        <label style="min-width:auto;">Cible</label>
+        <label for="gapTarget" style="min-width:auto;">Cible</label>
         <select id="gapTarget" style="width:auto;"></select>
       </div>
       <div class="row">
-        <label>Mesures jouées (N)</label>
+        <label for="gapPlay">Mesures jouées (N)</label>
         <input type="number" id="gapPlay" min="1" max="64" value="4" style="width:80px;">
-        <label style="min-width:auto;">Mesures coupées (M)</label>
+        <label for="gapMute" style="min-width:auto;">Mesures coupées (M)</label>
         <input type="number" id="gapMute" min="1" max="32" value="1" style="width:80px;">
       </div>
       <div class="row">
-        <label>Probabilité de coupure (aléatoire)</label>
+        <label for="gapProb">Probabilité de coupure (aléatoire)</label>
         <input type="range" id="gapProb" min="5" max="80" value="25">
         <span class="val" id="gapProbVal">25 %</span>
       </div>
@@ -1214,12 +2251,12 @@
     <summary><span class="sec-title">Son du clic</span><span class="sec-sub">fréquence · caractère</span></summary>
     <div class="section-body">
       <div class="row">
-        <label>Fréquence pulsation</label>
+        <label for="pulseFreq">Fréquence pulsation</label>
         <input type="range" id="pulseFreq" min="100" max="3000" value="1000">
         <span class="val" id="pulseFreqVal">1000 Hz</span>
       </div>
       <div class="row">
-        <label>Caractère</label>
+        <label for="clickType">Caractère</label>
         <select id="clickType" style="width:auto;">
           <option value="ton" selected>Tonal (ping)</option>
           <option value="sec">Sec (bruit, type rimshot)</option>
@@ -1234,7 +2271,7 @@
   <details class="section" id="secScript" data-strate="enveloppe">
     <summary><span class="sec-title">Routine programmée</span><span class="sec-sub">script</span></summary>
     <div class="section-body">
-      <textarea id="scriptArea" spellcheck="false"># Exemple de routine
+      <textarea id="scriptArea" spellcheck="false" aria-label="Script de routine"># Exemple de routine
 # 5 min à 80 BPM
 80bpm 5min
 # accelerando : 80 → 120 en 10 min
@@ -1261,7 +2298,7 @@ swing 62
     <summary><span class="sec-title">Bibliothèque partagée</span><span class="sec-sub">routines · Supabase</span></summary>
     <div class="section-body">
       <div class="row" style="gap:8px;flex-wrap:wrap">
-        <input id="biblioTitre" type="text" maxlength="120" placeholder="Titre de la routine à publier" style="flex:1;min-width:160px">
+        <input id="biblioTitre" type="text" maxlength="120" placeholder="Titre de la routine à publier" aria-label="Titre de la routine à publier" style="flex:1;min-width:160px">
         <button class="btn-sm primary" id="btnBiblioPublish">Publier la routine</button>
         <button class="btn-sm" id="btnBiblioRefresh">Charger la bibliothèque</button>
       </div>
@@ -1305,7 +2342,7 @@ swing 62
   </div>
   <div class="percfs-body">
     <div id="percFsVoices"></div>
-    <div class="percfs-status" id="percFsStatus"></div>
+    <div class="percfs-status" id="percFsStatus" role="status" aria-live="polite"></div>
   </div>
 </div>
 
@@ -1339,7 +2376,7 @@ swing 62
       <button class="wiz-opt" id="psMulti"><b>À plusieurs</b><small>chacun sa ligne — même groove, même classement, même répartition sur chaque appareil</small></button>
     </div>
     <div class="row hide" id="psNRow" style="margin:10px 0 0;">
-      <label style="min-width:auto;">Nombre de joueurs</label>
+      <label for="psN" style="min-width:auto;">Nombre de joueurs</label>
       <input type="number" id="psN" min="2" max="12" value="2" style="width:72px;">
     </div>
     <div class="wiz-sub" style="margin:18px 0 8px;"><b>Apprentissage</b> (ajout progressif sur ma ligne)</div>
@@ -1401,7 +2438,7 @@ swing 62
 
   // Identité du build affichée dans l'en-tête (5.3-bis). Bumper à chaque passe : elle sert à
   // savoir de quel build vient un enregistrement de validation.
-  const BUILD = 'metronomefunk-0.6.8', BUILD_DATE = '2026-07-14';
+  const BUILD = 'metronomefunk-0.6.9', BUILD_DATE = '2026-07-14';
 
   let audioCtx = null, masterGain = null, noiseBuf = null;
   let masterLimiter = null;                                   // 5.3-ter : limiteur de bus master
@@ -2645,14 +3682,14 @@ swing 62
     }
     $('statusLine').innerHTML = mutedThisCycle
       ? '<span class="mute">' + (S.gap.target === 'all'
-          ? '● COUPÉ — tiens le tempo !'
-          : '● GAP — ' + gapTargetLabel() + ' en silence, le reste continue')
-        + (gapMuteTotal > 1 ? ' · mesure ' + gapMuteDone + '/' + gapMuteTotal : '') + '</span>'
+          ? fmTr('● COUPÉ — tiens le tempo !')
+          : '● GAP — ' + gapTargetLabel() + ' ' + fmTr('en silence, le reste continue'))
+        + (gapMuteTotal > 1 ? ' · ' + fmTr('mesure') + ' ' + gapMuteDone + '/' + gapMuteTotal : '') + '</span>'
       : (S.perc.on && percBreakActive
-        ? '<span class="mute">◆ BREAK — niveau ' + S.perc.breakLevel + '/4</span>'
+        ? '<span class="mute">' + fmTr('◆ BREAK — niveau') + ' ' + S.perc.breakLevel + '/4</span>'
         : (S.perc.on && percBreakEchoNow
-          ? '<span class="mute">◆ À toi — rejoue le break !</span>'
-          : 'Mesure ' + measureCount + (S.gap.mode !== 'off' ? ' · gap actif' : '')));
+          ? '<span class="mute">' + fmTr('◆ À toi — rejoue le break !') + '</span>'
+          : fmTr('Mesure') + ' ' + measureCount + (S.gap.mode !== 'off' ? ' · ' + fmTr('gap actif') : '')));
     if ($('secArchet').open) {
       const beatsNow = totalBeats + Math.max(0, audioCtx.currentTime - cycleStart) * S.tempo / 60;
       drawBow(beatsNow);
@@ -2717,6 +3754,7 @@ swing 62
       for (let i = 0; i < n; i++) {
         const b = document.createElement('button');
         b.className = 'step';
+        b.setAttribute('aria-label', fmTr(v.label) + ' — ' + fmTr('pas') + ' ' + (i + 1));
         if (Number.isInteger(perBeat) && i % perBeat === 0) b.classList.add('beatmark');
         b.addEventListener('click', () => {
           d.grid[i] = (d.grid[i] + 1) % 3;
@@ -2731,7 +3769,7 @@ swing 62
       mi.addEventListener('change', () => {
         d.muted = mi.checked; percMuted[v.id] = mi.checked; percLineRender();
       });
-      mute.appendChild(mi); mute.append(' muet');
+      mute.appendChild(mi); mute.append(' ' + fmTr('muet'));
       row.append(lab, steps, mute);
       wrap.appendChild(row);
     });
@@ -5728,8 +6766,8 @@ swing 62
     const pick = pool[Math.floor(Math.random() * pool.length)];
     percGrids[pick.vid][pick.step] = 1;
     percAdded.push(pick);
-    percStatusSet('+ frappe ajoutée : ' + percVoiceLabel(pick.vid) + ', pas ' + (pick.step + 1) +
-      ' (' + percAdded.length + ' ajout' + (percAdded.length > 1 ? 's' : '') + ')');
+    percStatusSet(fmTr('+ frappe ajoutée :') + ' ' + percVoiceLabel(pick.vid) + ', ' + fmTr('pas') + ' ' + (pick.step + 1) +
+      ' (' + percAdded.length + ' ' + fmTr(percAdded.length > 1 ? 'ajouts' : 'ajout') + ')');
   }
 
   function percRemoveHit() {
@@ -5746,7 +6784,7 @@ swing 62
     }
     const pick = pool[Math.floor(Math.random() * pool.length)];
     percGrids[pick.vid][pick.step] = 0;
-    percStatusSet('− frappe retirée : ' + percVoiceLabel(pick.vid) + ', pas ' + (pick.step + 1) + '. Continue à la jouer dans ta tête !');
+    percStatusSet(fmTr('− frappe retirée :') + ' ' + percVoiceLabel(pick.vid) + ', ' + fmTr('pas') + ' ' + (pick.step + 1) + '. ' + fmTr('Continue à la jouer dans ta tête !'));
   }
 
   // appel-réponse : une seule variation active à la fois
@@ -5756,7 +6794,7 @@ swing 62
     }
     percAdded = [];
     percAddHit();
-    percStatusSet('Appel : écoute la variation (' + percVoiceLabel(percWork) + ')…');
+    percStatusSet(fmTr('Appel : écoute la variation') + ' (' + percVoiceLabel(percWork) + ')…');
   }
 
   function percOnNewMeasure() {
@@ -5782,12 +6820,12 @@ swing 62
           percBreakActive = true;
           percBreaksPlayed++;
           if (typeof tsProgressBump === 'function') tsProgressBump('break', S.perc.breakLevel);
-          percStatusSet('BREAK — niveau ' + S.perc.breakLevel + '/4 · ' + percCurrentBreak().label);
+          percStatusSet(fmTr('BREAK — niveau') + ' ' + S.perc.breakLevel + '/4 · ' + percCurrentBreak().label);
           if (S.perc.breakEcho) percBreakEchoPending = true;
         } else {
           percBreakActive = false;
           const reste = S.perc.period - (percMeasures % S.perc.period);
-          percStatusSet('Groove — break dans ' + reste + ' mesure' + (reste > 1 ? 's' : ''));
+          percStatusSet(fmTr('Groove — break dans') + ' ' + reste + ' ' + fmTr(reste > 1 ? 'mesures' : 'mesure'));
         }
       }
       refreshPercGrids();
@@ -5814,7 +6852,7 @@ swing 62
         else percStatusSet('Appel : écoute…');
       } else {
         percCallSilent = true;
-        percStatusSet('Réponse : à toi ! La voix « ' + percVoiceLabel(percWork) + ' » se tait.');
+        percStatusSet(fmTr('Réponse : à toi ! La voix') + ' « ' + percVoiceLabel(percWork) + ' » ' + fmTr('se tait') + '.');
       }
     } else {
       percCallSilent = false;
@@ -5836,6 +6874,7 @@ swing 62
       const steps = document.createElement('div'); steps.className = 'steps mini'; steps.dataset.voice = v.id;
       for (let i = 0; i < n; i++) {
         const b = document.createElement('button'); b.className = 'step';
+        b.setAttribute('aria-label', fmTr(v.label) + ' — ' + fmTr('pas') + ' ' + (i + 1));
         if (percIsOnBeat(i)) b.classList.add('beatmark');
         b.addEventListener('click', () => {
           if (b.dataset.dragged) { delete b.dataset.dragged; return; }
@@ -5847,7 +6886,7 @@ swing 62
           if (percOffsets[v.id] && percOffsets[v.id][i]) {
             percOffsets[v.id][i] = 0;
             refreshPercGrids();
-            percStatusSet('Micro-décalage remis à zéro (pas ' + (i + 1) + ').');
+            percStatusSet(fmTr('Micro-décalage remis à zéro') + ' (' + fmTr('pas') + ' ' + (i + 1) + ').');
           }
         });
         // glisser la case à gauche/droite = avancer/retarder la frappe (micro-timing).
@@ -5889,9 +6928,9 @@ swing 62
             const off = Math.max(-0.45, Math.min(0.45, startOff + dx / w));
             percOffsets[v.id][i] = off;
             const stepMs = (60000 / S.tempo) / (S.perc.count / S.beats);
-            percStatusSet('Micro-timing ' + percVoiceLabel(v.id) + ', pas ' + (i + 1) + ' : ' +
-              (off >= 0 ? '+' : '') + Math.round(off * 100) + ' % du pas (' +
-              (off >= 0 ? '+' : '') + Math.round(off * stepMs) + ' ms) — droite = laid back, gauche = en avance');
+            percStatusSet('Micro-timing ' + percVoiceLabel(v.id) + ', ' + fmTr('pas') + ' ' + (i + 1) + ' : ' +
+              (off >= 0 ? '+' : '') + Math.round(off * 100) + ' ' + fmTr('% du pas') + ' (' +
+              (off >= 0 ? '+' : '') + Math.round(off * stepMs) + ' ms) — ' + fmTr('droite = laid back, gauche = en avance'));
             refreshPercGrids();
           };
           const onUp = () => {
@@ -5911,7 +6950,7 @@ swing 62
       const mute = document.createElement('label'); mute.className = 'check pv-mute';
       const mi = document.createElement('input'); mi.type = 'checkbox'; mi.checked = !!percMuted[v.id];
       mi.addEventListener('change', () => { percMuted[v.id] = mi.checked; percLineRender(); });
-      mute.appendChild(mi); mute.append(' muet');
+      mute.appendChild(mi); mute.append(' ' + fmTr('muet'));
       row.append(lab, steps, mute);
       wrap.appendChild(row);
     });
@@ -6254,7 +7293,7 @@ swing 62
     percGuide = null; percStyleCur = null;
     S.perc.on = true; $('percOn').checked = true;
     buildPercGrids();
-    percStatusSet('Séquence « ' + name + ' » chargée.');
+    percStatusSet(fmTr('Séquence') + ' « ' + name + ' » ' + fmTr('chargée') + '.');
     if (!isPlaying) drawStatic();
   }
   $('percSaveBtn').addEventListener('click', () => {
@@ -6268,7 +7307,7 @@ swing 62
     percPresetsWrite(all);
     percSavedRefresh();
     $('percSavedSel').value = name;
-    percStatusSet('Séquence « ' + name + ' » sauvegardée.');
+    percStatusSet(fmTr('Séquence') + ' « ' + name + ' » ' + fmTr('sauvegardée') + '.');
   });
   $('percLoadBtn').addEventListener('click', () => {
     const n = $('percSavedSel').value;
@@ -6281,7 +7320,7 @@ swing 62
     delete all[n];
     percPresetsWrite(all);
     percSavedRefresh();
-    percStatusSet('Séquence « ' + n + ' » supprimée.');
+    percStatusSet(fmTr('Séquence') + ' « ' + n + ' » ' + fmTr('supprimée') + '.');
   });
   percSavedRefresh();
   $('percPeriod').addEventListener('change', e => S.perc.period = Math.max(1, +e.target.value));
@@ -6430,7 +7469,7 @@ swing 62
     // paramètres de génération non encore consommés par le moteur (densité, régularité,
     // ancres, startNote, rampe « progressive ») : conservés pour les passes 3-4, sans invention.
     S.perc.gen = profile.gen;
-    percStatusSet('Kit généré : ' + profile.label + '.');
+    percStatusSet(fmTr('Kit généré :') + ' ' + profile.label + '.');
     if (!isPlaying) drawStatic();
   }
 
@@ -8213,7 +9252,7 @@ swing 62
   // C8 : tout remettre par défaut — n'efface que les réglages de l'appli (fm-metro-*) ;
   // la langue, le thème, la file de votes et la session de compte sont conservés.
   $('btnResetAll').addEventListener('click', () => {
-    if (!confirm('Tout remettre par défaut ?\n(La langue, le thème et ton compte sont conservés.)')) return;
+    if (!confirm(fmTr('Tout remettre par défaut ?\n(La langue, le thème et ton compte sont conservés.)'))) return;
     try {
       const del = [];
       for (let i = 0; i < localStorage.length; i++) {
@@ -8711,11 +9750,11 @@ swing 62
   #acctCard input:focus-visible{outline:2px solid var(--fm-accent);outline-offset:1px}
   #acctCard .acct-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:6px;flex-wrap:wrap}
   #acctCard .acct-actions button{background:var(--fm-panel-2);border:1px solid var(--fm-line);color:var(--fm-ink);
-    padding:8px 14px;border-radius:7px;cursor:pointer;font-family:var(--fm-font-ui);font-size:.8rem;letter-spacing:.04em}
+    padding:8px 14px;border-radius:7px;cursor:pointer;font-family:var(--fm-font-ui);font-size: .8125rem;letter-spacing:.04em}
   #acctCard .acct-actions button:hover{border-color:var(--fm-accent)}
   #acctCard .acct-actions button.acct-primary{background:var(--fm-accent);border-color:var(--fm-accent);color:var(--fm-accent-ink);font-weight:600}
   #acctFb{min-height:20px;font-size:.82rem;font-weight:600;margin:2px 0 4px}
-  #acctFb.good{color:var(--fm-accent)} #acctFb.bad{color:#d9534f}
+  #acctFb.good{color:var(--fm-accent-text)} #acctFb.bad{color:var(--fm-danger-text)}
 </style>
 <div id="acctDim" aria-hidden="true"></div>
 <div id="acctCard" role="dialog" aria-modal="true" aria-labelledby="acctTitle" style="display:none">
@@ -8833,7 +9872,7 @@ swing 62
     titleEl.textContent="Ton compte";
     bodyEl.innerHTML=
       '<p>Connecté'+(name?' comme <b>'+esc(name)+'</b>':'')+
-        (mail?'<br><span style="opacity:.7;font-size:.8rem">'+esc(mail)+'</span>':'')+'</p>'+
+        (mail?'<br><span style="opacity:.7;font-size: .8125rem">'+esc(mail)+'</span>':'')+'</p>'+
       '<div class="acct-actions" style="justify-content:space-between">'+
         '<button id="acctEditPseudo">'+(name?'Changer de pseudo':'Choisir un pseudo')+'</button>'+
         '<button id="acctLogout">Se déconnecter</button>'+
@@ -8891,7 +9930,7 @@ swing 62
 (function(){
   function el(id){ return document.getElementById(id); }
   function esc(s){ var d=document.createElement('div'); d.textContent=(s==null?'':String(s)); return d.innerHTML; }
-  function fb(msg,ok){ var e=el('biblioFb'); if(e){ e.textContent=msg||''; e.style.color=ok?'var(--fm-accent)':'#d9534f'; } }
+  function fb(msg,ok){ var e=el('biblioFb'); if(e){ e.textContent=msg||''; e.style.color=ok?'var(--fm-accent-text)':'var(--fm-danger-text)'; } }
   function sb(){ return (window.fmSupabase&&window.fmSupabase())||null; }
   function user(){ return window.fmCurrentUser||null; }
 
@@ -8977,7 +10016,7 @@ swing 62
 /* ===== Export audio : capte la sortie masterGain en temps réel puis encode WAV/MP3 ===== */
 (function(){
   function el(id){ return document.getElementById(id); }
-  function fb(m,ok){ var e=el('expFb'); if(e){ e.textContent=m||''; e.style.color=ok?'var(--fm-accent)':'#d9534f'; } }
+  function fb(m,ok){ var e=el('expFb'); if(e){ e.textContent=m||''; e.style.color=ok?'var(--fm-accent-text)':'var(--fm-danger-text)'; } }
   var busy=false;
 
   function baseName(){ try{ var t=el('tempoValue'); var bpm=t?(''+t.textContent).replace(/[^\d]/g,''):''; return 'metronome'+(bpm?'_'+bpm+'bpm':''); }catch(e){ return 'metronome'; } }
@@ -9069,779 +10108,7 @@ swing 62
 <script>
 /* ===== Bascule FR/EN : traduit par correspondance du texte source français.
    __EN_DICT est complété par la traduction (Gemini) ; clé = texte FR normalisé. ===== */
-window.__I18N = { "en": {
-  "Métronome": "Metronome",
-  "Formation musicale · Groove & horloge interne": "Music training · Groove & internal clock",
-  "▶ Jouer": "▶ Play",
-  "Configurer": "Configure",
-  "✦ Guide-moi": "✦ Guide me",
-  "◐ Mode sombre": "◐ Dark mode",
-  "Se connecter": "Log in",
-  "BPM ·": "BPM ·",
-  "Moderato": "Moderato",
-  "▶ Démarrer": "▶ Start",
-  "Tap": "Tap",
-  "Temps / cycle": "Beats / bar",
-  "Subdivision": "Subdivision",
-  "Noires": "Quarter notes",
-  "Croches": "Eighth notes",
-  "Triolets": "Triplets",
-  "Doubles": "Sixteenth notes",
-  "Volume": "Volume",
-  "Accent 1er temps": "Accent on beat 1",
-  "Clic muet (couches seules)": "Muted click (layers only)",
-  "Prêt": "Ready",
-  "Export audio (WAV / MP3)": "Audio export (WAV / MP3)",
-  "Durée": "Length",
-  "10 s": "10 s",
-  "20 s": "20 s",
-  "30 s": "30 s",
-  "60 s": "60 s",
-  "WAV": "WAV",
-  "MP3": "MP3",
-  "Je suis :": "I am:",
-  "Solo": "Solo",
-  "Voir l'accompagnement": "View accompaniment",
-  "⟲ Setup": "⟲ Setup",
-  "Basse": "Bass",
-  "Tone": "Tone",
-  "Slap": "Slap",
-  "Ma ligne n'est pas encore répartie.": "My part is not distributed yet.",
-  "Répartir selon priorités (1 joueur)": "Distribute by priority (1 player)",
-  "Micro-timing & groove": "Micro-timing & groove",
-  "swing · placement": "swing · placement",
-  "Swing (asymétrique, libre)": "Swing (asymmetrical, free)",
-  "50 % = binaire droit · 66 % = ternaire parfait · valeurs intermédiaires = swing « humain ». S'applique aux croches et aux doubles-croches (par paires) — ex. ~58–62 % pour le placement samba/choro.": "50 % = straight binary · 66 % = perfect ternary · intermediate values = \"human\" swing. Applies to eighth and sixteenth notes (in pairs) — e.g. ~58–62 % for samba/choro placement.",
-  "Clic de placement (behind/ahead the beat)": "Placement click (behind/ahead the beat)",
-  "Décalage": "Offset",
-  "+25 ms": "+25 ms",
-  "Fréquence du clic décalé": "Offset click frequency",
-  "220 Hz": "220 Hz",
-  "Un second clic grave, décalé du clic de référence. Décalage positif = au fond du temps (contrebasse, surdo, dundun) · négatif = en avant du temps.": "A second low click, offset from the reference click. Positive offset = laid back/behind the beat (double bass, surdo, dundun) · negative = ahead of the beat.",
-  "Grille rythmique": "Rhythmic grid",
-  "Binaire · 16": "Binary · 16",
-  "Ternaire · 12": "Ternary · 12",
-  "Clave et percussion partagent cette grille — pour rester carré, on ne mélange pas binaire et ternaire (le mélange volontaire = polyrythmie superposée).": "Clave and percussion share this grid — to stay tight, do not mix binary and ternary (intentional mixing = superimposed polyrhythm).",
-  "Claves & cellules rythmiques": "Claves & rhythmic cells",
-  "séquenceur · polyrythmie": "sequencer · polyrhythm",
-  "— Presets —": "— Presets —",
-  "Son clave 3-2 (16)": "Son clave 3-2 (16)",
-  "Son clave 2-3 (16)": "Son clave 2-3 (16)",
-  "Rumba clave 3-2 (16)": "Rumba clave 3-2 (16)",
-  "Bossa (16)": "Bossa (16)",
-  "Partido alto (variante, 16)": "Partido alto (variant, 16)",
-  "Tresillo (8)": "Tresillo (8)",
-  "Cinquillo (8)": "Cinquillo (8)",
-  "8 pas": "8 steps",
-  "12 pas": "12 steps",
-  "16 pas": "16 steps",
-  "Effacer": "Clear",
-  "Clave grave": "Low clave",
-  "muet": "mute",
-  "Clave aiguë": "High clave",
-  "Clic sur un pas : silence → frappe → accent. Les points au-dessus marquent les temps.": "Click on a step: rest → hit → accent. Dots above mark the beats.",
-  "Deux voix": "Two voices",
-  "— cloche grave et cloche aiguë — comme n'importe quelle voix de percussion : les presets se posent sur la grave, la seconde voix est libre (contre-clave, bombo…). Le cercle montre comment la cellule se résout sur le 1 du cycle suivant.": "— low and high bell — like any percussion voice: presets are applied to the low one, the second voice is free (counter-clave, bombo…). The circle shows how the cell resolves on beat 1 of the next cycle.",
-  "Polyrythmie superposée": "Superimposed polyrhythm",
-  "Aucune": "None",
-  "2 par cycle": "2 per cycle",
-  "3 par cycle": "3 per cycle",
-  "4 par cycle": "4 per cycle",
-  "5 par cycle": "5 per cycle",
-  "7 par cycle": "7 per cycle",
-  "n frappes également réparties (ex. 3 sur 4 temps)": "n evenly distributed hits (e.g., 3 over 4 beats)",
-  "Percussion & indépendance": "Percussion & independence",
-  "groove · variations · appel-réponse": "groove · variations · call-response",
-  "Activer": "Enable",
-  "Instrument": "Instrument",
-  "Djembé (basse · tone · slap)": "Djembe (bass · tone · slap)",
-  "Cajón (grave · aigu)": "Cajon (low · high)",
-  "Dunduns & cloche": "Dunduns & bell",
-  "Agogô (grave · aigu)": "Agogo (low · high)",
-  "Surdo (grave · marcante)": "Surdo (low · marcante)",
-  "Reco-reco (raclement)": "Reco-reco (scrape)",
-  "12 pas (ternaire)": "12 steps (ternary)",
-  "16 pas (binaire)": "16 steps (binary)",
-  "Groove de base": "Basic groove",
-  "⛶ Plein écran": "⛶ Full screen",
-  "Style": "Style",
-  "— Styles —": "— Styles —",
-  "Passeport — base 4/4 (documenté)": "Passeport — 4/4 base (documented)",
-  "Kuku — accompagnement 1 (documenté)": "Kuku — accompaniment 1 (documented)",
-  "Kassa (adaptation)": "Kassa (adaptation)",
-  "Djolé (adaptation)": "Djole (adaptation)",
-  "Ternaire 12/8 — Soli/Soko (adaptation)": "Ternary 12/8 — Soli/Soko (adaptation)",
-  "Exercice": "Exercise",
-  "Libre (groove seul)": "Free (groove only)",
-  "Ajout progressif (une frappe à la fois)": "Progressive addition (one hit at a time)",
-  "Soustraction (le groove s'allège)": "Subtraction (lighter groove)",
-  "Appel-réponse (1 mesure app · 1 mesure toi)": "Call-response (1 bar app · 1 bar you)",
-  "Progression guidée (mains expliquées)": "Guided progression (hands explained)",
-  "Break programmé (toutes les N mesures)": "Programmed break (every N bars)",
-  "Voix travaillée": "Focused voice",
-  "Toutes les voix": "All voices",
-  "Mains": "Hands",
-  "Alternance stricte D-G": "Strict R-L alternation",
-  "Main directrice sur les temps": "Lead hand on beats",
-  "gaucher (inverser)": "left-handed (invert)",
-  "← Étape": "← Step",
-  "Étape →": "Step →",
-  "Break / phrase": "Break / phrase",
-  "Appel standard 4/4 (documenté)": "Standard 4/4 call (documented)",
-  "Appel ternaire 12/8 (documenté)": "Ternary 12/8 call (documented)",
-  "Échauffement — roulement (adaptation)": "Warm-up — roll (adaptation)",
-  "Break dununba « sstsss » 12/8 (documenté)": "Dununba break \"sstsss\" 12/8 (documented)",
-  "Niveau": "Level",
-  "1 (début de phrase)": "1 (phrase start)",
-  "4 (phrase complète)": "4 (full phrase)",
-  "progression auto": "auto progression",
-  "réponse après": "response after",
-  "Variation toutes les": "Variation every",
-  "mesures (paires en appel-réponse)": "bars (even in call-response)",
-  "Mes séquences": "My sequences",
-  "💾 Sauver": "💾 Save",
-  "— aucune séquence sauvée —": "— no sequences saved —",
-  "Charger": "Load",
-  "Clic sur un pas : silence → frappe → accent.": "Click on a step: rest → hit → accent.",
-  "Micro-timing": "Micro-timing",
-  ": glisse une case active vers la droite (en retard, laid back) ou la gauche (en avance) pour visualiser et entendre le swing de cette frappe — double-clic pour la recentrer.": ": slide an active box right (late, laid back) or left (early) to visualize and hear the swing of this hit — double-click to center it.",
-  "Sur écran tactile": "On a touch screen",
-  ": appui long (une demi-seconde) sur la case, puis glisse — un simple toucher fait défiler la page.": ": long-press the box (half a second), then slide — a simple touch scrolls the page.",
-  ": sauvegarde tes grooves (grilles, accents, micro-décalages) et recharge-les plus tard.": ": save your grooves (grids, accents, micro-offsets) and load them later.",
-  "Ajout progressif": "Progressive addition",
-  ": la voix travaillée gagne une frappe à la fois — contretemps d'abord, jamais sur les temps.": ": the focused voice gains one hit at a time — offbeats first, never on the beats.",
-  "Soustraction": "Subtraction",
-  ": le groove s'allège, les ancres (frappes sur les temps) restent.": ": the groove lightens, anchors (hits on the beats) remain.",
-  "Appel-réponse": "Call-response",
-  ": l'app joue la variation une mesure, tu la répètes la mesure suivante pendant que la voix se tait.": ": the app plays the variation for one bar, you repeat it the next bar while the voice mutes.",
-  "Break programmé": "Programmed break",
-  ": toutes les N mesures, le groove s'interrompt et l'app joue le break au niveau choisi — la phrase s'étoffe du niveau 1 au niveau 4 (« progression auto » monte d'un niveau à chaque break, « réponse après » te laisse une mesure pour le rejouer).": ": every N bars, the groove pauses and the app plays the break at the chosen level — the phrase builds from level 1 to 4 (\"auto progression\" levels up each break, \"response after\" gives you a bar to play it back).",
-  "Couper une seule voix": "Mute a single voice",
-  ": section Horloge interne, cible sur la voix — les autres continuent.": ": Internal clock section, target the voice — others continue playing.",
-  ": chaque frappe affiche sa main (D/G).": ": each hit displays its hand (R/L).",
-  "Progression guidée": "Guided progression",
-  ": tu démarres par le squelette du groove — qui dépend du style : alternance sur les temps pour le passeport, backbeat 2-4 pour le funk, kick/caisse claire pour le rock, la basse pour le Kuku — puis l'app ajoute une frappe à la fois, toutes les N mesures ou avec les boutons ← →, en t'expliquant à chaque étape quelle main va où, jusqu'au groove complet. Les patterns marqués": ": you start with the groove's skeleton — which depends on the style: alternation on beats for passeport, 2-4 backbeat for funk, kick/snare for rock, bass for Kuku — then the app adds one hit at a time, every N bars or using ← → buttons, explaining which hand goes where at each step, until the full groove. Patterns marked",
-  "adaptation": "adaptation",
-  "sont des approximations pédagogiques : édite-les selon ta référence.": "are pedagogical approximations: edit them to match your reference.",
-  "Répertoire de grooves": "Groove repertoire",
-  "choisis un groove · puis l'instrument de jeu": "choose a groove · then the playing instrument",
-  "Répertoire": "Repertoire",
-  "bresil": "brazil",
-  "ouest-africain": "west-african",
-  "funk": "funk",
-  "reggae": "reggae",
-  "hiphop": "hiphop",
-  "rock": "rock",
-  "Samba Batucada": "Samba Batucada",
-  "Maracatu Nação (baque virado)": "Maracatu Nação (baque virado)",
-  "Baião": "Baião",
-  "Ijexá / Afoxé": "Ijexá / Afoxé",
-  "Samba-Reggae": "Samba-Reggae",
-  "Décharger": "Unload",
-  "Jouer tout à": "Play all at",
-  "Instruments authentiques": "Authentic instruments",
-  "Djembé": "Djembe",
-  "Cajón": "Cajon",
-  "Agogô": "Agogo",
-  "Surdo": "Surdo",
-  "Reco-reco": "Reco-reco",
-  "Charge un groove de la bibliothèque puis choisis": "Load a groove from the library then choose",
-  "l'instrument de jeu": "the playing instrument",
-  ": rien n'oblige à rester sur l'instrument « authentique » — joue le répertoire du djembé au cajón si tu veux (les voix sont replacées par": ": you don't have to stick to the \"authentic\" instrument — play the djembe repertoire on a cajon if you like (voices are remapped by",
-  "tessiture": "pitch",
-  ", marquées": ", marked",
-  "adapté": "adapted",
-  "Le répertoire s'écoute librement, seul ou en groupe — la répartition entre participants se fait dans la section": "The repertoire can be listened to freely, alone or in a group — distribution among participants is done in the",
-  "Team Spirit": "Team Spirit",
-  "une ligne par personne · solo/muet · export": "one part per person · solo/mute · export",
-  "Mode team spirit (répartir entre participants)": "Team spirit mode (distribute among participants)",
-  "+ Participant": "+ Participant",
-  "Répartir auto": "Auto-distribute",
-  "Vérifier les doigtés": "Check fingerings",
-  "Qui joue quoi ?": "Who plays what?",
-  "Joueurs": "Players",
-  "Répartir selon priorités": "Distribute by priority",
-  "Accompagnement (backing track) — l'app joue les lignes écartées": "Backing track — the app plays the excluded lines",
-  "Classe les lignes par priorité — glisse la poignée ⠿ pour réordonner.": "Rank lines by priority — drag the ⠿ handle to reorder.",
-  "Les premières sont garanties : chaque ligne est attribuée": "The first ones are guaranteed: each line is assigned",
-  "entière ou pas du tout": "whole or not at all",
-  ", deux mains par joueur (jamais plus de 2 frappes ni deux fois la même main au même instant). Cumuler des instruments différents n'arrive qu'en dernier recours. Avec": ", two hands per player (never more than 2 hits or the same hand twice at the same time). Combining different instruments only happens as a last resort. With",
-  "1 joueur": "1 player",
-  ": la combinaison de lignes que tu peux tenir seul. Les lignes écartées passent en": ": the combination of lines you can handle alone. Excluded lines become a",
-  "backing track": "backing track",
-  "si la case est cochée, en sourdine sinon.": "if checked, muted otherwise.",
-  "↓ Exporter tout (JSON)": "↓ Export all (JSON)",
-  "Charge d'abord un groove dans la section": "First load a groove in the",
-  ", puis assigne chaque voix à un participant — menu sur chaque voix du répertoire, ou": "section, then assign each voice to a participant — menu on each repertoire voice, or",
-  "qui équilibre la charge de jeu (nombre de frappes) en mélangeant les tessitures.": "which balances the playing load (number of hits) by mixing pitches.",
-  "La carte de chacun affiche": "Everyone's card displays",
-  "sa ligne rythmique": "their rhythmic line",
-  "; écoute la part de chacun (": "; listen to each part (",
-  "solo": "solo",
-  ") et exporte sa": ") and export their",
-  "ligne en JSON": "line as JSON",
-  "pour la travailler chez soi.": "to practice at home.",
-  "signale quand une même main est demandée deux fois au même instant pour un même participant (physiquement impossible).": "flags when the same hand is required twice at the same time for the same participant (physically impossible).",
-  "Archet": "Bow",
-  "tirer · pousser · dérive": "down-bow · up-bow · drift",
-  "Violon / Alto": "Violin / Viola",
-  "Violoncelle": "Cello",
-  "Contrebasse — archet français": "Double bass — French bow",
-  "Contrebasse — archet allemand": "Double bass — German bow",
-  "Coup d'archet": "Bowing",
-  "Détaché (vitesse constante)": "Détaché (constant speed)",
-  "Legato / liaisons (souple)": "Legato / slurs (smooth)",
-  "Martelé (mordant, arrêt net)": "Martelé (biting, clean stop)",
-  "Spiccato (rebond)": "Spiccato (bouncing)",
-  "Débutant — chaque noire = archet complet": "Beginner — each quarter note = whole bow",
-  "Détaché — noires (moitié d'archet)": "Détaché — quarter notes (half bow)",
-  "Grand détaché — blanches (tout l'archet)": "Grand détaché — half notes (whole bow)",
-  "Détaché — croches au milieu": "Détaché — eighth notes in the middle",
-  "Liaisons — 4 croches par archet": "Slurs — 4 eighth notes per bow",
-  "Asymétrie — dérive vers la pointe (démo)": "Asymmetry — drift to the tip (demo)",
-  "Asymétrie corrigée — avec reprise": "Corrected asymmetry — with retake",
-  "Martelé — noires": "Martelé — quarter notes",
-  "Spiccato — croches au point d'équilibre": "Spiccato — eighth notes at balance point",
-  "Séquence (éditable)": "Sequence (editable)",
-  "Appliquer": "Apply",
-  "Archet léger et agile — les coups rapides (spiccato, sautillé) vivent autour du point d'équilibre ◆.": "Light and agile bow — fast strokes (spiccato, sautillé) live around the balance point ◆.",
-  "Syntaxe :": "Syntax:",
-  "T50x1": "T50x1",
-  "= tirer 50 % d'archet sur 1 temps": "= down-bow 50 % on 1 beat",
-  "P20x0.5": "P20x0.5",
-  "= pousser 20 % sur une croche": "= up-bow 20 % on an eighth note",
-  "Rx1": "Rx1",
-  "= reprise (retour au talon, archet levé)": "= retake (return to the frog, bow lifted)",
-  "n4": "n4",
-  "= 4 notes liées sur l'archet (": "= 4 slurred notes on the bow (",
-  "T80x2n4": "T80x2n4",
-  "Jauge : talon à gauche, pointe à droite. Si le curseur vire au rouge, la séquence te fait « manquer d'archet ».": "Gauge: frog on the left, tip on the right. If the cursor turns red, the sequence makes you \"run out of bow\".",
-  "Horloge interne": "Internal clock",
-  "coupures de clic (gap clicks)": "gap clicks",
-  "Mode": "Mode",
-  "Désactivé": "Disabled",
-  "Fixe (jouer N, couper M)": "Fixed (play N, mute M)",
-  "Progressif (coupures 1, 2, 4, 8…)": "Progressive (mutes 1, 2, 4, 8…)",
-  "Aléatoire": "Random",
-  "Cible": "Target",
-  "Tout (comportement classique)": "All (classic behavior)",
-  "Pulsation (clic)": "Pulse (click)",
-  "Mesures jouées (N)": "Bars played (N)",
-  "Mesures coupées (M)": "Bars muted (M)",
-  "Probabilité de coupure (aléatoire)": "Mute probability (random)",
-  "La cible se coupe, l'aiguille continue de tourner.": "The target is muted, the needle keeps turning.",
-  ": tout le son (gap classique), la pulsation seule, ou une seule voix (clave ou percussion) — les autres continuent, pour tester la solidité de chaque voix. En mode progressif, la durée des coupures double à chaque cycle (1, 2, 4, 8 mesures, plafonné à 16) : aucun filet de sécurité.": ": all sound (classic gap), pulse only, or a single voice (clave or percussion) — others continue, to test each voice's solidness. In progressive mode, mute duration doubles every cycle (1, 2, 4, 8 bars, capped at 16): no safety net.",
-  "Son du clic": "Click sound",
-  "fréquence · caractère": "frequency · character",
-  "Fréquence pulsation": "Pulse frequency",
-  "1000 Hz": "1000 Hz",
-  "Caractère": "Character",
-  "Tonal (ping)": "Tonal (ping)",
-  "Sec (bruit, type rimshot)": "Dry (noise, rimshot type)",
-  "Clic grave et sourd pour trancher avec un agogô · clic sec et brillant pour percer face à une contrebasse ou des dunduns.": "Deep and dull click to cut through an agogo · dry and bright click to pierce through a double bass or dunduns.",
-  "Routine programmée": "Programmed routine",
-  "script": "script",
-  "# Exemple de routine # 5 min à 80 BPM 80bpm 5min # accelerando : 80 → 120 en 10 min 80->120bpm 10min # gap : couper 2 mesures toutes les 16 gap 2/16 120bpm 32mes gap off swing 62 100bpm 16mes": "# Routine example # 5 min at 80 BPM 80bpm 5min # accelerando: 80 → 120 in 10 min 80->120bpm 10min # gap: mute 2 bars every 16 gap 2/16 120bpm 32bars gap off swing 62 100bpm 16bars",
-  "▶ Lancer la routine": "▶ Run routine",
-  "■ Arrêter la routine": "■ Stop routine",
-  "80bpm 5min": "80bpm 5min",
-  "80->120bpm 10min": "80->120bpm 10min",
-  "(rampe) ·": "(ramp) ·",
-  "100bpm 16mes": "100bpm 16bars",
-  "gap 2/16": "gap 2/16",
-  "gap off": "gap off",
-  "swing 62": "swing 62",
-  "· lignes": "· lines",
-  "= commentaires. Les changements s'appliquent à la mesure suivante.": "= comments. Changes apply to the next bar.",
-  "Bibliothèque partagée": "Shared library",
-  "routines · Supabase": "routines · Supabase",
-  "Publier la routine": "Publish routine",
-  "Charger la bibliothèque": "Load library",
-  "Le": "The",
-  "canon": "canon",
-  "(routines de référence) est visible sans connexion.": "(reference routines) is visible without logging in.",
-  "Connecte-toi": "Log in",
-  "(en haut) pour voir les routines de la classe et publier les tiennes. « Importer » place la routine dans l'éditeur ci-dessus.": "(top) to see class routines and publish your own. \"Import\" places the routine in the editor above.",
-  "Espace : lecture · ↑↓ : tempo ±1 · T : tap tempo": "Space: play · ↑↓: tempo ±1 · T: tap tempo",
-  "92 BPM": "92 BPM",
-  "✕ Fermer": "✕ Close",
-  "Percussion": "Percussion",
-  "Assistant de réglage": "Setup assistant",
-  "Que veux-tu travailler ?": "What do you want to practice?",
-  "Choisis un contexte — tu poseras tout le reste à la main, en direct.": "Choose a context — you'll set everything else manually, live.",
-  "Un tempo, un clic": "One tempo, one click",
-  "Métronome nu — tempo, mesure, subdivision. Rien d’autre.": "Bare metronome — tempo, meter, subdivision. Nothing else.",
-  "Pile rythmique": "Rhythm stack",
-  "Pulsation, claves et percussions se posent ensemble sur le même cycle.": "Pulse, claves and percussion sit together on the same cycle.",
-  "Coups d’archet": "Bowing",
-  "Aller-retour de l’archet visualisés — du violon à la contrebasse. Mode à part.": "Bow back-and-forth visualized — from violin to double bass. Separate mode.",
-  "← Retour": "← Back",
-  "Passer l'assistant": "Skip assistant",
-  "Continuer →": "Continue →",
-  "Écran d'accueil": "Home screen",
-  "Prêt à jouer ?": "Ready to play?",
-  "Deux choix — tout le reste s'ajuste ensuite derrière « Configurer ».": "Two choices — everything else is adjusted behind \"Configure\".",
-  "On joue…": "We are playing…",
-  "Seul": "Alone",
-  "toute la ligne jouable est à moi": "the whole playable line is mine",
-  "À plusieurs": "Together",
-  "chacun sa ligne — même groove, même classement, même répartition sur chaque appareil": "each their own line — same groove, same ranking, same distribution on every device",
-  "Nombre de joueurs": "Number of players",
-  "Apprentissage": "Learning",
-  "(ajout progressif sur ma ligne)": "(progressive addition on my line)",
-  "Oui": "Yes",
-  "ma ligne se construira frappe par frappe — choix mémorisé, l'exercice arrive à la prochaine étape": "my line will build hit by hit — choice saved, the exercise arrives at the next step",
-  "Non": "No",
-  "je joue la ligne complète": "I play the full line",
-  "C'est parti →": "Let's go →",
-  "Recevoir un lien de connexion par e-mail": "Get a sign-in link by e-mail",
-  "English / Français": "English / Français",
-  "Langue / Language": "Langue / Language",
-  "Tempo -1": "Tempo -1",
-  "Tempo +1": "Tempo +1",
-  "Coupe le clic (pulsation, subdivisions, clic décalé) — clave et percussion continuent": "Mutes the click (pulse, subdivisions, offset click) — clave and percussion continue",
-  "Durée enregistrée de ce qui joue": "Recorded length of what's playing",
-  "Rouvrir l'écran d'accueil (seul / à plusieurs · apprentissage)": "Reopen home screen (alone / together · learning)",
-  "Famille": "Family",
-  "Nombre de pas du cycle — 12 ou 16 bascule la famille (clave + percussion) ; 8 = cellule courte propre à la clave": "Number of cycle steps — 12 or 16 switches the family (clave + percussion); 8 = short cell specific to the clave",
-  "Pas du cycle — asservi à la famille : bascule clave + percussion ensemble": "Cycle step — linked to the family: switches clave + percussion together",
-  "nom de la séquence…": "sequence name…",
-  "Supprimer la séquence sélectionnée": "Delete selected sequence",
-  "Revenir à la percussion focale": "Return to focal percussion",
-  "Répartir les voix en équilibrant la charge de jeu (frappes) et les tessitures": "Distribute voices by balancing the playing load (hits) and pitches",
-  "Titre de la routine à publier": "Title of the routine to publish",
-  "Connecte-toi (en haut) pour publier": "Log in (top) to publish",
-  "◐ Mode clair": "◐ Light mode",
-  "Ton compte": "Your account",
-  "Se déconnecter": "Log out",
-  "■ Arrêter": "■ Stop",
-  "⟲ Tout réinitialiser": "⟲ Reset all",
-  "Tout remettre par défaut — la langue, le thème et ton compte sont conservés": "Restore all defaults — language, theme and your account are kept",
-  "L'assistant règle le métronome pour toi en trois questions": "The assistant sets up the metronome for you in three questions",
-  "Basculer entre thème clair et thème sombre": "Switch between light and dark theme",
-  "mesure : 2/4 · 3/4 (valse) · 4/4…": "time signature: 2/4 · 3/4 (waltz) · 4/4…",
-  "Nombre de temps dans chaque mesure : 2 = 2/4, 3 = 3/4 (valse), 4 = 4/4…": "Number of beats per bar: 2 = 2/4, 3 = 3/4 (waltz), 4 = 4/4…",
-  "Sourdine générale (coupe tout le son en un clic)": "Master mute (cuts all sound in one click)",
-  "Sommaire des sections": "Section index",
-  "Groove": "Groove",
-  "Claves": "Claves",
-  "Cours funk": "Funk course",
-  "Horloge": "Clock",
-  "Son": "Sound",
-  "Script": "Script",
-  "Bibliothèque": "Library",
-  "Export": "Export",
-  "↑ Haut": "↑ Top",
-  "Revenir en haut de la page": "Back to the top of the page",
-  "Micro-timing : décaler certaines frappes de quelques millisecondes autour du temps — c'est ce qui fait « groover »": "Micro-timing: shifting some hits a few milliseconds around the beat — that's what makes it groove",
-  "Swing : on retarde une croche sur deux — 50 % = binaire droit, 66 % = ternaire. Placement : jouer un peu avant ou après le clic": "Swing: every other eighth note is delayed — 50% = straight, 66% = ternary. Placement: playing slightly before or after the click",
-  "Une clave est une courte cellule rythmique qui se répète et sert de repère à tout le morceau (son, rumba, tresillo…)": "A clave is a short repeating rhythmic cell that anchors the whole piece (son, rumba, tresillo…)",
-  "Gap clicks : le métronome se tait quelques mesures puis revient — à toi de tenir le tempo pendant le silence": "Gap clicks: the metronome goes silent for a few bars then returns — keep the tempo through the silence",
-  "L'accompagnement (backing track) : les voix que l'appli joue à ta place": "The backing track: the voices the app plays for you",
-  "Drop-outs : la basse se tait quelques mesures puis revient — garde le tempo pendant le silence": "Drop-outs: the bass goes silent for a few bars then returns — keep the tempo through the silence",
-  "silences (drop-outs)": "drop-outs",
-  "Silences (drop-outs) — la basse se tait": "Drop-outs — the bass goes silent",
-  "Coupures traversées": "Gaps crossed",
-  "Nombre de coupures traversées depuis le dernier départ — chaque silence tenu jusqu'au bout compte pour un": "Number of gaps crossed since the last start — each silence held to the end counts as one",
-  "✓ Réglages enregistrés automatiquement": "✓ Settings saved automatically",
-  "Agrandir l'archet en plein écran": "Enlarge the bow view to full screen",
-  "Reçois un lien de connexion par e-mail — aucun mot de passe à retenir.": "Get a sign-in link by e-mail — no password to remember.",
-  "L'application fonctionne aussi sans compte : la connexion sert seulement à partager tes routines et suivre ta progression.": "The app also works without an account: signing in is only for sharing your routines and tracking your progress.",
-  "Pas reçu au bout d'une minute ? Vérifie tes indésirables (spams), ou renvoie le lien.": "Nothing after a minute? Check your spam folder, or resend the link.",
-  "Renvoyer le lien": "Resend the link",
-  "En savoir plus": "Learn more",
-  "Débutant ? Laisse-toi guider": "Beginner? Let us guide you",
-  "— l'assistant règle le métronome pour toi en trois questions.": "— the assistant sets up the metronome for you in three questions.",
-  "Plus tard": "Later",
-  "Une section à la fois": "One section at a time",
-  "Ouvrir une section referme les autres": "Opening a section closes the others"
-}, "pt": {
-  "Métronome": "Metrônomo",
-  "Formation musicale · Groove & horloge interne": "Treinamento musical · Groove & relógio interno",
-  "▶ Jouer": "▶ Tocar",
-  "Configurer": "Configurar",
-  "✦ Guide-moi": "✦ Guie-me",
-  "◐ Mode sombre": "◐ Modo escuro",
-  "Se connecter": "Entrar",
-  "BPM ·": "BPM ·",
-  "Moderato": "Moderato",
-  "▶ Démarrer": "▶ Iniciar",
-  "Tap": "Tap",
-  "Temps / cycle": "Tempos / compasso",
-  "Subdivision": "Subdivisão",
-  "Noires": "Semínimas",
-  "Croches": "Colcheias",
-  "Triolets": "Tercinas",
-  "Doubles": "Semicolcheias",
-  "Volume": "Volume",
-  "Accent 1er temps": "Acento no 1º tempo",
-  "Clic muet (couches seules)": "Clique mudo (apenas camadas)",
-  "Prêt": "Pronto",
-  "Export audio (WAV / MP3)": "Exportação de áudio (WAV / MP3)",
-  "Durée": "Duração",
-  "10 s": "10 s",
-  "20 s": "20 s",
-  "30 s": "30 s",
-  "60 s": "60 s",
-  "WAV": "WAV",
-  "MP3": "MP3",
-  "Je suis :": "Eu sou:",
-  "Solo": "Solo",
-  "Voir l'accompagnement": "Ver acompanhamento",
-  "⟲ Setup": "⟲ Setup",
-  "Basse": "Grave",
-  "Tone": "Tom",
-  "Slap": "Slap",
-  "Ma ligne n'est pas encore répartie.": "Minha linha ainda não foi distribuída.",
-  "Répartir selon priorités (1 joueur)": "Distribuir por prioridades (1 jogador)",
-  "Micro-timing & groove": "Micro-timing & groove",
-  "swing · placement": "swing · posicionamento",
-  "Swing (asymétrique, libre)": "Swing (assimétrico, livre)",
-  "50 % = binaire droit · 66 % = ternaire parfait · valeurs intermédiaires = swing « humain ». S'applique aux croches et aux doubles-croches (par paires) — ex. ~58–62 % pour le placement samba/choro.": "50 % = binário reto · 66 % = ternário perfeito · valores intermediários = swing \"humano\". Aplica-se a colcheias e semicolcheias (em pares) — ex. ~58–62 % para o posicionamento samba/choro.",
-  "Clic de placement (behind/ahead the beat)": "Clique de posicionamento (behind/ahead the beat)",
-  "Décalage": "Deslocamento",
-  "+25 ms": "+25 ms",
-  "Fréquence du clic décalé": "Frequência do clique deslocado",
-  "220 Hz": "220 Hz",
-  "Un second clic grave, décalé du clic de référence. Décalage positif = au fond du temps (contrebasse, surdo, dundun) · négatif = en avant du temps.": "Um segundo clique grave, deslocado do clique de referência. Deslocamento positivo = no fundo do tempo (contrabaixo, surdo, dundun) · negativo = à frente do tempo.",
-  "Grille rythmique": "Grade rítmica",
-  "Binaire · 16": "Binário · 16",
-  "Ternaire · 12": "Ternário · 12",
-  "Clave et percussion partagent cette grille — pour rester carré, on ne mélange pas binaire et ternaire (le mélange volontaire = polyrythmie superposée).": "Clave e percussão compartilham esta grade — para manter a precisão, não misture binário e ternário (a mistura intencional = polirritmia sobreposta).",
-  "Claves & cellules rythmiques": "Claves & células rítmicas",
-  "séquenceur · polyrythmie": "sequenciador · polirritmia",
-  "— Presets —": "— Presets —",
-  "Son clave 3-2 (16)": "Clave Son 3-2 (16)",
-  "Son clave 2-3 (16)": "Clave Son 2-3 (16)",
-  "Rumba clave 3-2 (16)": "Clave Rumba 3-2 (16)",
-  "Bossa (16)": "Bossa (16)",
-  "Partido alto (variante, 16)": "Partido alto (variante, 16)",
-  "Tresillo (8)": "Tresillo (8)",
-  "Cinquillo (8)": "Cinquillo (8)",
-  "8 pas": "8 passos",
-  "12 pas": "12 passos",
-  "16 pas": "16 passos",
-  "Effacer": "Apagar",
-  "Clave grave": "Clave grave",
-  "muet": "mudo",
-  "Clave aiguë": "Clave aguda",
-  "Clic sur un pas : silence → frappe → accent. Les points au-dessus marquent les temps.": "Clique num passo: silêncio → toque → acento. Os pontos acima marcam os tempos.",
-  "Deux voix": "Duas vozes",
-  "— cloche grave et cloche aiguë — comme n'importe quelle voix de percussion : les presets se posent sur la grave, la seconde voix est libre (contre-clave, bombo…). Le cercle montre comment la cellule se résout sur le 1 du cycle suivant.": "— campana grave e campana aguda — como qualquer voz de percussão: os presets aplicam-se à grave, a segunda voz é livre (contra-clave, bombo…). O círculo mostra como a célula se resolve no 1 do ciclo seguinte.",
-  "Polyrythmie superposée": "Polirritmia sobreposta",
-  "Aucune": "Nenhuma",
-  "2 par cycle": "2 por ciclo",
-  "3 par cycle": "3 por ciclo",
-  "4 par cycle": "4 por ciclo",
-  "5 par cycle": "5 por ciclo",
-  "7 par cycle": "7 por ciclo",
-  "n frappes également réparties (ex. 3 sur 4 temps)": "n toques igualmente distribuídos (ex. 3 sobre 4 tempos)",
-  "Percussion & indépendance": "Percussão & independência",
-  "groove · variations · appel-réponse": "groove · variações · pergunta e resposta",
-  "Activer": "Ativar",
-  "Instrument": "Instrumento",
-  "Djembé (basse · tone · slap)": "Djembê (grave · tom · slap)",
-  "Cajón (grave · aigu)": "Cajón (grave · agudo)",
-  "Dunduns & cloche": "Dunduns & campana",
-  "Agogô (grave · aigu)": "Agogô (grave · agudo)",
-  "Surdo (grave · marcante)": "Surdo (grave · marcante)",
-  "Reco-reco (raclement)": "Reco-reco (raspagem)",
-  "12 pas (ternaire)": "12 passos (ternário)",
-  "16 pas (binaire)": "16 passos (binário)",
-  "Groove de base": "Groove básico",
-  "⛶ Plein écran": "⛶ Tela cheia",
-  "Style": "Estilo",
-  "— Styles —": "— Estilos —",
-  "Passeport — base 4/4 (documenté)": "Passeport — base 4/4 (documentado)",
-  "Kuku — accompagnement 1 (documenté)": "Kuku — acompanhamento 1 (documentado)",
-  "Kassa (adaptation)": "Kassa (adaptação)",
-  "Djolé (adaptation)": "Djolé (adaptação)",
-  "Ternaire 12/8 — Soli/Soko (adaptation)": "Ternário 12/8 — Soli/Soko (adaptação)",
-  "Exercice": "Exercício",
-  "Libre (groove seul)": "Livre (apenas groove)",
-  "Ajout progressif (une frappe à la fois)": "Adição progressiva (um toque por vez)",
-  "Soustraction (le groove s'allège)": "Subtração (o groove fica mais leve)",
-  "Appel-réponse (1 mesure app · 1 mesure toi)": "Pergunta e resposta (1 compasso app · 1 compasso você)",
-  "Progression guidée (mains expliquées)": "Progressão guiada (mãos explicadas)",
-  "Break programmé (toutes les N mesures)": "Break programado (a cada N compassos)",
-  "Voix travaillée": "Voz focada",
-  "Toutes les voix": "Todas as vozes",
-  "Mains": "Mãos",
-  "Alternance stricte D-G": "Alternância estrita D-E",
-  "Main directrice sur les temps": "Mão guia nos tempos",
-  "gaucher (inverser)": "canhoto (inverter)",
-  "← Étape": "← Etapa",
-  "Étape →": "Etapa →",
-  "Break / phrase": "Break / frase",
-  "Appel standard 4/4 (documenté)": "Chamada padrão 4/4 (documentado)",
-  "Appel ternaire 12/8 (documenté)": "Chamada ternária 12/8 (documentado)",
-  "Échauffement — roulement (adaptation)": "Aquecimento — rufo (adaptação)",
-  "Break dununba « sstsss » 12/8 (documenté)": "Break dununba \"sstsss\" 12/8 (documentado)",
-  "Niveau": "Nível",
-  "1 (début de phrase)": "1 (início da frase)",
-  "4 (phrase complète)": "4 (frase completa)",
-  "progression auto": "progressão automática",
-  "réponse après": "resposta depois",
-  "Variation toutes les": "Variação a cada",
-  "mesures (paires en appel-réponse)": "compassos (pares em pergunta-resposta)",
-  "Mes séquences": "Minhas sequências",
-  "💾 Sauver": "💾 Salvar",
-  "— aucune séquence sauvée —": "— nenhuma sequência salva —",
-  "Charger": "Carregar",
-  "Clic sur un pas : silence → frappe → accent.": "Clique num passo: silêncio → toque → acento.",
-  "Micro-timing": "Micro-timing",
-  ": glisse une case active vers la droite (en retard, laid back) ou la gauche (en avance) pour visualiser et entendre le swing de cette frappe — double-clic pour la recentrer.": ": arraste uma caixa ativa para a direita (atrasado, laid back) ou esquerda (adiantado) para visualizar e ouvir o swing deste toque — clique duplo para centralizar.",
-  "Sur écran tactile": "Em tela sensível ao toque",
-  ": appui long (une demi-seconde) sur la case, puis glisse — un simple toucher fait défiler la page.": ": toque longo na caixa (meio segundo), depois arraste — um toque simples rola a página.",
-  ": sauvegarde tes grooves (grilles, accents, micro-décalages) et recharge-les plus tard.": ": salve seus grooves (grades, acentos, micro-deslocamentos) e carregue-os depois.",
-  "Ajout progressif": "Adição progressiva",
-  ": la voix travaillée gagne une frappe à la fois — contretemps d'abord, jamais sur les temps.": ": a voz focada ganha um toque por vez — contratempos primeiro, nunca nos tempos.",
-  "Soustraction": "Subtração",
-  ": le groove s'allège, les ancres (frappes sur les temps) restent.": ": o groove fica mais leve, as âncoras (toques nos tempos) permanecem.",
-  "Appel-réponse": "Pergunta e resposta",
-  ": l'app joue la variation une mesure, tu la répètes la mesure suivante pendant que la voix se tait.": ": o app toca a variação por um compasso, você repete no compasso seguinte enquanto a voz fica muda.",
-  "Break programmé": "Break programado",
-  ": toutes les N mesures, le groove s'interrompt et l'app joue le break au niveau choisi — la phrase s'étoffe du niveau 1 au niveau 4 (« progression auto » monte d'un niveau à chaque break, « réponse après » te laisse une mesure pour le rejouer).": ": a cada N compassos, o groove é interrompido e o app toca o break no nível escolhido — a frase se constrói do nível 1 ao 4 (\"progressão automática\" sobe um nível a cada break, \"resposta depois\" te dá um compasso para tocar de volta).",
-  "Couper une seule voix": "Silenciar uma única voz",
-  ": section Horloge interne, cible sur la voix — les autres continuent.": ": seção Relógio interno, foque na voz — as outras continuam.",
-  ": chaque frappe affiche sa main (D/G).": ": cada toque exibe a sua mão (D/E).",
-  "Progression guidée": "Progressão guiada",
-  ": tu démarres par le squelette du groove — qui dépend du style : alternance sur les temps pour le passeport, backbeat 2-4 pour le funk, kick/caisse claire pour le rock, la basse pour le Kuku — puis l'app ajoute une frappe à la fois, toutes les N mesures ou avec les boutons ← →, en t'expliquant à chaque étape quelle main va où, jusqu'au groove complet. Les patterns marqués": ": você começa pelo esqueleto do groove — que depende do estilo: alternância nos tempos para o passeport, backbeat 2-4 para o funk, bumbo/caixa para o rock, o grave para o Kuku — depois o app adiciona um toque por vez, a cada N compassos ou com os botões ← →, explicando a cada etapa qual mão vai onde, até o groove completo. Os padrões marcados",
-  "adaptation": "adaptação",
-  "sont des approximations pédagogiques : édite-les selon ta référence.": "são aproximações pedagógicas: edite-os de acordo com a sua referência.",
-  "Répertoire de grooves": "Repertório de grooves",
-  "choisis un groove · puis l'instrument de jeu": "escolha um groove · depois o instrumento para tocar",
-  "Répertoire": "Repertório",
-  "bresil": "brasil",
-  "ouest-africain": "oeste-africano",
-  "funk": "funk",
-  "reggae": "reggae",
-  "hiphop": "hip-hop",
-  "rock": "rock",
-  "Samba Batucada": "Samba Batucada",
-  "Maracatu Nação (baque virado)": "Maracatu Nação (baque virado)",
-  "Baião": "Baião",
-  "Ijexá / Afoxé": "Ijexá / Afoxé",
-  "Samba-Reggae": "Samba-Reggae",
-  "Décharger": "Descarregar",
-  "Jouer tout à": "Tocar tudo a",
-  "Instruments authentiques": "Instrumentos autênticos",
-  "Djembé": "Djembê",
-  "Cajón": "Cajón",
-  "Agogô": "Agogô",
-  "Surdo": "Surdo",
-  "Reco-reco": "Reco-reco",
-  "Charge un groove de la bibliothèque puis choisis": "Carregue um groove da biblioteca e escolha",
-  "l'instrument de jeu": "o instrumento para tocar",
-  ": rien n'oblige à rester sur l'instrument « authentique » — joue le répertoire du djembé au cajón si tu veux (les voix sont replacées par": ": não é obrigatório ficar no instrumento \"autêntico\" — toque o repertório do djembê no cajón se quiser (as vozes são remapeadas por",
-  "tessiture": "tessitura",
-  ", marquées": ", marcadas",
-  "adapté": "adaptado",
-  "Le répertoire s'écoute librement, seul ou en groupe — la répartition entre participants se fait dans la section": "O repertório pode ser ouvido livremente, sozinho ou em grupo — a distribuição entre os participantes é feita na seção",
-  "Team Spirit": "Team Spirit",
-  "une ligne par personne · solo/muet · export": "uma linha por pessoa · solo/mudo · exportar",
-  "Mode team spirit (répartir entre participants)": "Modo team spirit (distribuir entre os participantes)",
-  "+ Participant": "+ Participante",
-  "Répartir auto": "Distribuir auto",
-  "Vérifier les doigtés": "Verificar dedilhados",
-  "Qui joue quoi ?": "Quem toca o quê?",
-  "Joueurs": "Jogadores",
-  "Répartir selon priorités": "Distribuir por prioridades",
-  "Accompagnement (backing track) — l'app joue les lignes écartées": "Acompanhamento (backing track) — o app toca as linhas excluídas",
-  "Classe les lignes par priorité — glisse la poignée ⠿ pour réordonner.": "Classifique as linhas por prioridade — arraste a alça ⠿ para reordenar.",
-  "Les premières sont garanties : chaque ligne est attribuée": "As primeiras são garantidas: cada linha é atribuída",
-  "entière ou pas du tout": "inteira ou não é atribuída",
-  ", deux mains par joueur (jamais plus de 2 frappes ni deux fois la même main au même instant). Cumuler des instruments différents n'arrive qu'en dernier recours. Avec": ", duas mãos por jogador (nunca mais de 2 toques ou a mesma mão no mesmo instante). Acumular instrumentos diferentes acontece apenas como último recurso. Com",
-  "1 joueur": "1 jogador",
-  ": la combinaison de lignes que tu peux tenir seul. Les lignes écartées passent en": ": a combinação de linhas que você consegue tocar sozinho. As linhas excluídas tornam-se um",
-  "backing track": "backing track",
-  "si la case est cochée, en sourdine sinon.": "se a caixa estiver marcada, mudas caso contrário.",
-  "↓ Exporter tout (JSON)": "↓ Exportar tudo (JSON)",
-  "Charge d'abord un groove dans la section": "Primeiro carregue um groove na seção",
-  ", puis assigne chaque voix à un participant — menu sur chaque voix du répertoire, ou": ", depois atribua cada voz a um participante — menu em cada voz do repertório, ou",
-  "qui équilibre la charge de jeu (nombre de frappes) en mélangeant les tessitures.": "que equilibra a carga de tocar (número de toques) misturando as tessituras.",
-  "La carte de chacun affiche": "O cartão de cada um exibe",
-  "sa ligne rythmique": "sua linha rítmica",
-  "; écoute la part de chacun (": "; ouça a parte de cada um (",
-  "solo": "solo",
-  ") et exporte sa": ") e exporte sua",
-  "ligne en JSON": "linha em JSON",
-  "pour la travailler chez soi.": "para praticar em casa.",
-  "signale quand une même main est demandée deux fois au même instant pour un même participant (physiquement impossible).": "avisa quando a mesma mão é exigida duas vezes no mesmo instante para um mesmo participante (fisicamente impossível).",
-  "Archet": "Arco",
-  "tirer · pousser · dérive": "puxar · empurrar · deriva",
-  "Violon / Alto": "Violino / Viola",
-  "Violoncelle": "Violoncelo",
-  "Contrebasse — archet français": "Contrabaixo — arco francês",
-  "Contrebasse — archet allemand": "Contrabaixo — arco alemão",
-  "Coup d'archet": "Golpe de arco",
-  "Détaché (vitesse constante)": "Détaché (velocidade constante)",
-  "Legato / liaisons (souple)": "Legato / ligaduras (suave)",
-  "Martelé (mordant, arrêt net)": "Martelé (mordente, parada brusca)",
-  "Spiccato (rebond)": "Spiccato (salteado)",
-  "Débutant — chaque noire = archet complet": "Iniciante — cada semínima = arco completo",
-  "Détaché — noires (moitié d'archet)": "Détaché — semínimas (metade do arco)",
-  "Grand détaché — blanches (tout l'archet)": "Grand détaché — mínimas (todo o arco)",
-  "Détaché — croches au milieu": "Détaché — colcheias no meio",
-  "Liaisons — 4 croches par archet": "Ligaduras — 4 colcheias por arco",
-  "Asymétrie — dérive vers la pointe (démo)": "Assimetria — deriva para a ponta (demo)",
-  "Asymétrie corrigée — avec reprise": "Assimetria corrigida — com retomada",
-  "Martelé — noires": "Martelé — semínimas",
-  "Spiccato — croches au point d'équilibre": "Spiccato — colcheias no ponto de equilíbrio",
-  "Séquence (éditable)": "Sequência (editável)",
-  "Appliquer": "Aplicar",
-  "Archet léger et agile — les coups rapides (spiccato, sautillé) vivent autour du point d'équilibre ◆.": "Arco leve e ágil — os golpes rápidos (spiccato, sautillé) vivem em torno do ponto de equilíbrio ◆.",
-  "Syntaxe :": "Sintaxe:",
-  "T50x1": "T50x1",
-  "= tirer 50 % d'archet sur 1 temps": "= puxar 50 % do arco em 1 tempo",
-  "P20x0.5": "P20x0.5",
-  "= pousser 20 % sur une croche": "= empurrar 20 % numa colcheia",
-  "Rx1": "Rx1",
-  "= reprise (retour au talon, archet levé)": "= retomada (retorno ao talão, arco levantado)",
-  "n4": "n4",
-  "= 4 notes liées sur l'archet (": "= 4 notas ligadas no arco (",
-  "T80x2n4": "T80x2n4",
-  "Jauge : talon à gauche, pointe à droite. Si le curseur vire au rouge, la séquence te fait « manquer d'archet ».": "Medidor: talão à esquerda, ponta à direita. Se o cursor ficar vermelho, a sequência faz você \"ficar sem arco\".",
-  "Horloge interne": "Relógio interno",
-  "coupures de clic (gap clicks)": "cortes de clique (gap clicks)",
-  "Mode": "Modo",
-  "Désactivé": "Desativado",
-  "Fixe (jouer N, couper M)": "Fixo (tocar N, cortar M)",
-  "Progressif (coupures 1, 2, 4, 8…)": "Progressivo (cortes 1, 2, 4, 8…)",
-  "Aléatoire": "Aleatório",
-  "Cible": "Alvo",
-  "Tout (comportement classique)": "Tudo (comportamento clássico)",
-  "Pulsation (clic)": "Pulsação (clique)",
-  "Mesures jouées (N)": "Compassos tocados (N)",
-  "Mesures coupées (M)": "Compassos cortados (M)",
-  "Probabilité de coupure (aléatoire)": "Probabilidade de corte (aleatório)",
-  "La cible se coupe, l'aiguille continue de tourner.": "O alvo é cortado, a agulha continua girando.",
-  ": tout le son (gap classique), la pulsation seule, ou une seule voix (clave ou percussion) — les autres continuent, pour tester la solidité de chaque voix. En mode progressif, la durée des coupures double à chaque cycle (1, 2, 4, 8 mesures, plafonné à 16) : aucun filet de sécurité.": ": todo o som (gap clássico), apenas a pulsação, ou uma única voz (clave ou percussão) — os outros continuam, para testar a solidez de cada voz. No modo progressivo, a duração dos cortes dobra a cada ciclo (1, 2, 4, 8 compassos, limitado a 16): sem rede de segurança.",
-  "Son du clic": "Som do clique",
-  "fréquence · caractère": "frequência · caráter",
-  "Fréquence pulsation": "Frequência da pulsação",
-  "1000 Hz": "1000 Hz",
-  "Caractère": "Caráter",
-  "Tonal (ping)": "Tonal (ping)",
-  "Sec (bruit, type rimshot)": "Seco (ruído, tipo rimshot)",
-  "Clic grave et sourd pour trancher avec un agogô · clic sec et brillant pour percer face à une contrebasse ou des dunduns.": "Clique grave e surdo para contrastar com um agogô · clique seco e brilhante para perfurar através de um contrabaixo ou dunduns.",
-  "Routine programmée": "Rotina programada",
-  "script": "script",
-  "# Exemple de routine # 5 min à 80 BPM 80bpm 5min # accelerando : 80 → 120 en 10 min 80->120bpm 10min # gap : couper 2 mesures toutes les 16 gap 2/16 120bpm 32mes gap off swing 62 100bpm 16mes": "# Exemplo de rotina # 5 min a 80 BPM 80bpm 5min # accelerando : 80 → 120 em 10 min 80->120bpm 10min # gap : cortar 2 compassos a cada 16 gap 2/16 120bpm 32comp gap off swing 62 100bpm 16comp",
-  "▶ Lancer la routine": "▶ Iniciar rotina",
-  "■ Arrêter la routine": "■ Parar rotina",
-  "80bpm 5min": "80bpm 5min",
-  "80->120bpm 10min": "80->120bpm 10min",
-  "(rampe) ·": "(rampa) ·",
-  "100bpm 16mes": "100bpm 16comp",
-  "gap 2/16": "gap 2/16",
-  "gap off": "gap off",
-  "swing 62": "swing 62",
-  "· lignes": "· linhas",
-  "= commentaires. Les changements s'appliquent à la mesure suivante.": "= comentários. As mudanças aplicam-se ao compasso seguinte.",
-  "Bibliothèque partagée": "Biblioteca compartilhada",
-  "routines · Supabase": "rotinas · Supabase",
-  "Publier la routine": "Publicar rotina",
-  "Charger la bibliothèque": "Carregar biblioteca",
-  "Le": "O",
-  "canon": "cânone",
-  "(routines de référence) est visible sans connexion.": "(rotinas de referência) é visível sem login.",
-  "Connecte-toi": "Entre",
-  "(en haut) pour voir les routines de la classe et publier les tiennes. « Importer » place la routine dans l'éditeur ci-dessus.": "(no topo) para ver as rotinas da turma e publicar as suas. \"Importar\" coloca a rotina no editor acima.",
-  "Espace : lecture · ↑↓ : tempo ±1 · T : tap tempo": "Espaço: tocar · ↑↓: tempo ±1 · T: tap tempo",
-  "92 BPM": "92 BPM",
-  "✕ Fermer": "✕ Fechar",
-  "Percussion": "Percussão",
-  "Assistant de réglage": "Assistente de configuração",
-  "Que veux-tu travailler ?": "O que você quer praticar?",
-  "Choisis un contexte — tu poseras tout le reste à la main, en direct.": "Escolha um contexto — você configurará todo o resto manualmente, ao vivo.",
-  "Un tempo, un clic": "Um tempo, um clique",
-  "Métronome nu — tempo, mesure, subdivision. Rien d’autre.": "Metrônomo nu — tempo, compasso, subdivisão. Nada mais.",
-  "Pile rythmique": "Pilha rítmica",
-  "Pulsation, claves et percussions se posent ensemble sur le même cycle.": "Pulsação, claves e percussões assentam juntas no mesmo ciclo.",
-  "Coups d’archet": "Golpes de arco",
-  "Aller-retour de l’archet visualisés — du violon à la contrebasse. Mode à part.": "Movimento do arco visualizado — do violino ao contrabaixo. Modo à parte.",
-  "← Retour": "← Voltar",
-  "Passer l'assistant": "Pular assistente",
-  "Continuer →": "Continuar →",
-  "Écran d'accueil": "Tela inicial",
-  "Prêt à jouer ?": "Pronto para tocar?",
-  "Deux choix — tout le reste s'ajuste ensuite derrière « Configurer ».": "Duas opções — todo o resto se ajusta depois em \"Configurar\".",
-  "On joue…": "Nós tocamos…",
-  "Seul": "Sozinho",
-  "toute la ligne jouable est à moi": "toda a linha tocável é minha",
-  "À plusieurs": "Em grupo",
-  "chacun sa ligne — même groove, même classement, même répartition sur chaque appareil": "cada um com sua linha — mesmo groove, mesma classificação, mesma distribuição em cada dispositivo",
-  "Nombre de joueurs": "Número de jogadores",
-  "Apprentissage": "Aprendizado",
-  "(ajout progressif sur ma ligne)": "(adição progressiva na minha linha)",
-  "Oui": "Sim",
-  "ma ligne se construira frappe par frappe — choix mémorisé, l'exercice arrive à la prochaine étape": "minha linha será construída toque por toque — escolha salva, o exercício chega à próxima etapa",
-  "Non": "Não",
-  "je joue la ligne complète": "eu toco a linha completa",
-  "C'est parti →": "Vamos lá →",
-  "Recevoir un lien de connexion par e-mail": "Receber um link de acesso por e-mail",
-  "English / Français": "Inglês / Francês",
-  "Langue / Language": "Idioma / Language",
-  "Tempo -1": "Tempo -1",
-  "Tempo +1": "Tempo +1",
-  "Coupe le clic (pulsation, subdivisions, clic décalé) — clave et percussion continuent": "Corta o clique (pulsação, subdivisões, clique deslocado) — clave e percussão continuam",
-  "Durée enregistrée de ce qui joue": "Duração gravada do que está tocando",
-  "Rouvrir l'écran d'accueil (seul / à plusieurs · apprentissage)": "Reabrir a tela inicial (sozinho / em grupo · aprendizado)",
-  "Famille": "Família",
-  "Nombre de pas du cycle — 12 ou 16 bascule la famille (clave + percussion) ; 8 = cellule courte propre à la clave": "Número de passos do ciclo — 12 ou 16 alterna a família (clave + percussão); 8 = célula curta própria da clave",
-  "Pas du cycle — asservi à la famille : bascule clave + percussion ensemble": "Passo do ciclo — vinculado à família: alterna clave + percussão juntas",
-  "nom de la séquence…": "nome da sequência…",
-  "Supprimer la séquence sélectionnée": "Excluir a sequência selecionada",
-  "Revenir à la percussion focale": "Voltar à percussão focal",
-  "Répartir les voix en équilibrant la charge de jeu (frappes) et les tessitures": "Distribuir as vozes equilibrando a carga de tocar (toques) e as tessituras",
-  "Titre de la routine à publier": "Título da rotina a publicar",
-  "Connecte-toi (en haut) pour publier": "Entre (no topo) para publicar",
-  "◐ Mode clair": "◐ Modo claro",
-  "Ton compte": "Sua conta",
-  "Se déconnecter": "Sair",
-  "■ Arrêter": "■ Parar",
-  "⟲ Tout réinitialiser": "⟲ Redefinir tudo",
-  "Tout remettre par défaut — la langue, le thème et ton compte sont conservés": "Restaurar os padrões — o idioma, o tema e sua conta são mantidos",
-  "L'assistant règle le métronome pour toi en trois questions": "O assistente configura o metrônomo para você em três perguntas",
-  "Basculer entre thème clair et thème sombre": "Alternar entre tema claro e tema escuro",
-  "mesure : 2/4 · 3/4 (valse) · 4/4…": "compasso: 2/4 · 3/4 (valsa) · 4/4…",
-  "Nombre de temps dans chaque mesure : 2 = 2/4, 3 = 3/4 (valse), 4 = 4/4…": "Número de tempos por compasso: 2 = 2/4, 3 = 3/4 (valsa), 4 = 4/4…",
-  "Sourdine générale (coupe tout le son en un clic)": "Mudo geral (corta todo o som em um clique)",
-  "Sommaire des sections": "Índice das seções",
-  "Groove": "Groove",
-  "Claves": "Claves",
-  "Cours funk": "Curso de funk",
-  "Horloge": "Relógio",
-  "Son": "Som",
-  "Script": "Script",
-  "Bibliothèque": "Biblioteca",
-  "Export": "Exportar",
-  "↑ Haut": "↑ Topo",
-  "Revenir en haut de la page": "Voltar ao topo da página",
-  "Micro-timing : décaler certaines frappes de quelques millisecondes autour du temps — c'est ce qui fait « groover »": "Micro-timing: deslocar alguns toques por alguns milissegundos ao redor do tempo — é isso que faz o groove",
-  "Swing : on retarde une croche sur deux — 50 % = binaire droit, 66 % = ternaire. Placement : jouer un peu avant ou après le clic": "Swing: uma colcheia em cada duas é atrasada — 50% = reto, 66% = ternário. Posicionamento: tocar um pouco antes ou depois do clique",
-  "Une clave est une courte cellule rythmique qui se répète et sert de repère à tout le morceau (son, rumba, tresillo…)": "Uma clave é uma célula rítmica curta que se repete e serve de referência para toda a música (son, rumba, tresillo…)",
-  "Gap clicks : le métronome se tait quelques mesures puis revient — à toi de tenir le tempo pendant le silence": "Gap clicks: o metrônomo silencia por alguns compassos e depois volta — mantenha o tempo durante o silêncio",
-  "L'accompagnement (backing track) : les voix que l'appli joue à ta place": "O acompanhamento (backing track): as vozes que o app toca no seu lugar",
-  "Drop-outs : la basse se tait quelques mesures puis revient — garde le tempo pendant le silence": "Drop-outs: o baixo silencia por alguns compassos e depois volta — mantenha o tempo durante o silêncio",
-  "silences (drop-outs)": "silêncios (drop-outs)",
-  "Silences (drop-outs) — la basse se tait": "Silêncios (drop-outs) — o baixo se cala",
-  "Coupures traversées": "Cortes atravessados",
-  "Nombre de coupures traversées depuis le dernier départ — chaque silence tenu jusqu'au bout compte pour un": "Número de cortes atravessados desde a última partida — cada silêncio mantido até o fim conta como um",
-  "✓ Réglages enregistrés automatiquement": "✓ Configurações salvas automaticamente",
-  "Agrandir l'archet en plein écran": "Ampliar o arco em tela cheia",
-  "Reçois un lien de connexion par e-mail — aucun mot de passe à retenir.": "Receba um link de acesso por e-mail — nenhuma senha para lembrar.",
-  "L'application fonctionne aussi sans compte : la connexion sert seulement à partager tes routines et suivre ta progression.": "O app também funciona sem conta: entrar serve apenas para compartilhar suas rotinas e acompanhar seu progresso.",
-  "Pas reçu au bout d'une minute ? Vérifie tes indésirables (spams), ou renvoie le lien.": "Nada depois de um minuto? Verifique sua caixa de spam, ou reenvie o link.",
-  "Renvoyer le lien": "Reenviar o link",
-  "En savoir plus": "Saiba mais",
-  "Débutant ? Laisse-toi guider": "Iniciante? Deixe-se guiar",
-  "— l'assistant règle le métronome pour toi en trois questions.": "— o assistente ajusta o metrônomo para você em três perguntas.",
-  "Plus tard": "Mais tarde",
-  "Une section à la fois": "Uma seção de cada vez",
-  "Ouvrir une section referme les autres": "Abrir uma seção fecha as outras"
-} };
+
 (function(){
   var DICTS = window.__I18N || {};
   var LANGS = ['fr','en','pt'];
@@ -9850,10 +10117,15 @@ window.__I18N = { "en": {
   function lang(){ try{ var q=new URLSearchParams(location.search).get('lang'); var l=q||localStorage.getItem('fm-lang')||'fr'; return LANGS.indexOf(l)>=0?l:'fr'; }catch(e){ return 'fr'; } }
   function curDict(){ var l=lang(); return (l!=='fr' && DICTS[l]) ? DICTS[l] : null; }
   var D=null;
-  function trText(node){ if(!D)return; var raw=node.nodeValue; if(!raw)return; var key=norm(raw); if(!key)return; var t=D[key]; if(t){ var lead=(raw.match(/^\s*/)||[''])[0], trail=(raw.match(/\s*$/)||[''])[0]; if(node.nodeValue!==lead+t+trail) node.nodeValue=lead+t+trail; } }
+  /* I5 0.6.9 : ?i18ndebug=1 — marque les nœuds restés en français après bascule
+     (VALS = valeurs déjà traduites, pour ne pas marquer les nœuds convertis) */
+  var DEBUG=false; try{ DEBUG=new URLSearchParams(location.search).get('i18ndebug')==='1'; }catch(e){}
+  var VALS=null;
+  function trText(node){ if(!D)return; var raw=node.nodeValue; if(!raw)return; var key=norm(raw); if(!key)return; var t=D[key]; if(t){ var lead=(raw.match(/^\s*/)||[''])[0], trail=(raw.match(/\s*$/)||[''])[0]; if(node.nodeValue!==lead+t+trail) node.nodeValue=lead+t+trail; }
+    else if(DEBUG && /[A-Za-zÀ-ÿ]{2}/.test(key) && !(VALS && VALS[key])){ var p=node.parentElement; if(p && p.classList) p.classList.add('i18n-miss'); } }
   function trEl(el){ if(!D||!el||!el.getAttribute)return; ['placeholder','title','aria-label'].forEach(function(a){ if(el.hasAttribute&&el.hasAttribute(a)){ var t=D[norm(el.getAttribute(a))]; if(t) el.setAttribute(a,t); } }); }
   function walk(root){ try{ var w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,null),n,ns=[]; while(n=w.nextNode())ns.push(n); ns.forEach(trText); if(root.querySelectorAll) root.querySelectorAll('[placeholder],[title],[aria-label]').forEach(trEl); if(root.nodeType===1) trEl(root); }catch(e){} }
-  function enable(){ D=curDict(); if(!D) return; walk(document.body); try{ var obs=new MutationObserver(function(muts){ muts.forEach(function(m){ if(m.type==='characterData'){ trText(m.target); return; } m.addedNodes&&m.addedNodes.forEach(function(nd){ if(nd.nodeType===3)trText(nd); else if(nd.nodeType===1)walk(nd); }); }); }); obs.observe(document.body,{childList:true,subtree:true,characterData:true}); }catch(e){} }
+  function enable(){ D=curDict(); if(!D) return; if(DEBUG){ VALS={}; Object.keys(D).forEach(function(k){ VALS[D[k]]=1; }); } walk(document.body); try{ var obs=new MutationObserver(function(muts){ muts.forEach(function(m){ if(m.type==='characterData'){ trText(m.target); return; } m.addedNodes&&m.addedNodes.forEach(function(nd){ if(nd.nodeType===3)trText(nd); else if(nd.nodeType===1)walk(nd); }); }); }); obs.observe(document.body,{childList:true,subtree:true,characterData:true}); }catch(e){} }
   function setLang(code){
     if(LANGS.indexOf(code)<0 || code===lang()) return;
     try{ localStorage.setItem('fm-lang',code); }catch(e){}
