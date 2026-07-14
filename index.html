@@ -475,6 +475,15 @@
   .pf-vote { display:flex; align-items:center; gap:6px; margin-top:8px; font-size:.76rem; color:var(--fm-sub); flex-wrap:wrap; }
   .pf-vote .pf-v { font-size:.74rem; padding:2px 8px; }
   #pfStatus { font-size:.78rem; color:var(--fm-accent-2); margin-top:8px; min-height:1em; }
+  .pf-mod { border:1px solid var(--fm-line); border-radius:10px; margin:8px 0; overflow:hidden; background:var(--fm-panel); }
+  .pf-mod-head { width:100%; display:flex; align-items:center; gap:8px; padding:9px 10px; background:transparent; border:none; cursor:pointer; color:var(--fm-ink); font:inherit; text-align:left; }
+  .pf-mod-idx { min-width:1.6em; height:1.6em; border-radius:50%; background:var(--pf-c); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:.72rem; font-weight:700; }
+  .pf-mod-objet { flex:1; font-weight:700; font-size:.85rem; }
+  .pf-mod-count { font-size:.72rem; color:var(--fm-sub); font-variant-numeric:tabular-nums; }
+  .pf-mod-chev { color:var(--fm-sub); transition:transform .18s ease; }
+  .pf-mod.open .pf-mod-chev { transform:rotate(180deg); }
+  .pf-mod-body { display:none; padding:0 8px 6px; }
+  .pf-mod.open .pf-mod-body { display:block; }
 </style>
 
 <script>
@@ -1248,7 +1257,7 @@ swing 62
 
   // Identité du build affichée dans l'en-tête (5.3-bis). Bumper à chaque passe : elle sert à
   // savoir de quel build vient un enregistrement de validation.
-  const BUILD = 'metronomefunk-0.6.4', BUILD_DATE = '2026-07-12';
+  const BUILD = 'metronomefunk-0.6.5', BUILD_DATE = '2026-07-14';
 
   let audioCtx = null, masterGain = null, noiseBuf = null;
   let masterLimiter = null;                                   // 5.3-ter : limiteur de bus master
@@ -7988,13 +7997,181 @@ swing 62
     'EX-DJ-I2-05': { kind:'synthese', objet:'Synthèse — groove 2 cellules',
       consigne:"Enchaîne bass sur The One + slap fouetté dans le trou + nappe ghost, sur les deux mesures.",
       critere:"quand tu tiens le groove entier détendu, même quand la basse change d'accord.",
-      preset:{ pattern:'theOne', prog:'vamp2', drop:{on:false} } }
+      preset:{ pattern:'theOne', prog:'vamp2', drop:{on:false} } },
+    // ===== P-2 : modules 1-5 de l'Intermediaire =====
+    // -- Module 1 : The One (partage) --
+    'EX-SOCLE-T1-01': { kind:'atome', objet:'Le grave sur le 1',
+      consigne:"A chaque mesure, pose ton grave exactement sur le 1 - rien d'autre pour l'instant.",
+      critere:"quand tu retrouves le 1 sans le chercher, mesure apres mesure.",
+      preset:{ pattern:'theOne', prog:'vamp1', drop:{on:false} } },
+    'EX-SOCLE-T1-02': { kind:'atome', objet:'Le 1 comme repere, pas comme coup de force',
+      consigne:"Rejoue ton grave sur le 1, mais doux : c'est une reference d'organisation, pas l'accent le plus fort.",
+      critere:"quand le 1 continue de t'organiser meme joue en retrait.",
+      preset:{ pattern:'theOne', prog:'vamp1', drop:{on:false} } },
+    'EX-SOCLE-T1-03': { kind:'atome', objet:"Tenir le 1 quand la basse s'efface",
+      consigne:"Quand la basse disparait une mesure, garde ta pulsation interieure et retombe pile sur le 1 suivant.",
+      critere:"quand ton 1 retombe juste sans avoir eu besoin de reentendre la basse.",
+      preset:{ pattern:'theOne', prog:'vamp1', drop:{on:true, everyN:4, lenBeats:4} } },
+    'EX-SOCLE-T1-04': { kind:'atome', objet:"Le 1 ne bouge pas quand l'accord change",
+      consigne:"Sur la progression a deux accords, garde ton 1 identique meme quand l'harmonie change a la 2e mesure.",
+      critere:"quand le changement d'accord ne deplace jamais ton repere du 1.",
+      preset:{ pattern:'theOne', prog:'vamp2', drop:{on:false} } },
+    'EX-SOCLE-T1-05': { kind:'synthese', objet:"Groove d'ancrage sur The One",
+      consigne:"Enchaine grave sur chaque 1 + une nappe legere de touches entre les temps, sur les deux mesures.",
+      critere:"quand le 1 reste ton point fixe pendant que la nappe tourne autour.",
+      preset:{ pattern:'theOne', prog:'vamp2', drop:{on:false} } },
+    // -- Module 2 : Grille de 16es (partage) --
+    'EX-SOCLE-T2-01': { kind:'atome', objet:'Sentir les 4 doubles-croches',
+      consigne:"Joue une touche tres legere sur chacune des 4 doubles-croches d'un temps, regulieres comme un moteur.",
+      critere:"quand les 4 touches sont egales, sans trou ni bosse.",
+      preset:{ pattern:'ghostPendule', prog:'vamp1', drop:{on:false} } },
+    'EX-SOCLE-T2-02': { kind:'atome', objet:'Etendre la grille sur la mesure',
+      consigne:"Etale la nappe de 16es sur toute la mesure, sans repos, sous la basse.",
+      critere:"quand la grille tourne en continu sans que tu y penses.",
+      preset:{ pattern:'ghostPendule', prog:'vamp1', drop:{on:false} } },
+    'EX-SOCLE-T2-03': { kind:'atome', objet:'Le swing des 16es',
+      consigne:"Laisse tes contretemps faibles glisser legerement en retard : un swing doux, ni tout a fait binaire ni ternaire.",
+      critere:"quand la nappe respire avec un balancement regulier au lieu d'etre raide.",
+      preset:{ pattern:'ghostPendule', prog:'vamp1', drop:{on:false} } },
+    'EX-SOCLE-T2-04': { kind:'atome', objet:'Accentuer un point de la grille',
+      consigne:"Garde la nappe egale mais fais ressortir un seul point par temps (le e, puis le a).",
+      critere:"quand l'accent choisi ressort sans casser la regularite du reste.",
+      preset:{ pattern:'ghostPendule', prog:'vamp1', drop:{on:false} } },
+    'EX-SOCLE-T2-05': { kind:'synthese', objet:'Grille complete swinguee',
+      consigne:"Tourne la grille complete sur les deux mesures : nappe reguliere + swing + un accent place, sous la basse.",
+      critere:"quand la grille tient toute seule et donne envie de bouger.",
+      preset:{ pattern:'ghostPendule', prog:'vamp2', drop:{on:false} } },
+    // -- Module 3 : Backbeat 2 & 4 - CAJON (propre) --
+    'EX-CJ-B1-01': { kind:'atome', objet:'Le slap seul sur 2 et 4 (catapulte)',
+      consigne:"Place un slap catapulte franc sur le 2 et sur le 4, rien d'autre.",
+      critere:"quand tes deux slaps claquent nets, toujours a la meme place.",
+      preset:{ pattern:'theOne', prog:'vamp1', drop:{on:false} } },
+    'EX-CJ-B1-02': { kind:'atome', objet:'Slap tranchant contre grave rond',
+      consigne:"Alterne grave rond sur le 1 et slap tranchant sur 2 & 4 : deux couleurs bien distinctes.",
+      critere:"quand on entend clairement deux sons opposes, grave et claquant.",
+      preset:{ pattern:'theOne', prog:'vamp1', drop:{on:false} } },
+    'EX-CJ-B1-03': { kind:'atome', objet:'Backbeat regulier sous la basse',
+      consigne:"Garde tes slaps 2 & 4 exactement cales pendant que la basse bouge.",
+      critere:"quand le backbeat ne bronche pas, quoi que fasse la basse.",
+      preset:{ pattern:'theOne', prog:'vamp1', drop:{on:false} } },
+    'EX-CJ-B1-04': { kind:'atome', objet:'Backbeat quand la basse coupe',
+      consigne:"Meme quand la basse coupe deux temps, tes slaps 2 & 4 restent a l'heure.",
+      critere:"quand tes 2 & 4 retombent justes au retour de la basse.",
+      preset:{ pattern:'theOne', prog:'vamp1', drop:{on:true, everyN:4, lenBeats:2} } },
+    'EX-CJ-B1-05': { kind:'synthese', objet:'Groove backbeat',
+      consigne:"Enchaine grave sur 1 + slaps sur 2 & 4, sur les deux mesures de la progression.",
+      critere:"quand le backbeat porte le groove sans effort.",
+      preset:{ pattern:'theOne', prog:'vamp2', drop:{on:false} } },
+    // -- Module 3 : Backbeat 2 & 4 - DJEMBE (propre) --
+    'EX-DJ-B1-01': { kind:'atome', objet:'Le tone/slap seul sur 2 et 4 (fouette)',
+      consigne:"Place un slap fouette (ou un tone claquant) sur le 2 et le 4, rien d'autre.",
+      critere:"quand tes deux accents claquent nets, toujours a la meme place.",
+      preset:{ pattern:'theOne', prog:'vamp1', drop:{on:false} } },
+    'EX-DJ-B1-02': { kind:'atome', objet:'Slap tranchant contre bass ronde',
+      consigne:"Alterne bass ronde sur le 1 et slap fouette sur 2 & 4 : deux couleurs opposees.",
+      critere:"quand on distingue clairement la bass et le slap.",
+      preset:{ pattern:'theOne', prog:'vamp1', drop:{on:false} } },
+    'EX-DJ-B1-03': { kind:'atome', objet:'Backbeat regulier sous la basse',
+      consigne:"Garde tes slaps 2 & 4 exactement cales pendant que la basse bouge.",
+      critere:"quand le backbeat ne bronche pas, quoi que fasse la basse.",
+      preset:{ pattern:'theOne', prog:'vamp1', drop:{on:false} } },
+    'EX-DJ-B1-04': { kind:'atome', objet:'Backbeat quand la basse coupe',
+      consigne:"Meme quand la basse coupe deux temps, tes slaps 2 & 4 restent a l'heure.",
+      critere:"quand tes 2 & 4 retombent justes au retour de la basse.",
+      preset:{ pattern:'theOne', prog:'vamp1', drop:{on:true, everyN:4, lenBeats:2} } },
+    'EX-DJ-B1-05': { kind:'synthese', objet:'Groove backbeat',
+      consigne:"Enchaine bass sur 1 + slaps fouettes sur 2 & 4, sur les deux mesures.",
+      critere:"quand le backbeat porte le groove sans effort.",
+      preset:{ pattern:'theOne', prog:'vamp2', drop:{on:false} } },
+    // -- Module 4 : Backbeat deplace - CAJON (propre) --
+    'EX-CJ-B2-01': { kind:'atome', objet:'Garder le 2, retirer le 4',
+      consigne:"Garde le slap sur le 2, mais supprime celui du 4 - laisse le trou.",
+      critere:"quand l'absence du 4 cree une tension au lieu d'un manque.",
+      preset:{ pattern:'syncopeGrave', prog:'vamp1', drop:{on:false} } },
+    'EX-CJ-B2-02': { kind:'atome', objet:'Migrer le 4 sur le et',
+      consigne:"Redonne le deuxieme slap, mais decale juste apres le 4 (sur le et).",
+      critere:"quand le slap deplace tire le groove en avant sans le desequilibrer.",
+      preset:{ pattern:'syncopeGrave', prog:'vamp1', drop:{on:false} } },
+    'EX-CJ-B2-03': { kind:'atome', objet:'Le deplacement contre la basse',
+      consigne:"Cale ton slap deplace dans un silence de la basse, jamais sur sa note.",
+      critere:"quand le slap deplace tombe dans le vide de la basse.",
+      preset:{ pattern:'syncopeGrave', prog:'vamp1', drop:{on:false} } },
+    'EX-CJ-B2-04': { kind:'atome', objet:'Alterner backbeat droit / deplace',
+      consigne:"Une mesure backbeat droit (2 & 4), une mesure backbeat deplace : alterne sans trou.",
+      critere:"quand le passage droit-deplace est fluide, sans accroc de time.",
+      preset:{ pattern:'syncopeGrave', prog:'vamp2', drop:{on:false} } },
+    'EX-CJ-B2-05': { kind:'synthese', objet:'Groove a backbeat deplace',
+      consigne:"Installe le groove avec le backbeat deplace stabilise sur les deux cellules.",
+      critere:"quand le deplacement devient le caractere du groove, pas une erreur.",
+      preset:{ pattern:'syncopeGrave', prog:'vamp2', drop:{on:false} } },
+    // -- Module 4 : Backbeat deplace - DJEMBE (propre) --
+    'EX-DJ-B2-01': { kind:'atome', objet:'Garder le 2, retirer le 4',
+      consigne:"Garde le slap fouette sur le 2, mais supprime celui du 4 - laisse le trou.",
+      critere:"quand l'absence du 4 cree une tension au lieu d'un manque.",
+      preset:{ pattern:'syncopeGrave', prog:'vamp1', drop:{on:false} } },
+    'EX-DJ-B2-02': { kind:'atome', objet:'Migrer le 4 sur le et',
+      consigne:"Redonne le deuxieme slap, decale juste apres le 4 (sur le et), poignet fouette.",
+      critere:"quand le slap deplace tire le groove en avant sans le desequilibrer.",
+      preset:{ pattern:'syncopeGrave', prog:'vamp1', drop:{on:false} } },
+    'EX-DJ-B2-03': { kind:'atome', objet:'Le deplacement contre la basse',
+      consigne:"Cale ton slap deplace dans un silence de la basse, jamais sur sa note.",
+      critere:"quand le slap deplace tombe dans le vide de la basse.",
+      preset:{ pattern:'syncopeGrave', prog:'vamp1', drop:{on:false} } },
+    'EX-DJ-B2-04': { kind:'atome', objet:'Alterner backbeat droit / deplace',
+      consigne:"Une mesure backbeat droit (2 & 4), une mesure deplace : alterne sans trou.",
+      critere:"quand le passage droit-deplace est fluide, sans accroc de time.",
+      preset:{ pattern:'syncopeGrave', prog:'vamp2', drop:{on:false} } },
+    'EX-DJ-B2-05': { kind:'synthese', objet:'Groove a backbeat deplace',
+      consigne:"Installe le groove avec le backbeat deplace stabilise sur les deux cellules.",
+      critere:"quand le deplacement devient le caractere du groove, pas une erreur.",
+      preset:{ pattern:'syncopeGrave', prog:'vamp2', drop:{on:false} } },
+    // -- Module 5 : Ghost pendule (partage) --
+    'EX-SOCLE-D1-01': { kind:'atome', objet:'Le ghost sur le e',
+      consigne:"Glisse un ghost tres faible sur le e de chaque temps (juste apres le temps).",
+      critere:"quand les ghosts du e sont reguliers et presque inaudibles.",
+      preset:{ pattern:'ghostPendule', prog:'vamp1', drop:{on:false} } },
+    'EX-SOCLE-D1-02': { kind:'atome', objet:'Le ghost du a avant le 2',
+      consigne:"Ajoute un ghost sur le a juste avant le 2, comme un elan vers le backbeat.",
+      critere:"quand le a pousse naturellement vers le 2 sans le couvrir.",
+      preset:{ pattern:'ghostPendule', prog:'vamp1', drop:{on:false} } },
+    'EX-SOCLE-D1-03': { kind:'atome', objet:'Le pendule : va-et-vient regulier',
+      consigne:"Fais osciller tes ghosts en un balancement regulier, comme un pendule sous la basse.",
+      critere:"quand le tapis de ghosts respire a intervalle egal.",
+      preset:{ pattern:'ghostPendule', prog:'vamp1', drop:{on:false} } },
+    'EX-SOCLE-D1-04': { kind:'atome', objet:'Ghost + accent : contraste dynamique',
+      consigne:"Garde les ghosts tres faibles et fais ressortir un seul accent : le contraste fait la poche.",
+      critere:"quand l'ecart entre ghost et accent est net et constant.",
+      preset:{ pattern:'ghostPendule', prog:'vamp1', drop:{on:false} } },
+    'EX-SOCLE-D1-05': { kind:'synthese', objet:'Nappe de ghosts complete',
+      consigne:"Tisse le pendule complet (e + a) sur les deux mesures, sous la basse.",
+      critere:"quand la nappe de ghosts tient toute seule et donne le groove.",
+      preset:{ pattern:'ghostPendule', prog:'vamp2', drop:{on:false} } }
   };
   const PF_MOD = {
     'MOD-CJ-I-I2': { parcours:'cajon', niveau:'intermediaire', objet:'Verrouiller sur la basse funk',
       exercices:['EX-SOCLE-I2-01','EX-CJ-I2-02','EX-SOCLE-I2-03','EX-SOCLE-I2-04','EX-CJ-I2-05'] },
     'MOD-DJ-I-I2': { parcours:'djembe', niveau:'intermediaire', objet:'Verrouiller sur la basse funk',
-      exercices:['EX-SOCLE-I2-01','EX-DJ-I2-02','EX-SOCLE-I2-03','EX-SOCLE-I2-04','EX-DJ-I2-05'] }
+      exercices:['EX-SOCLE-I2-01','EX-DJ-I2-02','EX-SOCLE-I2-03','EX-SOCLE-I2-04','EX-DJ-I2-05'] },
+    'MOD-CJ-I-T1': { parcours:'cajon', niveau:'intermediaire', objet:'The One',
+      exercices:['EX-SOCLE-T1-01','EX-SOCLE-T1-02','EX-SOCLE-T1-03','EX-SOCLE-T1-04','EX-SOCLE-T1-05'] },
+    'MOD-DJ-I-T1': { parcours:'djembe', niveau:'intermediaire', objet:'The One',
+      exercices:['EX-SOCLE-T1-01','EX-SOCLE-T1-02','EX-SOCLE-T1-03','EX-SOCLE-T1-04','EX-SOCLE-T1-05'] },
+    'MOD-CJ-I-T2': { parcours:'cajon', niveau:'intermediaire', objet:'Grille de 16es',
+      exercices:['EX-SOCLE-T2-01','EX-SOCLE-T2-02','EX-SOCLE-T2-03','EX-SOCLE-T2-04','EX-SOCLE-T2-05'] },
+    'MOD-DJ-I-T2': { parcours:'djembe', niveau:'intermediaire', objet:'Grille de 16es',
+      exercices:['EX-SOCLE-T2-01','EX-SOCLE-T2-02','EX-SOCLE-T2-03','EX-SOCLE-T2-04','EX-SOCLE-T2-05'] },
+    'MOD-CJ-I-B1': { parcours:'cajon', niveau:'intermediaire', objet:'Backbeat 2 & 4',
+      exercices:['EX-CJ-B1-01','EX-CJ-B1-02','EX-CJ-B1-03','EX-CJ-B1-04','EX-CJ-B1-05'] },
+    'MOD-DJ-I-B1': { parcours:'djembe', niveau:'intermediaire', objet:'Backbeat 2 & 4',
+      exercices:['EX-DJ-B1-01','EX-DJ-B1-02','EX-DJ-B1-03','EX-DJ-B1-04','EX-DJ-B1-05'] },
+    'MOD-CJ-I-B2': { parcours:'cajon', niveau:'intermediaire', objet:'Backbeat deplace',
+      exercices:['EX-CJ-B2-01','EX-CJ-B2-02','EX-CJ-B2-03','EX-CJ-B2-04','EX-CJ-B2-05'] },
+    'MOD-DJ-I-B2': { parcours:'djembe', niveau:'intermediaire', objet:'Backbeat deplace',
+      exercices:['EX-DJ-B2-01','EX-DJ-B2-02','EX-DJ-B2-03','EX-DJ-B2-04','EX-DJ-B2-05'] },
+    'MOD-CJ-I-D1': { parcours:'cajon', niveau:'intermediaire', objet:'Ghost pendule',
+      exercices:['EX-SOCLE-D1-01','EX-SOCLE-D1-02','EX-SOCLE-D1-03','EX-SOCLE-D1-04','EX-SOCLE-D1-05'] },
+    'MOD-DJ-I-D1': { parcours:'djembe', niveau:'intermediaire', objet:'Ghost pendule',
+      exercices:['EX-SOCLE-D1-01','EX-SOCLE-D1-02','EX-SOCLE-D1-03','EX-SOCLE-D1-04','EX-SOCLE-D1-05'] }
   };
   function pfSharedSet(){
     const c = {};
@@ -8103,53 +8280,83 @@ swing 62
   function pfRender(){
     const root = $('pfRoot'); if (!root) return;
     const shared = pfSharedSet();
+    const PF_MOD_ORDER = ['T1','T2','B1','B2','D1','I2'];
     let html = '<div class="pf-grid">';
     ['cajon','djembe'].forEach(pk => {
-      const mid = pk === 'cajon' ? 'MOD-CJ-I-I2' : 'MOD-DJ-I-I2';
-      const M = PF_MOD[mid], parc = PF_PARC[pk];
+      const parc = PF_PARC[pk];
+      const pref = (pk === 'cajon') ? 'MOD-CJ-I-' : 'MOD-DJ-I-';
       html += '<div class="pf-col" style="--pf-c:' + parc.couleur + '">';
-      html += '<div class="pf-col-head"><span class="pf-dot"></span>' + pfEsc(parc.label) + ' · ' + pfEsc(M.objet) + '</div>';
-      M.exercices.forEach((ex, i) => {
-        const E = PF_EX[ex]; const isShared = shared.indexOf(ex) >= 0;
-        const acq = pfIsAcquis(pk, ex);
-        const promo = pfPromoGet(pk, ex, E.kind); const promu = !!(promo && promo.promu);
-        html += '<div class="pf-card' + (isShared ? ' pf-shared' : '') + (acq ? ' pf-acq' : '') + '" data-ex="' + ex + '" data-parc="' + pk + '">';
-        html += '<div class="pf-card-top"><span class="pf-rang">' + (E.kind === 'synthese' ? '★' : (i + 1)) + '</span>';
-        html += '<span class="pf-objet">' + pfEsc(E.objet) + '</span>';
-        if (isShared) html += '<span class="pf-badge-shared" title="Déjà rencontré dans l\'autre parcours">déjà rencontré</span>';
-        if (promu) html += '<span class="pf-badge-promo" title="Monté d\'un niveau par les votes">&#8593; niveau</span>';
-        html += '</div>';
-        html += '<div class="pf-consigne">' + pfEsc(E.consigne) + '</div>';
-        html += '<div class="pf-critere">&laquo; ' + pfEsc(E.critere) + ' &raquo;</div>';
-        html += '<div class="pf-actions"><button class="btn-sm primary pf-load">Charger</button>';
-        html += '<label class="check pf-acq-lbl"><input type="checkbox" class="pf-acquis"' + (acq ? ' checked' : '') + '> acquis</label></div>';
-        html += '<details class="pf-perso"><summary>Personnaliser</summary><div class="pf-perso-body">';
-        html += '<label>Tempo <input type="range" class="pf-tempo" min="70" max="110" value="90"></label>';
-        html += '<label>Densité <select class="pf-dens"><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option></select></label>';
-        html += '<label class="check"><input type="checkbox" class="pf-drop"' + (E.preset.drop && E.preset.drop.on ? ' checked' : '') + '> Drop-outs</label>';
-        html += '<label>Tonalité <select class="pf-key">' + PF_KEYS.map(k => '<option' + (k === 'E' ? ' selected' : '') + '>' + k + '</option>').join('') + '</select></label>';
-        html += '</div></details>';
-        html += '<div class="pf-vote"><span>Difficulté :</span>';
-        html += '<button class="btn-sm pf-v" data-v="facile">facile</button>';
-        html += '<button class="btn-sm pf-v" data-v="ok">ok</button>';
-        html += '<button class="btn-sm pf-v" data-v="difficile">difficile</button></div>';
-        html += '</div>';
+      html += '<div class="pf-col-head"><span class="pf-dot"></span>' + pfEsc(parc.label) + '</div>';
+      let mi = 0;
+      PF_MOD_ORDER.forEach(code => {
+        const mid = pref + code; const M = PF_MOD[mid]; if (!M) return;
+        let done = 0; M.exercices.forEach(ex => { if (pfIsAcquis(pk, ex)) done++; });
+        const total = M.exercices.length; const open = (mi === 0);
+        html += '<div class="pf-mod' + (open ? ' open' : '') + '" data-parc="' + pk + '" data-mid="' + mid + '">';
+        html += '<button type="button" class="pf-mod-head"><span class="pf-mod-idx">' + (mi + 1) + '</span>';
+        html += '<span class="pf-mod-objet">' + pfEsc(M.objet) + '</span>';
+        html += '<span class="pf-mod-count">' + done + '/' + total + '</span>';
+        html += '<span class="pf-mod-chev">&#9662;</span></button>';
+        html += '<div class="pf-mod-body">';
+        M.exercices.forEach((ex, i) => {
+          const E = PF_EX[ex]; const isShared = shared.indexOf(ex) >= 0;
+          const acq = pfIsAcquis(pk, ex);
+          const promo = pfPromoGet(pk, ex, E.kind); const promu = !!(promo && promo.promu);
+          html += '<div class="pf-card' + (isShared ? ' pf-shared' : '') + (acq ? ' pf-acq' : '') + '" data-ex="' + ex + '" data-parc="' + pk + '">';
+          html += '<div class="pf-card-top"><span class="pf-rang">' + (E.kind === 'synthese' ? '&#9733;' : (i + 1)) + '</span>';
+          html += '<span class="pf-objet">' + pfEsc(E.objet) + '</span>';
+          if (isShared) html += '<span class="pf-badge-shared" title="Deja rencontre dans l\'autre parcours">deja rencontre</span>';
+          if (promu) html += '<span class="pf-badge-promo" title="Monte d\'un niveau par les votes">&#8593; niveau</span>';
+          html += '</div>';
+          html += '<div class="pf-consigne">' + pfEsc(E.consigne) + '</div>';
+          html += '<div class="pf-critere">&laquo; ' + pfEsc(E.critere) + ' &raquo;</div>';
+          html += '<div class="pf-actions"><button class="btn-sm primary pf-load">Charger</button>';
+          html += '<label class="check pf-acq-lbl"><input type="checkbox" class="pf-acquis"' + (acq ? ' checked' : '') + '> acquis</label></div>';
+          html += '<details class="pf-perso"><summary>Personnaliser</summary><div class="pf-perso-body">';
+          html += '<label>Tempo <input type="range" class="pf-tempo" min="70" max="110" value="90"></label>';
+          html += '<label>Densite <select class="pf-dens"><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option></select></label>';
+          html += '<label class="check"><input type="checkbox" class="pf-drop"' + (E.preset.drop && E.preset.drop.on ? ' checked' : '') + '> Drop-outs</label>';
+          html += '<label>Tonalite <select class="pf-key">' + PF_KEYS.map(k => '<option' + (k === 'E' ? ' selected' : '') + '>' + k + '</option>').join('') + '</select></label>';
+          html += '</div></details>';
+          html += '<div class="pf-vote"><span>Difficulte :</span>';
+          html += '<button class="btn-sm pf-v" data-v="facile">facile</button>';
+          html += '<button class="btn-sm pf-v" data-v="ok">ok</button>';
+          html += '<button class="btn-sm pf-v" data-v="difficile">difficile</button></div>';
+          html += '</div>';
+        });
+        html += '</div></div>';
+        mi++;
       });
       html += '</div>';
     });
     html += '</div>';
     root.innerHTML = html;
+    root.querySelectorAll('.pf-mod-head').forEach(head => {
+      head.addEventListener('click', () => {
+        const mod = head.parentElement, col = mod.parentElement;
+        const wasOpen = mod.classList.contains('open');
+        col.querySelectorAll('.pf-mod').forEach(m => m.classList.remove('open'));
+        if (!wasOpen) mod.classList.add('open');
+      });
+    });
     root.querySelectorAll('.pf-card').forEach(card => {
       const ex = card.getAttribute('data-ex'), pk = card.getAttribute('data-parc'), E = PF_EX[ex];
       card.querySelector('.pf-load').addEventListener('click', () => pfLoadPreset(ex));
-      card.querySelector('.pf-acquis').addEventListener('change', e => { pfAcquisSet(pk, ex, e.target.checked); card.classList.toggle('pf-acq', e.target.checked); });
+      card.querySelector('.pf-acquis').addEventListener('change', e => {
+        pfAcquisSet(pk, ex, e.target.checked); card.classList.toggle('pf-acq', e.target.checked);
+        const modDiv = card.closest('.pf-mod');
+        if (modDiv){ const MM = PF_MOD[modDiv.getAttribute('data-mid')];
+          if (MM){ let d = 0; MM.exercices.forEach(x => { if (pfIsAcquis(pk, x)) d++; });
+            const cnt = modDiv.querySelector('.pf-mod-count'); if (cnt) cnt.textContent = d + '/' + MM.exercices.length; } }
+      });
       card.querySelector('.pf-tempo').addEventListener('input', e => setTempo(+e.target.value));
       card.querySelector('.pf-dens').addEventListener('change', e => { S.bass.density = +e.target.value; try { bassResetCycle(); } catch(_){} });
       card.querySelector('.pf-drop').addEventListener('change', e => { S.bass.drop = S.bass.drop || { on:false, everyN:4, lenBeats:2 }; S.bass.drop.on = e.target.checked; try { bassResetCycle(); } catch(_){} });
       card.querySelector('.pf-key').addEventListener('change', e => { S.bass.key = e.target.value; try { bassResetCycle(); bassUpdateChordLabel(); } catch(_){} });
-      card.querySelectorAll('.pf-v').forEach(b => b.addEventListener('click', () => { pfVote(pk, ex, E.kind, b.getAttribute('data-v')); pfStatus('Vote enregistré : ' + b.getAttribute('data-v') + '.'); }));
+      card.querySelectorAll('.pf-v').forEach(b => b.addEventListener('click', () => { pfVote(pk, ex, E.kind, b.getAttribute('data-v')); pfStatus('Vote enregistre : ' + b.getAttribute('data-v') + '.'); }));
     });
   }
+
   function pfInit(){
     if (!$('pfRoot')) return;
     pfRender();
