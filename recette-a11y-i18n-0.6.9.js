@@ -317,12 +317,15 @@ async function runTests() {
     // de traduction dédié) ; tampon de build ; sélecteur de langue (chaque langue dans sa
     // langue) ; aria-labels composés des cases (fragments déjà traduits via fmTr) ; termes
     // identiques dans les trois langues (anglicismes, unités, chiffrages harmoniques).
+    // 0.7.0 (C14) : l'overlay de coloration .script-hl reflète le texte tapé par
+    // l'utilisateur (intraduisible par nature) et #scriptLint/#bowLint sont des statuts
+    // composés de fragments déjà traduits via fmTr — même justification que les cases.
     const IDENT = new Set(['FR', 'EN', 'BR', 'Langue / Language / Idioma', 'Français', 'English',
       'Português (Brasil)', 'time', 'Drop-outs', 'min', 'ok', 'tone', 'slap', 'Tempo', 'Tempo (BPM)',
       'Swing (%)', 'Swing -1 %', 'Swing +1 %', 'I⁷ → IV⁷ — Sex Machine', 'ii⁷ → V⁷ — jazz-funk']);
     const EXCL = (t, el) => IDENT.has(t) || /^build metronomefunk-/.test(t) ||
       /— (pas|step|passo) \d+$/.test(t) ||
-      !!(el && el.closest && el.closest('[class*="pf-"], #pfStatus'));
+      !!(el && el.closest && el.closest('[class*="pf-"], #pfStatus, .script-hl, #scriptLint, #bowLint'));
     const misses = new Set();
     const walker = D.createTreeWalker(D.body, 4);
     let n;

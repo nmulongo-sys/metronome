@@ -78,7 +78,10 @@ boot(() => {
 
   // --- 1. Estampille de build -----------------------------------------------
   console.log('[1] Estampille de build');
-  ok(typeof R.build === 'string' && /0\.6/.test(R.build), 'BUILD renseigné et bumpé (' + R.build + ')');
+  // 0.7.0 : comparaison de version en « ≥ » (motif acté) — le seuil testé reste 0.6.0
+  const vge = (b, X, Y, Z) => { const m = /metronomefunk-(\d+)\.(\d+)\.(\d+)/.exec(b || ''); return !!m &&
+    (+m[1] > X || (+m[1] === X && (+m[2] > Y || (+m[2] === Y && +m[3] >= Z)))); };
+  ok(typeof R.build === 'string' && vge(R.build, 0, 6, 0), 'BUILD renseigné et bumpé (' + R.build + ')');
   ok(($('buildStamp').textContent || '').indexOf(R.build) !== -1, 'estampille visible reflète le build');
 
   // --- 2. Table INSTR_TIERS (paliers par instrument cible) ------------------

@@ -375,6 +375,60 @@
     color: var(--fm-accent-text); min-height: 1.5em; margin-top: 18px;
   }
 
+  /* ---- mode atelier (0.7.0, C11) : BPM lisible à plusieurs mètres, gros boutons ---- */
+  .atelierfs {
+    position: fixed; inset: 0; background: var(--fm-bg);
+    display: none; flex-direction: column; z-index: 72;
+  }
+  .atelierfs.open { display: flex; }
+  .atelier-body {
+    flex: 1; min-height: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 1.5vh; padding: 12px;
+  }
+  .atelier-bpm {
+    font-family: var(--fm-font-display); font-weight: 700;
+    font-size: clamp(96px, 34vh, 40vw); line-height: 1;
+    font-variant-numeric: tabular-nums; color: var(--fm-ink);
+  }
+  .atelier-sub { font-size: 1.35rem; color: var(--fm-sub); }
+  .atelier-sub em { font-family: var(--fm-font-display); color: var(--fm-accent-text); }
+  .atelier-status {
+    font-size: 1.3rem; font-weight: 600; color: var(--fm-accent-text);
+    min-height: 1.5em; text-align: center;
+  }
+  .atelier-controls {
+    display: flex; gap: 20px; align-items: center; justify-content: center;
+    padding: 0 12px 5vh;
+  }
+  .atelier-controls button {
+    min-width: 86px; min-height: 86px; font-size: 2.2rem; border-radius: 16px;
+    background: var(--fm-panel); border: 1px solid var(--fm-line); color: var(--fm-ink);
+    cursor: pointer; touch-action: manipulation;
+  }
+  .atelier-controls button.play {
+    background: var(--fm-accent); border-color: var(--fm-accent);
+    color: var(--fm-accent-ink); min-width: 130px; font-weight: 600;
+  }
+  .atelier-wl { color: var(--fm-accent-text); font-size: 1.1rem; }
+
+  /* ---- lint en direct + coloration des syntaxes expertes (0.7.0, C14) ---- */
+  .lint-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .script-hl-wrap { position: relative; }
+  .script-hl-wrap pre.script-hl {
+    position: absolute; inset: 0; margin: 0; overflow: hidden; pointer-events: none;
+    white-space: pre-wrap; word-break: break-word; color: var(--fm-ink);
+    visibility: hidden; border-color: transparent; background: var(--fm-panel-2);
+    border-radius: 7px;
+  }
+  .script-hl-wrap.hl-on pre.script-hl { visibility: visible; }
+  .script-hl-wrap textarea { position: relative; background: transparent; }
+  .script-hl-wrap.hl-on textarea { color: transparent; caret-color: var(--fm-ink); }
+  .hl-tempo { color: var(--fm-accent-text); font-weight: 600; }
+  .hl-gap { color: var(--fm-danger-text); }
+  .hl-swing { color: var(--fm-accent-text); }
+  .hl-comment { color: var(--fm-sub); }
+  .hl-err { text-decoration: underline wavy var(--fm-danger-text); text-underline-offset: 3px; }
+
   textarea { min-height: 150px; font-family: 'Consolas', 'Menlo', monospace; font-size: .85rem; line-height: 1.6; resize: vertical; }
   .script-status { font-size: .84rem; color: var(--fm-accent-text); margin-top: 8px; min-height: 1.2em; }
   .kbd-hint { text-align: center; color: var(--fm-sub); font-size: .8125rem; margin-top: 14px; }
@@ -1102,6 +1156,57 @@ window.__I18N = { "en": {
   "secondes": "seconds",
   "Décalage -1 ms": "Offset -1 ms",
   "Décalage +1 ms": "Offset +1 ms",
+  "⛶ Atelier": "⛶ Workshop",
+  "Mode atelier — BPM en très grand, gros boutons, écran maintenu allumé": "Workshop mode — huge BPM, big buttons, screen kept awake",
+  "Atelier": "Workshop",
+  "Mode atelier": "Workshop mode",
+  "Transport atelier": "Workshop transport",
+  "Écran maintenu allumé": "Screen kept awake",
+  "Tempo -1 (maintenir pour répéter)": "Tempo -1 (hold to repeat)",
+  "Tempo +1 (maintenir pour répéter)": "Tempo +1 (hold to repeat)",
+  "Lecture / arrêt": "Play / stop",
+  "🖨 Imprimer / PDF": "🖨 Print / PDF",
+  "↓ PNG": "↓ PNG",
+  "Vue imprimable de la grille — imprime ou « Enregistrer en PDF »": "Printable view of the grid — print or \"Save as PDF\"",
+  "Image PNG de la grille (pupitre, partage)": "PNG image of the grid (music stand, sharing)",
+  "Vue imprimable de la séquence — imprime ou « Enregistrer en PDF »": "Printable view of the sequence — print or \"Save as PDF\"",
+  "Image PNG de la séquence (pupitre)": "PNG image of the sequence (music stand)",
+  "Imprimer la ligne (ou « Enregistrer en PDF »)": "Print the line (or \"Save as PDF\")",
+  "Image PNG de la ligne": "PNG image of the line",
+  "Vue imprimable ouverte — imprime ou « Enregistre en PDF ».": "Printable view opened — print or \"Save as PDF\".",
+  "Grille exportée en PNG.": "Grid exported as PNG.",
+  "Séquence exportée en PNG.": "Sequence exported as PNG.",
+  "Corrige d'abord la séquence.": "Fix the sequence first.",
+  "Tous": "Everyone",
+  "frappe": "hit",
+  "accent": "accent",
+  "doigté (main droite / main gauche)": "fingering (right hand / left hand)",
+  "tiré": "down-bow",
+  "poussé": "up-bow",
+  "reprise": "retake",
+  "reprise (retour au talon, archet levé)": "retake (return to the frog, bow lifted)",
+  "notes liées": "slurred notes",
+  "Détaché": "Détaché",
+  "Legato / liaisons": "Legato / slurs",
+  "Martelé": "Martelé",
+  "Spiccato": "Spiccato",
+  "Jauge : talon à gauche, pointe à droite.": "Gauge: frog on the left, tip on the right.",
+  "ligne": "line",
+  "attendu :": "expected:",
+  "autre(s) ligne(s) en erreur": "other line(s) with errors",
+  "autre(s) jeton(s) en erreur": "other token(s) with errors",
+  "segment(s)": "segment(s)",
+  "durée": "duration",
+  "+ tiré 50 %": "+ down-bow 50 %",
+  "+ poussé 50 %": "+ up-bow 50 %",
+  "+ reprise": "+ retake",
+  "+ 4 notes liées": "+ 4 slurred notes",
+  "+ 5 min à 80": "+ 5 min at 80",
+  "+ accelerando": "+ accelerando",
+  "+ gap 2/16": "+ gap 2/16",
+  "+ swing": "+ swing",
+  "Insérer un jeton d'exemple": "Insert an example token",
+  "Insérer une ligne d'exemple": "Insert an example line",
 }, "pt": {
   "Métronome": "Metrônomo",
   "Formation musicale · Groove & horloge interne": "Treinamento musical · Groove & relógio interno",
@@ -1610,7 +1715,58 @@ window.__I18N = { "en": {
   "minutes": "minutos",
   "secondes": "segundos",
   "Décalage -1 ms": "Deslocamento -1 ms",
-  "Décalage +1 ms": "Deslocamento +1 ms"
+  "Décalage +1 ms": "Deslocamento +1 ms",
+  "⛶ Atelier": "⛶ Oficina",
+  "Mode atelier — BPM en très grand, gros boutons, écran maintenu allumé": "Modo oficina — BPM bem grande, botões grandes, tela mantida acesa",
+  "Atelier": "Oficina",
+  "Mode atelier": "Modo oficina",
+  "Transport atelier": "Transporte da oficina",
+  "Écran maintenu allumé": "Tela mantida acesa",
+  "Tempo -1 (maintenir pour répéter)": "Tempo -1 (segure para repetir)",
+  "Tempo +1 (maintenir pour répéter)": "Tempo +1 (segure para repetir)",
+  "Lecture / arrêt": "Tocar / parar",
+  "🖨 Imprimer / PDF": "🖨 Imprimir / PDF",
+  "↓ PNG": "↓ PNG",
+  "Vue imprimable de la grille — imprime ou « Enregistrer en PDF »": "Visualização imprimível da grade — imprima ou « Salvar como PDF »",
+  "Image PNG de la grille (pupitre, partage)": "Imagem PNG da grade (estante, compartilhamento)",
+  "Vue imprimable de la séquence — imprime ou « Enregistrer en PDF »": "Visualização imprimível da sequência — imprima ou « Salvar como PDF »",
+  "Image PNG de la séquence (pupitre)": "Imagem PNG da sequência (estante)",
+  "Imprimer la ligne (ou « Enregistrer en PDF »)": "Imprimir a linha (ou « Salvar como PDF »)",
+  "Image PNG de la ligne": "Imagem PNG da linha",
+  "Vue imprimable ouverte — imprime ou « Enregistre en PDF ».": "Visualização imprimível aberta — imprima ou « Salvar como PDF ».",
+  "Grille exportée en PNG.": "Grade exportada em PNG.",
+  "Séquence exportée en PNG.": "Sequência exportada em PNG.",
+  "Corrige d'abord la séquence.": "Corrija a sequência primeiro.",
+  "Tous": "Todos",
+  "frappe": "batida",
+  "accent": "acento",
+  "doigté (main droite / main gauche)": "digitação (mão direita / mão esquerda)",
+  "tiré": "puxado",
+  "poussé": "empurrado",
+  "reprise": "retomada",
+  "reprise (retour au talon, archet levé)": "retomada (retorno ao talão, arco levantado)",
+  "notes liées": "notas ligadas",
+  "Détaché": "Détaché",
+  "Legato / liaisons": "Legato / ligaduras",
+  "Martelé": "Martelé",
+  "Spiccato": "Spiccato",
+  "Jauge : talon à gauche, pointe à droite.": "Medidor: talão à esquerda, ponta à direita.",
+  "ligne": "linha",
+  "attendu :": "esperado:",
+  "autre(s) ligne(s) en erreur": "outra(s) linha(s) com erro",
+  "autre(s) jeton(s) en erreur": "outro(s) símbolo(s) com erro",
+  "segment(s)": "segmento(s)",
+  "durée": "duração",
+  "+ tiré 50 %": "+ puxado 50 %",
+  "+ poussé 50 %": "+ empurrado 50 %",
+  "+ reprise": "+ retomada",
+  "+ 4 notes liées": "+ 4 notas ligadas",
+  "+ 5 min à 80": "+ 5 min a 80",
+  "+ accelerando": "+ accelerando",
+  "+ gap 2/16": "+ gap 2/16",
+  "+ swing": "+ swing",
+  "Insérer un jeton d'exemple": "Inserir um símbolo de exemplo",
+  "Insérer une ligne d'exemple": "Inserir uma linha de exemplo"
 } };
 window.fmTr = (function(){
   function norm(t){ return (t||'').replace(/\s+/g,' ').trim(); }
@@ -1657,6 +1813,7 @@ window.fmTr = (function(){
       <div class="main-buttons">
         <button class="btn-start" id="startBtn">▶ Démarrer</button>
         <button class="btn-tap" id="tapBtn">Tap</button>
+        <button class="btn-tap" id="atelierBtn" title="Mode atelier — BPM en très grand, gros boutons, écran maintenu allumé">⛶ Atelier</button>
       </div>
       <div class="kbd-top"><span aria-hidden="true">⌨</span> Espace : lecture · ↑↓ : tempo ±1 · T : tap tempo</div>
       <div class="mini-grid">
@@ -2030,6 +2187,8 @@ window.fmTr = (function(){
       <div id="tsFingerOut" class="script-status" style="white-space:pre-line;"></div>
       <div class="row" style="margin-top:10px;">
         <button class="btn-sm" id="tsExportAll">↓ Exporter tout (JSON)</button>
+        <button class="btn-sm" id="tsPrintBtn" title="Vue imprimable de la grille — imprime ou « Enregistrer en PDF »">🖨 Imprimer / PDF</button>
+        <button class="btn-sm" id="tsPngBtn" title="Image PNG de la grille (pupitre, partage)">↓ PNG</button>
       </div>
       <div class="hint">Charge d'abord un groove dans la section <b>Répertoire de grooves</b>, puis assigne
       chaque voix à un participant — menu sur chaque voix du répertoire, ou <b>Répartir auto</b> qui équilibre
@@ -2080,7 +2239,16 @@ window.fmTr = (function(){
         <input type="text" id="bowSeqInput" value="T92x1, P92x1" style="flex:1;min-width:220px;font-family:Consolas,Menlo,monospace;">
         <button class="btn-sm" id="bowApply">Appliquer</button>
         <button class="btn-sm primary" id="bowFsBtn">⛶ Plein écran</button>
+        <button class="btn-sm" id="bowPrintBtn" title="Vue imprimable de la séquence — imprime ou « Enregistrer en PDF »">🖨 Imprimer / PDF</button>
+        <button class="btn-sm" id="bowPngBtn" title="Image PNG de la séquence (pupitre)">↓ PNG</button>
       </div>
+      <div class="lint-chips" role="group" aria-label="Insérer un jeton d'exemple">
+        <button class="btn-sm bow-chip" data-ins="T50x1">+ tiré 50 %</button>
+        <button class="btn-sm bow-chip" data-ins="P50x1">+ poussé 50 %</button>
+        <button class="btn-sm bow-chip" data-ins="Rx0.5">+ reprise</button>
+        <button class="btn-sm bow-chip" data-ins="T80x2n4">+ 4 notes liées</button>
+      </div>
+      <div class="script-status" id="bowLint" role="status" aria-live="polite"></div>
       <div class="cv-wrap">
         <canvas id="bowCv" width="760" height="150"></canvas>
         <button class="btn-sm cv-fs-overlay" id="bowFsBtn2" title="Agrandir l'archet en plein écran">⛶</button>
@@ -2271,7 +2439,9 @@ window.fmTr = (function(){
   <details class="section" id="secScript" data-strate="enveloppe">
     <summary><span class="sec-title">Routine programmée</span><span class="sec-sub">script</span></summary>
     <div class="section-body">
-      <textarea id="scriptArea" spellcheck="false" aria-label="Script de routine"># Exemple de routine
+      <div class="script-hl-wrap" id="scriptHlWrap">
+        <pre class="script-hl" id="scriptHl" aria-hidden="true"></pre>
+        <textarea id="scriptArea" spellcheck="false" aria-label="Script de routine"># Exemple de routine
 # 5 min à 80 BPM
 80bpm 5min
 # accelerando : 80 → 120 en 10 min
@@ -2282,6 +2452,14 @@ gap 2/16
 gap off
 swing 62
 100bpm 16mes</textarea>
+      </div>
+      <div class="script-status" id="scriptLint" role="status" aria-live="polite"></div>
+      <div class="lint-chips" role="group" aria-label="Insérer une ligne d'exemple">
+        <button class="btn-sm script-chip" data-ins="80bpm 5min">+ 5 min à 80</button>
+        <button class="btn-sm script-chip" data-ins="80->120bpm 10min">+ accelerando</button>
+        <button class="btn-sm script-chip" data-ins="gap 2/16">+ gap 2/16</button>
+        <button class="btn-sm script-chip" data-ins="swing 62">+ swing</button>
+      </div>
       <div class="row" style="margin-top:10px;">
         <button class="btn-sm primary" id="scriptRun">▶ Lancer la routine</button>
         <button class="btn-sm" id="scriptStop">■ Arrêter la routine</button>
@@ -2343,6 +2521,30 @@ swing 62
   <div class="percfs-body">
     <div id="percFsVoices"></div>
     <div class="percfs-status" id="percFsStatus" role="status" aria-live="polite"></div>
+  </div>
+</div>
+
+<!-- ============ MODE ATELIER (0.7.0, C11) ============ -->
+<div class="atelierfs" id="atelierFs" role="dialog" aria-label="Mode atelier">
+  <div class="bowfs-bar">
+    <div>
+      <div class="bowfs-title">Atelier</div>
+      <div class="kicker" id="atelierMeasure"></div>
+    </div>
+    <div class="bowfs-controls">
+      <span class="atelier-wl" id="atelierWl" title="Écran maintenu allumé" hidden aria-hidden="true">☀</span>
+      <button id="atelierClose">✕ Fermer</button>
+    </div>
+  </div>
+  <div class="atelier-body">
+    <div class="atelier-bpm" id="atelierBpm">92</div>
+    <div class="atelier-sub">BPM · <em id="atelierName">Moderato</em></div>
+    <div class="atelier-status" id="atelierStatus" role="status" aria-live="polite"></div>
+  </div>
+  <div class="atelier-controls" role="group" aria-label="Transport atelier">
+    <button id="atelierMinus" aria-label="Tempo -1 (maintenir pour répéter)">−</button>
+    <button class="play" id="atelierPlay" aria-label="Lecture / arrêt">▶</button>
+    <button id="atelierPlus" aria-label="Tempo +1 (maintenir pour répéter)">+</button>
   </div>
 </div>
 
@@ -2438,14 +2640,43 @@ swing 62
 
   // Identité du build affichée dans l'en-tête (5.3-bis). Bumper à chaque passe : elle sert à
   // savoir de quel build vient un enregistrement de validation.
-  const BUILD = 'metronomefunk-0.6.9', BUILD_DATE = '2026-07-14';
+  const BUILD = 'metronomefunk-0.7.0', BUILD_DATE = '2026-07-15';
 
   let audioCtx = null, masterGain = null, noiseBuf = null;
   let masterLimiter = null;                                   // 5.3-ter : limiteur de bus master
   let bassBus = null, bassHP = null, bassWet = null;          // 5.3-ter : bus de la couche basse
   let isPlaying = false;
   let schedulerTimer = null;
-  const LOOKAHEAD_MS = 25, AHEAD = 0.12;
+  // P3 0.7.0 (C12) : fenêtre de pré-planification élargie 0.12 → 0.20 s — plus de
+  // résilience quand le fil principal est occupé (rendu, GC) sur mobile modeste.
+  const LOOKAHEAD_MS = 25, AHEAD = 0.20;
+  // P1 0.7.0 (C12) : HUD de mesure sous flag URL uniquement — aucun effet sans ?perfhud=1.
+  const PERF_HUD = /[?&]perfhud=1/.test(location.search);
+  const perfStats = { lastTick: 0, jitterMax: 0, minMargin: Infinity, frames: 0, fps: 0, lastFpsT: 0 };
+  let perfHudEl = null;
+  function perfHudRender() {
+    if (!perfHudEl) return;
+    perfHudEl.textContent =
+      'gigue ordonnanceur max : ' + perfStats.jitterMax.toFixed(1) + ' ms\n' +
+      'marge audio min : ' + (perfStats.minMargin === Infinity ? '—' : (perfStats.minMargin * 1000).toFixed(0) + ' ms') + '\n' +
+      'fps : ' + perfStats.fps;
+    perfStats.jitterMax = 0; perfStats.minMargin = Infinity;
+  }
+  if (PERF_HUD) {
+    document.addEventListener('DOMContentLoaded', () => {
+      perfHudEl = document.createElement('div');
+      perfHudEl.id = 'perfHud';
+      perfHudEl.setAttribute('aria-hidden', 'true');
+      const st = perfHudEl.style;
+      st.position = 'fixed'; st.bottom = '8px'; st.left = '8px'; st.zIndex = '99';
+      st.background = 'rgba(10,8,4,.78)'; st.color = '#b6e3a8';
+      st.fontFamily = 'Consolas,Menlo,monospace'; st.fontSize = '12px'; st.lineHeight = '1.5';
+      st.padding = '6px 9px'; st.borderRadius = '6px';
+      st.pointerEvents = 'none'; st.whiteSpace = 'pre';
+      document.body.appendChild(perfHudEl);
+      setInterval(perfHudRender, 1000);
+    });
+  }
 
   let cycleStart = 0, cycleDur = 1, events = [], evIdx = 0, totalBeats = 0;
   let measureCount = 0, mutedThisCycle = false;
@@ -3411,11 +3642,17 @@ swing 62
   }
 
   // ============ SCRIPT ============
+  // L1 0.7.0 (C14) : le parseur rapporte désormais TOUTES les lignes fautives (numéro +
+  // contenu, champ `errors`) et la nature de chaque ligne (`lines`, pour la coloration
+  // L4). Contrat historique conservé : `error` = première erreur bloquante pour ▶.
   function parseScript(text) {
-    const segs = [];
+    const segs = [], errors = [], lines = [];
+    let ln = 0;
     for (let raw of text.split('\n')) {
+      ln++;
       const line = raw.trim().toLowerCase();
-      if (!line || line.startsWith('#')) continue;
+      if (!line) { lines.push({ line: ln, kind: 'blank' }); continue; }
+      if (line.startsWith('#')) { lines.push({ line: ln, kind: 'comment' }); continue; }
       let m;
       if ((m = line.match(/^(\d+)(?:\s*->\s*(\d+))?\s*bpm\s+(\d+(?:[.,]\d+)?)\s*(min|s|sec|mes|bars?|comps?)$/))) {
         segs.push({
@@ -3424,18 +3661,24 @@ swing 62
           unit: /^(mes|bar|bars|comp|comps)$/.test(m[4]) ? 'mes' : (m[4] === 'min' ? 'min' : 's'),
           src: raw.trim()
         });
+        lines.push({ line: ln, kind: 'tempo' });
       } else if (line.match(/^gap\s+off$/)) {
         segs.push({ type: 'gapoff', src: raw.trim() });
+        lines.push({ line: ln, kind: 'gap' });
       } else if ((m = line.match(/^gap\s+(\d+)\s*\/\s*(\d+)$/))) {
         segs.push({ type: 'gap', mute: +m[1], play: +m[2] - +m[1] > 0 ? +m[2] - +m[1] : +m[2], src: raw.trim() });
+        lines.push({ line: ln, kind: 'gap' });
       } else if ((m = line.match(/^swing\s+(\d+)\s*%?$/))) {
         segs.push({ type: 'swing', val: +m[1], src: raw.trim() });
+        lines.push({ line: ln, kind: 'swing' });
       } else {
-        return { error: 'Ligne non reconnue : « ' + raw.trim() + ' »' };
+        errors.push({ line: ln, src: raw.trim() });
+        lines.push({ line: ln, kind: 'err' });
       }
     }
-    if (!segs.length) return { error: 'Script vide.' };
-    return { segs };
+    if (errors.length) return { error: 'Ligne non reconnue : « ' + errors[0].src + ' »', errors, lines, segs };
+    if (!segs.length) return { error: 'Script vide.', errors, lines, segs };
+    return { segs, errors, lines };
   }
 
   function scriptAdvanceDirectives() {
@@ -3507,12 +3750,21 @@ swing 62
   }
 
   function scheduler() {
+    if (PERF_HUD) {
+      const nowMs = performance.now();
+      if (perfStats.lastTick) {
+        const j = Math.abs(nowMs - perfStats.lastTick - LOOKAHEAD_MS);
+        if (j > perfStats.jitterMax) perfStats.jitterMax = j;
+      }
+      perfStats.lastTick = nowMs;
+    }
     const now = audioCtx.currentTime;
     while (true) {
       if (evIdx < events.length) {
         const ev = events[evIdx];
         const t = cycleStart + ev.frac * cycleDur + (ev.offMs ? ev.offMs / 1000 : 0);
         if (t < now + AHEAD) {
+          if (PERF_HUD && t - now < perfStats.minMargin) perfStats.minMargin = Math.max(0, t - now);
           playClick(Math.max(t, now + 0.005), ev.layer, ev.accent || 0, ev.voice, ev.brk, ev.note);
           evIdx++;
           continue;
@@ -3541,16 +3793,22 @@ swing 62
     schedulerTimer = setInterval(scheduler, LOOKAHEAD_MS);
     $('startBtn').textContent = '■ Arrêter';
     $('startBtn').classList.add('playing');
+    wakeLockUpdate();
+    if (atelierOpen) atelierRender();
     requestAnimationFrame(draw);
   }
 
   function stop() {
     isPlaying = false;
     clearInterval(schedulerTimer);
+    if (PERF_HUD) perfStats.lastTick = 0;
     $('startBtn').textContent = '▶ Démarrer';
     $('startBtn').classList.remove('playing');
     $('percFsPlay').textContent = '▶';
+    statusLineLast = null;
     $('statusLine').textContent = 'Arrêté';
+    wakeLockUpdate();
+    if (atelierOpen) atelierRender();
     drawStatic();
   }
 
@@ -3646,27 +3904,53 @@ swing 62
     }
   }
 
+  // P2 0.7.0 (C12) : caches de rendu — les collections DOM ne sont plus interrogées à
+  // chaque frame, les classes « cur » ne sont touchées que quand l'index change, et
+  // #statusLine n'est réécrit que si le texte composé change réellement.
+  let drawCache = null;
+  let statusLineLast = null, statusLineWrites = 0;
+  function invalidateDrawCache() { drawCache = null; }
+  function drawCacheGet() {
+    if (!drawCache) drawCache = {
+      claveRows: Array.from(document.querySelectorAll('#claveSteps .steps')),
+      percRows: Array.from(document.querySelectorAll('#percVoices .steps, #percFsVoices .steps'))
+    };
+    return drawCache;
+  }
+  function rowSetCur(row, cur) {
+    if (row._fmCur === cur) return;
+    if (row._fmCur != null && row.children[row._fmCur]) row.children[row._fmCur].classList.remove('cur');
+    if (row.children[cur]) row.children[cur].classList.add('cur');
+    row._fmCur = cur;
+  }
+  function statusLineSet(html) {
+    if (html === statusLineLast) return;
+    statusLineLast = html;
+    statusLineWrites++;
+    $('statusLine').innerHTML = html;
+  }
+
   function draw() {
     if (!isPlaying) return;
     const phase = ((audioCtx.currentTime - cycleStart) / cycleDur) % 1;
     drawBase(phase < 0 ? 0 : phase);
-    document.querySelectorAll('#claveSteps .steps').forEach(row => {
+    const rows = drawCacheGet();
+    rows.claveRows.forEach(row => {
       const n = row.children.length;
       if (!n) return;
-      const cur = Math.floor((phase < 0 ? 0 : phase) * n) % n;
-      for (let i = 0; i < n; i++) row.children[i].classList.toggle('cur', i === cur);
+      rowSetCur(row, Math.floor((phase < 0 ? 0 : phase) * n) % n);
     });
     if (S.perc.on && ($('secPerc').open || percFsOpen)) {
       const nP = (percBreakActive && percCurrentBreak()) ? percCurrentBreak().count : S.perc.count;
       const curP = Math.floor((phase < 0 ? 0 : phase) * nP) % nP;
-      document.querySelectorAll('#percVoices .steps, #percFsVoices .steps').forEach(row => {
-        for (let i = 0; i < row.children.length; i++) row.children[i].classList.toggle('cur', i === curP);
-      });
+      rows.percRows.forEach(row => rowSetCur(row, curP));
     }
     if (percFsOpen) {
-      $('percFsTempo').textContent = S.tempo + ' BPM · mes. ' + measureCount;
+      const pft = S.tempo + ' BPM · mes. ' + measureCount;
+      if ($('percFsTempo')._fmLast !== pft) { $('percFsTempo').textContent = pft; $('percFsTempo')._fmLast = pft; }
       $('percFsPlay').textContent = '■';
     }
+    if (atelierOpen) atelierRender();
     // curseur et signal de break sur la ligne de réduction
     if ($('secPerc').open || percFsOpen) {
       const lc = $('percLine').querySelector('.pl-cursor');
@@ -3680,7 +3964,7 @@ swing 62
       bassPulseCheck(phase < 0 ? 0 : phase);   // 5.4 : témoin d'activité basse
       fingerVizCursor(phase < 0 ? 0 : phase);  // chantier B 0.6.1 : curseur temps réel
     }
-    $('statusLine').innerHTML = mutedThisCycle
+    statusLineSet(mutedThisCycle
       ? '<span class="mute">' + (S.gap.target === 'all'
           ? fmTr('● COUPÉ — tiens le tempo !')
           : '● GAP — ' + gapTargetLabel() + ' ' + fmTr('en silence, le reste continue'))
@@ -3689,10 +3973,17 @@ swing 62
         ? '<span class="mute">' + fmTr('◆ BREAK — niveau') + ' ' + S.perc.breakLevel + '/4</span>'
         : (S.perc.on && percBreakEchoNow
           ? '<span class="mute">' + fmTr('◆ À toi — rejoue le break !') + '</span>'
-          : fmTr('Mesure') + ' ' + measureCount + (S.gap.mode !== 'off' ? ' · ' + fmTr('gap actif') : '')));
+          : fmTr('Mesure') + ' ' + measureCount + (S.gap.mode !== 'off' ? ' · ' + fmTr('gap actif') : ''))));
     if ($('secArchet').open) {
       const beatsNow = totalBeats + Math.max(0, audioCtx.currentTime - cycleStart) * S.tempo / 60;
       drawBow(beatsNow);
+    }
+    if (PERF_HUD) {
+      perfStats.frames++;
+      const nowP = performance.now();
+      if (nowP - perfStats.lastFpsT >= 1000) {
+        perfStats.fps = perfStats.frames; perfStats.frames = 0; perfStats.lastFpsT = nowP;
+      }
     }
     requestAnimationFrame(draw);
   }
@@ -3700,6 +3991,7 @@ swing 62
   function drawStatic() {
     drawBase(null);
     document.querySelectorAll('#claveSteps .step.cur, #percVoices .step.cur, #percFsVoices .step.cur').forEach(el => el.classList.remove('cur'));
+    document.querySelectorAll('#claveSteps .steps, #percVoices .steps, #percFsVoices .steps').forEach(row => { row._fmCur = null; });
     const lc = $('percLine') && $('percLine').querySelector('.pl-cursor');
     if (lc) lc.style.display = 'none';
     if ($('percLine')) $('percLine').classList.remove('break-now');
@@ -3744,6 +4036,7 @@ swing 62
   function buildStepGrid() {
     const wrap = $('claveSteps');
     wrap.innerHTML = '';
+    invalidateDrawCache();
     CLAVE_VOICES.forEach(v => {
       const d = claveData[v.id];
       const row = document.createElement('div'); row.className = 'perc-voice';
@@ -6865,6 +7158,7 @@ swing 62
 
   // ---- UI percussion ----
   function buildPercRowsInto(wrap) {
+    invalidateDrawCache();
     wrap.innerHTML = '';
     const def = PERC_INSTR[S.perc.instr];
     const n = S.perc.count;
@@ -7092,7 +7386,22 @@ swing 62
         });
         return { instr: instr, tiers: T, voices: voices };
       },
-      build: BUILD
+      build: BUILD,
+      // 0.7.0 (recette atelier & exports) : hooks en lecture seule / purs
+      v070: {
+        ahead: AHEAD,
+        perfHud: PERF_HUD,
+        atelierOpen: function () { return atelierOpen; },
+        wakeLockWanted: function () { return fmWakeLockWanted; },
+        statusLineSet: statusLineSet,
+        statusLineWrites: function () { return statusLineWrites; },
+        parseScript: parseScript,
+        parseBowSeq: parseBowSeq,
+        tsPrintableHTML: tsPrintableHTML,
+        tsGridCanvas: tsGridCanvas,
+        bowPrintableHTML: bowPrintableHTML,
+        bowSeqCanvas: bowSeqCanvas
+      }
     };
   };
 
@@ -7494,6 +7803,91 @@ swing 62
   $('percFsBtn').addEventListener('click', openPercFs);
   $('percFsClose').addEventListener('click', closePercFs);
   $('percFsPlay').addEventListener('click', toggle);
+
+  // ---- mode atelier (0.7.0, C11 — W1) : BPM en très grand, gros boutons ----
+  let atelierOpen = false;
+  function atelierRender() {
+    if (!atelierOpen) return;
+    const bpm = String(S.tempo);
+    if ($('atelierBpm').textContent !== bpm) {
+      $('atelierBpm').textContent = bpm;
+      $('atelierName').textContent = nameOf(S.tempo);
+    }
+    $('atelierPlay').textContent = isPlaying ? '■' : '▶';
+    const mes = isPlaying ? fmTr('mesure') + ' ' + measureCount : fmTr('Prêt');
+    if ($('atelierMeasure')._fmLast !== mes) {
+      $('atelierMeasure').textContent = mes; $('atelierMeasure')._fmLast = mes;
+    }
+    // rappel d'état minimal : gap/break en cours, sinon rien (écran dépouillé)
+    const st = !isPlaying ? ''
+      : (mutedThisCycle
+        ? (S.gap.target === 'all' ? fmTr('● COUPÉ — tiens le tempo !')
+                                  : '● GAP — ' + fmTr('en silence, le reste continue'))
+        : (S.perc.on && percBreakActive ? fmTr('◆ BREAK — niveau') + ' ' + S.perc.breakLevel + '/4' : ''));
+    if ($('atelierStatus')._fmLast !== st) {
+      $('atelierStatus').textContent = st; $('atelierStatus')._fmLast = st;
+    }
+  }
+  function openAtelier() {
+    atelierOpen = true;
+    $('atelierFs').classList.add('open');
+    atelierRender();
+    if ($('atelierFs').requestFullscreen) $('atelierFs').requestFullscreen().catch(() => {});
+    wakeLockUpdate();
+  }
+  function closeAtelier() {
+    atelierOpen = false;
+    $('atelierFs').classList.remove('open');
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    wakeLockUpdate();
+  }
+  // appui maintenu = répétition (reco panel : gros boutons −/+ utilisables de loin).
+  // Le clic clavier (detail 0) déclenche une fois ; le pointeur passe par pointerdown.
+  function holdRepeat(btn, fn) {
+    let t = null, iv = null;
+    const stopRep = () => { clearTimeout(t); clearInterval(iv); t = iv = null; };
+    btn.addEventListener('pointerdown', () => {
+      fn();
+      t = setTimeout(() => { iv = setInterval(fn, 90); }, 450);
+    });
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => btn.addEventListener(ev, stopRep));
+    btn.addEventListener('click', e => { if (e.detail === 0) fn(); });
+  }
+  $('atelierBtn').addEventListener('click', openAtelier);
+  $('atelierClose').addEventListener('click', closeAtelier);
+  $('atelierPlay').addEventListener('click', toggle);
+  holdRepeat($('atelierMinus'), () => { setTempo(S.tempo - 1); atelierRender(); });
+  holdRepeat($('atelierPlus'), () => { setTempo(S.tempo + 1); atelierRender(); });
+
+  // ---- wake lock (0.7.0, C11 — W2) : écran maintenu pendant la lecture OU l'atelier.
+  // Amélioration progressive pure : silencieux si l'API est absente.
+  let fmWakeLock = null, fmWakeLockWanted = false;
+  function wakeLockShow(on) {
+    const w = $('atelierWl'); if (w) w.hidden = !on;
+  }
+  function wakeLockUpdate() {
+    fmWakeLockWanted = isPlaying || atelierOpen;
+    if (!('wakeLock' in navigator) || !navigator.wakeLock || !navigator.wakeLock.request) {
+      wakeLockShow(false); return;
+    }
+    if (fmWakeLockWanted && !fmWakeLock) {
+      navigator.wakeLock.request('screen').then(wl => {
+        fmWakeLock = wl;
+        wakeLockShow(true);
+        if (wl.addEventListener) wl.addEventListener('release', () => { fmWakeLock = null; wakeLockShow(false); });
+        // si le besoin a disparu pendant la requête (stop immédiat), on relâche
+        if (!fmWakeLockWanted) wakeLockUpdate();
+      }).catch(() => { wakeLockShow(false); });
+    } else if (!fmWakeLockWanted && fmWakeLock) {
+      const wl = fmWakeLock; fmWakeLock = null;
+      try { wl.release().catch(() => {}); } catch (e) {}
+      wakeLockShow(false);
+    }
+  }
+  // le verrou est perdu quand l'onglet passe en arrière-plan : ré-acquisition au retour
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && fmWakeLockWanted) { fmWakeLock = null; wakeLockUpdate(); }
+  });
 
   // ============ TEAM SPIRIT & RÉPERTOIRE (passe 3, étape 4) ============
   // Une surface d'édition distincte des modes générateur (arbitrage A) : on charge un
@@ -7916,6 +8310,169 @@ swing 62
     $('tsStatus').textContent = 'Groove complet exporté.';
   }
 
+  // ---- exports élèves (0.7.0, C13 — E1/E2) : vue imprimable + PNG ----
+  // Le JSON reste le format machine (réimportation) ; ici, un support lisible à donner
+  // aux élèves ou à poser sur un pupitre. Aucune bibliothèque externe (fichier unique) :
+  // impression native (→ « Enregistrer en PDF » du navigateur) et PNG par canvas.
+  function tsScopeData(pid) {
+    if (!TS.loaded) return null;
+    const g = tsGrooveMeta();
+    const mergedAll = tsMergedMap();
+    const parts = [];
+    const pool = pid ? TS.participants.filter(p => p.id === pid) : TS.participants;
+    pool.forEach(p => {
+      const mine = TS.voices.filter(v => v.participant === p.id && !v.dropped);
+      if (!mine.length) return;
+      const merged = tsHandsMerged(mine);
+      parts.push({ label: p.label, voices: mine.map(v => ({
+        label: v.label, role: v.role, played: tsPlayedLabel(v), approx: !!v.approx,
+        grid: v.grid, hands: merged[v.gid] || percHandsFor(v.grid)
+      })) });
+    });
+    // voix non assignées (ou mode team spirit éteint) : une grille « commun »
+    if (!pid) {
+      const rest = TS.voices.filter(v => v.participant == null && !v.dropped);
+      if (rest.length) parts.push({ label: fmTr('Tous'), voices: rest.map(v => ({
+        label: v.label, role: v.role, played: tsPlayedLabel(v), approx: !!v.approx,
+        grid: v.grid, hands: mergedAll[v.gid] || percHandsFor(v.grid)
+      })) });
+    }
+    return { groove: g, parts };
+  }
+  function fmPrintCss() {
+    return 'body{font-family:Georgia,serif;color:#000;background:#fff;margin:24px;}' +
+      'h1{font-size:20px;margin:0 0 2px;} .meta{font-size:13px;color:#333;margin-bottom:18px;}' +
+      'h2{font-size:16px;margin:20px 0 6px;border-bottom:1px solid #000;padding-bottom:2px;}' +
+      '.voice{font-size:13px;margin:10px 0 4px;} .voice i{color:#444;}' +
+      'table{border-collapse:collapse;margin:4px 0 10px;} td,th{border:1px solid #000;' +
+      'width:26px;height:26px;text-align:center;font-size:12px;padding:0;}' +
+      'th{font-weight:normal;background:#eee;} td.hit{font-weight:bold;font-size:15px;}' +
+      'td.beat{border-left-width:3px;} th.beat{border-left-width:3px;}' +
+      '.legend{font-size:12px;color:#333;margin-top:16px;}' +
+      '@media print{.noprint{display:none;}}';
+  }
+  function tsGridTable(v) {
+    const n = v.grid.length, pb = n / S.beats;
+    let head = '<tr>', row = '<tr>';
+    for (let i = 0; i < n; i++) {
+      const beat = Number.isInteger(pb) && i % pb === 0;
+      head += '<th' + (beat ? ' class="beat"' : '') + '>' + (beat ? (Math.floor(i / pb) + 1) : '·') + '</th>';
+      const mark = v.grid[i] === 2 ? '◉' : (v.grid[i] === 1 ? '●' : '');
+      const hand = v.grid[i] > 0 && v.hands[i] ? '<br>' + v.hands[i] : '';
+      row += '<td class="' + (v.grid[i] > 0 ? 'hit' : '') + (beat ? ' beat' : '') + '">' + mark + hand + '</td>';
+    }
+    return '<table>' + head + '</tr>' + row + '</tr></table>';
+  }
+  function tsPrintableHTML(pid) {
+    const data = tsScopeData(pid);
+    if (!data) return '';
+    let h = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>' +
+      tsEsc(data.groove.label || 'groove') + '</title><style>' + fmPrintCss() + '</style></head><body>';
+    h += '<h1>' + tsEsc(data.groove.label || '') + '</h1>';
+    h += '<div class="meta">' + tsEsc(data.groove.family || '') + ' · ' + (data.groove.count || '') + ' ' +
+      fmTr('pas') + ' · ' + (data.groove.tempo ? data.groove.tempo + ' BPM' : '') + '</div>';
+    data.parts.forEach(p => {
+      h += '<h2>' + tsEsc(p.label) + '</h2>';
+      p.voices.forEach(v => {
+        h += '<div class="voice"><b>' + tsEsc(v.label) + '</b> — ' + tsEsc(v.played) +
+          (v.approx ? ' <i>(' + fmTr('adapté') + ')</i>' : '') + '</div>' + tsGridTable(v);
+      });
+    });
+    h += '<div class="legend">● ' + fmTr('frappe') + ' · ◉ ' + fmTr('accent') + ' · D/G ' +
+      fmTr('doigté (main droite / main gauche)') + '</div>';
+    h += '</body></html>';
+    return h;
+  }
+  // impression via un iframe caché — pas de popup (bloqueurs), pas de lib.
+  function fmPrintDoc(html) {
+    const f = document.createElement('iframe');
+    f.setAttribute('aria-hidden', 'true');
+    f.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden;';
+    document.body.appendChild(f);
+    const d = f.contentDocument || (f.contentWindow && f.contentWindow.document);
+    if (!d) { f.remove(); return; }
+    d.open(); d.write(html); d.close();
+    setTimeout(() => {
+      try { f.contentWindow.focus(); f.contentWindow.print(); } catch (e) {}
+      setTimeout(() => f.remove(), 3000);
+    }, 60);
+  }
+  function tsPrint(pid) {
+    if (!TS.loaded) { $('tsStatus').textContent = 'Charge d\'abord un groove.'; return; }
+    const html = tsPrintableHTML(pid);
+    if (html) { fmPrintDoc(html); $('tsStatus').textContent = fmTr('Vue imprimable ouverte — imprime ou « Enregistre en PDF ».'); }
+  }
+  // rendu PNG : mêmes données, canvas hors écran, thème clair forcé (photocopie).
+  function tsGridCanvas(pid) {
+    const data = tsScopeData(pid);
+    if (!data) return null;
+    const W = 1600, PADX = 40, LABW = 300, CELLH = 56, TITLEH = 110, PARTH = 54, VOICEH = 34, LEGH = 60;
+    let H = TITLEH + LEGH;
+    data.parts.forEach(p => { H += PARTH + p.voices.length * (VOICEH + CELLH + 18); });
+    const c = document.createElement('canvas'); c.width = W; c.height = H;
+    const x = c.getContext('2d');
+    if (!x) return null;
+    x.fillStyle = '#ffffff'; x.fillRect(0, 0, W, H);
+    x.fillStyle = '#1c1712'; x.font = 'bold 40px Georgia, serif';
+    x.fillText(data.groove.label || 'groove', PADX, 56);
+    x.font = '24px Georgia, serif'; x.fillStyle = '#555';
+    x.fillText((data.groove.family || '') + ' · ' + (data.groove.count || '') + ' ' + fmTr('pas') +
+      (data.groove.tempo ? ' · ' + data.groove.tempo + ' BPM' : ''), PADX, 92);
+    let y = TITLEH;
+    data.parts.forEach(p => {
+      x.font = 'bold 30px Georgia, serif'; x.fillStyle = '#1c1712';
+      x.fillText(p.label, PADX, y + 36);
+      x.strokeStyle = '#1c1712'; x.lineWidth = 2;
+      x.beginPath(); x.moveTo(PADX, y + 46); x.lineTo(W - PADX, y + 46); x.stroke();
+      y += PARTH;
+      p.voices.forEach(v => {
+        x.font = '22px Georgia, serif'; x.fillStyle = '#333';
+        x.fillText(v.label + ' — ' + v.played + (v.approx ? ' (' + fmTr('adapté') + ')' : ''), PADX, y + 24);
+        y += VOICEH;
+        const n = v.grid.length, pb = n / S.beats;
+        const cw = (W - PADX * 2 - LABW) / n;
+        for (let i = 0; i < n; i++) {
+          const cx = PADX + LABW + i * cw;
+          const beat = Number.isInteger(pb) && i % pb === 0;
+          x.strokeStyle = '#1c1712'; x.lineWidth = beat ? 4 : 1;
+          x.strokeRect(cx, y, cw, CELLH);
+          if (v.grid[i] > 0) {
+            x.fillStyle = v.grid[i] === 2 ? '#1c1712' : '#6b4a23';
+            x.beginPath(); x.arc(cx + cw / 2, y + CELLH / 2 - 6, Math.min(cw, CELLH) / 5, 0, Math.PI * 2); x.fill();
+            if (v.hands[i]) {
+              x.font = 'bold 18px Georgia, serif';
+              x.fillText(v.hands[i], cx + cw / 2 - 7, y + CELLH - 8);
+            }
+          }
+          if (beat) {
+            x.fillStyle = '#777'; x.font = '16px Georgia, serif';
+            x.fillText(String(Math.floor(i / pb) + 1), cx + 4, y - 4 + CELLH + 16);
+          }
+        }
+        x.font = '20px Georgia, serif'; x.fillStyle = '#1c1712';
+        y += CELLH + 18;
+      });
+    });
+    x.font = '20px Georgia, serif'; x.fillStyle = '#555';
+    x.fillText('● ' + fmTr('frappe') + ' · ◉ ' + fmTr('accent') + ' · D/G ' +
+      fmTr('doigté (main droite / main gauche)'), PADX, H - 24);
+    return c;
+  }
+  function fmDownloadDataURL(url, name) {
+    const a = document.createElement('a'); a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  }
+  function tsExportPNG(pid) {
+    if (!TS.loaded) { $('tsStatus').textContent = 'Charge d\'abord un groove.'; return; }
+    const c = tsGridCanvas(pid);
+    if (!c) return;
+    const p = pid ? TS.participants.find(x => x.id === pid) : null;
+    const name = p ? 'ma-ligne-' + p.label.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '.png'
+                   : 'groove-' + (TS.grooveId || 'export') + '.png';
+    fmDownloadDataURL(c.toDataURL('image/png'), name);
+    $('tsStatus').textContent = fmTr('Grille exportée en PNG.');
+  }
+
   // ---- rendu du panneau ----
   function tsMiniGrid(v, mergedHands) {
     const hands = mergedHands || percHandsFor(v.grid);
@@ -7964,6 +8521,8 @@ swing 62
         '<div class="ts-line">' + line + '</div>' +
         '<div style="margin-top:6px;display:flex;gap:6px;">' +
           '<button class="btn-sm ts-exp" data-p="' + p.id + '">↓ Ma ligne</button>' +
+          '<button class="btn-sm ts-print" data-p="' + p.id + '" title="Imprimer la ligne (ou « Enregistrer en PDF »)">🖨</button>' +
+          '<button class="btn-sm ts-png" data-p="' + p.id + '" title="Image PNG de la ligne">↓ PNG</button>' +
           '<button class="btn-sm ts-del" data-p="' + p.id + '">✕</button>' +
         '</div>' +
       '</div>';
@@ -8020,6 +8579,10 @@ swing 62
       }));
     document.querySelectorAll('#tsParticipants .ts-exp').forEach(el =>
       el.addEventListener('click', e => tsExportParticipant(e.target.dataset.p)));
+    document.querySelectorAll('#tsParticipants .ts-print').forEach(el =>
+      el.addEventListener('click', e => tsPrint(e.target.dataset.p)));
+    document.querySelectorAll('#tsParticipants .ts-png').forEach(el =>
+      el.addEventListener('click', e => tsExportPNG(e.target.dataset.p)));
     document.querySelectorAll('#tsParticipants .ts-del').forEach(el =>
       el.addEventListener('click', e => tsRemoveParticipant(e.target.dataset.p)));
     document.querySelectorAll('#tsVoices .ts-assign').forEach(el =>
@@ -8087,6 +8650,8 @@ swing 62
     });
     $('tsFinger').addEventListener('change', e => { TS.checkFinger = e.target.checked; tsRefresh(); });
     $('tsExportAll').addEventListener('click', tsExportAll);
+    $('tsPrintBtn').addEventListener('click', () => tsPrint(null));
+    $('tsPngBtn').addEventListener('click', () => tsExportPNG(null));
     // note de progression, insérée dans la ligne de break existante
     const note = document.createElement('span');
     note.id = 'tsProgressNote'; note.className = 'hint'; note.style.margin = '0';
@@ -8528,11 +9093,138 @@ swing 62
     script = null; $('scriptStatus').textContent = 'Routine arrêtée.';
   });
 
+  // ---- lint en direct des syntaxes expertes (0.7.0, C14 — L1/L2/L3/L4) ----
+  // Lecture seule : le lint n'exécute rien et ne touche pas l'état du métronome.
+  const SCRIPT_LINT_HELP = '80bpm 5min · 80->120bpm 10min · gap 2/16 · gap off · swing 62';
+  const BOW_LINT_HELP = 'T50x1 · P20x0.5 · Rx0.5 · T80x2n4';
+  function scriptDurationEstimate(segs) {
+    let s = 0, approx = false;
+    segs.forEach(seg => {
+      if (seg.type !== 'play') return;
+      if (seg.unit === 'min') s += seg.dur * 60;
+      else if (seg.unit === 's') s += seg.dur;
+      else { approx = true; s += seg.dur * S.beats * 60 / (((seg.t0 + seg.t1) / 2) || 1); }
+    });
+    return { s, approx };
+  }
+  function scriptLintRender() {
+    const el = $('scriptLint'); if (!el) return;
+    const txt = $('scriptArea').value;
+    if (!txt.trim()) { el.textContent = ''; scriptHlRender(null); return; }
+    const res = parseScript(txt);
+    if (res.errors && res.errors.length) {
+      const e0 = res.errors[0];
+      el.textContent = '✖ ' + fmTr('ligne') + ' ' + e0.line + ' : « ' + e0.src + ' » — ' +
+        fmTr('attendu :') + ' ' + SCRIPT_LINT_HELP +
+        (res.errors.length > 1 ? ' — ' + (res.errors.length - 1) + ' ' + fmTr('autre(s) ligne(s) en erreur') : '');
+    } else if (!res.segs || !res.segs.length) {
+      el.textContent = '';
+    } else {
+      const d = scriptDurationEstimate(res.segs);
+      el.textContent = '✔ ' + res.segs.length + ' ' + fmTr('segment(s)') +
+        (d.s > 0 ? ' — ' + fmTr('durée') + ' ' + (d.approx ? '~' : '') + fmtTime(d.s) : '');
+    }
+    scriptHlRender(res);
+  }
+  // L4 : coloration des jetons — overlay <pre> derrière le textarea rendu transparent.
+  // Repli propre : à la moindre désynchronisation détectée, l'overlay se désactive seul
+  // et le lint L1 reste le retour d'erreur de référence.
+  let hlDisabled = false;
+  function hlEsc(s) { return s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c])); }
+  function hlSyncStyles() {
+    const ta = $('scriptArea'), pre = $('scriptHl');
+    if (!ta || !pre || !window.getComputedStyle) return;
+    const cs = getComputedStyle(ta);
+    ['fontFamily', 'fontSize', 'lineHeight', 'paddingTop', 'paddingRight', 'paddingBottom',
+     'paddingLeft', 'borderTopWidth', 'borderRightWidth', 'borderBottomWidth', 'borderLeftWidth',
+     'letterSpacing'].forEach(p => { if (cs[p]) pre.style[p] = cs[p]; });
+    pre.style.borderStyle = 'solid'; pre.style.borderColor = 'transparent';
+  }
+  function scriptHlRender(res) {
+    const wrap = $('scriptHlWrap'), pre = $('scriptHl'), ta = $('scriptArea');
+    if (!wrap || !pre || !ta) return;
+    if (hlDisabled || !res) { pre.innerHTML = ''; wrap.classList.remove('hl-on'); return; }
+    const kinds = {};
+    (res.lines || []).forEach(l => { kinds[l.line] = l.kind; });
+    pre.innerHTML = ta.value.split('\n').map((raw, i) => {
+      const k = kinds[i + 1];
+      const cls = k === 'tempo' ? 'hl-tempo' : k === 'gap' ? 'hl-gap' : k === 'swing' ? 'hl-swing'
+        : k === 'comment' ? 'hl-comment' : k === 'err' ? 'hl-err' : '';
+      return cls ? '<span class="' + cls + '">' + hlEsc(raw) + '</span>' : hlEsc(raw);
+    }).join('\n') + '\n';
+    wrap.classList.add('hl-on');
+    pre.scrollTop = ta.scrollTop; pre.scrollLeft = ta.scrollLeft;
+    if (ta.scrollHeight && Math.abs(pre.scrollHeight - ta.scrollHeight) > 6) {
+      hlDisabled = true; pre.innerHTML = ''; wrap.classList.remove('hl-on');
+    }
+  }
+  let scriptLintT = null;
+  $('scriptArea').addEventListener('input', () => {
+    clearTimeout(scriptLintT); scriptLintT = setTimeout(scriptLintRender, 300);
+  });
+  $('scriptArea').addEventListener('scroll', () => {
+    const pre = $('scriptHl');
+    if (pre) { pre.scrollTop = $('scriptArea').scrollTop; pre.scrollLeft = $('scriptArea').scrollLeft; }
+  });
+  function bowLintRender() {
+    const el = $('bowLint'); if (!el) return;
+    const v = $('bowSeqInput').value;
+    if (!v.trim()) { el.textContent = ''; return; }
+    const res = parseBowSeq(v);
+    if (res.errors && res.errors.length) {
+      el.textContent = '✖ « ' + res.errors[0] + ' » — ' + fmTr('attendu :') + ' ' + BOW_LINT_HELP +
+        (res.errors.length > 1 ? ' — ' + (res.errors.length - 1) + ' ' + fmTr('autre(s) jeton(s) en erreur') : '');
+    } else {
+      const beats = res.seq.reduce((a, st) => a + st.beats, 0);
+      el.textContent = '✔ ' + res.seq.length + ' ' + fmTr('pas') + ' · ' + beats + ' ' + fmTr('temps');
+    }
+  }
+  let bowLintT = null;
+  $('bowSeqInput').addEventListener('input', () => {
+    clearTimeout(bowLintT); bowLintT = setTimeout(bowLintRender, 300);
+  });
+  // L3 : insertion d'exemples — les hésitants partent d'une ligne qui marche.
+  function scriptInsertExample(lineTxt) {
+    const ta = $('scriptArea');
+    const v = ta.value;
+    const s = ta.selectionStart != null ? ta.selectionStart : v.length;
+    const e = ta.selectionEnd != null ? ta.selectionEnd : s;
+    const before = v.slice(0, s), after = v.slice(e);
+    const ins = (before && !before.endsWith('\n') ? '\n' : '') + lineTxt +
+      (!after || after.startsWith('\n') ? '' : '\n');
+    ta.value = before + ins + after;
+    const pos = (before + ins).length;
+    if (ta.setSelectionRange) ta.setSelectionRange(pos, pos);
+    ta.dispatchEvent(new Event('input', { bubbles: true }));
+    if (ta.focus) ta.focus();
+  }
+  document.querySelectorAll('.script-chip').forEach(b =>
+    b.addEventListener('click', () => scriptInsertExample(b.dataset.ins)));
+  function bowInsertToken(tok) {
+    const inp = $('bowSeqInput');
+    const v = inp.value;
+    const s = inp.selectionStart != null ? inp.selectionStart : v.length;
+    const e = inp.selectionEnd != null ? inp.selectionEnd : s;
+    const before = v.slice(0, s), after = v.slice(e);
+    const ins = (before.trim() && !/[,\n]\s*$/.test(before) ? ', ' : '') + tok +
+      (after.trim() && !/^\s*[,\n]/.test(after) ? ', ' : '');
+    inp.value = before + ins + after;
+    inp.dispatchEvent(new Event('input', { bubbles: true }));
+    if (inp.focus) inp.focus();
+  }
+  document.querySelectorAll('.bow-chip').forEach(b =>
+    b.addEventListener('click', () => bowInsertToken(b.dataset.ins)));
+  // premier rendu : l'exemple par défaut est valide, le lint l'affiche d'emblée
+  hlSyncStyles();
+  scriptLintRender();
+  bowLintRender();
+
   document.addEventListener('keydown', e => {
     const tag = e.target.tagName;
     if (tag === 'TEXTAREA' || tag === 'INPUT' || tag === 'SELECT') return;
     if (e.key === 'Escape' && fsOpen) { closeBowFs(); return; }
     if (e.key === 'Escape' && percFsOpen) { closePercFs(); return; }
+    if (e.key === 'Escape' && atelierOpen) { closeAtelier(); return; }
     if (e.code === 'Space') { e.preventDefault(); toggle(); }
     else if (e.key === 'ArrowUp') { e.preventDefault(); setTempo(S.tempo + 1); }
     else if (e.key === 'ArrowDown') { e.preventDefault(); setTempo(S.tempo - 1); }
@@ -8566,13 +9258,15 @@ swing 62
   let bowSeq = [], bowTech = 'detache', bowInstr = 'violon';
   let bowIdx = 0, bowStepStart = 0, bowPos0 = 0;
 
+  // L2 0.7.0 (C14) : comme parseScript, le parseur collecte TOUS les jetons fautifs
+  // (champ `errors`) ; `error` reste la première erreur bloquante (contrat bowCompile).
   function parseBowSeq(text) {
-    const seq = [];
+    const seq = [], errors = [];
     for (const tok of text.split(/[,\n]+/)) {
       const t = tok.trim();
       if (!t) continue;
       const m = t.match(/^([tpr])\s*(\d+)?\s*x\s*(\d+(?:[.,]\d+)?)\s*(?:n\s*(\d+))?$/i);
-      if (!m) return { error: 'Élément non reconnu : « ' + t + ' »' };
+      if (!m) { errors.push(t); continue; }
       const kind = m[1].toLowerCase();
       seq.push({
         retake: kind === 'r',
@@ -8582,8 +9276,9 @@ swing 62
         notes: m[4] ? Math.max(1, +m[4]) : 1
       });
     }
-    if (!seq.length) return { error: 'Séquence vide.' };
-    return { seq };
+    if (errors.length) return { error: 'Élément non reconnu : « ' + errors[0] + ' »', errors, seq };
+    if (!seq.length) return { error: 'Séquence vide.', errors, seq };
+    return { seq, errors };
   }
 
   function bowReset() {
@@ -8610,6 +9305,101 @@ swing 62
     $('bowPreset').value = name;
     bowCompile(false);
   }
+
+  // ---- exports élèves (0.7.0, C13 — E3) : la séquence d'archet sur un pupitre ----
+  const BOW_TECH_LABELS = { detache: 'Détaché', legato: 'Legato / liaisons', martele: 'Martelé', spiccato: 'Spiccato' };
+  // rejoue la machine à pas (même logique que bowStateAt) pour obtenir départ/arrivée de chaque jeton
+  function bowSeqTrace(seq) {
+    let pos = (bowTech === 'spiccato' && seq.length) ? INSTR[bowInstr].bal : 0;
+    return seq.map(st => {
+      const from = pos;
+      let to;
+      if (st.retake) { to = 0.05; pos = 0.05; }
+      else if (bowTech === 'spiccato') { to = INSTR[bowInstr].bal; pos = to; }
+      else { to = Math.min(1, Math.max(0, pos + st.dir * st.len)); pos = to; }
+      return { st, from, to };
+    });
+  }
+  function bowTokenText(st) {
+    if (st.retake) return fmTr('reprise (retour au talon, archet levé)') + ' — ' + st.beats + ' ' + fmTr('temps');
+    return (st.dir > 0 ? fmTr('tiré') : fmTr('poussé')) + ' ' + Math.round(st.len * 100) + ' % — ' +
+      st.beats + ' ' + fmTr('temps') + (st.notes > 1 ? ' — ' + st.notes + ' ' + fmTr('notes liées') : '');
+  }
+  function bowPrintableHTML() {
+    const res = parseBowSeq($('bowSeqInput').value);
+    if (res.error) return '';
+    const trace = bowSeqTrace(res.seq);
+    let h = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>' + fmTr('Coup d\'archet') +
+      '</title><style>' + fmPrintCss() +
+      '.bar{position:relative;height:22px;border:1px solid #000;margin:4px 0 14px;}' +
+      '.seg{position:absolute;top:0;bottom:0;background:#bbb;border:1px solid #000;}' +
+      '.tok{font-family:Consolas,Menlo,monospace;font-size:13px;}' +
+      '</style></head><body>';
+    h += '<h1>' + fmTr('Coup d\'archet') + '</h1>';
+    h += '<div class="meta">' + tsEsc(INSTR[bowInstr].label) + ' · ' + tsEsc(fmTr(BOW_TECH_LABELS[bowTech] || bowTech)) +
+      ' · <span class="tok">' + tsEsc($('bowSeqInput').value) + '</span></div>';
+    trace.forEach((t, i) => {
+      h += '<div class="voice"><b>' + (i + 1) + '.</b> <span class="tok">' + tsEsc(tokenSrc(t.st)) + '</span> — ' +
+        tsEsc(bowTokenText(t.st)) + '</div>';
+      const l = Math.min(t.from, t.to) * 100, w = Math.max(2, Math.abs(t.to - t.from) * 100);
+      h += '<div class="bar"><div class="seg" style="left:' + l.toFixed(1) + '%;width:' + w.toFixed(1) + '%;"></div></div>';
+    });
+    h += '<div class="legend">' + fmTr('Jauge : talon à gauche, pointe à droite.') + ' T = ' + fmTr('tiré') +
+      ' · P = ' + fmTr('poussé') + ' · R = ' + fmTr('reprise') + '</div>';
+    h += '</body></html>';
+    return h;
+  }
+  function tokenSrc(st) {
+    if (st.retake) return 'Rx' + st.beats;
+    return (st.dir > 0 ? 'T' : 'P') + Math.round(st.len * 100) + 'x' + st.beats + (st.notes > 1 ? 'n' + st.notes : '');
+  }
+  function bowSeqCanvas() {
+    const res = parseBowSeq($('bowSeqInput').value);
+    if (res.error) return null;
+    const trace = bowSeqTrace(res.seq);
+    const W = 1600, PADX = 40, TITLEH = 110, ROWH = 92, LEGH = 70;
+    const H = TITLEH + trace.length * ROWH + LEGH;
+    const c = document.createElement('canvas'); c.width = W; c.height = H;
+    const x = c.getContext('2d');
+    if (!x) return null;
+    x.fillStyle = '#ffffff'; x.fillRect(0, 0, W, H);
+    x.fillStyle = '#1c1712'; x.font = 'bold 40px Georgia, serif';
+    x.fillText(fmTr('Coup d\'archet'), PADX, 56);
+    x.font = '24px Georgia, serif'; x.fillStyle = '#555';
+    x.fillText(fmTr(INSTR[bowInstr].label) + ' · ' + fmTr(BOW_TECH_LABELS[bowTech] || bowTech) + ' · ' + $('bowSeqInput').value, PADX, 92);
+    let y = TITLEH;
+    trace.forEach((t, i) => {
+      x.font = '22px Georgia, serif'; x.fillStyle = '#333';
+      x.fillText((i + 1) + '. ' + tokenSrc(t.st) + ' — ' + bowTokenText(t.st), PADX, y + 26);
+      const bx = PADX, bw = W - PADX * 2, by = y + 40, bh = 26;
+      x.strokeStyle = '#1c1712'; x.lineWidth = 2; x.strokeRect(bx, by, bw, bh);
+      const x0 = bx + t.from * bw, x1 = bx + t.to * bw;
+      x.fillStyle = t.st.retake ? '#999' : '#6b4a23';
+      x.fillRect(Math.min(x0, x1), by + 3, Math.max(4, Math.abs(x1 - x0)), bh - 6);
+      // pointe de flèche vers la destination
+      x.beginPath();
+      const dir = x1 >= x0 ? 1 : -1;
+      x.moveTo(x1, by + bh / 2); x.lineTo(x1 - dir * 14, by + 3); x.lineTo(x1 - dir * 14, by + bh - 3);
+      x.closePath(); x.fillStyle = '#1c1712'; x.fill();
+      y += ROWH;
+    });
+    x.font = '20px Georgia, serif'; x.fillStyle = '#555';
+    x.fillText(fmTr('Jauge : talon à gauche, pointe à droite.') + ' T = ' + fmTr('tiré') +
+      ' · P = ' + fmTr('poussé') + ' · R = ' + fmTr('reprise'), PADX, H - 28);
+    return c;
+  }
+  $('bowPrintBtn').addEventListener('click', () => {
+    const html = bowPrintableHTML();
+    if (!html) { $('bowStatus').textContent = '✖ ' + fmTr('Corrige d\'abord la séquence.'); return; }
+    fmPrintDoc(html);
+    $('bowStatus').textContent = fmTr('Vue imprimable ouverte — imprime ou « Enregistre en PDF ».');
+  });
+  $('bowPngBtn').addEventListener('click', () => {
+    const c = bowSeqCanvas();
+    if (!c) { $('bowStatus').textContent = '✖ ' + fmTr('Corrige d\'abord la séquence.'); return; }
+    fmDownloadDataURL(c.toDataURL('image/png'), 'archet-sequence.png');
+    $('bowStatus').textContent = fmTr('Séquence exportée en PNG.');
+  });
 
   // avance la machine à états jusqu'au temps « beats » et calcule la position
   function bowStateAt(beats) {
