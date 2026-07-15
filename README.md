@@ -3,8 +3,8 @@
 Métronome pédagogique du Portail Formation Musicale. **Application HTML fichier unique**, français,
 mobile-first. Livraison toujours en **fichier complet, jamais un patch**.
 
-**Build courant** : `metronomefunk-0.6.9` (2026-07-14) — salve **UX 0.6.9 accessibilité & i18n**
-(C4 + C10 du panel v0.6.5), sur la base 0.6.8 (mobile & tactile, PR #17).
+**Build courant** : `metronomefunk-0.7.0` (2026-07-15) — salve **UX 0.7.0 atelier & exports**
+(C11 à C14 du panel v0.6.5), sur la base 0.6.9 (accessibilité & i18n, PR #18).
 **Dépendances** : aucune, **sauf** le SDK Supabase (`@supabase/supabase-js@2`, chargé par CDN depuis
 0.6.3) pour l'auth lien-magique et la persistance des votes du parcours funk. L'app reste utilisable
 **hors ligne** : les votes sont mis en file locale et partent au retour du réseau.
@@ -231,6 +231,64 @@ première persistance postérieure à l'init (`window.__fmReady`).
   table pour un rang correct. La table couvre 100 % du corpus `GROOVES` actuel (vérifié 2026-07-11).
 
 ## Journal de développement
+
+### 2026-07-15 — Salve UX 0.7.0 : atelier & exports (C11–C14) · build 0.7.0
+
+- **Origine** : roadmap du panel UX v0.6.5 — cinquième salve (« atelier & exports »), spec
+  `metronome-salve-ux-0.7.0-atelier-exports-spec.md` validée avant code (lot optionnel L4
+  inclus, wake lock « lecture OU atelier » — décisions Jean).
+- **W1 — mode atelier** : overlay `#atelierFs` (motif `#percFs`) — BPM en très grand
+  (`clamp(96px, 34vh, 40vw)`), nom de tempo, compteur de mesure, rappel gap/break minimal,
+  trois gros boutons ▶/■ − + (≥ 86 px, répétition à l'appui maintenu via `holdRepeat`,
+  activation clavier `e.detail === 0`) ; bouton « ⛶ Atelier » près du transport ; Échap/✕.
+- **W2 — wake lock** : `navigator.wakeLock.request('screen')` pendant la **lecture ou tant
+  que l'atelier est ouvert** ; libération au stop/fermeture, ré-acquisition sur
+  `visibilitychange` ; **silencieux si l'API est absente** (amélioration progressive pure) ;
+  témoin ☀ discret dans la barre atelier.
+- **P1 — HUD `?perfhud=1`** : gigue de l'ordonnanceur (écart aux 25 ms), marge audio minimale,
+  fps — outil du protocole d'essai C12 sur appareil réel ; aucun effet sans le flag,
+  `aria-hidden`, styles posés propriété par propriété (compat jsdom).
+- **P2 — `draw()` allégé** : collections DOM mises en cache (`drawCacheGet`, invalidation aux
+  reconstructions `buildStepGrid`/`buildPercRowsInto`) ; classes `cur` touchées seulement
+  quand l'index change (`rowSetCur`, mémo `_fmCur`) ; `#statusLine` réécrit **seulement si le
+  texte composé change** (`statusLineSet`, compteur espionnable) ; idem `percFsTempo`.
+- **P3 — pré-planification élargie** : `AHEAD` 0.12 → **0.20 s** (LOOKAHEAD 25 ms inchangé) —
+  résilience quand le fil principal est occupé ; le visuel lit `audioCtx.currentTime`, rien
+  ne bouge à l'œil. **Verdict C12 final à l'essai de Jean** (protocole : Android milieu de
+  gamme, > 180 BPM, perc + basse + clic, `?perfhud=1`, avant/après) ; l'allègement du rendu
+  de la roue reste un lot conditionnel non codé.
+- **E1 — vue imprimable Team Spirit** : `tsPrintableHTML(pid)` — document local autonome
+  (méta groove, **une grille par participant** voix × pas avec ●/◉ et doigtés D/G, voix non
+  assignées sous « Tous », légende), impression par **iframe caché** + `window.print()`
+  (→ « Enregistrer en PDF » natif, aucune bibliothèque). Boutons globaux + par participant.
+- **E2 — PNG de la grille** : `tsGridCanvas(pid)` — canvas hors écran 1600 px, thème clair
+  forcé (photocopie), téléchargement via dataURL. **Le JSON existant ne change pas.**
+- **E3 — archet imprimable** : `bowPrintableHTML()`/`bowSeqCanvas()` — séquence jeton par
+  jeton (machine à pas rejouée : départ/arrivée sur la jauge, flèches), légende talon/pointe,
+  technique et instrument rappelés ; mêmes boutons 🖨 / ↓ PNG dans la section archet.
+- **L1/L2 — lint en direct** : `parseScript`/`parseBowSeq` collectent désormais **toutes**
+  les erreurs (`errors`, numéros de ligne / jetons) en gardant le contrat historique
+  (`error` = première bloquante pour ▶) ; sous les champs, `#scriptLint`/`#bowLint`
+  (débobinés 300 ms, `role="status"`) : `✔ n segments — durée ~X` / `✖ ligne N : « … » —
+  attendu : …`. Le lint n'exécute rien.
+- **L3 — chips d'insertion** : exemples insérés au curseur (script : 5 min à 80, accelerando,
+  gap, swing ; archet : tiré/poussé 50 %, reprise, 4 notes liées), lint rafraîchi aussitôt.
+- **L4 — coloration des jetons** : overlay `<pre>` synchronisé derrière le textarea rendu
+  transparent (styles copiés par `getComputedStyle`, scroll suivi) — tempo/gap/swing/
+  commentaires teintés (variables `--fm-*-text`), lignes fautives soulignées ; **repli
+  propre** : désynchronisation détectée → l'overlay se désactive seul, L1 reste la référence.
+- **i18n** : +51 clés par langue (**507 → 558**), symétrie EN↔PT ; statuts composés par
+  fragments `fmTr` (lint, exports) ; textes des documents imprimés/PNG traduits à la
+  génération. Exclusions d'audit ajoutées et documentées dans la recette 0.6.9 : overlay
+  `.script-hl` (reflet du texte de l'utilisateur), `#scriptLint`/`#bowLint` (composés).
+- **Registre de test** : `fmMetroReg().v070` (hooks lecture seule : `ahead`, `atelierOpen`,
+  `wakeLockWanted`, `statusLineSet`/`statusLineWrites`, parseurs, générateurs d'exports).
+- **Recettes** : nouvelle suite `recette-atelier-exports-0.7.0.js` — **85/85** (atelier,
+  wake lock stubé + API absente, HUD sous flag, mémo statusLine, caches `cur`, vue
+  imprimable/PNG Team Spirit et archet, JSON inchangé, lint multi-erreurs FR/EN, chips,
+  coloration, i18n symétrie). Les trois vérifications de build des suites historiques
+  passent en comparaison **≥** (motif acté — seuils inchangés). **Non-régression complète
+  (18 suites) : 690/690, 0 rouge** (605 + 85).
 
 ### 2026-07-14 — Salve UX 0.6.9 : accessibilité & i18n (C4, C10) · build 0.6.9
 

@@ -81,7 +81,10 @@ boot(() => {
 
   // --- 1. Estampille + présence de la couche d'action -----------------------
   console.log('[1] Build & couche d\'action de recette');
-  ok(typeof R.build === 'string' && /metronomefunk-0\.6\.[1-9]\d*/.test(R.build), 'BUILD ≥ 0.6.1 (finition curseur ; ' + R.build + ')');
+  // 0.7.0 : comparaison de version en « ≥ » (motif acté) — le seuil testé reste 0.6.1
+  const vge = (b, X, Y, Z) => { const m = /metronomefunk-(\d+)\.(\d+)\.(\d+)/.exec(b || ''); return !!m &&
+    (+m[1] > X || (+m[1] === X && (+m[2] > Y || (+m[2] === Y && +m[3] >= Z)))); };
+  ok(typeof R.build === 'string' && vge(R.build, 0, 6, 1), 'BUILD ≥ 0.6.1 (finition curseur ; ' + R.build + ')');
   ok(typeof window.fmMetroFvCursor === 'function', 'window.fmMetroFvCursor exposé (pilotage du curseur)');
 
   // --- 2. Un curseur par piste (djembé) -------------------------------------

@@ -80,7 +80,10 @@ boot(() => {
 
   // --- 1. Estampille de build ----------------------------------------------
   console.log('[1] Build');
-  ok(typeof R.build === 'string' && /metronomefunk-0\.6\.[2-9]\d*/.test(R.build), 'BUILD bumpé à 0.6.2 (' + R.build + ')');
+  // 0.7.0 : comparaison de version en « ≥ » (motif acté) — le seuil testé reste 0.6.2
+  const vge = (b, X, Y, Z) => { const m = /metronomefunk-(\d+)\.(\d+)\.(\d+)/.exec(b || ''); return !!m &&
+    (+m[1] > X || (+m[1] === X && (+m[2] > Y || (+m[2] === Y && +m[3] >= Z)))); };
+  ok(typeof R.build === 'string' && vge(R.build, 0, 6, 2), 'BUILD bumpé à 0.6.2 (' + R.build + ')');
 
   // --- 2. Modèle de données (hook lecture seule) ---------------------------
   console.log('\n[2] Paliers & libellés (hook)');
