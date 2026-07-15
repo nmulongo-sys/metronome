@@ -3,8 +3,8 @@
 Métronome pédagogique du Portail Formation Musicale. **Application HTML fichier unique**, français,
 mobile-first. Livraison toujours en **fichier complet, jamais un patch**.
 
-**Build courant** : `metronomefunk-0.6.8` (2026-07-14) — salve **UX 0.6.8 mobile & tactile** (C3 du
-panel v0.6.5), sur la base 0.6.7 (onboarding, PR #16).
+**Build courant** : `metronomefunk-0.6.9` (2026-07-14) — salve **UX 0.6.9 accessibilité & i18n**
+(C4 + C10 du panel v0.6.5), sur la base 0.6.8 (mobile & tactile, PR #17).
 **Dépendances** : aucune, **sauf** le SDK Supabase (`@supabase/supabase-js@2`, chargé par CDN depuis
 0.6.3) pour l'auth lien-magique et la persistance des votes du parcours funk. L'app reste utilisable
 **hors ligne** : les votes sont mis en file locale et partent au retour du réseau.
@@ -231,6 +231,50 @@ première persistance postérieure à l'init (`window.__fmReady`).
   table pour un rang correct. La table couvre 100 % du corpus `GROOVES` actuel (vérifié 2026-07-11).
 
 ## Journal de développement
+
+### 2026-07-14 — Salve UX 0.6.9 : accessibilité & i18n (C4, C10) · build 0.6.9
+
+- **Origine** : roadmap du panel UX v0.6.5 — quatrième salve (« accessibilité + i18n »), spec
+  `metronome-salve-ux-0.6.9-a11y-i18n-spec.md` validée avant code (lot optionnel I5 inclus).
+- **A1 — texte utile ≥ 13 px** : toutes les `font-size` de texte utile montées à `.8125rem`
+  (hints, `.sec-sub`, statuts, badges, chips, libellés) ; tampon de build 11 px/op. .5 →
+  13 px/op. .75. Exclusion documentée : l'ornement ◆ des `summary` (décoratif, `.6rem`).
+- **A2 — contrastes AA** : nouvelles variables `--fm-accent-text` (clair `#875627` 5.5:1,
+  sombre = accent 7.6:1) et `--fm-danger-text` (clair `#b23530` 5.4:1, sombre `#d9534f` 4.6:1) ;
+  tous les usages **texte** de `--fm-accent` basculés (`.kicker`, `.val`, `.script-status`,
+  `.status-line .mute`, `.wiz-recap b`, « En savoir plus », feedbacks compte/biblio/export) ;
+  les usages non textuels (fonds, bordures, halos) inchangés. Ratios **calculés** par la recette.
+- **A3 — ARIA** : `role="status"` + `aria-live="polite"` sur `#statusLine`, `#percStatus`,
+  `#percFsStatus`, `#expFb` ; roue `#wheel` en `role="img"` + alternative textuelle (l'état est
+  vocalisé par `#statusLine`, pas de flux par battement) ; **0 contrôle sans nom accessible**
+  (35 `for=` ajoutés, 9 `aria-label` manuels, cases des grilles nommées « voix — pas N » à la
+  construction) ; groupes nommés (export audio, grappe tempo).
+- **A4 — focus visible** : règle globale `:focus-visible` (outline 2 px accent) + règle dédiée
+  aux sliders (leur `outline:none` historique) ; la bulle des termes « ? » reste le remplacement
+  visible du focus sur `.term`.
+- **A5 — zoom 150–200 %** : rien à coder (viewport saine) — à vérifier à l'essai.
+- **I1 — `fmTr()`** : dictionnaires EN/PT **hoistés en tête de page** + helper `window.fmTr(fr)`
+  pour les chaînes composées en JS ; le `confirm()` du reset passe par `fmTr` (sa clé, présente
+  depuis 0.6.6, devient enfin effective).
+- **I2 — statuts dynamiques traduits** : statuts fixes par le walker (clés ajoutées : « Arrêté »,
+  « Micro-timing armé… » — dette 0.6.8 —, appel-réponse, groove vide/restauré) ; statuts
+  **composés** par `fmTr` fragment par fragment (± frappe, break, séquences, kit, micro-timing,
+  gap « ● COUPÉ / ● GAP », « Mesure N · gap actif », « muet » des voix).
+- **I3 — hint basse traduit** : la section basse entière (hint fragmenté par les `<b>`) ajoutée
+  aux dictionnaires EN et PT — purement additif, aucune clé existante scindée ni re-clée.
+- **I4 — audit d'extraction** : libellés d'interface restants traduits (section basse complète,
+  gap, export, wizard, notes de musique, répertoire) — dictionnaires **385 → 507 clés** par
+  langue, symétrie EN↔PT exigée. Exclusions justifiées et testées : contenu pédagogique
+  P-2/P-4 (classes `pf-*`, **chantier de traduction dédié à planifier**), tampon de build,
+  sélecteur de langue, aria-labels composés des cases, termes identiques dans les trois langues.
+- **I5 — `?lang=en&i18ndebug=1`** : marqueur debug — liseré sur tout nœud resté en français
+  après bascule (table inverse des valeurs pour ignorer les nœuds déjà traduits) ; aucun effet
+  sans le flag.
+- **Recettes** : nouvelle suite `recette-a11y-i18n-0.6.9.js` — **54/54** (tailles avec exclusion,
+  ratios WCAG calculés, zones vocalisables, 0 contrôle sans nom sur le DOM vivant, focus,
+  `fmTr`/confirm, statuts fixes et composés, hint basse EN/PT, audit d'extraction 0 manque,
+  symétrie, debug I5). **Non-régression complète (17 suites) : 605/605, 0 rouge** contre 0.6.9
+  (13 historiques 398 + UX 0.6.6 48 + onboarding 49 + mobile 56 + a11y-i18n 54).
 
 ### 2026-07-14 — Salve UX 0.6.8 : mobile & tactile (C3) · build 0.6.8
 
