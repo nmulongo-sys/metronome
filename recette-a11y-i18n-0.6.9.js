@@ -9,12 +9,17 @@
    fixes, fmTr pour les composés), I3 hint basse traduit EN/PT, I4 audit d'extraction
    complet (0 chaîne FR hors dictionnaires, exclusions justifiées, symétrie EN↔PT),
    I5 marqueur debug ?i18ndebug=1. Comptages en « ≥ » (motif 0.6.7/0.6.8).
-   Usage : node recette-a11y-i18n-0.6.9.js [chemin/index.html]  (défaut ./index.html) */
+   R-4b : la page riche auditée (sections, grilles, statuts, compte) est
+   pratiquer.html — la suite suit sa surface ; l'accueil refondu a son audit
+   propre (recette-accueil.js). Adaptations : plus de .wiz-recap (wizard retiré
+   §9.4), plus d'exclusion .pl-brick.back (écran de jeu retiré), plus de
+   « Kit généré » (DSL retiré) — chaque écart motivé en place.
+   Usage : node recette-a11y-i18n-0.6.9.js [chemin/pratiquer.html]  (défaut ./pratiquer.html) */
 const fs = require('fs');
 const path = require('path');
 const { JSDOM, VirtualConsole } = require('jsdom');
 
-const FILE = process.argv[2] || path.join(__dirname, 'index.html');
+const FILE = process.argv[2] || path.join(__dirname, 'pratiquer.html');
 const html = require('./recette-harnais').chargeHtml(FILE);   // R-2 : inline les corpus/*.js
 
 let PASS = 0, FAIL = 0;
@@ -181,12 +186,12 @@ async function runTests() {
          ratio(dg, panel) >= 4.5);
     }
     // les usages texte de l'accent passent par la variable dédiée
-    ok('2.5 texte accent → --fm-accent-text (.kicker, .val, .script-status, .mute, .wiz-recap b, hint-more)',
+    // R-4b : .wiz-recap b sort de la liste — le wizard est retiré de l'application (§9.4).
+    ok('2.5 texte accent → --fm-accent-text (.kicker, .val, .script-status, .mute, hint-more)',
        /\.kicker\s*\{[^}]*var\(--fm-accent-text\)/.test(css) &&
        /\.val\s*\{[^}]*var\(--fm-accent-text\)/.test(css) &&
        /\.script-status\s*\{[^}]*var\(--fm-accent-text\)/.test(css) &&
        /\.status-line \.mute\s*\{[^}]*var\(--fm-accent-text\)/.test(css) &&
-       /\.wiz-recap b\s*\{[^}]*var\(--fm-accent-text\)/.test(css) &&
        /hint-more > summary\s*\{[^}]*var\(--fm-accent-text\)/.test(css));
     ok('2.6 feedback compte : .good → accent-text, .bad → danger-text',
        /#acctFb\.good\{color:var\(--fm-accent-text\)\}/.test(css) &&
@@ -197,9 +202,9 @@ async function runTests() {
     ok('2.8 les usages non textuels de --fm-accent ne changent pas (bordures, fonds, .step.on)',
        /\.step\.on\s*\{[^}]*background:\s*var\(--fm-accent\)/.test(css) &&
        /\.btn-sm\.primary\s*\{[^}]*background:\s*var\(--fm-accent\)/.test(css));
-    // exclusions : opacités de visualisation conservées (briques, curseurs — pas du texte utile)
-    ok('2.9 exclusions A2 conservées : .pl-brick.back .25 (sémantique de la visualisation)',
-       /\.pl-brick\.back\s*\{\s*opacity:\s*\.25/.test(css));
+    // 2.9 RETIRÉE (R-4b) : l'exclusion .pl-brick.back (briques atténuées du
+    // backing) est partie avec l'écran de jeu (§9.4) — plus d'opacité de
+    // visualisation à documenter sur cette page.
   }
 
   // ---- 3. A3 — ARIA : vocaliser et nommer ----
@@ -283,8 +288,8 @@ async function runTests() {
        /percStatusSet\(fmTr\('− frappe retirée :'\)/.test(html) &&
        /percStatusSet\(fmTr\('Réponse : à toi ! La voix'\)/.test(html) &&
        /percStatusSet\(fmTr\('BREAK — niveau'\)/.test(html) &&
-       /percStatusSet\(fmTr\('Séquence'\)/.test(html) &&
-       /percStatusSet\(fmTr\('Kit généré :'\)/.test(html));
+       /percStatusSet\(fmTr\('Séquence'\)/.test(html));
+    // R-4b : « Kit généré : » est parti avec le DSL pédagogique (retrait §9.4).
     ok('6.4 statusLine gap/break/mesure via fmTr (● COUPÉ, ● GAP, ◆ BREAK, Mesure N)',
        /fmTr\('● COUPÉ — tiens le tempo !'\)/.test(html) &&
        /fmTr\('en silence, le reste continue'\)/.test(html) &&

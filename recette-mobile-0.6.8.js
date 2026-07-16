@@ -12,7 +12,9 @@ const fs = require('fs');
 const path = require('path');
 const { JSDOM, VirtualConsole } = require('jsdom');
 
-const FILE = process.argv[2] || path.join(__dirname, 'index.html');
+// R-4b : la surface mobile auditée (sections, grilles, sliders fins, appui long)
+// vit sur pratiquer.html depuis la refonte de l'accueil (argument fichier conservé).
+const FILE = process.argv[2] || path.join(__dirname, 'pratiquer.html');
 const html = require('./recette-harnais').chargeHtml(FILE);   // R-2 : inline les corpus/*.js
 
 let PASS = 0, FAIL = 0;

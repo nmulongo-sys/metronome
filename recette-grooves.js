@@ -12,8 +12,9 @@
         valeurs 0/1/2, identités de timbre instr+voiceKind CONNUES du moteur
         (la table fermée routée par playPerc, moteur/fm-audio.js), drapeaux
         approx/uncertain/isBreak, ids de voix préfixés par le groove ;
-     D. câblage : index.html charge les 6 familles dans l'ordre de la table
-        d'origine et n'embarque plus la table en dur.
+     D. câblage : la page à répertoire (pratiquer.html depuis R-4b — les
+        grooves ont quitté l'accueil avec la section Répertoire) charge les
+        6 familles dans l'ordre de la table d'origine, sans table en dur.
    « Ajouter une famille = un fichier, zéro code » : ce validateur est la
    revue mécanique qui garde l'ajout unitaire.
    ============================================================================ */
@@ -31,11 +32,13 @@ const egal = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const REF = JSON.parse(fs.readFileSync(path.join(__dirname, 'reference-grooves-0.11.0.json'), 'utf-8'));
 
 // ---- chargement du registre : les fichiers famille dans l'ordre des balises ------
-const page = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf-8');
+// R-4b : la page à répertoire est pratiquer.html (argument fichier conservé).
+const FILE = process.argv[2] || path.join(__dirname, 'pratiquer.html');
+const page = fs.readFileSync(FILE, 'utf-8');
 const ordreBalises = [];
 page.replace(/<script src="corpus\/grooves\/([^"]+)\.js"><\/script>/g, (m, fam) => { ordreBalises.push(fam); return m; });
 ok(egal(ordreBalises, REF.ordreFamilles),
-  'index.html : les 6 balises corpus/grooves/*.js dans l’ordre de la table 0.11.0 (' + ordreBalises.join(', ') + ')');
+  path.basename(FILE) + ' : les 6 balises corpus/grooves/*.js dans l’ordre de la table 0.11.0 (' + ordreBalises.join(', ') + ')');
 
 const window = {};
 for (const fam of ordreBalises)
@@ -108,8 +111,8 @@ ok(GROOVES.filter(g => g.family === 'ouest-africain').every(g => voixDe(g).every
 ok(new Set(toutes.map(x => x.v.id)).size === toutes.length, 'ids de voix/variations tous uniques');
 
 // ---- D. câblage de la page ------------------------------------------------------
-ok(!/const GROOVES = \[/.test(page), 'index.html : plus de table GROOVES en dur (assemblage seul)');
-ok(/const GROOVES = \(\(\) =>/.test(page), 'index.html : l’assemblage FM_GROOVES est en place');
+ok(!/const GROOVES = \[/.test(page), path.basename(FILE) + ' : plus de table GROOVES en dur (assemblage seul)');
+ok(/const GROOVES = \(\(\) =>/.test(page), path.basename(FILE) + ' : l’assemblage FM_GROOVES est en place');
 
 console.log(`\n--- grooves : ${nOk} vertes, ${nKo} rouges (total ${nOk + nKo}) ---`);
 process.exit(nKo ? 1 : 0);

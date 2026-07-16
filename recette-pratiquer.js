@@ -73,7 +73,7 @@ setTimeout(runTests, 80);
 function runTests() {
   /* ---------- A. chargement + hiérarchie J1 ---------- */
   ok('chargement sans erreur jsdom (' + jsdomErrors.length + ')', jsdomErrors.length === 0);
-  ok('BUILD 0.13.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.13.0');   // R-4a : la ligne vivante suit le build
+  ok('BUILD 0.14.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.14.0');   // la ligne vivante suit le build
   ok('GROOVES assemblés depuis FM_GROOVES (31)', g('GROOVES.length') === 31 && Object.keys(W.FM_GROOVES || {}).length === 6);
   const b1 = $('blocJoue'), b2 = $('blocAccomp'), b3 = $('blocClic');
   ok('les trois blocs J1 présents', !!(b1 && b2 && b3));
@@ -94,22 +94,33 @@ function runTests() {
   ok('lien retour vers l\'accueil (index.html)', !!D.querySelector('header a[href="index.html"]'));
   ok('pas de mode simple sur cette page', !D.body.classList.contains('mode-simple'));
 
-  /* ---------- B. stubs inertes + contrat de coquille ---------- */
-  ok('surfaces index-only inertes : team, archet, cours, écran de jeu, wizard dans #fmStubs caché',
-    ['secTeam', 'secArchet', 'secCours', 'playScreen', 'wizOverlay', 'playSetup', 'bowFs']
-      .every(id => !!D.querySelector('#fmStubs[hidden] #' + id)));
-  ok('bibliothèque partagée + compte ABSENTS (restent sur index.html)',
-    !$('secBiblio') && !$('btnAccount') && !$('biblioList'));
-  ok('sommaire (C6) sans chips vers les surfaces index-only',
-    !D.querySelector('#tocBar [data-toc="secTeam"]') && !D.querySelector('#tocBar [data-toc="secArchet"]') &&
-    !D.querySelector('#tocBar [data-toc="secCours"]') && !!D.querySelector('#tocBar [data-toc="secRepertoire"]'));
+  /* ---------- B. dissolution R-4b : stubs au strict contrat, surfaces migrées ----------
+     v R-4b (spec R-4 §4.2) : la duplication transitoire R-3b est dissoute — écran de
+     jeu, wizard, DSL et « je joue » sont RETIRÉS de l'application ; l'archet vit sur
+     index.html, le parcours sur apprendre.html ; Team Spirit et la bibliothèque (avec
+     le compte partagé) deviennent des surfaces VISIBLES de cette page. */
+  ok('R-4b : #fmStubs vidé — le contrat moteur est rempli par de vrais éléments',
+    !!D.querySelector('#fmStubs[hidden]') && D.querySelectorAll('#fmStubs > *').length === 0);
+  ok('R-4b : surfaces retirées absentes du DOM (écran de jeu, wizard, « je joue », archet, cours)',
+    ['playScreen', 'wizOverlay', 'playSetup', 'secArchet', 'bowFs', 'secCours', 'onboardBanner', 'wizardBtn']
+      .every(id => !$(id)));
+  ok('R-4b : Team Spirit VISIBLE au bloc 2 (avec le répertoire qu\'il répartit)',
+    !!D.querySelector('#blocAccomp #secTeam #tsOn') && !D.querySelector('#fmStubs #secTeam'));
+  ok('R-4b : bibliothèque partagée + compte PRÉSENTS (migrés avec la coquille fm-compte)',
+    !!D.querySelector('#blocClic #secBiblio #biblioList') && !!$('btnAccount') && !!$('acctCard') && !!$('biblioTitre'));
+  ok('R-4b : sommaire (C6) avec chips Team Spirit et Bibliothèque, sans chips archet/cours',
+    !!D.querySelector('#tocBar [data-toc="secTeam"]') && !!D.querySelector('#tocBar [data-toc="secBiblio"]') &&
+    !D.querySelector('#tocBar [data-toc="secArchet"]') && !D.querySelector('#tocBar [data-toc="secCours"]') &&
+    !!D.querySelector('#tocBar [data-toc="secRepertoire"]'));
   ok('contrat fm-audio : startBtn, statusLine, percFsPlay fournis (visibles)',
     !!$('startBtn') && !!$('statusLine') && !!$('percFsPlay') && !D.querySelector('#fmStubs #startBtn'));
+  // v R-4b : le panneau play* n'existe plus NULLE PART — le moteur sort par sa garde
+  // (bassPlayRefresh teste playBassOn) ; le reste du contrat est porté par secBass/secGap.
   const IDS_ACCOMP = ['bassOn','bassPattern','bassKey','bassProg','bassChord','bassDensity','bassVel','bassVary',
-    'bassLegato','bassSpace','bassDropOn','bassDropEvery','bassDropLen','bassSwingFollow',
-    'playBassOn','playBassChord','playBassDensity','playBassDrop','playBassGroup','gapTarget','gapCrossed'];
-  ok('contrat fm-accomp : les 21 IDs fournis (panneau play* en stub inerte)',
-    IDS_ACCOMP.every(id => !!$(id)));
+    'bassLegato','bassSpace','bassDropOn','bassDropEvery','bassDropLen','bassSwingFollow','gapTarget','gapCrossed'];
+  ok('contrat fm-accomp : les 16 IDs vivants fournis, play* absents et sans crash (garde du moteur)',
+    IDS_ACCOMP.every(id => !!$(id)) && !$('playBassOn') && !$('playBassGroup') &&
+    (() => { try { W.eval('bassPlayRefresh()'); return true; } catch (e) { return false; } })());
   ok('plein écran percussion + atelier restent utilisables (hors stubs)',
     !!$('percFs') && !!$('atelierFs') && !D.querySelector('#fmStubs #percFs') && !D.querySelector('#fmStubs #atelierFs'));
 
@@ -190,6 +201,46 @@ function runTests() {
   ok('décharger : les voix ts.* quittent l\'état moteur',
     g('Object.keys(percGrids).every(k => k.indexOf("ts.") !== 0)') === true);
 
-  console.log(`\n--- pratiquer (R-3b) : ${PASS} vertes, ${FAIL} rouges (total ${PASS + FAIL}) ---`);
+  /* ---------- F. R-4b : Team Spirit sur pratiquer × mute maître × répertoire ---------- */
+  $('tsLoad').click();
+  const tsVoice = g('Object.keys(percGrids).find(k => k.indexOf("ts.") === 0)');
+  ok('R-4b : groove rechargé, une voix ts.* de référence en main', typeof tsVoice === 'string');
+  $('tsOn').click();
+  ok('R-4b : mode team spirit actif depuis la section visible', g('TS.on') === true);
+  $('tsAddPart').click();
+  ok('R-4b : + Participant crée une carte (la mécanique index vit ici)',
+    D.querySelectorAll('#tsParticipants .ts-part').length >= 1);
+  // mute maître × voix ts : patron percLayerMuted — la couche perc passe par playClick
+  W.eval(`window.__spyTs = 0;
+    const _ppTs = playPerc;
+    playPerc = function () { window.__spyTs++; };
+    playClick(0, 'perc', 1, ${JSON.stringify('__TSV__')}, false);
+    playPerc = _ppTs;`.replace('__TSV__', tsVoice));
+  ok('R-4b : sans mute maître, la voix ts sonne (témoin)', W.__spyTs === 1);
+  $('accompMuteBtn').click();
+  W.eval(`window.__spyTs = 0;
+    const _ppTs = playPerc;
+    playPerc = function () { window.__spyTs++; };
+    playClick(0, 'perc', 1, ${JSON.stringify('__TSV__')}, false);
+    playPerc = _ppTs;`.replace('__TSV__', tsVoice));
+  ok('R-4b : mute maître ENFONCÉ → la voix ts est coupée (patron percLayerMuted)', W.__spyTs === 0);
+  $('accompMuteBtn').click();
+  W.eval(`window.__spyTs = 0;
+    const _ppTs = playPerc;
+    playPerc = function () { window.__spyTs++; };
+    playClick(0, 'perc', 1, ${JSON.stringify('__TSV__')}, false);
+    playPerc = _ppTs;`.replace('__TSV__', tsVoice));
+  ok('R-4b : mute maître levé → la voix ts revient telle quelle', W.__spyTs === 1);
+  $('tsOn').click();
+  $('tsUnload').click();
+
+  /* ---------- G. R-4b : bibliothèque partagée branchée (Supabase absent = repli propre) ---------- */
+  $('btnBiblioRefresh').click();   // loadBiblio() : le repli « client indisponible » est synchrone
+  ok('R-4b : « Charger la bibliothèque » câblé — sans client Supabase, repli propre affiché',
+    /Supabase indisponible/.test($('biblioFb').textContent));
+  ok('R-4b : « Publier la routine » câblé (title dynamique posé par le bloc biblio)',
+    ($('btnBiblioPublish').getAttribute('title') || '').length > 10);
+
+  console.log(`\n--- pratiquer (R-3b→R-4b) : ${PASS} vertes, ${FAIL} rouges (total ${PASS + FAIL}) ---`);
   process.exit(FAIL ? 1 : 0);
 }

@@ -95,9 +95,12 @@ const MOTEUR_T = ['moteur/fm-etat.js', 'moteur/fm-audio.js', 'moteur/fm-accomp.j
 const COMPTE_T = ['coquille/fm-compte.js'];
 // l'ordre contractuel s'énonce PAR PAGE (R-4a) :
 //   corpus → [grooves si répertoire] → moteur → [coquille partagée si compte]
+// v R-4b : l'accueil refondu n'a plus ni répertoire (grooves → pratiquer) ni
+// consommateur Supabase (bibliothèque → pratiquer, compte avec elle) ; pratiquer
+// gagne les deux (Team Spirit/bibliothèque migrés, spec R-4 §4.2).
 const ORDRES = {
-  'index.html':     CORPUS_T.concat(GROOVES_T, MOTEUR_T, COMPTE_T),
-  'pratiquer.html': CORPUS_T.concat(GROOVES_T, MOTEUR_T),
+  'index.html':     CORPUS_T.concat(MOTEUR_T),
+  'pratiquer.html': CORPUS_T.concat(GROOVES_T, MOTEUR_T, COMPTE_T),
   'apprendre.html': CORPUS_T.concat(MOTEUR_T, COMPTE_T)
 };
 for (const page of Object.keys(ORDRES)) {
@@ -110,8 +113,8 @@ for (const page of Object.keys(ORDRES)) {
   ok(new RegExp('</script>\\s*<script>\\s*\'use strict\';').test(html),
     page + ' : le script principal ouvre sur \'use strict\' sans IIFE (portée globale partagée)');
 }
-ok(/const BUILD = 'metronomefunk-0\.13\.0'/.test(etat),
-  'BUILD = 0.13.0 dans fm-etat.js (unique ligne vivante, tolérance déclarée)');
+ok(/const BUILD = 'metronomefunk-0\.14\.0'/.test(etat),
+  'BUILD = 0.14.0 dans fm-etat.js (unique ligne vivante, tolérance déclarée)');
 
 // ---- C. coquille partagée : fm-compte.js == bloc COMPTE du 0.12.0 (déplacement) ----
 const REFC = JSON.parse(fs.readFileSync(path.join(__dirname, 'reference-compte-0.12.0.json'), 'utf-8'));
@@ -122,12 +125,15 @@ const REFC = JSON.parse(fs.readFileSync(path.join(__dirname, 'reference-compte-0
   const bloc = contenu.slice(debut, contenu[contenu.length - 1] === '' ? -1 : undefined);
   ok(bloc.length === REFC.nb, `coquille/fm-compte.js : ${REFC.nb} lignes verbatim (trouvé ${bloc.length})`);
   ok(md5(bloc) === REFC.md5, `coquille/fm-compte.js : md5 du bloc == bloc COMPTE d'index.html 0.12.0 (${REFC.md5.slice(0, 8)}…)`);
+  // v R-4b : les pages consommatrices du compte sont apprendre et pratiquer ;
+  // l'accueil refondu n'a plus de consommateur Supabase (spec R-4 §4.2).
   const idx = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf-8');
-  ok(idx.indexOf('window.fmSupabase=function()') < 0,
-    'index.html : la logique compte n\'est plus en dur (une seule source, coquille/fm-compte.js)');
+  ok(idx.indexOf('window.fmSupabase=function()') < 0 && idx.indexOf('fm-compte.js') < 0,
+    'index.html : plus de logique compte, ni en dur ni par coquille (aucun consommateur)');
   const app = fs.readFileSync(path.join(__dirname, 'apprendre.html'), 'utf-8');
-  ok(app.indexOf('id="acctCard"') > 0 && idx.indexOf('id="acctCard"') > 0,
-    'le petit markup compte (carte) reste porté par chaque page consommatrice');
+  const pra = fs.readFileSync(path.join(__dirname, 'pratiquer.html'), 'utf-8');
+  ok(app.indexOf('id="acctCard"') > 0 && pra.indexOf('id="acctCard"') > 0,
+    'le petit markup compte (carte) reste porté par chaque page consommatrice (apprendre, pratiquer)');
 }
 
 console.log(`\n--- extraction : ${nOk} vertes, ${nKo} rouges (total ${nOk + nKo}) ---`);

@@ -53,7 +53,10 @@ class FakeAudioContext {
 }
 
 // ---- construction du DOM -----------------------------------------------------
-const html = require('./recette-harnais').chargeHtml();   // R-2 : inline les corpus/*.js
+// R-4b : la surface testée (couches, basse, percussion, répertoire) vit sur
+// pratiquer.html depuis la refonte de l'accueil (argument fichier conservé).
+const FILE = process.argv[2] || path.join(__dirname, 'pratiquer.html');
+const html = require('./recette-harnais').chargeHtml(FILE);   // R-2 : inline les corpus/*.js
 const dom = new JSDOM(html, {
   url: 'http://localhost/',
   runScripts: 'dangerously',
