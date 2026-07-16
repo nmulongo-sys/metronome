@@ -516,6 +516,13 @@
 
   /* ===== Parcours funk (P-4) — surcouche additive ===== */
   :root { --pf-cajon:#C8722E; --pf-djembe:#2E86C8; }
+  /* P-6 : sélecteur de niveau (Débutant / Intermédiaire / …) */
+  .pf-niv-tabs { display:flex; flex-wrap:wrap; gap:6px; margin:2px 0 4px; }
+  .pf-niv-tab { font-family:var(--fm-font-ui); font-size:.8125rem; letter-spacing:.02em; padding:6px 14px; border-radius:20px;
+    border:1px solid var(--fm-line); background:var(--fm-panel-2); color:var(--fm-sub); cursor:pointer; }
+  .pf-niv-tab:hover { border-color:var(--fm-accent); color:var(--fm-ink); }
+  .pf-niv-tab.active { background:var(--fm-accent); border-color:var(--fm-accent); color:var(--fm-accent-ink); font-weight:600; }
+  .pf-niv-tab:focus-visible { outline:2px solid var(--fm-accent); outline-offset:1px; }
   .pf-grid { display:grid; grid-template-columns:1fr; gap:14px; margin-top:6px; }
   @media (min-width:640px){ .pf-grid { grid-template-columns:1fr 1fr; } }
   .pf-col { border:1px solid var(--fm-line); border-radius:12px; padding:10px; background:var(--fm-panel-2); border-top:3px solid var(--pf-c); }
@@ -1148,7 +1155,7 @@ window.__I18N = { "en": {
   "toutes les": "every",
   "mesures, trou de": "measures, hole of",
   "temps": "beats",
-  "parcours · intermédiaire": "path · intermediate",
+  "parcours · plusieurs niveaux": "path · several levels",
   "Deux parcours parallèles — cajón et djembé. « Charger » installe l'accompagnement de basse de l'exercice ; tu joues par-dessus. Coche « acquis » quand le critère est atteint ; le vote de difficulté aide à recalibrer le niveau pour tout le monde.": "Two parallel paths — cajón and djembé. “Load” installs the exercise's bass accompaniment; you play on top. Tick “done” when the criterion is met; the difficulty vote helps recalibrate the level for everyone.",
   "L'assistant règle le métronome pour toi — tu pourras tout ajuster ensuite.": "The assistant sets the metronome for you — you can adjust everything afterwards.",
   "Durée à enregistrer (la boucle en cours)": "Duration to record (the current loop)",
@@ -1708,7 +1715,7 @@ window.__I18N = { "en": {
   "toutes les": "a cada",
   "mesures, trou de": "compassos, buraco de",
   "temps": "tempos",
-  "parcours · intermédiaire": "percurso · intermediário",
+  "parcours · plusieurs niveaux": "percurso · vários níveis",
   "Deux parcours parallèles — cajón et djembé. « Charger » installe l'accompagnement de basse de l'exercice ; tu joues par-dessus. Coche « acquis » quand le critère est atteint ; le vote de difficulté aide à recalibrer le niveau pour tout le monde.": "Dois percursos paralelos — cajón e djembê. « Carregar » instala o acompanhamento de baixo do exercício; você toca por cima. Marque « adquirido » quando o critério for atingido; o voto de dificuldade ajuda a recalibrar o nível para todos.",
   "L'assistant règle le métronome pour toi — tu pourras tout ajuster ensuite.": "O assistente ajusta o metrônomo para você — depois você pode ajustar tudo.",
   "Durée à enregistrer (la boucle en cours)": "Duração a gravar (o loop atual)",
@@ -2368,7 +2375,7 @@ window.fmTr = (function(){
 
   <!-- Parcours funk (P-4) : surcouche pédagogique, module 6 (niveau Intermédiaire) -->
   <details class="section" id="secCours" data-strate="couche">
-    <summary><span class="sec-title">Cours funk</span><span class="sec-sub">parcours · intermédiaire</span></summary>
+    <summary><span class="sec-title">Cours funk</span><span class="sec-sub">parcours · plusieurs niveaux</span></summary>
     <div class="section-body">
       <div class="hint">Deux parcours parallèles — cajón et djembé. « Charger » installe l'accompagnement de basse de l'exercice ; tu joues par-dessus. Coche « acquis » quand le critère est atteint ; le vote de difficulté aide à recalibrer le niveau pour tout le monde.</div>
       <div id="pfRoot"></div>
@@ -2640,7 +2647,7 @@ swing 62
 
   // Identité du build affichée dans l'en-tête (5.3-bis). Bumper à chaque passe : elle sert à
   // savoir de quel build vient un enregistrement de validation.
-  const BUILD = 'metronomefunk-0.7.0', BUILD_DATE = '2026-07-15';
+  const BUILD = 'metronomefunk-0.8.0', BUILD_DATE = '2026-07-16';
 
   let audioCtx = null, masterGain = null, noiseBuf = null;
   let masterLimiter = null;                                   // 5.3-ter : limiteur de bus master
@@ -10100,6 +10107,15 @@ swing 62
     djembe: { label: 'Djembé', couleur: 'var(--pf-djembe)' }
   };
   const PF_NIVEAUX = ['debutant', 'intermediaire', 'avance', 'artiste'];
+  // P-6 : parcours multi-niveaux. Chaque niveau a son infixe d'ID, son ordre de modules et son libellé.
+  const PF_NIV_INFIX = { debutant:'D', intermediaire:'I', avance:'Av', artiste:'Ar' };
+  const PF_NIV_LABEL = { debutant:'Débutant', intermediaire:'Intermédiaire', avance:'Avancé', artiste:'Artiste' };
+  const PF_NIV_ORDER = {
+    debutant:      ['POS','SON','PLS','SUB','DYN'],
+    intermediaire: ['T1','T2','B1','B2','D1','I2'],
+    avance:        [],
+    artiste:       []
+  };
   const PF_EX = {
     'EX-SOCLE-I2-01': { kind:'atome', objet:'Grave sur The One',
       consigne:"Pose ton grave exactement sur le 1, en même temps que la fondamentale de la basse.",
@@ -10276,7 +10292,176 @@ swing 62
     'EX-SOCLE-D1-05': { kind:'synthese', objet:'Nappe de ghosts complete',
       consigne:"Tisse le pendule complet (e + a) sur les deux mesures, sous la basse.",
       critere:"quand la nappe de ghosts tient toute seule et donne le groove.",
-      preset:{ pattern:'ghostPendule', prog:'vamp2', drop:{on:false} } }
+      preset:{ pattern:'ghostPendule', prog:'vamp2', drop:{on:false} } },
+    // ===== P-6 : niveau Débutant (primer technique, pré-funk) — clic seul, jamais de basse funk =====
+    // -- Module 1 : Posture, ancrage, rebond - CAJON (propre) --
+    'EX-CJ-POS-01': { kind:'atome', objet:'S\'installer, caler le cajón',
+      consigne:"Assieds-toi en équilibre, cale le cajón entre tes jambes, épaules relâchées et mains libres.",
+      critere:"quand tu tiens l'instrument sans le serrer et que tes deux mains tombent naturellement sur la tapa.",
+      preset:{ metro:true, tempo:72 } },
+    'EX-CJ-POS-02': { kind:'atome', objet:'Le relâchement fait le rebond',
+      consigne:"Laisse ta main retomber sur la tapa et rebondir toute seule, bras lourd et poignet souple — ne la retiens pas.",
+      critere:"quand la main rebondit d'elle-même au lieu de rester collée à la tapa.",
+      preset:{ metro:true, tempo:72 } },
+    'EX-CJ-POS-03': { kind:'atome', objet:'Tension = son mort',
+      consigne:"Compare une frappe crispée (son court et mat) et une frappe relâchée (son qui sonne) — garde la relâchée.",
+      critere:"quand tu sens que serrer étouffe le son et que relâcher le libère.",
+      preset:{ metro:true, tempo:72 } },
+    'EX-CJ-POS-04': { kind:'atome', objet:'Frapper au même endroit, sans forcer',
+      consigne:"Pose dix frappes détendues au même point de la tapa, une par temps, sans chercher à taper fort.",
+      critere:"quand les dix frappes tombent au même endroit, sans effort ni fatigue.",
+      preset:{ metro:true, tempo:72 } },
+    'EX-CJ-POS-05': { kind:'synthese', objet:'Assise + rebond, une main puis l\'autre',
+      consigne:"Alterne main gauche et main droite en frappes relâchées et rebondissantes sur le clic, épaules basses, une minute.",
+      critere:"quand tu tiens une minute détendu, chaque frappe rebondit et rien ne se crispe.",
+      preset:{ metro:true, tempo:72 } },
+    // -- Module 1 : Posture, ancrage, rebond - DJEMBE (propre) --
+    'EX-DJ-POS-01': { kind:'atome', objet:'S\'installer, incliner le djembé',
+      consigne:"Cale le djembé incliné entre tes jambes pour que l'air passe dessous, dos droit, épaules relâchées, mains libres.",
+      critere:"quand le fût est stable et incliné, et que tes mains tombent naturellement sur la peau.",
+      preset:{ metro:true, tempo:72 } },
+    'EX-DJ-POS-02': { kind:'atome', objet:'Le rebond « open »',
+      consigne:"Frappe le bord de la peau et laisse la main rebondir aussitôt (open) — la peau sonne parce que la main repart.",
+      critere:"quand la main repart toute seule après la frappe et laisse la peau résonner.",
+      preset:{ metro:true, tempo:72 } },
+    'EX-DJ-POS-03': { kind:'atome', objet:'Tension = son mort',
+      consigne:"Compare une frappe crispée (mate et courte) et une frappe relâchée qui rebondit (ouverte) — garde la relâchée.",
+      critere:"quand tu sens que la main qui reste sur la peau tue le son.",
+      preset:{ metro:true, tempo:72 } },
+    'EX-DJ-POS-04': { kind:'atome', objet:'Frapper au même endroit, sans forcer',
+      consigne:"Pose dix frappes détendues au bord de la peau, une par temps, sans forcer.",
+      critere:"quand les dix frappes sonnent pareil, au même endroit, sans fatigue.",
+      preset:{ metro:true, tempo:72 } },
+    'EX-DJ-POS-05': { kind:'synthese', objet:'Assise + rebond open, une main puis l\'autre',
+      consigne:"Alterne les mains en frappes open rebondissantes sur le clic, une minute, épaules basses.",
+      critere:"quand tu tiens une minute détendu, chaque main rebondit et la peau sonne à chaque coup.",
+      preset:{ metro:true, tempo:72 } },
+    // -- Module 2 : La palette de sons - CAJON (propre) --
+    'EX-CJ-SON-01': { kind:'atome', objet:'Le grave (centre bas)',
+      consigne:"Frappe le centre bas de la tapa, main pleine et relâchée : c'est le grave, rond et profond.",
+      critere:"quand ton grave sort rond et profond, toujours au même endroit.",
+      preset:{ metro:true, tempo:76 } },
+    'EX-CJ-SON-02': { kind:'atome', objet:'Le tone (haut de tapa)',
+      consigne:"Frappe plus haut sur la tapa, doigts joints : c'est le tone, plus clair et plus court que le grave.",
+      critere:"quand ton tone sonne clair et bien distinct du grave.",
+      preset:{ metro:true, tempo:76 } },
+    'EX-CJ-SON-03': { kind:'atome', objet:'Le slap (catapulte)',
+      consigne:"Fais claquer les doigts en catapulte sur le haut de la tapa : c'est le slap, sec et tranchant.",
+      critere:"quand ton slap claque net, franchement différent du tone.",
+      preset:{ metro:true, tempo:76 } },
+    'EX-CJ-SON-04': { kind:'atome', objet:'Nommer les trois sons (vocalisation)',
+      consigne:"Dis un mot de quatre syllabes, une par temps (« TA-KA-DI-MI »), et pose un son sur chaque syllabe.",
+      critere:"quand chaque syllabe et chaque son tombent ensemble sur le temps.",
+      preset:{ metro:true, tempo:76 } },
+    'EX-CJ-SON-05': { kind:'synthese', objet:'Les trois sons à la suite, propres',
+      consigne:"Enchaîne grave, tone, slap sur les trois premiers temps puis silence sur le 4, en boucle sur le clic.",
+      critere:"quand les trois sons restent nets et distincts, toujours à leur place, tour après tour.",
+      preset:{ metro:true, tempo:76 } },
+    // -- Module 2 : La palette de sons - DJEMBE (propre) --
+    'EX-DJ-SON-01': { kind:'atome', objet:'La bass (centre)',
+      consigne:"Frappe le centre de la peau, main pleine et relâchée : c'est la bass, grave et ronde.",
+      critere:"quand ta bass sort grave et pleine, au centre de la peau.",
+      preset:{ metro:true, tempo:76 } },
+    'EX-DJ-SON-02': { kind:'atome', objet:'Le tone (bord)',
+      consigne:"Frappe le bord, doigts joints et à plat : c'est le tone, clair et chantant.",
+      critere:"quand ton tone sonne clair, bien distinct de la bass.",
+      preset:{ metro:true, tempo:76 } },
+    'EX-DJ-SON-03': { kind:'atome', objet:'Le slap (fouetté)',
+      consigne:"Fouette le bord, doigts relâchés qui claquent : c'est le slap, sec et perçant.",
+      critere:"quand ton slap claque net, franchement différent du tone.",
+      preset:{ metro:true, tempo:76 } },
+    'EX-DJ-SON-04': { kind:'atome', objet:'Nommer les trois sons (vocalisation)',
+      consigne:"Dis un mot de quatre syllabes, une par temps (« TA-KA-DI-MI »), et pose un son sur chaque syllabe.",
+      critere:"quand chaque syllabe et chaque son tombent ensemble sur le temps.",
+      preset:{ metro:true, tempo:76 } },
+    'EX-DJ-SON-05': { kind:'synthese', objet:'Les trois sons à la suite',
+      consigne:"Enchaîne bass, tone, slap sur les trois premiers temps puis silence sur le 4, en boucle sur le clic.",
+      critere:"quand les trois sons restent nets et distincts, tour après tour.",
+      preset:{ metro:true, tempo:76 } },
+    // -- Module 3 : La pulse & le comptage (socle agnostique) --
+    'EX-SOCLE-D-PLS-01': { kind:'atome', objet:'Compter les 4 temps (vocalisation)',
+      consigne:"Frappe un coup par temps en comptant à voix haute « 1-2-3-4 », en boucle, calé sur le clic.",
+      critere:"quand tu comptes et frappes ensemble, sans te presser ni traîner.",
+      preset:{ metro:true, tempo:80 } },
+    'EX-SOCLE-D-PLS-02': { kind:'atome', objet:'Retomber sur le 1',
+      consigne:"Accentue le 1 de chaque mesure, un peu plus fort, les trois autres temps égaux.",
+      critere:"quand le 1 revient tout seul, mesure après mesure.",
+      preset:{ metro:true, tempo:80 } },
+    'EX-SOCLE-D-PLS-03': { kind:'atome', objet:'Tenir sans se presser',
+      consigne:"Ne joue que le 1 et le 3, en gardant l'intervalle exactement égal — le silence compte autant que la frappe.",
+      critere:"quand les frappes espacées restent parfaitement régulières.",
+      preset:{ metro:true, tempo:80 } },
+    'EX-SOCLE-D-PLS-04': { kind:'atome', objet:'La coupure (machine gap)',
+      consigne:"Le clic se tait une mesure entière : garde ta pulsation intérieure et retombe pile sur le 1 quand il revient.",
+      critere:"quand le clic revient et que tu es toujours exactement en place.",
+      preset:{ metro:true, tempo:80, gap:{ playN:4, muteM:1 } } },
+    'EX-SOCLE-D-PLS-05': { kind:'synthese', objet:'Compter, tenir, retomber',
+      consigne:"Sur des cycles où le clic coupe une mesure sur quatre, compte les temps, tiens le time et retombe juste à chaque 1.",
+      critere:"quand tu traverses la coupure sans perdre le compte ni le 1.",
+      preset:{ metro:true, tempo:80, gap:{ playN:3, muteM:1 } } },
+    // -- Module 4 : Les subdivisions (socle agnostique) --
+    'EX-SOCLE-D-SUB-01': { kind:'atome', objet:'Deux frappes par temps (croches)',
+      consigne:"Pose deux frappes égales par temps (« 1-et, 2-et… »), légères et régulières, sur les croches du clic.",
+      critere:"quand les deux frappes par temps sont parfaitement égales.",
+      preset:{ metro:true, tempo:80, subdiv:2 } },
+    'EX-SOCLE-D-SUB-02': { kind:'atome', objet:'Quatre frappes par temps (doubles)',
+      consigne:"Passe à quatre frappes égales par temps (« 1-e-et-a »), toujours très légères.",
+      critere:"quand les quatre frappes tiennent sans accélérer ni ralentir.",
+      preset:{ metro:true, tempo:80, subdiv:4 } },
+    'EX-SOCLE-D-SUB-03': { kind:'atome', objet:'Alterner 2 et 4',
+      consigne:"Une mesure en croches (2 par temps), une mesure en doubles (4 par temps), sans trou au changement.",
+      critere:"quand tu passes de 2 à 4 frappes sans accroc de time.",
+      preset:{ metro:true, tempo:80, subdiv:4 } },
+    'EX-SOCLE-D-SUB-04': { kind:'atome', objet:'Toucher léger, régulier',
+      consigne:"Garde le tapis de doubles très léger et parfaitement égal, comme un moteur, sans aucun accent.",
+      critere:"quand le tapis de doubles tourne, égal et sans bosse.",
+      preset:{ metro:true, tempo:80, subdiv:4 } },
+    'EX-SOCLE-D-SUB-05': { kind:'synthese', objet:'La grille de 16es, amorce',
+      consigne:"Tiens quatre frappes légères par temps sur deux mesures, régulières et détendues — c'est la future grille du funk.",
+      critere:"quand la grille de doubles tient toute seule, légère et régulière.",
+      preset:{ metro:true, tempo:80, subdiv:4 } },
+    // -- Module 5 : Fort & doux (dynamique) - CAJON (propre) --
+    'EX-CJ-DYN-01': { kind:'atome', objet:'Fort puis doux (contrôle dynamique)',
+      consigne:"Joue le même tone quatre fois fort, quatre fois doux, sans changer de geste — seule l'intensité change.",
+      critere:"quand l'écart fort/doux est net et que le son reste le même.",
+      preset:{ metro:true, tempo:84 } },
+    'EX-CJ-DYN-02': { kind:'atome', objet:'Le ghost (presque rien)',
+      consigne:"Baisse encore : des touches à peine audibles (ghost) entre les temps, sous une frappe forte marquée.",
+      critere:"quand tes ghosts sont réguliers et presque inaudibles.",
+      preset:{ metro:true, tempo:84 } },
+    'EX-CJ-DYN-03': { kind:'atome', objet:'Étouffer le son (mute)',
+      consigne:"Frappe puis pose la main pour couper la résonance (mute) — un son court et sec, sur demande.",
+      critere:"quand tu coupes le son exactement quand tu le décides.",
+      preset:{ metro:true, tempo:84 } },
+    'EX-CJ-DYN-04': { kind:'atome', objet:'Le press tone',
+      consigne:"Frappe en laissant la main appuyée : un tone étouffé, plus mat (press tone) — alterne avec le tone ouvert.",
+      critere:"quand tu obtiens deux couleurs, ouvert et étouffé, à volonté.",
+      preset:{ metro:true, tempo:84 } },
+    'EX-CJ-DYN-05': { kind:'synthese', objet:'Nappe fort/doux',
+      consigne:"Sur deux mesures, place des accents forts sur un fond de ghosts, avec un son coupé de temps en temps.",
+      critere:"quand le contraste fort/doux/coupé donne du relief sans casser le time.",
+      preset:{ metro:true, tempo:84 } },
+    // -- Module 5 : Fort & doux (dynamique) - DJEMBE (propre) --
+    'EX-DJ-DYN-01': { kind:'atome', objet:'Fort puis doux (contrôle dynamique)',
+      consigne:"Joue le même tone quatre fois fort, quatre fois doux, sans changer de geste — seule l'intensité change.",
+      critere:"quand l'écart fort/doux est net et que le son reste le même.",
+      preset:{ metro:true, tempo:84 } },
+    'EX-DJ-DYN-02': { kind:'atome', objet:'Le ghost/touch',
+      consigne:"Baisse encore : des touches à peine audibles (ghost) entre les temps, sous une frappe forte marquée.",
+      critere:"quand tes ghosts sont réguliers et presque inaudibles.",
+      preset:{ metro:true, tempo:84 } },
+    'EX-DJ-DYN-03': { kind:'atome', objet:'Le muffled slap',
+      consigne:"Fais un slap étouffé, mat et court, en gardant les doigts un instant sur la peau — alterne avec le slap ouvert.",
+      critere:"quand tu obtiens deux slaps, ouvert et étouffé, à volonté.",
+      preset:{ metro:true, tempo:84 } },
+    'EX-DJ-DYN-04': { kind:'atome', objet:'Doser bass, tone, slap',
+      consigne:"Enchaîne bass douce, tone moyen, slap fort — trois sons, trois intensités croissantes.",
+      critere:"quand chaque son garde sa couleur et son niveau d'intensité.",
+      preset:{ metro:true, tempo:84 } },
+    'EX-DJ-DYN-05': { kind:'synthese', objet:'Nappe fort/doux',
+      consigne:"Sur deux mesures, place des accents forts sur un fond de ghosts, avec un slap étouffé de temps en temps.",
+      critere:"quand le contraste fort/doux/étouffé donne du relief sans casser le time.",
+      preset:{ metro:true, tempo:84 } }
   };
   const PF_MOD = {
     'MOD-CJ-I-I2': { parcours:'cajon', niveau:'intermediaire', objet:'Verrouiller sur la basse funk',
@@ -10302,7 +10487,28 @@ swing 62
     'MOD-CJ-I-D1': { parcours:'cajon', niveau:'intermediaire', objet:'Ghost pendule',
       exercices:['EX-SOCLE-D1-01','EX-SOCLE-D1-02','EX-SOCLE-D1-03','EX-SOCLE-D1-04','EX-SOCLE-D1-05'] },
     'MOD-DJ-I-D1': { parcours:'djembe', niveau:'intermediaire', objet:'Ghost pendule',
-      exercices:['EX-SOCLE-D1-01','EX-SOCLE-D1-02','EX-SOCLE-D1-03','EX-SOCLE-D1-04','EX-SOCLE-D1-05'] }
+      exercices:['EX-SOCLE-D1-01','EX-SOCLE-D1-02','EX-SOCLE-D1-03','EX-SOCLE-D1-04','EX-SOCLE-D1-05'] },
+    // ===== P-6 : modules Débutant (5 objets × 2 parcours) =====
+    'MOD-CJ-D-POS': { parcours:'cajon', niveau:'debutant', objet:'Posture, ancrage, rebond',
+      exercices:['EX-CJ-POS-01','EX-CJ-POS-02','EX-CJ-POS-03','EX-CJ-POS-04','EX-CJ-POS-05'] },
+    'MOD-DJ-D-POS': { parcours:'djembe', niveau:'debutant', objet:'Posture, ancrage, rebond',
+      exercices:['EX-DJ-POS-01','EX-DJ-POS-02','EX-DJ-POS-03','EX-DJ-POS-04','EX-DJ-POS-05'] },
+    'MOD-CJ-D-SON': { parcours:'cajon', niveau:'debutant', objet:'La palette de sons',
+      exercices:['EX-CJ-SON-01','EX-CJ-SON-02','EX-CJ-SON-03','EX-CJ-SON-04','EX-CJ-SON-05'] },
+    'MOD-DJ-D-SON': { parcours:'djembe', niveau:'debutant', objet:'La palette de sons',
+      exercices:['EX-DJ-SON-01','EX-DJ-SON-02','EX-DJ-SON-03','EX-DJ-SON-04','EX-DJ-SON-05'] },
+    'MOD-CJ-D-PLS': { parcours:'cajon', niveau:'debutant', objet:'La pulse & le comptage',
+      exercices:['EX-SOCLE-D-PLS-01','EX-SOCLE-D-PLS-02','EX-SOCLE-D-PLS-03','EX-SOCLE-D-PLS-04','EX-SOCLE-D-PLS-05'] },
+    'MOD-DJ-D-PLS': { parcours:'djembe', niveau:'debutant', objet:'La pulse & le comptage',
+      exercices:['EX-SOCLE-D-PLS-01','EX-SOCLE-D-PLS-02','EX-SOCLE-D-PLS-03','EX-SOCLE-D-PLS-04','EX-SOCLE-D-PLS-05'] },
+    'MOD-CJ-D-SUB': { parcours:'cajon', niveau:'debutant', objet:'Les subdivisions',
+      exercices:['EX-SOCLE-D-SUB-01','EX-SOCLE-D-SUB-02','EX-SOCLE-D-SUB-03','EX-SOCLE-D-SUB-04','EX-SOCLE-D-SUB-05'] },
+    'MOD-DJ-D-SUB': { parcours:'djembe', niveau:'debutant', objet:'Les subdivisions',
+      exercices:['EX-SOCLE-D-SUB-01','EX-SOCLE-D-SUB-02','EX-SOCLE-D-SUB-03','EX-SOCLE-D-SUB-04','EX-SOCLE-D-SUB-05'] },
+    'MOD-CJ-D-DYN': { parcours:'cajon', niveau:'debutant', objet:'Fort & doux',
+      exercices:['EX-CJ-DYN-01','EX-CJ-DYN-02','EX-CJ-DYN-03','EX-CJ-DYN-04','EX-CJ-DYN-05'] },
+    'MOD-DJ-D-DYN': { parcours:'djembe', niveau:'debutant', objet:'Fort & doux',
+      exercices:['EX-DJ-DYN-01','EX-DJ-DYN-02','EX-DJ-DYN-03','EX-DJ-DYN-04','EX-DJ-DYN-05'] }
   };
   function pfSharedSet(){
     const c = {};
@@ -10323,11 +10529,25 @@ swing 62
     const all = pfPromoAll(); all[p+'|'+ex+'|'+c] = Object.assign({ ts:Date.now() }, rec);
     store.set('fm-metro-parcours-promo', JSON.stringify(all));
   }
-  function pfNiveauEffectif(p, ex, c){
-    const promo = pfPromoGet(p, ex, c); const base = PF_NIVEAUX.indexOf('intermediaire');
-    const eff = base + ((promo && promo.promu) ? 1 : 0);
-    return PF_NIVEAUX[Math.min(eff, PF_NIVEAUX.length - 1)];
+  // P-6 : niveau de base d'un exercice = niveau du (premier) module qui le référence.
+  function pfExNiveau(ex){
+    for (const mid in PF_MOD){ if (PF_MOD[mid].exercices.indexOf(ex) >= 0) return PF_MOD[mid].niveau; }
+    return 'intermediaire';
   }
+  function pfNiveauEffectif(p, ex, c){
+    const promo = pfPromoGet(p, ex, c);
+    let base = PF_NIVEAUX.indexOf(pfExNiveau(ex)); if (base < 0) base = PF_NIVEAUX.indexOf('intermediaire');
+    const eff = base + ((promo && promo.promu) ? 1 : 0);
+    return PF_NIVEAUX[Math.min(Math.max(eff, 0), PF_NIVEAUX.length - 1)];
+  }
+  // P-6 : niveaux « peuplés » = ceux qui ont au moins un module déclaré. Niveau affiché : persistant, défaut = 1er peuplé.
+  function pfPopulatedNiveaux(){ return PF_NIVEAUX.filter(n => Object.keys(PF_MOD).some(mid => PF_MOD[mid].niveau === n)); }
+  function pfNivGet(){
+    const pop = pfPopulatedNiveaux(); const def = pop[0] || 'intermediaire';
+    let n = null; try { n = store.get('fm-metro-parcours-niveau'); } catch(e){}
+    return (n && pop.indexOf(n) >= 0) ? n : def;
+  }
+  function pfNivSet(n){ try { store.set('fm-metro-parcours-niveau', n); } catch(e){} }
   // ---- file de votes offline-first ----
   function pfQueueAll(){ try { return JSON.parse(store.get('pf_vote_queue')||'[]'); } catch(e){ return []; } }
   function pfQueueWrite(arr){ store.set('pf_vote_queue', JSON.stringify(arr)); }
@@ -10390,18 +10610,41 @@ swing 62
     if (b.drop){ set('bassDropEvery', b.drop.everyN); set('bassDropLen', b.drop.lenBeats); }
     try { bassUpdateChordLabel(); } catch(e){}
   }
+  // P-6 : sync des contrôles métronome pilotés par un preset Débutant (subdivision + gap).
+  function pfSyncMetroUI(){
+    const ss = $('subdivSel'); if (ss) ss.value = String(S.subdiv);
+    const gm = $('gapMode'); if (gm) gm.value = S.gap.mode;
+    try { gapTargetRefresh(); } catch(e){}
+    const gp = $('gapPlay'); if (gp) gp.value = String(S.gap.playN);
+    const gmv = $('gapMute'); if (gmv) gmv.value = String(S.gap.muteM);
+    try { if (typeof drawStatic === 'function' && !isPlaying) drawStatic(); } catch(e){}
+  }
   function pfLoadPreset(ex){
     const E = PF_EX[ex]; if (!E) return; const P = E.preset;
-    setTempo(90); setSwing(50);
+    setTempo(P.tempo || 90); setSwing(P.swing || 50);
     S.family = 'bin'; setFamily('bin', true);
     S.perc.on = false;
-    S.bass.on = true; S.bass.key = 'E'; S.bass.density = 2; S.bass.vel = 'mixte'; S.bass.vary = false;
-    S.bass.pattern = P.pattern; S.bass.prog = P.prog;
-    S.bass.drop = Object.assign({ on:false, everyN:4, lenBeats:2 }, P.drop || {});
+    if (P.metro) {
+      // Débutant : clic seul (jamais de basse funk). Subdivisions + gap pilotés par le preset.
+      S.bass.on = false;
+      S.subdiv = (P.subdiv != null) ? P.subdiv : 1;
+      if (P.gap) {
+        S.gap = Object.assign({}, S.gap, { mode:'fixed', target:(P.gap.target || 'pulse'),
+          playN:(P.gap.playN || 4), muteM:(P.gap.muteM || 1) });
+      } else {
+        S.gap = Object.assign({}, S.gap, { mode:'off', target:'all' });
+      }
+      try { resetGap(); } catch(e){}
+    } else {
+      S.bass.on = true; S.bass.key = 'E'; S.bass.density = (P.dens != null ? P.dens : 2); S.bass.vel = 'mixte'; S.bass.vary = false;
+      S.bass.pattern = P.pattern; S.bass.prog = P.prog;
+      S.bass.drop = Object.assign({ on:false, everyN:4, lenBeats:2 }, P.drop || {});
+    }
     try { buildPercGrids(); } catch(e){}
     try { bassResetCycle(); } catch(e){}
     try { if (typeof bassPersist === 'function') bassPersist(); } catch(e){}
     pfSyncBassUI();
+    if (P.metro) pfSyncMetroUI();
     pfStatus('Chargé : ' + E.objet + ' — lance le métronome.');
   }
   function pfStatus(msg){ const el = $('pfStatus'); if (el) el.textContent = msg || ''; }
@@ -10411,15 +10654,26 @@ swing 62
   function pfRender(){
     const root = $('pfRoot'); if (!root) return;
     const shared = pfSharedSet();
-    const PF_MOD_ORDER = ['T1','T2','B1','B2','D1','I2'];
-    let html = '<div class="pf-grid">';
+    const niv = pfNivGet(); const pop = pfPopulatedNiveaux();
+    const order = PF_NIV_ORDER[niv] || [];
+    let html = '';
+    // P-6 : sélecteur de niveau — n'apparaît que si plus d'un niveau est peuplé.
+    if (pop.length > 1) {
+      html += '<div class="pf-niv-tabs" role="tablist" aria-label="Niveau du parcours">';
+      pop.forEach(n => {
+        html += '<button type="button" class="pf-niv-tab' + (n === niv ? ' active' : '') + '" data-niv="' + n + '"' +
+          (n === niv ? ' aria-selected="true"' : '') + '>' + pfEsc(PF_NIV_LABEL[n] || n) + '</button>';
+      });
+      html += '</div>';
+    }
+    html += '<div class="pf-grid" data-niv="' + niv + '">';
     ['cajon','djembe'].forEach(pk => {
       const parc = PF_PARC[pk];
-      const pref = (pk === 'cajon') ? 'MOD-CJ-I-' : 'MOD-DJ-I-';
+      const pref = 'MOD-' + (pk === 'cajon' ? 'CJ' : 'DJ') + '-' + (PF_NIV_INFIX[niv] || 'I') + '-';
       html += '<div class="pf-col" style="--pf-c:' + parc.couleur + '">';
       html += '<div class="pf-col-head"><span class="pf-dot"></span>' + pfEsc(parc.label) + '</div>';
       let mi = 0;
-      PF_MOD_ORDER.forEach(code => {
+      order.forEach(code => {
         const mid = pref + code; const M = PF_MOD[mid]; if (!M) return;
         let done = 0; M.exercices.forEach(ex => { if (pfIsAcquis(pk, ex)) done++; });
         const total = M.exercices.length; const open = (mi === 0);
@@ -10444,7 +10698,7 @@ swing 62
           html += '<div class="pf-actions"><button class="btn-sm primary pf-load">Charger</button>';
           html += '<label class="check pf-acq-lbl"><input type="checkbox" class="pf-acquis"' + (acq ? ' checked' : '') + '> acquis</label></div>';
           html += '<details class="pf-perso"><summary>Personnaliser</summary><div class="pf-perso-body">';
-          html += '<label>Tempo <input type="range" class="pf-tempo" min="70" max="110" value="90"></label>';
+          html += '<label>Tempo <input type="range" class="pf-tempo" min="70" max="110" value="' + (E.preset.tempo || 90) + '"></label>';
           html += '<label>Densite <select class="pf-dens"><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option></select></label>';
           html += '<label class="check"><input type="checkbox" class="pf-drop"' + (E.preset.drop && E.preset.drop.on ? ' checked' : '') + '> Drop-outs</label>';
           html += '<label>Tonalite <select class="pf-key">' + PF_KEYS.map(k => '<option' + (k === 'E' ? ' selected' : '') + '>' + k + '</option>').join('') + '</select></label>';
@@ -10462,6 +10716,10 @@ swing 62
     });
     html += '</div>';
     root.innerHTML = html;
+    // P-6 : sélecteur de niveau — un seul niveau rendu à la fois, choix persistant.
+    root.querySelectorAll('.pf-niv-tab').forEach(tab => {
+      tab.addEventListener('click', () => { pfNivSet(tab.getAttribute('data-niv')); pfRender(); });
+    });
     root.querySelectorAll('.pf-mod-head').forEach(head => {
       head.addEventListener('click', () => {
         const mod = head.parentElement, col = mod.parentElement;
@@ -10514,7 +10772,10 @@ swing 62
       flush: function(){ return pfFlushVotes(); },
       isAcquis: pfIsAcquis,
       setAcquis: pfAcquisSet,
-      niveauEffectif: pfNiveauEffectif
+      niveauEffectif: pfNiveauEffectif,
+      niveau: pfNivGet,
+      niveauxPeuples: pfPopulatedNiveaux,
+      showNiveau: function(n){ pfNivSet(n); try { pfRender(); } catch(e){} }
     };
   };
 

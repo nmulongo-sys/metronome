@@ -112,6 +112,9 @@ async function runTests() {
   ok('0.4 nouveau hook fmMetroParcours présent', typeof W.fmMetroParcours === 'function');
 
   const P = W.fmMetroParcours();
+  // P-6 : le parcours est multi-niveaux, défaut = Débutant. recette-P4 vérifie le module 6
+  // (Intermédiaire) : on affiche ce niveau avant les assertions de rendu DOM.
+  P.showNiveau('intermediaire');
 
   // 1. rendu
   const cols = D.querySelectorAll('#pfRoot .pf-col');

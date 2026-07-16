@@ -1,7 +1,9 @@
 /* recette-P2.js — parcours funk, étape P-2 (5 autres modules de l'Intermédiaire + accordéon).
    Headless jsdom : mêmes stubs que recette-P4 (Web Audio / canvas / Supabase mocké).
-   Vérifie l'intégrité des données (12 modules, 42 exercices), le partage EX-SOCLE, le rendu
-   accordéon (6 modules/colonne, un seul ouvert), les presets des nouveaux exercices.
+   Vérifie l'intégrité des données Intermédiaire (12 modules, 42 exercices), le partage EX-SOCLE,
+   le rendu accordéon (6 modules/colonne, un seul ouvert), les presets des nouveaux exercices.
+   P-6 : le parcours est multi-niveaux ; cette recette scope ses garanties à l'Intermédiaire
+   (compteurs filtrés par niveau, sélecteur mis sur « intermédiaire »). Le Débutant → recette-P6.
    Usage : node recette-P2.js [chemin/index.html]  (défaut ./index.html) */
 const fs = require('fs');
 const path = require('path');
@@ -101,30 +103,35 @@ async function runTests() {
   const EX = P.data.EXERCISES, MOD = P.data.MODULES;
   const OK_PATTERN = ['theOne', 'syncopeGrave', 'ghostPendule', 'claveGrave'];
   const OK_PROG = ['vamp1', 'vamp2'];
+  // P-6 : le parcours est devenu multi-niveaux (Débutant ajouté). recette-P2 garde l'INTERMÉDIAIRE :
+  // on scope les compteurs d'intégrité à ce niveau (le Débutant a sa propre recette-P6).
+  const interMods = Object.keys(MOD).filter(id => MOD[id].niveau === 'intermediaire');
+  const interEx = Array.from(new Set(interMods.reduce((a, id) => a.concat(MOD[id].exercices), [])));
+  // sélecteur de niveau : on affiche l'Intermédiaire pour les assertions de rendu (2, 3, 5, 6).
+  P.showNiveau('intermediaire');
 
-  // 1. intégrité données
-  eq('1.1 douze modules (6 objets × 2 parcours)', Object.keys(MOD).length, 12);
-  eq('1.2 quarante-deux exercices (35 P-2 + 7 module 6)', Object.keys(EX).length, 42);
+  // 1. intégrité données (Intermédiaire)
+  eq('1.1 douze modules Intermédiaire (6 objets × 2 parcours)', interMods.length, 12);
+  eq('1.2 quarante-deux exercices Intermédiaire (35 P-2 + 7 module 6)', interEx.length, 42);
   const modIds = ['T1','T2','B1','B2','D1','I2'].reduce((a,c)=>a.concat(['MOD-CJ-I-'+c,'MOD-DJ-I-'+c]),[]);
   ok('1.3 les 12 IDs de modules attendus présents', modIds.every(id => !!MOD[id]));
   let allFive = true, allRefsExist = true, allKinds = true, allPreset = true;
-  Object.keys(MOD).forEach(id => {
+  interMods.forEach(id => {
     const m = MOD[id];
     if (m.exercices.length !== 5) allFive = false;
-    if (m.niveau !== 'intermediaire') allKinds = allKinds; // niveau constant
     const kinds = m.exercices.map(e => (EX[e] || {}).kind);
     if (kinds.filter(k => k === 'atome').length !== 4 || kinds.filter(k => k === 'synthese').length !== 1) allKinds = false;
     m.exercices.forEach(e => { if (!EX[e]) allRefsExist = false; });
   });
-  Object.keys(EX).forEach(e => {
+  interEx.forEach(e => {
     const p = EX[e].preset || {};
     if (OK_PATTERN.indexOf(p.pattern) < 0 || OK_PROG.indexOf(p.prog) < 0) allPreset = false;
   });
-  ok('1.4 chaque module = 5 exercices', allFive);
-  ok('1.5 chaque module = 4 atomes + 1 synthèse', allKinds);
-  ok('1.6 toutes les références d\'exercices existent', allRefsExist);
-  ok('1.7 tous les presets valides (pattern/prog connus)', allPreset);
-  ok('1.8 tous les modules au niveau intermédiaire', Object.keys(MOD).every(id => MOD[id].niveau === 'intermediaire'));
+  ok('1.4 chaque module Intermédiaire = 5 exercices', allFive);
+  ok('1.5 chaque module Intermédiaire = 4 atomes + 1 synthèse', allKinds);
+  ok('1.6 toutes les références d\'exercices Intermédiaire existent', allRefsExist);
+  ok('1.7 tous les presets Intermédiaire valides (pattern/prog connus)', allPreset);
+  ok('1.8 tous les modules Intermédiaire au niveau intermédiaire', interMods.every(id => MOD[id].niveau === 'intermediaire'));
 
   // 2. rendu accordéon : 6 modules/colonne, ordre attendu
   const cols = D.querySelectorAll('#pfRoot .pf-col');
@@ -151,14 +158,16 @@ async function runTests() {
   ok('3.7 colonnes indépendantes (djembé garde son ouvert)', cols[1].querySelectorAll('.pf-mod.open').length === 1);
 
   // 4. partage / double couleur
-  const shared = P.shared.slice().sort();
+  // P-6 : l'ensemble partagé inclut désormais le socle Débutant (EX-SOCLE-D-PLS/SUB). On isole le
+  // socle Intermédiaire (hors préfixe « EX-SOCLE-D- ») et on vérifie qu'il vaut exactement les 18 attendus.
+  const sharedInter = P.shared.filter(e => !/^EX-SOCLE-D-/.test(e)).slice().sort();
   const attendu = [
     'EX-SOCLE-D1-01','EX-SOCLE-D1-02','EX-SOCLE-D1-03','EX-SOCLE-D1-04','EX-SOCLE-D1-05',
     'EX-SOCLE-I2-01','EX-SOCLE-I2-03','EX-SOCLE-I2-04',
     'EX-SOCLE-T1-01','EX-SOCLE-T1-02','EX-SOCLE-T1-03','EX-SOCLE-T1-04','EX-SOCLE-T1-05',
     'EX-SOCLE-T2-01','EX-SOCLE-T2-02','EX-SOCLE-T2-03','EX-SOCLE-T2-04','EX-SOCLE-T2-05'
   ].sort();
-  eq('4.1 ensemble partagé exact (18 EX-SOCLE)', JSON.stringify(shared), JSON.stringify(attendu));
+  eq('4.1 ensemble partagé Intermédiaire exact (18 EX-SOCLE)', JSON.stringify(sharedInter), JSON.stringify(attendu));
   const cardOf = (parc, ex) => D.querySelector('.pf-card[data-parc="'+parc+'"][data-ex="'+ex+'"]');
   ok('4.2 EX-SOCLE-T1-01 double couleur (cajón)', cardOf('cajon','EX-SOCLE-T1-01').classList.contains('pf-shared'));
   ok('4.3 EX-SOCLE-T1-01 badge « déjà rencontré » (djembé)', !!cardOf('djembe','EX-SOCLE-T1-01').querySelector('.pf-badge-shared'));
