@@ -74,7 +74,7 @@ setTimeout(runTests, 120);
 function runTests() {
   /* ---------- A. chargement + page minimale ---------- */
   ok('chargement sans erreur jsdom (' + jsdomErrors.length + ')', jsdomErrors.length === 0);
-  ok('BUILD 0.13.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.13.0');
+  ok('BUILD 0.14.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.14.0');
   ok('2 corpus chargés (socle-technique + funk), 152 exercices assemblés',
     Object.keys(W.FM_CORPUS || {}).length === 2 && Object.keys(g('FM_ASM.exercices')).length === 152);
   ok('pas de répertoire ici : FM_GROOVES absent (la page ne charge pas les grooves)',

@@ -13,7 +13,10 @@ const fs = require('fs');
 const path = require('path');
 const { JSDOM, VirtualConsole } = require('jsdom');
 
-const FILE = process.argv[2] || path.join(__dirname, 'index.html');
+// R-4b : atelier, exports Team Spirit, export audio, script et lint vivent sur
+// pratiquer.html ; la part ARCHET (E3, L2, chips bow) vit sur index.html et ses
+// assertions équivalentes sont dans recette-accueil.js (argument fichier conservé).
+const FILE = process.argv[2] || path.join(__dirname, 'pratiquer.html');
 const html = require('./recette-harnais').chargeHtml(FILE);   // R-2 : inline les corpus/*.js
 
 let PASS = 0, FAIL = 0;
@@ -303,28 +306,10 @@ async function runTests() {
   }
 
   // ---- 6. E3 — impression / PNG de la séquence d'archet ----
-  console.log('\n[6] E3 — séquence d\'archet imprimable');
-  {
-    ok('6.1 boutons 🖨 / ↓ PNG présents dans la section archet',
-       !!D.getElementById('bowPrintBtn') && !!D.getElementById('bowPngBtn'));
-    const bh = R.v070.bowPrintableHTML();
-    ok('6.2 vue imprimable : séquence par défaut décrite jeton par jeton',
-       bh.indexOf('T92x1') !== -1 && bh.indexOf('tiré') !== -1 && bh.indexOf('poussé') !== -1);
-    ok('6.3 vue imprimable : légende de la jauge (talon/pointe)', bh.indexOf('talon à gauche') !== -1);
-    const bc = R.v070.bowSeqCanvas();
-    ok('6.4 PNG : canvas 1600 px généré', !!bc && bc.width === 1600 && bc.height > 150);
-    D.getElementById('bowPngBtn').click();
-    ok('6.5 clic ↓ PNG → confirmation', txt(D.getElementById('bowStatus')).indexOf('Séquence exportée en PNG') !== -1);
-    // séquence fautive : les exports refusent proprement
-    const bi = D.getElementById('bowSeqInput');
-    const keep = bi.value;
-    bi.value = 'ZZZ';
-    ok('6.6 séquence fautive → vue imprimable refusée (chaîne vide)', R.v070.bowPrintableHTML() === '');
-    D.getElementById('bowPrintBtn').click();
-    ok('6.7 clic 🖨 sur séquence fautive → message ✖, pas de crash',
-       txt(D.getElementById('bowStatus')).indexOf('✖') === 0);
-    bi.value = keep;
-  }
+  /* --- 6. DÉPLACÉE (R-4b) : E3 — séquence d'archet imprimable ----------------
+     La section Archet (et ses exports 🖨 / ↓ PNG) vit sur index.html depuis la
+     refonte de l'accueil — les 7 assertions équivalentes sont dans
+     recette-accueil.js (A6), via le diagnostic de page fmMetroArchet(). */
 
   // ---- 7. L1 — lint en direct du script de routine ----
   console.log('\n[7] L1 — lint du script (multi-erreurs, en direct)');
@@ -358,27 +343,9 @@ async function runTests() {
   }
 
   // ---- 8. L2 — lint en direct de la séquence d'archet ----
-  console.log('\n[8] L2 — lint de la séquence d\'archet');
-  {
-    const rep = R.v070.parseBowSeq('T50x1, ZZZ, P20x0.5, WWW');
-    ok('8.1 parseur : tous les jetons fautifs collectés (2), les valides parsés (2)',
-       rep.errors.length === 2 && rep.errors[0] === 'ZZZ' && rep.seq.length === 2);
-    const bi = D.getElementById('bowSeqInput');
-    bi.value = 'T50x1, P50x1';
-    input(bi);
-    await tick(400);
-    ok('8.2 séquence valide → ✔ pas et temps comptés',
-       txt(D.getElementById('bowLint')).indexOf('✔ 2 pas · 2 temps') === 0);
-    bi.value = 'T50x1, gloub';
-    input(bi);
-    await tick(400);
-    const bl = txt(D.getElementById('bowLint'));
-    ok('8.3 jeton fautif → ✖ cité + rappel de syntaxe',
-       bl.indexOf('✖ « gloub »') === 0 && bl.indexOf('attendu :') !== -1 && bl.indexOf('T50x1') !== -1);
-    bi.value = 'T92x1, P92x1';
-    input(bi);
-    await tick(400);
-  }
+  /* --- 8. DÉPLACÉE (R-4b) : L2 — lint de la séquence d'archet ----------------
+     Même déplacement que la section 6 : 3 assertions équivalentes dans
+     recette-accueil.js (A7). */
 
   // ---- 9. L3 — chips d'insertion d'exemples ----
   console.log('\n[9] L3 — insertion d\'exemples');
@@ -393,15 +360,8 @@ async function runTests() {
     await tick(400);
     ok('9.2 chip « + gap 2/16 » insère la ligne au curseur', ta.value.indexOf('80bpm 5min\ngap 2/16') === 0);
     ok('9.3 le lint se rafraîchit après insertion', txt(D.getElementById('scriptLint')).indexOf('✔') === 0);
-    const bi = D.getElementById('bowSeqInput');
-    bi.value = 'T92x1';
-    bi.setSelectionRange(bi.value.length, bi.value.length);
-    D.querySelector('.bow-chip[data-ins="Rx0.5"]').click();
-    await tick(400);
-    ok('9.4 chip archet « + reprise » insère le jeton avec séparateur', bi.value === 'T92x1, Rx0.5');
-    ok('9.5 la séquence insérée reste valide au lint', txt(D.getElementById('bowLint')).indexOf('✔') === 0);
-    bi.value = 'T92x1, P92x1';
-    input(bi);
+    /* 9.4–9.5 DÉPLACÉES (R-4b) : les chips archet vivent sur index.html —
+       assertions équivalentes dans recette-accueil.js (A7). */
   }
 
   // ---- 10. L4 — coloration des jetons ----
