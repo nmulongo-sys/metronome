@@ -43,7 +43,10 @@ class FakeAudioContext {
 }
 
 // ---- DOM ---------------------------------------------------------------------
-const html = require('./recette-harnais').chargeHtml();   // R-2 : inline les corpus/*.js
+// R-4b : la surface testée (couches, basse, percussion, répertoire) vit sur
+// pratiquer.html depuis la refonte de l'accueil (argument fichier conservé).
+const FILE = process.argv[2] || path.join(__dirname, 'pratiquer.html');
+const html = require('./recette-harnais').chargeHtml(FILE);   // R-2 : inline les corpus/*.js
 const dom = new JSDOM(html, {
   url: 'http://localhost/',
   runScripts: 'dangerously',
@@ -121,78 +124,15 @@ boot(() => {
   ok(R.rankOf('tone') === 1, 'tone rank 1');
   ok(R.rankOf('slap') === 2, 'slap rank 2');
 
-  // --- 6. Mapping de MA ligne (djembé par défaut) ---------------------------
-  console.log('\n[6] Projection de ma ligne — djembé');
-  const mD = R.mapping();
-  ok(mD.instr === 'djembe' && mD.tiers === 3, 'instrument focal djembé, T=3');
-  ok(mD.voices.length === 3, '3 voix projetées (basse/tone/slap)');
-  const byId = {}; mD.voices.forEach(v => byId[v.id] = v);
-  ok(byId.basse && byId.basse.palier === 0, 'basse → palier 0');
-  ok(byId.tone && byId.tone.palier === 1, 'tone → palier 1');
-  ok(byId.slap && byId.slap.palier === 2, 'slap → palier 2');
-  ok(mD.voices.every(v => v.palier === R.palier(v.rank, mD.tiers)), 'palier = clamp(rank, T) pour chaque voix');
-  ok(mD.voices.every(v => v.hits.length > 0), 'chaque voix projetée a au moins une frappe');
-
-  // --- 7. Encart #fingerViz — DOM (djembé) ----------------------------------
-  console.log('\n[7] Encart #fingerViz (DOM, djembé)');
-  ok(!fvHidden(), 'encart visible (ma ligne non vide)');
-  ok(fvLanes() === 3, '3 couloirs rendus');
-  ok(fvHits() === mD.voices.reduce((s, v) => s + v.hits.length, 0), 'nombre de repères = total des frappes projetées');
-  ok(eqArr(fvLabels(), ['slap', 'tone', 'basse']), 'ordre des couloirs = aigu en haut → grave en bas');
-
-  // --- 8. Changement d'instrument cible : clamp & couloir vide honnête ------
-  console.log('\n[8] Changement d\'instrument cible');
-  setInstr('cajon');
-  const mC = R.mapping();
-  ok(mC.tiers === 3 && fvLanes() === 3, 'cajón : 3 couloirs');
-  ok(mC.voices.find(v => v.id === 'grave').palier === 0, 'cajón grave → palier 0');
-  ok(mC.voices.find(v => v.id === 'aigu').palier === 2, 'cajón aigu (rang 2) → palier 2 (médium laissé vide, honnête)');
-  ok(!fvHidden(), 'encart visible malgré le couloir médium vide (d\'autres couloirs sonnent)');
-
-  setInstr('agogo');
-  const mA = R.mapping();
-  ok(mA.tiers === 2, 'agogô : 2 paliers');
-  ok(mA.voices.find(v => v.id === 'aigu').palier === 1, 'agogô aigu (rang 2) → clampé au palier 1 (T=2)');
-  ok(fvLanes() === 2, 'agogô : 2 couloirs');
-
-  setInstr('recoreco');
-  const mR = R.mapping();
-  ok(mR.tiers === 1 && fvLanes() === 1, 'reco-reco : 1 palier / 1 couloir');
-  ok(mR.voices[0].palier === 0, 'reco-reco raclement (rang 2) → clampé au palier 0 (T=1)');
-
-  // --- 9. Robustesse : tout palier projeté est un entier valide [0, T−1] ----
-  console.log('\n[9] Aucun état cassé (palier ∈ [0, T−1], jamais NaN)');
-  let allValid = true;
-  ['djembe', 'cajon', 'dunduns', 'agogo', 'surdo', 'recoreco'].forEach(instr => {
-    setInstr(instr);
-    const m = R.mapping();
-    m.voices.forEach(v => {
-      if (!Number.isInteger(v.palier) || v.palier < 0 || v.palier > m.tiers - 1) allValid = false;
-    });
-  });
-  ok(allValid, 'chaque frappe atterrit sur un couloir entier valide, tous instruments confondus');
-
-  // --- 10. Doctrine : la basse funk n'est jamais projetée -------------------
-  console.log('\n[10] Exclusion de la basse funk (instrument de référence)');
-  setInstr('djembe');
-  const beforeIds = R.mapping().voices.map(v => v.id).sort().join(',');
-  $('bassOn').checked = true; $('bassOn').dispatchEvent(new window.Event('change'));
-  const after = R.mapping();
-  const afterIds = after.voices.map(v => v.id).sort().join(',');
-  // NB : la voix grave du djembé s'appelle « basse » — c'est un palier légitime, pas la
-  // basse funk (couche layer:'bass', jamais dans plVoiceList/percGrids). La doctrine se
-  // vérifie par l'invariance de l'ensemble projeté quand on active la basse.
-  ok(afterIds === beforeIds, 'basse funk activée : ensemble des voix projetées strictement inchangé');
-  ok(afterIds === 'basse,slap,tone', 'projection = exactement les 3 voix du djembé (aucune injection basse funk)');
-  ok(fvLanes() === 3, 'toujours 3 couloirs (aucun couloir « basse funk » ajouté)');
-  $('bassOn').checked = false; $('bassOn').dispatchEvent(new window.Event('change'));
-
-  // --- 11. Masquage quand ma ligne est vide ---------------------------------
-  console.log('\n[11] Encart masqué si ma ligne est vide');
-  setInstr('djembe');
-  qsa('#percVoices .pv-mute input').forEach(mi => { if (!mi.checked) { mi.checked = true; mi.dispatchEvent(new window.Event('change')); } });
-  ok(R.mapping().voices.length === 0, 'toutes les voix focales muettes → aucune voix projetée');
-  ok(fvHidden(), 'encart #fingerViz masqué (classe hide)');
+  /* --- 6 à 11 : RETIRÉES (R-4b) ----------------------------------------------
+     Les sections « projection de MA ligne » (mapping), « encart #fingerViz »,
+     robustesse du mapping, exclusion basse funk du mapping et masquage de
+     l'encart testaient l'ÉCRAN DE JEU (passe 4.1), retiré de l'application au
+     GO R-4 (§9.4) — la notion de « ma ligne » n'existe plus hors Team Spirit.
+     Restent testées les COUCHES DE DONNÉES du chantier : paliers par instrument
+     (INSTR_TIERS), clamp voicePalier, libellés, rang de registre (chantier A,
+     consommé par « Répartir auto ») — sections 1 à 5, comptes inchangés.
+     26 assertions retirées avec leur surface (52 → 26). */
 
   // ---- bilan ---------------------------------------------------------------
   console.log('\n=== Bilan : ' + pass + '/' + (pass + fail) + ' \u2014 ' + (fail === 0 ? 'TOUT PASSE' : (fail + ' ÉCHEC(S)')) + ' ===\n');

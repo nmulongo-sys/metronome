@@ -50,6 +50,17 @@ const KINDS = ['atome', 'synthese'];
 const estPattern = p => p && typeof p.steps === 'number' && Array.isArray(p.hits) &&
   p.hits.every(h => typeof h.i === 'number' && h.i >= 0 && h.i < p.steps);
 
+// demo (R-4a, format acté au GO R-4 §9.2) : { instr, steps, voix:{<voix>:[0/1/2 × steps]} },
+// swing optionnel ; ou une variante par instrument { cajon:{…}, djembe:{…} } (EX-SOCLE partagés).
+const estDemo1 = d => d && typeof d.instr === 'string' && typeof d.steps === 'number' &&
+  d.voix && typeof d.voix === 'object' &&
+  Object.keys(d.voix).length > 0 &&
+  Object.keys(d.voix).every(v => Array.isArray(d.voix[v]) && d.voix[v].length === d.steps &&
+    d.voix[v].every(x => x === 0 || x === 1 || x === 2)) &&
+  (d.swing === undefined || (typeof d.swing === 'number' && d.swing >= 50 && d.swing <= 85));
+const estDemo = d => d && (d.voix ? estDemo1(d)
+  : Object.keys(d).length > 0 && Object.keys(d).every(k => estDemo1(d[k])));
+
 // unicité des IDs à travers TOUS les corpus
 for (const cle of ['exercices', 'modules', 'patterns', 'progressions']) {
   const vus = {};
@@ -80,12 +91,12 @@ for (const cid of Object.keys(CORPUS)) {
       if (!PRESET_VOCAB.includes(champ)) presetOk = false;
     if (e.preset.pattern && !union.patterns[e.preset.pattern]) refPatOk = false;
     if (e.preset.prog && !union.progressions[e.preset.prog]) refPatOk = false;
-    if (e.demo !== undefined && !estPattern(e.demo)) demoOk = false;
+    if (e.demo !== undefined && !estDemo(e.demo)) demoOk = false;
   }
   ok(exOk, `exercices complets (kind∈{atome,synthese}, objet, consigne, critere, preset) — ${Object.keys(exs).length} exercices`);
   ok(presetOk, 'presets au vocabulaire fermé (' + PRESET_VOCAB.join(', ') + ')');
   ok(refPatOk, 'presets : patterns/progressions référencés existent (union des corpus)');
-  ok(demoOk, 'champ demo (optionnel) au format moteur');
+  ok(demoOk, 'champ demo (optionnel) : grille(s) par voix (format acté R-4a §9.2 — le détail est porté par recette-demo.js)');
 
   // modules
   let modOk = true, refExOk = true, parcOk = true, rolesOk = true;

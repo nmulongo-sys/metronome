@@ -3,12 +3,12 @@
    Vérifie l'intégrité des données Débutant (10 modules, 40 exercices, socle PLS/SUB, 4+1, ordre),
    les presets « pré-funk » (clic seul / subdivision / gap), le partage, le rendu niveau-aware +
    sélecteur, la promotion (base debutant → intermediaire), la vocalisation.
-   Usage : node recette-P6.js [chemin/index.html]  (défaut ./index.html) */
+   Usage : node recette-P6.js [chemin/apprendre.html]  (défaut ./apprendre.html — R-4a : le parcours vit sur apprendre.html) */
 const fs = require('fs');
 const path = require('path');
 const { JSDOM, VirtualConsole } = require('jsdom');
 
-const FILE = process.argv[2] || path.join(__dirname, 'index.html');
+const FILE = process.argv[2] || path.join(__dirname, 'apprendre.html');   // R-4a : la surface parcours a déménagé
 const html = require('./recette-harnais').chargeHtml(FILE);   // R-2 : inline les corpus/*.js
 
 let PASS = 0, FAIL = 0;
@@ -98,7 +98,8 @@ async function runTests() {
   ok('0.1 aucun jsdomError hors ressource externe', realErrors.length === 0);
   if (realErrors.length) realErrors.forEach(m => console.log('     ! ' + m));
   ok('0.2 hook fmMetroParcours présent', typeof W.fmMetroParcours === 'function');
-  ok('0.3 hooks existants conservés (bass/reg)', typeof W.fmMetroBass === 'function' && typeof W.fmMetroReg === 'function');
+  // R-4a : fmMetroReg (rang de registre) vit sur index/pratiquer — ici le hook moteur fait foi.
+  ok('0.3 hooks existants conservés (bass ; reg vit sur index/pratiquer)', typeof W.fmMetroBass === 'function');
 
   const P = W.fmMetroParcours();
   const EX = P.data.EXERCISES, MOD = P.data.MODULES;
@@ -191,14 +192,14 @@ async function runTests() {
   eq('6.1 POS-01 : basse coupée (clic seul)', b.on, false);
   eq('6.2 POS-01 : tempo 72', D.getElementById('tempoValue').textContent, '72');
   cardOf('cajon','EX-SOCLE-D-SUB-02').querySelector('.pf-load').click();
-  eq('6.3 SUB-02 : subdivision du métronome = 4', D.getElementById('subdivSel').value, '4');
+  eq('6.3 SUB-02 : subdivision du métronome = 4', W.eval('S.subdiv'), 4);   // R-4a : l'état fait foi (subdivSel vit sur index/pratiquer)
   eq('6.4 SUB-02 : toujours clic seul', W.fmMetroBass().state.on, false);
   cardOf('cajon','EX-SOCLE-D-PLS-04').querySelector('.pf-load').click();
-  eq('6.5 PLS-04 : machine gap active (mode fixe)', D.getElementById('gapMode').value, 'fixed');
+  eq('6.5 PLS-04 : machine gap active (mode fixe)', W.eval('S.gap.mode'), 'fixed');   // R-4a : idem
   eq('6.6 PLS-04 : cible du gap = pulsation (clic)', D.getElementById('gapTarget').value, 'pulse');
   cardOf('cajon','EX-CJ-SON-01').querySelector('.pf-load').click();
-  eq('6.7 SON-01 : gap remis à off (preset sans gap)', D.getElementById('gapMode').value, 'off');
-  eq('6.8 SON-01 : subdivision remise à 1', D.getElementById('subdivSel').value, '1');
+  eq('6.7 SON-01 : gap remis à off (preset sans gap)', W.eval('S.gap.mode'), 'off');   // R-4a : idem
+  eq('6.8 SON-01 : subdivision remise à 1', W.eval('S.subdiv'), 1);   // R-4a : idem
 
   // 7. acquis par position + niveau effectif (base = debutant)
   resetLocal();

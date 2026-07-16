@@ -17,8 +17,14 @@
         évolue légitimement en R-3b (grooves extraits, lien pratiquer, stub
         mute maître) et sa non-régression est portée par la batterie
         fonctionnelle complète + recette-grooves.js. Restent les invariants
-        structurels : balises moteur dans l'ordre contractuel sur les DEUX
-        pages, script principal en portée globale stricte sans IIFE, BUILD.
+        structurels : balises moteur dans l'ordre contractuel PAR PAGE
+        (R-4a : apprendre.html rejoint index/pratiquer — sans grooves, avec
+        coquille/fm-compte.js), script principal en portée globale stricte
+        sans IIFE, BUILD.
+     C. coquille partagée (R-4a, GO §9.5) : coquille/fm-compte.js est le
+        DÉPLACEMENT verbatim du bloc COMPTE d'index.html 0.12.0 — référence
+        figée reference-compte-0.12.0.json (ancre, nb lignes, md5), et
+        index.html ne porte plus la logique en dur (une seule source).
    ============================================================================ */
 'use strict';
 const fs = require('fs');
@@ -80,23 +86,55 @@ ok(compte(etat + audio + accomp, /accompMuted/g) === 1 && compte(audio + accomp,
    compte(etat, /feelMs/g) === 1,
   'aucune autre retouche : accompMuted ×1 et feelMs ×2 dans tout le moteur, pas un de plus');
 
-// ---- B. garde-fous de coquille (index.html ET pratiquer.html) ---------------------
-const ORDRE = ['corpus/socle-technique.js', 'corpus/funk.js',
-  'corpus/grooves/bresil.js', 'corpus/grooves/ouest-africain.js', 'corpus/grooves/funk.js',
-  'corpus/grooves/reggae.js', 'corpus/grooves/hiphop.js', 'corpus/grooves/rock.js',
-  'moteur/fm-etat.js', 'moteur/fm-audio.js', 'moteur/fm-accomp.js'];
-for (const page of ['index.html', 'pratiquer.html']) {
+// ---- B. garde-fous de coquille (index.html, pratiquer.html ET apprendre.html) -----
+const CORPUS_T = ['corpus/socle-technique.js', 'corpus/funk.js'];
+const GROOVES_T = ['corpus/grooves/bresil.js', 'corpus/grooves/ouest-africain.js',
+  'corpus/grooves/funk.js', 'corpus/grooves/reggae.js', 'corpus/grooves/hiphop.js',
+  'corpus/grooves/rock.js'];
+const MOTEUR_T = ['moteur/fm-etat.js', 'moteur/fm-audio.js', 'moteur/fm-accomp.js'];
+const COMPTE_T = ['coquille/fm-compte.js'];
+// l'ordre contractuel s'énonce PAR PAGE (R-4a) :
+//   corpus → [grooves si répertoire] → moteur → [coquille partagée si compte]
+// v R-4b : l'accueil refondu n'a plus ni répertoire (grooves → pratiquer) ni
+// consommateur Supabase (bibliothèque → pratiquer, compte avec elle) ; pratiquer
+// gagne les deux (Team Spirit/bibliothèque migrés, spec R-4 §4.2).
+const ORDRES = {
+  'index.html':     CORPUS_T.concat(MOTEUR_T),
+  'pratiquer.html': CORPUS_T.concat(GROOVES_T, MOTEUR_T, COMPTE_T),
+  'apprendre.html': CORPUS_T.concat(MOTEUR_T, COMPTE_T)
+};
+for (const page of Object.keys(ORDRES)) {
   const html = fs.readFileSync(path.join(__dirname, page), 'utf-8');
   const srcs = [];
   html.replace(/<script src="([^"]+)"><\/script>/g, (m, s) => { srcs.push(s); return m; });
   const locaux = srcs.filter(s => !/^(https?:)?\/\//.test(s));
-  ok(JSON.stringify(locaux) === JSON.stringify(ORDRE),
-    page + ' : balises locales dans l\'ordre contractuel corpus → grooves → fm-etat → fm-audio → fm-accomp');
+  ok(JSON.stringify(locaux) === JSON.stringify(ORDRES[page]),
+    page + ' : balises locales dans l\'ordre contractuel de la page (corpus → [grooves] → moteur → [compte])');
   ok(new RegExp('</script>\\s*<script>\\s*\'use strict\';').test(html),
     page + ' : le script principal ouvre sur \'use strict\' sans IIFE (portée globale partagée)');
 }
-ok(/const BUILD = 'metronomefunk-0\.12\.0'/.test(etat),
-  'BUILD = 0.12.0 dans fm-etat.js (unique ligne vivante, tolérance déclarée)');
+ok(/const BUILD = 'metronomefunk-0\.14\.0'/.test(etat),
+  'BUILD = 0.14.0 dans fm-etat.js (unique ligne vivante, tolérance déclarée)');
+
+// ---- C. coquille partagée : fm-compte.js == bloc COMPTE du 0.12.0 (déplacement) ----
+const REFC = JSON.parse(fs.readFileSync(path.join(__dirname, 'reference-compte-0.12.0.json'), 'utf-8'));
+{
+  const contenu = lignes('coquille/fm-compte.js');
+  const debut = contenu.indexOf(REFC.ancre);
+  ok(debut > 0, 'coquille/fm-compte.js : ancre trouvée sous l\'en-tête (« ' + REFC.ancre.slice(0, 46) + '… »)');
+  const bloc = contenu.slice(debut, contenu[contenu.length - 1] === '' ? -1 : undefined);
+  ok(bloc.length === REFC.nb, `coquille/fm-compte.js : ${REFC.nb} lignes verbatim (trouvé ${bloc.length})`);
+  ok(md5(bloc) === REFC.md5, `coquille/fm-compte.js : md5 du bloc == bloc COMPTE d'index.html 0.12.0 (${REFC.md5.slice(0, 8)}…)`);
+  // v R-4b : les pages consommatrices du compte sont apprendre et pratiquer ;
+  // l'accueil refondu n'a plus de consommateur Supabase (spec R-4 §4.2).
+  const idx = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf-8');
+  ok(idx.indexOf('window.fmSupabase=function()') < 0 && idx.indexOf('fm-compte.js') < 0,
+    'index.html : plus de logique compte, ni en dur ni par coquille (aucun consommateur)');
+  const app = fs.readFileSync(path.join(__dirname, 'apprendre.html'), 'utf-8');
+  const pra = fs.readFileSync(path.join(__dirname, 'pratiquer.html'), 'utf-8');
+  ok(app.indexOf('id="acctCard"') > 0 && pra.indexOf('id="acctCard"') > 0,
+    'le petit markup compte (carte) reste porté par chaque page consommatrice (apprendre, pratiquer)');
+}
 
 console.log(`\n--- extraction : ${nOk} vertes, ${nKo} rouges (total ${nOk + nKo}) ---`);
 process.exit(nKo ? 1 : 0);

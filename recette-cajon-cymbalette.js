@@ -45,7 +45,10 @@ class FakeAudioContext {
 }
 
 // ---- DOM ---------------------------------------------------------------------
-const html = require('./recette-harnais').chargeHtml();   // R-2 : inline les corpus/*.js
+// R-4b : la surface testée (couches, basse, percussion, répertoire) vit sur
+// pratiquer.html depuis la refonte de l'accueil (argument fichier conservé).
+const FILE = process.argv[2] || path.join(__dirname, 'pratiquer.html');
+const html = require('./recette-harnais').chargeHtml(FILE);   // R-2 : inline les corpus/*.js
 const dom = new JSDOM(html, {
   url: 'http://localhost/',
   runScripts: 'dangerously',
@@ -105,23 +108,13 @@ boot(() => {
   ok(R.rankOf('aigu') === 2, 'voix aigu : rang 2');
   ok(R.rankOf('cimbalette') === 3, 'voix cimbalette : rang 3 (4e son réel)');
 
-  // --- 4. fingerViz : 4 couloirs, cimbalette en haut, grave en bas ---------
-  console.log('\n[4] fingerViz — 4 couloirs (aigu → grave de haut en bas)');
-  const ls = lanes();
-  ok(ls.length === 4, '4 pistes rendues');
-  ok(cursors().length === 4, '4 curseurs (un par piste — non-régression 0.6.1)');
-  ok(laneLabel(ls[0]) === 'cimbalette', 'piste du HAUT = cimbalette');
-  ok(laneLabel(ls[1]) === 'aigu', 'piste 2 = aigu');
-  ok(laneLabel(ls[2]) === 'médium', 'piste 3 = médium');
-  ok(laneLabel(ls[3]) === 'grave', 'piste du BAS = grave');
-
-  // --- 5. Groove de base : cimbalette sonne, médium reste vide (honnête) ----
-  console.log('\n[5] Groove de base & médium vide honnête');
-  ok(laneHits(ls[0]) > 0, 'cimbalette porte des frappes (jingles du groove de base)');
-  ok(laneHits(ls[3]) > 0, 'grave porte des frappes');
-  ok(laneHits(ls[1]) > 0, 'aigu porte des frappes');
-  ok(ls[2].classList.contains('empty') && laneHits(ls[2]) === 0,
-     'médium (palier 1) = vide honnête (classe .empty, 0 frappe)');
+  /* --- 4 et 5 : RETIRÉES (R-4b) ----------------------------------------------
+     « fingerViz — 4 couloirs » et « groove de base sur les couloirs » testaient
+     l'encart fingerViz de l'ÉCRAN DE JEU, retiré de l'application au GO R-4
+     (§9.4). La couche de données (4 paliers, rangs, clamp) reste couverte par
+     les sections 1 à 3 ; le routage audio par la section 6 ; la non-régression
+     du cajón classique par la section 7 (réduite aux paliers, plus de couloirs).
+     13 assertions retirées avec leur surface (32 → 19, dont 3 en section 7). */
 
   // --- 6. Câblage audio (source) : routage reconnu, timbre non jugé ---------
   console.log('\n[6] Routage audio (contrôle sur source — le son ne se juge pas ici)');
@@ -135,12 +128,9 @@ boot(() => {
   console.log('\n[7] Non-régression — cajón classique (3 paliers, médium vide)');
   setInstr('cajon');
   ok(R.tiers() === 3, 'cajón : 3 paliers');
-  const lc = lanes();
-  ok(lc.length === 3 && cursors().length === 3, 'cajón : 3 pistes, 3 curseurs');
-  ok(laneLabel(lc[0]) === 'aigu' && laneLabel(lc[2]) === 'grave', 'cajón : aigu en haut, grave en bas');
-  ok(lc[1].classList.contains('empty'), 'cajón : médium toujours vide honnête (inchangé)');
+  // R-4b : les pistes/curseurs fingerViz sont retirés avec l'écran de jeu (§9.4)
   setInstr('djembe');
-  ok(R.tiers() === 3 && cursors().length === 3, 'retour djembé : 3 paliers, 3 curseurs (aucun orphelin)');
+  ok(R.tiers() === 3, 'retour djembé : 3 paliers (aucun état cassé)');
 
   // ---- bilan ---------------------------------------------------------------
   console.log('\n=== Bilan : ' + pass + '/' + (pass + fail) + ' \u2014 ' + (fail === 0 ? 'TOUT PASSE' : (fail + ' ÉCHEC(S)')) + ' ===\n');

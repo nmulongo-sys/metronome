@@ -3,12 +3,15 @@
    Vérifie : terminologie & infobulles (C2), découvrabilité (C5), sommaire sticky (C6),
    connexion reformulée avec renvoi du lien (C7), réinitialisation sélective + toast (C8),
    petits irritants (C15), et la parité i18n EN/PT de toutes les chaînes nouvelles ou déplacées.
-   Usage : node recette-ux-0.6.6.js [chemin/index.html]  (défaut ./index.html) */
+   R-4b : la surface auditée (sections, sommaire, volume, reset, compte) vit sur
+   pratiquer.html — la suite suit sa surface ; l'archet (C5 ⛶) est couvert par
+   recette-accueil.js ; wizard et écran de jeu sont retirés de l'application (§9.4).
+   Usage : node recette-ux-0.6.6.js [chemin/pratiquer.html]  (défaut ./pratiquer.html) */
 const fs = require('fs');
 const path = require('path');
 const { JSDOM, VirtualConsole } = require('jsdom');
 
-const FILE = process.argv[2] || path.join(__dirname, 'index.html');
+const FILE = process.argv[2] || path.join(__dirname, 'pratiquer.html');
 const html = require('./recette-harnais').chargeHtml(FILE);   // R-2 : inline les corpus/*.js
 
 let PASS = 0, FAIL = 0;
@@ -109,36 +112,37 @@ async function runTests() {
   eq('1.3 sous-titre de « Horloge interne » francisé', txt(D.querySelector('#secGap .sec-sub')), 'coupures de clic (gap clicks)');
   ok('1.4 libellé Team Spirit : « Accompagnement (backing track)… »', /^Accompagnement \(backing track\)/.test(txt(Array.from(D.querySelectorAll('label')).find(l => l.querySelector('#tsBacking')))));
   ok('1.5 libellé basse : « Silences (drop-outs) — la basse se tait »', /Silences \(drop-outs\)/.test(txt(Array.from(D.querySelectorAll('label')).find(l => l.querySelector('#bassDropOn')))));
-  ok('1.6 libellé écran de jeu : « silences (drop-outs) »', /silences \(drop-outs\)/.test(txt(Array.from(D.querySelectorAll('label')).find(l => l.querySelector('#playBassDrop')))));
+  // 1.6 RETIRÉE (R-4b) : le libellé vivait sur l'écran de jeu, retiré §9.4.
   const terms = Array.from(D.querySelectorAll('.term'));
   ok('1.7 au moins 5 termes à infobulle, tous avec définition non vide', terms.length >= 5 && terms.every(t => norm(t.getAttribute('title')).length > 20));
   ok('1.8 les termes à infobulle sont focusables (tap mobile)', terms.filter(t => t.getAttribute('tabindex') === '0').length >= 4);
   ok('1.9 bulle CSS au focus présente (attr(title))', /\.term:focus::before/.test(styleText()) && /attr\(title\)/.test(styleText()));
 
   // ---- 2. C5 — découvrabilité ----
-  eq('2.1 « ✦ Assistant » renommé « ✦ Guide-moi »', txt(D.getElementById('wizardBtn')), '✦ Guide-moi');
+  // 2.1 RETIRÉE (R-4b) : le wizard est retiré de l'application (§9.4).
   const kbdTop = D.querySelector('.kbd-top');
   ok('2.2 rappel des raccourcis près du transport', !!kbdTop && /Espace/.test(txt(kbdTop)) && /tap tempo/.test(txt(kbdTop)));
-  const bowFs2 = D.getElementById('bowFsBtn2');
-  ok('2.3 bouton ⛶ en surimpression du canvas archet', !!bowFs2 && !!bowFs2.closest('.cv-wrap') && !!bowFs2.closest('.cv-wrap').querySelector('#bowCv'));
+  // 2.3 DÉPLACÉE (R-4b) : le ⛶ du canvas archet vit sur index.html avec la
+  // section Archet — assertion équivalente dans recette-accueil.js (A6).
   ok('2.4 libellé « Export audio (WAV / MP3) » + ancre #expAudio', !!D.getElementById('expAudio') && /Export audio \(WAV \/ MP3\)/.test(txt(D.getElementById('expAudio'))));
 
   // ---- 3. C6 — sommaire sticky ----
   const toc = D.getElementById('tocBar');
   const chips = toc ? Array.from(toc.querySelectorAll('.toc-chip')) : [];
-  eq('3.1 sommaire présent avec 14 puces (12 sections + Export + Haut)', chips.length, 14);
+  // R-4b : 12 puces sur pratiquer (10 sections + Export + Haut) — Cours funk et
+  // Archet ont quitté la page ; Team Spirit et Bibliothèque l'ont rejointe.
+  eq('3.1 sommaire présent avec 12 puces (10 sections + Export + Haut)', chips.length, 12);
   const targets = chips.map(c => c.getAttribute('data-toc')).filter(id => id !== '__top');
   ok('3.2 chaque puce (hors Haut) vise un élément existant', targets.every(id => !!D.getElementById(id)));
-  ok('3.3 le sommaire est masqué en mode Jouer (règle CSS)', /body\.mode-simple \.toc-bar \{ display:none/.test(styleText()));
-  const archetChip = chips.find(c => c.getAttribute('data-toc') === 'secArchet');
-  D.getElementById('secArchet').open = false;
-  archetChip.click();
-  ok('3.4 clic sur une puce ouvre la section visée', D.getElementById('secArchet').open === true);
+  // 3.3 RETIRÉE (R-4b) : plus de mode « Jouer » (écran de jeu retiré §9.4).
+  const claveChip = chips.find(c => c.getAttribute('data-toc') === 'secClave');
+  D.getElementById('secClave').open = false;
+  claveChip.click();
+  ok('3.4 clic sur une puce ouvre la section visée', D.getElementById('secClave').open === true);
   ok('3.5 sommaire sticky (position:sticky)', /\.toc-bar \{ position:sticky/.test(styleText()));
 
   // ---- 4. C15 — petits irritants ----
-  const whoWrap = D.getElementById('playWhoWrap');
-  ok('4.1 « Je suis » masqué tant que Solo est la seule option', !!whoWrap && whoWrap.style.display === 'none' && D.getElementById('playWho').options.length === 1);
+  // 4.1 RETIRÉE (R-4b) : « Je suis » vivait sur l'écran de jeu, retiré §9.4.
   ok('4.2 volume : valeur affichée « · 80 % »', /80\s*%/.test(txt(D.getElementById('volVal'))));
   const muteBtn = D.getElementById('volMuteBtn');
   eq('4.3 bouton sourdine présent, état initial sonore', muteBtn.getAttribute('aria-pressed'), 'false');
@@ -149,21 +153,23 @@ async function runTests() {
   ok('4.5 bouger le volume lève la sourdine et met à jour le %', muteBtn.getAttribute('aria-pressed') === 'false' && /60\s*%/.test(txt(D.getElementById('volVal'))));
   eq('4.6 compteur « Coupures traversées » présent à 0', txt(D.getElementById('gapCrossed')), '0');
   ok('4.7 badge d\'accord agrandi (règles CSS ×2)', /#playBassChord \{ font-size:1\.9rem/.test(styleText()) && /#bassChord \{ font-size:1\.35rem/.test(styleText()));
-  ok('4.8 icônes du header : title explicite partout', ['wizardBtn', 'themeBtn', 'btnResetAll', 'btnAccount', 'playSetupBtn'].every(id => norm(D.getElementById(id).getAttribute('title')).length > 10));
+  // R-4b : le header de pratiquer porte thème / réinitialisation / compte.
+  ok('4.8 icônes du header : title explicite partout', ['themeBtn', 'btnResetAll', 'btnAccount'].every(id => norm(D.getElementById(id).getAttribute('title')).length > 10));
 
   // ---- 5. C8 — filet de sécurité ----
   // 5.a toast à la première sauvegarde post-init (bascule de mode → fm-metro-mode)
   ok('5.1 init terminée (__fmReady)', W.__fmReady === true);
-  D.getElementById('modeExpertBtn').click();
+  // R-4b : plus de bascule de mode — le 1er réglage persisté devient la famille.
+  D.getElementById('famTernBtn').click();
   const toast = D.getElementById('fmToast');
   ok('5.2 toast « ✓ Réglages enregistrés automatiquement » après le 1er réglage', !!toast && toast.classList.contains('show') && /Réglages enregistrés/.test(txt(toast)));
   // 5.b réinitialisation refusée : rien ne bouge
   W.localStorage.setItem('fm-lang', 'fr'); W.localStorage.setItem('fm-theme', 'sombre');
   W.localStorage.setItem('pf_vote_queue', '[]');
-  ok('5.3 des réglages fm-metro-* existent avant le reset', !!W.localStorage.getItem('fm-metro-mode'));
+  ok('5.3 des réglages fm-metro-* existent avant le reset', !!W.localStorage.getItem('fm-metro-family'));
   W.confirm = () => false;
   D.getElementById('btnResetAll').click();
-  ok('5.4 confirmation refusée → réglages conservés', !!W.localStorage.getItem('fm-metro-mode'));
+  ok('5.4 confirmation refusée → réglages conservés', !!W.localStorage.getItem('fm-metro-family'));
   // 5.c réinitialisation confirmée : fm-metro-* purgés, le reste conservé
   W.confirm = () => true;
   D.getElementById('btnResetAll').click();
@@ -197,8 +203,9 @@ async function runTests() {
   // ---- 7. i18n — parité EN/PT des chaînes nouvelles et déplacées ----
   const DICTS = W.__I18N || {};
   const en = DICTS.en || {}, pt = DICTS.pt || {};
+  // R-4b : les clés des surfaces retirées (wizard) sortent de la liste ; les
+  // puces vivantes du sommaire de pratiquer y entrent.
   const NEW_KEYS = [
-    '✦ Guide-moi',
     'Recevoir un lien de connexion par e-mail',
     'coupures de clic (gap clicks)',
     'Accompagnement (backing track) — l\'app joue les lignes écartées',
@@ -216,7 +223,7 @@ async function runTests() {
     'L\'application fonctionne aussi sans compte : la connexion sert seulement à partager tes routines et suivre ta progression.',
     'Pas reçu au bout d\'une minute ? Vérifie tes indésirables (spams), ou renvoie le lien.',
     'Renvoyer le lien',
-    'Groove', 'Claves', 'Cours funk', 'Horloge', 'Son', 'Bibliothèque', 'Export', '↑ Haut',
+    'Groove', 'Claves', 'Percussion', 'Basse', 'Répertoire', 'Horloge', 'Son', 'Bibliothèque', 'Export', '↑ Haut',
     'Sommaire des sections', 'Revenir en haut de la page'
   ];
   const missEn = NEW_KEYS.filter(k => !en[k]), missPt = NEW_KEYS.filter(k => !pt[k]);

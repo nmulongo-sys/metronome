@@ -61,7 +61,10 @@ class FakeAudioContext {
   resume() {}
 }
 
-const html = require('./recette-harnais').chargeHtml();   // R-2 : inline les corpus/*.js
+// R-4b : la surface testée (couches, basse, percussion, répertoire) vit sur
+// pratiquer.html depuis la refonte de l'accueil (argument fichier conservé).
+const FILE = process.argv[2] || path.join(__dirname, 'pratiquer.html');
+const html = require('./recette-harnais').chargeHtml(FILE);   // R-2 : inline les corpus/*.js
 const dom = new JSDOM(html, {
   url: 'http://localhost/', runScripts: 'dangerously', pretendToBeVisual: true,
   beforeParse(window) {
@@ -226,26 +229,15 @@ boot(() => {
   setDrop({ on: false, everyN: 4, lenBeats: 2 });
   setFollow(true);
 
-  // --- 8. Écran de jeu : commandes basse + synchro bidirectionnelle ------------------------------
-  console.log('\n[8] Écran de jeu : basse on/off · densité · drop-outs · accord');
-  ok(!!$('playBassGroup') && !!$('playBassOn') && !!$('playBassDensity') && !!$('playBassDrop') && !!$('playBassChord'),
-     'les 4 commandes + la pastille d’accord existent');
+  /* --- 8. RETIRÉE (R-4b) : « Écran de jeu : commandes basse + synchro » ------
+     Le panneau basse de l'écran de jeu (playBassGroup/playBassOn/playBassDensity/
+     playBassDrop/playBassChord) est parti avec l'ÉCRAN DE JEU, retiré de
+     l'application au GO R-4 (§9.4). La surface basse restante — secBass — est
+     couverte par les sections 1 à 7 ci-dessus, comptes inchangés (le moteur
+     garde bassPlayRefresh et sort par sa garde si le panneau est absent).
+     8 assertions retirées avec leur surface (40 → 32). */
+  console.log('\n[8] Écran de jeu — RETIRÉ (R-4b, §9.4) : voir note ci-dessus');
   setBass({ prog: 'vamp1', key: 'E' });
-  ok($('playBassChord').textContent === '♪ E7', 'accord affiché sur l’écran de jeu : « ♪ E7 »');
-  $('playBassOn').checked = false; fire('playBassOn', 'change');
-  ok(B().state.on === false && $('bassOn').checked === false, 'playBassOn → S.bass.on et secBass synchronisés');
-  $('bassOn').checked = true; fire('bassOn', 'change');
-  ok($('playBassOn').checked === true, 'bassOn → playBassOn synchronisé (sens inverse)');
-  $('playBassDensity').value = '3'; fire('playBassDensity', 'change');
-  ok(B().state.density === 3 && $('bassDensity').value === '3', 'densité synchronisée écran de jeu → secBass');
-  $('playBassDrop').checked = true; fire('playBassDrop', 'change');
-  ok(B().state.drop.on === true && $('bassDropOn').checked === true, 'drop-outs synchronisés écran de jeu → secBass');
-  $('playBassDrop').checked = false; fire('playBassDrop', 'change');
-  $('famTernBtn').click();
-  ok($('playBassOn').disabled && $('playBassGroup').classList.contains('bass-tern'),
-     'famille ternaire : groupe basse de l’écran de jeu désactivé (binaire v1)');
-  $('famBinBtn').click();
-  ok(!$('playBassOn').disabled, 'retour binaire : groupe réactivé');
 
   // --- 9. Estampille ------------------------------------------------------------------------------
   console.log('\n[9] Estampille');

@@ -191,8 +191,6 @@
   .sec-title { font-family: var(--fm-font-display); font-weight: 600; font-size: 1.25rem; }
   .sec-sub { color: var(--fm-sub); font-size: .8125rem; letter-spacing: .1em; text-transform: uppercase; }
   .section-body { padding: 2px 22px 20px; }
-  body.mode-simple details.section { display: none; }
-  body.mode-simple .kbd-hint { display: none; }
 
   /* ---- masquage piloté par CONTEXTE (strates) ----
      Le contexte choisit une tâche ; les couches et surcouches restent visibles.
@@ -215,7 +213,6 @@
     color: var(--fm-ink);
   }
   .family-bar .fb-hint { color: var(--fm-sub); font-size: .8125rem; flex: 1; min-width: 160px; }
-  body.mode-simple .family-bar { display: none; }
   body.ctx-archet .family-bar { display: none; }
 
   .row { display: flex; align-items: center; gap: 12px; margin: 10px 0; flex-wrap: wrap; }
@@ -280,58 +277,7 @@
     margin-right: 5px; vertical-align: -1px;
   }
 
-  /* ---- écran de jeu (passe 4.1) : MES briques en grand, le reste en accompagnement ----
-     Visible uniquement en mode « Jouer » (mode simple recomposé). Mes voix = briques
-     pleine couleur, hauteur double, main D/G inscrite ; le backing (tout le reste,
-     y compris les lignes écartées) = briques atténuées, masquables — l'audio, lui,
-     ne dépend jamais de cet affichage. */
-  #playScreen { display: none; margin-bottom: 14px; }
-  body.mode-simple #playScreen { display: block; }
-  .play-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
-  /* 5.4 : ligne basse de l'écran de jeu — commandes tactiles + pastille d'accord pulsante */
-  .play-bass select, .play-bass input[type="checkbox"] { min-height: 24px; }
-  .play-bass .check { min-height: 40px; }
-  .play-bass.bass-tern { opacity: .45; }
-  #playBassChord { display: inline-block; font-weight: 600; font-variant-numeric: tabular-nums;
-    padding: 2px 10px; border: 1px solid var(--fm-line); border-radius: 12px; min-width: 52px;
-    text-align: center; }
-  #playBassChord.pulse { animation: bassPulse .28s ease-out; }
-  @keyframes bassPulse {
-    0% { transform: scale(1.22); color: var(--fm-accent); border-color: var(--fm-accent); }
-    100% { transform: scale(1); }
-  }
-  .play-line { height: 170px; }
-  .pl-brick.mine {
-    height: 20px; display: flex; align-items: center; justify-content: center;
-    font-size: .8125rem; font-weight: 700; color: #fff;
-    text-shadow: 0 1px 2px rgba(20,15,8,.55); border-radius: 3px;
-  }
-  .pl-brick.back { opacity: .25; }
-  #playScreen.no-back .pl-brick.back { display: none; }
-
-  /* chantier B : encart fingerViz — paliers de l'instrument cible (grave→aigu) */
-  .finger-viz { margin: 6px 0 2px; display: flex; flex-direction: column; gap: 3px; }
-  .finger-viz.hide { display: none; }
-  .fv-lane { display: flex; align-items: center; gap: 8px; }
-  .fv-label {
-    min-width: 70px; font-size: .8125rem; color: var(--fm-sub);
-    text-align: right; font-variant-numeric: tabular-nums;
-  }
-  .fv-lane.empty .fv-label { opacity: .4; }
-  .fv-track {
-    position: relative; flex: 1; height: 16px; border-radius: 4px;
-    background: var(--fm-panel-2); border: 1px solid var(--fm-line);
-  }
-  .fv-hit {
-    position: absolute; top: 2px; width: 6px; height: 10px; border-radius: 2px;
-    transform: translateX(-50%); opacity: .92;
-  }
-  .fv-hit.acc { box-shadow: 0 0 0 1.5px var(--fm-ink); top: 1px; height: 12px; }
-  /* chantier B (finition 0.6.1) : curseur temps réel — un par piste, même phase que #playLine */
-  .fv-cursor {
-    position: absolute; top: 0; bottom: 0; width: 2px;
-    background: var(--fm-ink); opacity: .5; transform: translateX(-50%); display: none;
-  }
+  /* R-4b : CSS de l'écran de jeu et de l'encart fingerViz retirés avec leurs surfaces (§9.4) */
 
   /* ---- percussion ---- */
   .perc-voice { display: flex; align-items: center; gap: 10px; margin: 8px 0; flex-wrap: wrap; }
@@ -442,7 +388,7 @@
   .bloc-head h2 { margin: 0; font-family: inherit; font-size: 1.08rem; font-weight: 600; letter-spacing: .01em; }
   .bloc-head .bloc-num { display: inline-flex; align-items: center; justify-content: center;
                width: 24px; height: 24px; border-radius: 50%; flex: none;
-               background: var(--fm-accent); color: #fff; font-size: .8rem; font-weight: 700; }
+               background: var(--fm-accent); color: #fff; font-size: .8125rem; font-weight: 700; }   /* A1 (0.6.9) : ≥ 13 px, aligné en R-4b */
   .bloc-head .bloc-sub { color: var(--fm-sub); font-size: .8125rem; }
   #accompMuteBtn[aria-pressed="true"], #accompMuteBtn2[aria-pressed="true"] {
                background: var(--fm-accent); color: #fff; border-color: transparent; }
@@ -472,12 +418,8 @@
   .toc-chip { font-size: .8125rem; border:1px solid var(--fm-line); background:var(--fm-panel);
     color:var(--fm-ink); border-radius:16px; padding:3px 10px; cursor:pointer; font:inherit; }
   .toc-chip:hover { border-color:var(--fm-accent); color:var(--fm-accent-text); }
-  body.mode-simple .toc-bar { display:none; }
   /* ============ SALVE UX 0.6.7 — C1 onboarding · C9 aides repliables ============ */
-  .onboard-banner { display:flex; flex-wrap:wrap; align-items:center; gap:8px;
-    border:1px solid var(--fm-accent); border-radius:10px; padding:8px 12px; margin-bottom:10px;
-    background:var(--fm-panel); font-size:.85rem; }
-  .onboard-banner .ob-txt { flex:1; min-width:200px; }
+  /* R-4b : bandeau d'onboarding retiré avec le wizard (§9.4) */
   .toc-focus { font-size: .8125rem; margin-left:auto; white-space:nowrap; }
   details.hint-more { display:inline; }
   details.hint-more > summary { display:inline; cursor:pointer; color:var(--fm-accent-text);
@@ -540,6 +482,8 @@
     } catch (e) { /* silencieux */ }
   })();
 </script>
+<!-- R-4b : compte partagé (coquille/fm-compte.js) — le client Supabase du lien magique. -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* ===== i18n (0.6.9 I1) : dictionnaires EN/PT hoistés + helper fmTr() pour les chaînes
    composées en JS (statuts dynamiques, confirm, aria-labels construits). Le walker de
@@ -723,6 +667,33 @@ window.__I18N = { "en": {
   "Surdo": "Surdo",
   "Reco-reco": "Reco-reco",
   "Charge un groove de la bibliothèque puis choisis": "Load a groove from the library then choose",
+  "l'instrument de rendu": "the rendering instrument",
+  "Métronome — Pratiquer": "Metronome — Practice",
+  "Pratique libre · ce que je joue — ce qui m'accompagne — le clic": "Free practice · what I play — what accompanies me — the click",
+  "← Accueil du métronome": "← Metronome home",
+  "Apprendre": "Learn",
+  "🔊 Accomp.": "🔊 Accomp.",
+  "Ce que je joue": "What I play",
+  "mon instrument · mon séquenceur · mes exercices": "my instrument · my sequencer · my exercises",
+  "Ce qui m'accompagne": "What accompanies me",
+  "basse · claves · répertoire — l'accompagnement, pas moi": "bass · claves · repertoire — the accompaniment, not me",
+  "🔊 Accompagnement actif": "🔊 Accompaniment on",
+  "Placement — posé ↔ poussé": "Placement — laid-back ↔ on top",
+  "0 ms": "0 ms",
+  "choisis un groove · l'instrument de rendu de l'accompagnement": "pick a groove · the accompaniment's rendering instrument",
+  "Accompagnement rendu à": "Accompaniment rendered on",
+  "Le clic": "The click",
+  "micro-timing · coupures · son · routine — le métronome lui-même": "micro-timing · gaps · sound · routine — the metronome itself",
+  "Revenir à la page d'accueil du métronome": "Back to the metronome home page",
+  "Le parcours d'apprentissage : cajón · djembé, mode écoute et mode pratique": "The learning path: cajón · djembé, listen mode and practice mode",
+  "Mute maître de l'accompagnement — coupe basse, claves et répertoire, le clic continue": "Accompaniment master mute — cuts bass, claves and repertoire, the click keeps going",
+  "Mute maître : coupe d'un geste tout l'accompagnement (basse, claves, répertoire) — le clic continue ; chaque couche garde ses réglages": "Master mute: one tap silences the whole accompaniment (bass, claves, repertoire) — the click keeps going; every layer keeps its settings",
+  "Placement -1 ms": "Placement -1 ms",
+  "Placement de la basse (millisecondes)": "Bass placement (milliseconds)",
+  "Placement +1 ms": "Placement +1 ms",
+  "L'instrument qui REND l'accompagnement — pas celui que je joue (bloc 1)": "The instrument that RENDERS the accompaniment — not the one I play (block 1)",
+  "Feel : décale toute la couche basse de quelques millisecondes autour de la grille — posé (laid-back, derrière) ↔ poussé (on top, devant). 0 = calé sur la grille": "Feel: shifts the whole bass layer by a few milliseconds around the grid — laid-back (behind) ↔ on top (ahead). 0 = locked to the grid",
+  "de l'accompagnement : rien n'oblige à rester sur l'instrument « authentique » — joue le répertoire du djembé au cajón si tu veux (les voix sont replacées par": "of the accompaniment: you don't have to stick to the \"authentic\" instrument — play the djembe repertoire on a cajon if you like (voices are remapped by",
   "l'instrument de jeu": "the playing instrument",
   ": rien n'oblige à rester sur l'instrument « authentique » — joue le répertoire du djembé au cajón si tu veux (les voix sont replacées par": ": you don't have to stick to the \"authentic\" instrument — play the djembe repertoire on a cajon if you like (voices are remapped by",
   "tessiture": "pitch",
@@ -1285,6 +1256,33 @@ window.__I18N = { "en": {
   "Surdo": "Surdo",
   "Reco-reco": "Reco-reco",
   "Charge un groove de la bibliothèque puis choisis": "Carregue um groove da biblioteca e escolha",
+  "l'instrument de rendu": "o instrumento de renderização",
+  "Métronome — Pratiquer": "Metrônomo — Praticar",
+  "Pratique libre · ce que je joue — ce qui m'accompagne — le clic": "Prática livre · o que eu toco — o que me acompanha — o clique",
+  "← Accueil du métronome": "← Início do metrônomo",
+  "Apprendre": "Aprender",
+  "🔊 Accomp.": "🔊 Acomp.",
+  "Ce que je joue": "O que eu toco",
+  "mon instrument · mon séquenceur · mes exercices": "meu instrumento · meu sequenciador · meus exercícios",
+  "Ce qui m'accompagne": "O que me acompanha",
+  "basse · claves · répertoire — l'accompagnement, pas moi": "baixo · claves · repertório — o acompanhamento, não eu",
+  "🔊 Accompagnement actif": "🔊 Acompanhamento ativo",
+  "Placement — posé ↔ poussé": "Colocação — laid-back ↔ on top",
+  "0 ms": "0 ms",
+  "choisis un groove · l'instrument de rendu de l'accompagnement": "escolha um groove · o instrumento de renderização do acompanhamento",
+  "Accompagnement rendu à": "Acompanhamento renderizado em",
+  "Le clic": "O clique",
+  "micro-timing · coupures · son · routine — le métronome lui-même": "micro-timing · cortes · som · rotina — o próprio metrônomo",
+  "Revenir à la page d'accueil du métronome": "Voltar à página inicial do metrônomo",
+  "Le parcours d'apprentissage : cajón · djembé, mode écoute et mode pratique": "O percurso de aprendizagem: cajón · djembê, modo escuta e modo prática",
+  "Mute maître de l'accompagnement — coupe basse, claves et répertoire, le clic continue": "Mute mestre do acompanhamento — corta baixo, claves e repertório, o clique continua",
+  "Mute maître : coupe d'un geste tout l'accompagnement (basse, claves, répertoire) — le clic continue ; chaque couche garde ses réglages": "Mute mestre: um gesto corta todo o acompanhamento (baixo, claves, repertório) — o clique continua; cada camada mantém seus ajustes",
+  "Placement -1 ms": "Colocação -1 ms",
+  "Placement de la basse (millisecondes)": "Colocação do baixo (milissegundos)",
+  "Placement +1 ms": "Colocação +1 ms",
+  "L'instrument qui REND l'accompagnement — pas celui que je joue (bloc 1)": "O instrumento que RENDERIZA o acompanhamento — não o que eu toco (bloco 1)",
+  "Feel : décale toute la couche basse de quelques millisecondes autour de la grille — posé (laid-back, derrière) ↔ poussé (on top, devant). 0 = calé sur la grille": "Feel: desloca toda a camada de baixo alguns milissegundos em torno da grade — laid-back (atrás) ↔ on top (à frente). 0 = travado na grade",
+  "de l'accompagnement : rien n'oblige à rester sur l'instrument « authentique » — joue le répertoire du djembé au cajón si tu veux (les voix sont replacées par": "do acompanhamento: nada obriga a ficar no instrumento « autêntico » — toque o repertório do djembê no cajón se quiser (as vozes são realocadas por",
   "l'instrument de jeu": "o instrumento para tocar",
   ": rien n'oblige à rester sur l'instrument « authentique » — joue le répertoire du djembé au cajón si tu veux (les voix sont replacées par": ": não é obrigatório ficar no instrumento \"autêntico\" — toque o repertório do djembê no cajón se quiser (as vozes são remapeadas por",
   "tessiture": "tessitura",
@@ -1683,11 +1681,13 @@ window.fmTr = (function(){
       <h1>Métronome — Pratiquer</h1>
       <div class="kicker">Pratique libre · ce que je joue — ce qui m'accompagne — le clic</div>
       <div class="build-stamp" id="buildStamp" style="font-size:13px;opacity:.75;margin-top:2px;font-variant-numeric:tabular-nums;"></div>
-      <div style="font-size:12px;margin-top:2px;"><a href="index.html" style="color:inherit;opacity:.7;" title="Revenir à la page d'accueil du métronome (écran de jeu, parcours, team spirit, archet)">← Accueil du métronome</a></div>
+      <div style="font-size:12px;margin-top:2px;"><a href="index.html" style="color:inherit;opacity:.7;" title="Revenir à la page d'accueil du métronome">← Accueil du métronome</a>
+        · <a href="apprendre.html" style="color:inherit;opacity:.7;" title="Le parcours d'apprentissage : cajón · djembé, mode écoute et mode pratique">Apprendre</a></div>
     </div>
     <div class="header-actions">
       <button class="btn-ghost" id="themeBtn" title="Basculer entre thème clair et thème sombre">◐ Mode sombre</button>
       <button class="btn-ghost" id="btnResetAll" title="Tout remettre par défaut — la langue, le thème et ton compte sont conservés">⟲ Tout réinitialiser</button>
+      <button class="btn-ghost" id="btnAccount" title="Recevoir un lien de connexion par e-mail">Se connecter</button>
       <span id="langSwitch" class="lang-switch" role="group" aria-label="Langue / Language / Idioma">
         <button type="button" class="lang-btn" data-lang="fr" title="Français" aria-label="Français"><svg class="flag" viewBox="0 0 3 2" aria-hidden="true"><rect width="3" height="2" fill="#fff"/><rect width="1" height="2" fill="#0055A4"/><rect x="2" width="1" height="2" fill="#EF4135"/></svg>FR</button>
         <button type="button" class="lang-btn" data-lang="en" title="English" aria-label="English"><svg class="flag" viewBox="0 0 60 30" aria-hidden="true"><clipPath id="ukc"><path d="M0,0 v30 h60 v-30 z"/></clipPath><g clip-path="url(#ukc)"><path d="M0,0 v30 h60 v-30 z" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M30,0 v30 M0,15 h60" stroke="#fff" stroke-width="10"/><path d="M30,0 v30 M0,15 h60" stroke="#C8102E" stroke-width="6"/></g></svg>EN</button>
@@ -1770,10 +1770,12 @@ window.fmTr = (function(){
     <button class="toc-chip" data-toc="secBass">Basse</button>
     <button class="toc-chip" data-toc="secClave">Claves</button>
     <button class="toc-chip" data-toc="secRepertoire">Répertoire</button>
+    <button class="toc-chip" data-toc="secTeam">Team Spirit</button>
     <button class="toc-chip" data-toc="secGroove">Groove</button>
     <button class="toc-chip" data-toc="secGap">Horloge</button>
     <button class="toc-chip" data-toc="secSon">Son</button>
     <button class="toc-chip" data-toc="secScript">Script</button>
+    <button class="toc-chip" data-toc="secBiblio">Bibliothèque</button>
     <button class="toc-chip" data-toc="expAudio">Export</button>
     <button class="toc-chip" data-toc="__top" title="Revenir en haut de la page">↑ Haut</button>
     <label class="check toc-focus" title="Ouvrir une section referme les autres"><input type="checkbox" id="focusMode"> Une section à la fois</label>
@@ -2100,7 +2102,53 @@ window.fmTr = (function(){
       rien n'oblige à rester sur l'instrument « authentique » — joue le répertoire du djembé au cajón si tu veux
       (les voix sont replacées par <b>tessiture</b>, marquées <i>adapté</i>).
       <details class="hint-more"><summary>En savoir plus</summary><span class="hm-body">Le répertoire s'écoute librement,
-      seul ou en groupe — la répartition entre participants (<b>Team Spirit</b>) se fait sur la <a href="index.html">page d'accueil</a>.</span></details></div>
+      seul ou en groupe — la répartition entre participants se fait dans la section <b>Team Spirit</b>.</span></details></div>
+    </div>
+  </details>
+
+  <!-- 2 ter. Team Spirit (R-4b : migré d'index.html — il vit avec le répertoire qu'il répartit,
+       en attendant equipe.html, R-6) -->
+  <details class="section" id="secTeam" data-strate="couche">
+    <summary><span class="sec-title">Team Spirit</span><span class="sec-sub">une ligne par personne · solo/muet · export</span></summary>
+    <div class="section-body">
+      <div class="row">
+        <label class="check"><input type="checkbox" id="tsOn"> Mode team spirit (répartir entre participants)</label>
+        <button class="btn-sm" id="tsAddPart">+ Participant</button>
+        <button class="btn-sm" id="tsAuto" title="Répartir les voix en équilibrant la charge de jeu (frappes) et les tessitures">Répartir auto</button>
+        <label class="check"><input type="checkbox" id="tsFinger"> Vérifier les doigtés</label>
+      </div>
+      <div id="tsParticipants" class="ts-parts"></div>
+      <div class="ts-wizbox">
+        <div class="row">
+          <label>Qui joue quoi ?</label>
+          <label for="tsWizN" style="min-width:auto;">Joueurs</label>
+          <input type="number" id="tsWizN" min="1" max="12" value="1" style="width:64px;">
+          <button class="btn-sm primary" id="tsWizRun">Répartir selon priorités</button>
+          <label class="check" title="L'accompagnement (backing track) : les voix que l'appli joue à ta place"><input type="checkbox" id="tsBacking" checked> Accompagnement (backing track) — l'app joue les lignes écartées</label>
+        </div>
+        <div class="hint" style="margin-top:4px;">Classe les lignes par priorité — glisse la poignée ⠿ pour
+        réordonner.
+        <details class="hint-more"><summary>En savoir plus</summary><span class="hm-body">Les premières sont garanties : chaque ligne est attribuée <b>entière ou pas du tout</b>,
+        deux mains par joueur (jamais plus de 2 frappes ni deux fois la même main au même instant). Cumuler des
+        instruments différents n'arrive qu'en dernier recours. Avec <b>1 joueur</b> : la combinaison de lignes
+        que tu peux tenir seul. Les lignes écartées passent en <b>backing track</b> si la case est cochée,
+        en sourdine sinon.</span></details></div>
+        <div id="tsRank" class="ts-rank"></div>
+        <div class="script-status" id="tsWizOut"></div>
+      </div>
+      <div id="tsFingerOut" class="script-status" style="white-space:pre-line;"></div>
+      <div class="row" style="margin-top:10px;">
+        <button class="btn-sm" id="tsExportAll">↓ Exporter tout (JSON)</button>
+        <button class="btn-sm" id="tsPrintBtn" title="Vue imprimable de la grille — imprime ou « Enregistrer en PDF »">🖨 Imprimer / PDF</button>
+        <button class="btn-sm" id="tsPngBtn" title="Image PNG de la grille (pupitre, partage)">↓ PNG</button>
+      </div>
+      <div class="hint">Charge d'abord un groove dans la section <b>Répertoire de grooves</b>, puis assigne
+      chaque voix à un participant — menu sur chaque voix du répertoire, ou <b>Répartir auto</b> qui équilibre
+      la charge de jeu (nombre de frappes) en mélangeant les tessitures.
+      <details class="hint-more"><summary>En savoir plus</summary><span class="hm-body">La carte de chacun affiche <b>sa ligne
+      rythmique</b> ; écoute la part de chacun (<b>solo</b>/<b>muet</b>) et exporte sa <b>ligne en JSON</b> pour
+      la travailler chez soi. <b>Vérifier les doigtés</b> signale quand une même main est demandée deux fois au
+      même instant pour un même participant (physiquement impossible).</span></details></div>
     </div>
   </details>
 
@@ -2238,6 +2286,22 @@ swing 62
       lignes <code>#</code> = commentaires. Les changements s'appliquent à la mesure suivante.</div>
     </div>
   </details>
+
+  <!-- Bibliothèque partagée (R-4b : migrée d'index.html — ses routines sont des réglages
+       complets, sa place est la pratique libre) -->
+  <details class="section" id="secBiblio">
+    <summary><span class="sec-title">Bibliothèque partagée</span><span class="sec-sub">routines · Supabase</span></summary>
+    <div class="section-body">
+      <div class="row" style="gap:8px;flex-wrap:wrap">
+        <input id="biblioTitre" type="text" maxlength="120" placeholder="Titre de la routine à publier" aria-label="Titre de la routine à publier" style="flex:1;min-width:160px">
+        <button class="btn-sm primary" id="btnBiblioPublish">Publier la routine</button>
+        <button class="btn-sm" id="btnBiblioRefresh">Charger la bibliothèque</button>
+      </div>
+      <div class="script-status" id="biblioFb"></div>
+      <div id="biblioList" style="margin-top:8px"></div>
+      <div class="hint" style="margin-top:8px">Le <b>canon</b> (routines de référence) est visible sans connexion. <b>Connecte-toi</b> (en haut) pour voir les routines de la classe et publier les tiennes. « Importer » place la routine dans l'éditeur ci-dessus.</div>
+    </div>
+  </details>
   </section>
 
   <div class="kbd-hint">Espace : lecture · ↑↓ : tempo ±1 · T : tap tempo</div>
@@ -2286,242 +2350,15 @@ swing 62
   </div>
 </div>
 
-<!-- ============ R-3b — STUBS INERTES (contrat de coquille, annexe R-3a) ============
-     Surfaces index-only (écran de jeu, team spirit, archet, cours funk, wizard,
-     accueil « je joue », mode simple/expert) : leur JS de coquille reste VERBATIM
-     sur cette page — seuls quelques points marqués « R-3b (pratiquer) » dévient.
-     Leurs éléments vivent ici, INERTES et INVISIBLES (#fmStubs est display:none) :
-     ils satisfont les câblages existants sans offrir la fonctionnalité, qui reste
-     sur index.html. R-4 (pages par scénario) dissout cette duplication transitoire. -->
-<div id="fmStubs" hidden aria-hidden="true">
-      <div class="seg" role="group" aria-label="Mode">
-        <button id="modeSimpleBtn" class="sel">▶ Jouer</button>
-        <button id="modeExpertBtn">Configurer</button>
-      </div>
-      <button class="btn-ghost" id="wizardBtn" title="L'assistant règle le métronome pour toi en trois questions">✦ Guide-moi</button>
-
-  <!-- ============ ÉCRAN DE JEU (passe 4.1) ============ -->
-  <div class="card" id="playScreen">
-    <!-- 0.6.7 (C1) : bandeau d'invitation à la première visite — disparaît après « ✦ Guide-moi »
-         (le wizard pose fm-metro-wizard-done) ou « Plus tard » (fm-metro-onboard-dismissed). -->
-    <div class="onboard-banner hide" id="onboardBanner">
-      <span class="ob-txt"><b>Débutant ? Laisse-toi guider</b> — l'assistant règle le métronome pour toi en trois questions.</span>
-      <button class="btn-sm primary" id="obGuide">✦ Guide-moi</button>
-      <button class="btn-sm" id="obLater">Plus tard</button>
-    </div>
-    <div class="play-bar">
-      <span id="playWhoWrap" style="display:none;align-items:center;gap:8px">
-        <label for="playWho" style="min-width:auto;">Je suis :</label>
-        <select id="playWho" style="width:auto;"><option value="solo">Solo</option></select>
-      </span>
-      <label class="check" title="L'accompagnement (backing track) : les voix que l'appli joue à ta place"><input type="checkbox" id="playBacking" checked> Voir l'accompagnement</label>
-      <span style="flex:1;"></span>
-      <button class="btn-sm" id="playSetupBtn" title="Rouvrir l'écran d'accueil (seul / à plusieurs · apprentissage)">⟲ Setup</button>
-    </div>
-    <!-- 5.4 : commandes basse de l'écran de jeu (spec de passe §5) — mêmes champs d'état
-         que secBass, synchro bidirectionnelle ; l'accord courant pulse sur les frappes. -->
-    <div class="play-bar play-bass" id="playBassGroup">
-      <label style="min-width:auto;">Basse :</label>
-      <label class="check"><input type="checkbox" id="playBassOn"> activer</label>
-      <select id="playBassDensity" style="width:auto;" aria-label="Densité de la basse">
-        <option value="1">1 — allégé</option>
-        <option value="2" selected>2 — normal</option>
-        <option value="3">3 — chargé</option>
-      </select>
-      <label class="check" title="Drop-outs : la basse se tait quelques mesures puis revient — garde le tempo pendant le silence"><input type="checkbox" id="playBassDrop"> silences (drop-outs)</label>
-      <span style="flex:1;"></span>
-      <span id="playBassChord" aria-live="polite">♪ —</span>
-    </div>
-    <div class="perc-line play-line" id="playLine"></div>
-    <div class="perc-line-legend" id="playLegend"></div>
-    <!-- chantier B : projection des frappes de ma ligne sur les paliers de l'instrument cible -->
-    <div class="finger-viz hide" id="fingerViz" aria-hidden="true"></div>
-    <div class="row hide" id="playHintRow" style="margin-bottom:0;">
-      <span class="hint" style="margin:0;" id="playHintTxt">Ma ligne n'est pas encore répartie.</span>
-      <button class="btn-sm primary" id="playDist1">Répartir selon priorités (1 joueur)</button>
-    </div>
-  </div>
-
-  <!-- 2 ter. Team Spirit -->
-  <details class="section" id="secTeam" data-strate="couche">
-    <summary><span class="sec-title">Team Spirit</span><span class="sec-sub">une ligne par personne · solo/muet · export</span></summary>
-    <div class="section-body">
-      <div class="row">
-        <label class="check"><input type="checkbox" id="tsOn"> Mode team spirit (répartir entre participants)</label>
-        <button class="btn-sm" id="tsAddPart">+ Participant</button>
-        <button class="btn-sm" id="tsAuto" title="Répartir les voix en équilibrant la charge de jeu (frappes) et les tessitures">Répartir auto</button>
-        <label class="check"><input type="checkbox" id="tsFinger"> Vérifier les doigtés</label>
-      </div>
-      <div id="tsParticipants" class="ts-parts"></div>
-      <div class="ts-wizbox">
-        <div class="row">
-          <label>Qui joue quoi ?</label>
-          <label for="tsWizN" style="min-width:auto;">Joueurs</label>
-          <input type="number" id="tsWizN" min="1" max="12" value="1" style="width:64px;">
-          <button class="btn-sm primary" id="tsWizRun">Répartir selon priorités</button>
-          <label class="check" title="L'accompagnement (backing track) : les voix que l'appli joue à ta place"><input type="checkbox" id="tsBacking" checked> Accompagnement (backing track) — l'app joue les lignes écartées</label>
-        </div>
-        <div class="hint" style="margin-top:4px;">Classe les lignes par priorité — glisse la poignée ⠿ pour
-        réordonner.
-        <details class="hint-more"><summary>En savoir plus</summary><span class="hm-body">Les premières sont garanties : chaque ligne est attribuée <b>entière ou pas du tout</b>,
-        deux mains par joueur (jamais plus de 2 frappes ni deux fois la même main au même instant). Cumuler des
-        instruments différents n'arrive qu'en dernier recours. Avec <b>1 joueur</b> : la combinaison de lignes
-        que tu peux tenir seul. Les lignes écartées passent en <b>backing track</b> si la case est cochée,
-        en sourdine sinon.</span></details></div>
-        <div id="tsRank" class="ts-rank"></div>
-        <div class="script-status" id="tsWizOut"></div>
-      </div>
-      <div id="tsFingerOut" class="script-status" style="white-space:pre-line;"></div>
-      <div class="row" style="margin-top:10px;">
-        <button class="btn-sm" id="tsExportAll">↓ Exporter tout (JSON)</button>
-        <button class="btn-sm" id="tsPrintBtn" title="Vue imprimable de la grille — imprime ou « Enregistrer en PDF »">🖨 Imprimer / PDF</button>
-        <button class="btn-sm" id="tsPngBtn" title="Image PNG de la grille (pupitre, partage)">↓ PNG</button>
-      </div>
-      <div class="hint">Charge d'abord un groove dans la section <b>Répertoire de grooves</b>, puis assigne
-      chaque voix à un participant — menu sur chaque voix du répertoire, ou <b>Répartir auto</b> qui équilibre
-      la charge de jeu (nombre de frappes) en mélangeant les tessitures.
-      <details class="hint-more"><summary>En savoir plus</summary><span class="hm-body">La carte de chacun affiche <b>sa ligne
-      rythmique</b> ; écoute la part de chacun (<b>solo</b>/<b>muet</b>) et exporte sa <b>ligne en JSON</b> pour
-      la travailler chez soi. <b>Vérifier les doigtés</b> signale quand une même main est demandée deux fois au
-      même instant pour un même participant (physiquement impossible).</span></details></div>
-    </div>
-  </details>
-
-  <!-- 3. Archet -->
-  <details class="section" id="secArchet" data-strate="archet">
-    <summary><span class="sec-title">Archet</span><span class="sec-sub">tirer · pousser · dérive</span></summary>
-    <div class="section-body">
-      <div class="row">
-        <label for="bowInstr">Instrument</label>
-        <select id="bowInstr" style="width:auto;">
-          <option value="violon" selected>Violon / Alto</option>
-          <option value="cello">Violoncelle</option>
-          <option value="cbfr">Contrebasse — archet français</option>
-          <option value="cbde">Contrebasse — archet allemand</option>
-        </select>
-        <label for="bowTech" style="min-width:auto;">Coup d'archet</label>
-        <select id="bowTech" style="width:auto;">
-          <option value="detache" selected>Détaché (vitesse constante)</option>
-          <option value="legato">Legato / liaisons (souple)</option>
-          <option value="martele">Martelé (mordant, arrêt net)</option>
-          <option value="spiccato">Spiccato (rebond)</option>
-        </select>
-      </div>
-      <div class="row">
-        <label for="bowPreset">Exercice</label>
-        <select id="bowPreset" style="flex:1;min-width:220px;">
-          <option value="debutant" selected>Débutant — chaque noire = archet complet</option>
-          <option value="det_noires">Détaché — noires (moitié d'archet)</option>
-          <option value="grand_det">Grand détaché — blanches (tout l'archet)</option>
-          <option value="det_croches">Détaché — croches au milieu</option>
-          <option value="liaison4">Liaisons — 4 croches par archet</option>
-          <option value="asym">Asymétrie — dérive vers la pointe (démo)</option>
-          <option value="asym_fix">Asymétrie corrigée — avec reprise</option>
-          <option value="martele_x">Martelé — noires</option>
-          <option value="spiccato_x">Spiccato — croches au point d'équilibre</option>
-        </select>
-      </div>
-      <div class="row">
-        <label for="bowSeqInput">Séquence (éditable)</label>
-        <input type="text" id="bowSeqInput" value="T92x1, P92x1" style="flex:1;min-width:220px;font-family:Consolas,Menlo,monospace;">
-        <button class="btn-sm" id="bowApply">Appliquer</button>
-        <button class="btn-sm primary" id="bowFsBtn">⛶ Plein écran</button>
-        <button class="btn-sm" id="bowPrintBtn" title="Vue imprimable de la séquence — imprime ou « Enregistrer en PDF »">🖨 Imprimer / PDF</button>
-        <button class="btn-sm" id="bowPngBtn" title="Image PNG de la séquence (pupitre)">↓ PNG</button>
-      </div>
-      <div class="lint-chips" role="group" aria-label="Insérer un jeton d'exemple">
-        <button class="btn-sm bow-chip" data-ins="T50x1">+ tiré 50 %</button>
-        <button class="btn-sm bow-chip" data-ins="P50x1">+ poussé 50 %</button>
-        <button class="btn-sm bow-chip" data-ins="Rx0.5">+ reprise</button>
-        <button class="btn-sm bow-chip" data-ins="T80x2n4">+ 4 notes liées</button>
-      </div>
-      <div class="script-status" id="bowLint" role="status" aria-live="polite"></div>
-      <div class="cv-wrap">
-        <canvas id="bowCv" width="760" height="150"></canvas>
-        <button class="btn-sm cv-fs-overlay" id="bowFsBtn2" title="Agrandir l'archet en plein écran">⛶</button>
-      </div>
-      <div class="script-status" id="bowStatus"></div>
-      <div class="hint" id="bowNote">Archet léger et agile — les coups rapides (spiccato, sautillé) vivent autour du point d'équilibre ◆.</div>
-      <div class="hint">Syntaxe : <code>T50x1</code> = tirer 50 % d'archet sur 1 temps
-      <details class="hint-more"><summary>En savoir plus</summary><span class="hm-body">
-      <ul>
-        <li><code>P20x0.5</code> = pousser 20 % sur une croche</li>
-        <li><code>Rx1</code> = reprise (retour au talon, archet levé)</li>
-        <li><code>n4</code> = 4 notes liées sur l'archet (<code>T80x2n4</code>).</li>
-      </ul>
-      Jauge : talon à gauche, pointe à droite. Si le curseur vire au rouge, la séquence te fait « manquer d'archet ».</span></details></div>
-    </div>
-  </details>
-
-  <!-- Parcours funk (P-4) : surcouche pédagogique, module 6 (niveau Intermédiaire) -->
-  <details class="section" id="secCours" data-strate="couche">
-    <summary><span class="sec-title">Cours funk</span><span class="sec-sub">parcours · plusieurs niveaux</span></summary>
-    <div class="section-body">
-      <div class="hint">Deux parcours parallèles — cajón et djembé. « Charger » installe l'accompagnement de basse de l'exercice ; tu joues par-dessus. Coche « acquis » quand le critère est atteint ; le vote de difficulté aide à recalibrer le niveau pour tout le monde.</div>
-      <div id="pfRoot"></div>
-      <div id="pfStatus" aria-live="polite"></div>
-    </div>
-  </details>
-
-<!-- ============ ARCHET PLEIN ÉCRAN ============ -->
-<div class="bowfs" id="bowFs">
-  <div class="bowfs-bar">
-    <div>
-      <div class="bowfs-title">Archet</div>
-      <div class="kicker" id="bowFsInstr">Violon / Alto</div>
-    </div>
-    <div class="bowfs-controls">
-      <span class="bowfs-tempo" id="bowFsTempo">92 BPM</span>
-      <button class="play" id="bowFsPlay">▶</button>
-      <button id="bowFsClose">✕ Fermer</button>
-    </div>
-  </div>
-  <canvas id="bowFsCv"></canvas>
-</div>
-
-<!-- ============ WIZARD ============ -->
-<div class="wiz-overlay" id="wizOverlay">
-  <div class="wiz">
-    <div class="kicker">Assistant de réglage</div>
-    <h2 id="wizTitle">Que veux-tu travailler ?</h2>
-    <div class="wiz-sub" id="wizSub">L'assistant règle le métronome pour toi — tu pourras tout ajuster ensuite.</div>
-    <div class="wiz-dots" id="wizDots"></div>
-    <div id="wizBody"></div>
-    <div class="wiz-nav">
-      <button class="btn-sm" id="wizBack">← Retour</button>
-      <div style="display:flex;gap:8px;">
-        <button class="btn-sm" id="wizSkip">Passer l'assistant</button>
-        <button class="btn-sm primary" id="wizNext">Continuer →</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ============ ÉCRAN D'ACCUEIL « JE JOUE » (passe 4.1) ============ -->
-<div class="wiz-overlay" id="playSetup">
-  <div class="wiz">
-    <div class="kicker">Écran d'accueil</div>
-    <h2>Prêt à jouer ?</h2>
-    <div class="wiz-sub">Deux choix — tout le reste s'ajuste ensuite derrière « Configurer ».</div>
-    <div class="wiz-sub" style="margin-bottom:8px;"><b>On joue…</b></div>
-    <div class="wiz-options" style="grid-template-columns:1fr 1fr;">
-      <button class="wiz-opt sel" id="psSolo"><b>Seul</b><small>toute la ligne jouable est à moi</small></button>
-      <button class="wiz-opt" id="psMulti"><b>À plusieurs</b><small>chacun sa ligne — même groove, même classement, même répartition sur chaque appareil</small></button>
-    </div>
-    <div class="row hide" id="psNRow" style="margin:10px 0 0;">
-      <label for="psN" style="min-width:auto;">Nombre de joueurs</label>
-      <input type="number" id="psN" min="2" max="12" value="2" style="width:72px;">
-    </div>
-    <div class="wiz-sub" style="margin:18px 0 8px;"><b>Apprentissage</b> (ajout progressif sur ma ligne)</div>
-    <div class="wiz-options" style="grid-template-columns:1fr 1fr;">
-      <button class="wiz-opt" id="psLearnYes"><b>Oui</b><small>ma ligne se construira frappe par frappe — choix mémorisé, l'exercice arrive à la prochaine étape</small></button>
-      <button class="wiz-opt sel" id="psLearnNo"><b>Non</b><small>je joue la ligne complète</small></button>
-    </div>
-    <div class="wiz-nav"><span></span><button class="btn-sm primary" id="psGo">C'est parti →</button></div>
-  </div>
-</div>
-
-</div>
+<!-- ============ R-4b — STUBS : le STRICT contrat moteur (annexe R-3a) ============
+     La duplication transitoire R-3b (surfaces d'index en stubs + coquille verbatim) est
+     DISSOUTE : écran de jeu, wizard, DSL pédagogique, accueil « je joue » sont RETIRÉS
+     de l'application (spec R-4 §9.4) ; l'archet vit sur index.html, le parcours sur
+     apprendre.html, Team Spirit et la bibliothèque sont désormais des surfaces VISIBLES
+     de cette page. Les deux éléments que moteur/*.js référence sans garde (stop() écrit
+     #percFsPlay, gapTargetRefresh() remplit #gapTarget) sont ici de VRAIS éléments
+     (percussion plein écran, section Horloge) : le div reste vide, garde-fou du patron. -->
+<div id="fmStubs" hidden aria-hidden="true"></div>
 
 <!-- Corpus de contenus (R-2) : un style = un fichier de données (schéma spec R-1 §4.1).
      Chargés AVANT le script principal ; la coquille les assemble (FM_ASM). -->
@@ -2570,17 +2407,10 @@ swing 62
     };
   }
 
-  // ============ MODE SIMPLE / EXPERT ============
-  function setMode(m) {
-    document.body.classList.toggle('mode-simple', m === 'simple');
-    $('modeSimpleBtn').classList.toggle('sel', m === 'simple');
-    $('modeExpertBtn').classList.toggle('sel', m === 'expert');
-    store.set('fm-metro-mode', m);
-    // écran de jeu (4.1) : le mode simple recomposé — rafraîchi à l'entrée
-    if (m === 'simple' && typeof playLineRender === 'function') playLineRender();
-  }
-  $('modeSimpleBtn').addEventListener('click', () => setMode('simple'));
-  $('modeExpertBtn').addEventListener('click', () => setMode('expert'));
+  // ============ MODE SIMPLE / EXPERT — RETIRÉ (R-4b) ============
+  // L'écran de jeu et le mode « ▶ Jouer » sont retirés de l'application (spec R-4 §9.4) :
+  // cette page est la pratique libre, toujours en mise en page complète. Le réglage
+  // partagé fm-metro-mode n'est plus ni lu ni écrit ici.
 
   // ============ CONTEXTE (masquage par strate) ============
   // 'pile'  : pile rythmique — couches (clave, perc) visibles, Archet masqué
@@ -2860,13 +2690,7 @@ swing 62
       if (lc) { lc.style.display = 'block'; lc.style.left = ((phase < 0 ? 0 : phase) * 100) + '%'; }
       $('percLine').classList.toggle('break-now', S.perc.on && percBreakActive);
     }
-    // curseur de l'écran de jeu (4.1) — même phase, même motif
-    if (document.body.classList.contains('mode-simple')) {
-      const pc = $('playLine') && $('playLine').querySelector('.pl-cursor');
-      if (pc) { pc.style.display = 'block'; pc.style.left = ((phase < 0 ? 0 : phase) * 100) + '%'; }
-      bassPulseCheck(phase < 0 ? 0 : phase);   // 5.4 : témoin d'activité basse
-      fingerVizCursor(phase < 0 ? 0 : phase);  // chantier B 0.6.1 : curseur temps réel
-    }
+    // R-4b (pratiquer) : plus de curseur d'écran de jeu ni d'encart fingerViz (retirés §9.4)
     statusLineSet(mutedThisCycle
       ? '<span class="mute">' + (S.gap.target === 'all'
           ? fmTr('● COUPÉ — tiens le tempo !')
@@ -2877,10 +2701,7 @@ swing 62
         : (S.perc.on && percBreakEchoNow
           ? '<span class="mute">' + fmTr('◆ À toi — rejoue le break !') + '</span>'
           : fmTr('Mesure') + ' ' + measureCount + (S.gap.mode !== 'off' ? ' · ' + fmTr('gap actif') : ''))));
-    if ($('secArchet').open) {
-      const beatsNow = totalBeats + Math.max(0, audioCtx.currentTime - cycleStart) * S.tempo / 60;
-      drawBow(beatsNow);
-    }
+    // R-4b (pratiquer) : plus de jauge d'archet à animer — la section vit sur index.html
     if (PERF_HUD) {
       perfStats.frames++;
       const nowP = performance.now();
@@ -2898,10 +2719,8 @@ swing 62
     const lc = $('percLine') && $('percLine').querySelector('.pl-cursor');
     if (lc) lc.style.display = 'none';
     if ($('percLine')) $('percLine').classList.remove('break-now');
-    const pc = $('playLine') && $('playLine').querySelector('.pl-cursor');
-    if (pc) pc.style.display = 'none';
-    document.querySelectorAll('#fingerViz .fv-cursor').forEach(c => c.style.display = 'none');
-    drawBowStatic();
+    // R-4b (pratiquer) : écran de jeu (playLine/fingerViz) et archet retirés — plus de
+    // curseurs à éteindre ici, ni de jauge d'archet à redessiner.
   }
 
   // ============ CLAVE MULTI-VOIX (passe 2, étape 3) ============
@@ -2912,7 +2731,7 @@ swing 62
     { id: 'claveAigue', label: 'Clave aiguë', timbre: 'cloche', freq: 2200, rank: 3 }
   ];
   // source de vérité des grilles clave — survit aux reconstructions de percGrids
-  // déclenchées par percSetInstr / applyPercStyle / percLoadPreset / applyKitProfile
+  // déclenchées par percSetInstr / applyPercStyle / percLoadPreset
   const claveData = {};
   CLAVE_VOICES.forEach(v => claveData[v.id] = {
     grid: new Array(16).fill(0), offsets: new Array(16).fill(0), muted: false
@@ -3809,19 +3628,10 @@ swing 62
       palier: function (rank, T) { return voicePalier(rank, T == null ? instrTiers(S.perc.instr) : T); },
       labels: function (instr) { const i = instr == null ? S.perc.instr : instr, T = instrTiers(i); return Array.from({ length: T }, (_, t) => palierLabel(i, t, T)); },
       rankOf: function (id) { const v = plVoiceList().find(x => x.id === id); return v ? v.rank : null; },
-      // projection courante de MA ligne sur les paliers de l'instrument focal.
-      mapping: function () {
-        const instr = S.perc.instr, T = instrTiers(instr), m = playMine();
-        const voices = [];
-        plVoiceList().forEach(v => {
-          if (!m.ids[v.id] || !audible(v.id)) return;
-          const g = percGrids[v.id]; if (!g) return;
-          const hits = [];
-          for (let i = 0; i < g.length; i++) if (g[i]) hits.push({ i: i, frac: i / g.length, acc: g[i] === 2 });
-          if (hits.length) voices.push({ id: v.id, rank: v.rank, palier: voicePalier(v.rank, T), hits: hits });
-        });
-        return { instr: instr, tiers: T, voices: voices };
-      },
+      // R-4b : plus de « mapping » — la projection de MA ligne alimentait l'encart
+      // fingerViz de l'écran de jeu (retiré §9.4). Les tables de paliers (tiers/
+      // palier/labels) et le rang (chantier A, consommé par « Répartir auto »)
+      // restent la couche de données, reprise possible par equipe.html (R-6).
       build: BUILD,
       // 0.7.0 (recette atelier & exports) : hooks en lecture seule / purs
       v070: {
@@ -3832,11 +3642,10 @@ swing 62
         statusLineSet: statusLineSet,
         statusLineWrites: function () { return statusLineWrites; },
         parseScript: parseScript,
-        parseBowSeq: parseBowSeq,
+        // R-4b (pratiquer) : les hooks archet (parseBowSeq, bowPrintableHTML,
+        // bowSeqCanvas) vivent sur index.html — l'archet a quitté cette page.
         tsPrintableHTML: tsPrintableHTML,
-        tsGridCanvas: tsGridCanvas,
-        bowPrintableHTML: bowPrintableHTML,
-        bowSeqCanvas: bowSeqCanvas
+        tsGridCanvas: tsGridCanvas
       }
     };
   };
@@ -3900,7 +3709,7 @@ swing 62
       if (!g || !audible(v.id) || !g.some(x => x > 0)) return '';
       return '<span><span class="chip" style="background:' + v.color + '"></span>' + v.label + '</span>';
     }).join('');
-    playLineRender();   // écran de jeu (4.1) : même chemin de mise à jour que la réduction
+    // R-4b (pratiquer) : plus d'écran de jeu à rafraîchir (retiré §9.4)
   }
 
   // ---- divulgation progressive : le mode d'exercice pilote les contrôles visibles ----
@@ -4079,144 +3888,6 @@ swing 62
   });
   $('percBreakEcho').addEventListener('change', e => S.perc.breakEcho = e.target.checked);
 
-  // ============ DSL PÉDAGOGIQUE — MOTEUR DE RÈGLES (passe 2, étape 2) ============
-  // Générateur embarqué, zéro IA / zéro DOM / zéro réseau. Le questionnaire (wizard)
-  // fournit des réponses ; buildKitProfile() en dérive un profil de kit conforme au
-  // schéma normatif de la spec passe 2 (§2) ; applyKitProfile() le pose sur l'état vivant
-  // par le même chemin que les presets — le moteur audio n'est pas touché à cette étape.
-
-  // objectif de compétence × niveau → paramètres de génération (dynamique déjà en
-  // nomenclature normative : accentuee | progressive — arbitrage spec §7.2).
-  const RULES_TABLE = {
-    separation: {
-      debutant:      { mode: 'guide', period: 4, voiceCount: 2, dynamics: 'accentuee',  handRuleDefault: 'alt' },
-      intermediaire: { mode: 'guide', period: 2, voiceCount: 2, dynamics: 'accentuee',  handRuleDefault: 'alt' },
-      avance:        { mode: 'add',   period: 2, voiceCount: 3, dynamics: 'progressive', handRuleDefault: 'lead' }
-    },
-    independance: {
-      debutant:      { mode: 'guide', period: 4, voiceCount: 2, dynamics: 'accentuee',  handRuleDefault: 'alt' },
-      intermediaire: { mode: 'add',   period: 2, voiceCount: 3, dynamics: 'accentuee',  handRuleDefault: 'alt' },
-      avance:        { mode: 'call',  period: 2, voiceCount: 3, dynamics: 'progressive', handRuleDefault: 'lead' }
-    },
-    dynamique: {
-      debutant:      { mode: 'off',   period: 4, voiceCount: 2, dynamics: 'accentuee',  handRuleDefault: 'alt' },
-      intermediaire: { mode: 'sub',   period: 2, voiceCount: 2, dynamics: 'accentuee',  handRuleDefault: 'alt' },
-      avance:        { mode: 'break', period: 4, voiceCount: 3, dynamics: 'progressive', handRuleDefault: 'lead' }
-    },
-    regularite: {
-      debutant:      { mode: 'off',   period: 8, voiceCount: 1, dynamics: 'accentuee',  handRuleDefault: 'alt' },
-      intermediaire: { mode: 'off',   period: 4, voiceCount: 2, dynamics: 'accentuee',  handRuleDefault: 'alt' },
-      avance:        { mode: 'sub',   period: 2, voiceCount: 3, dynamics: 'progressive', handRuleDefault: 'lead' }
-    }
-  };
-  const SUBDIV_TABLE = { binaire: { count: 16 }, ternaire: { count: 12 } };
-
-  // rôle indicatif (spec §3) : basse→basse, cloche/dundunba→timekeeper, sinon medium.
-  function kitRoleForVoice(vid) {
-    if (vid === 'basse') return 'basse';
-    if (vid === 'cloche' || vid === 'dundunba') return 'timekeeper';
-    return 'medium';
-  }
-
-  // buildKitProfile(answers) — fonction pure et déterministe. Défauts sur toute réponse
-  // manquante/invalide. Sortie = profil de kit normatif (voir spec passe 2 §2).
-  function buildKitProfile(answers) {
-    const a = answers || {};
-    const objectif = RULES_TABLE[a.objectif] ? a.objectif : 'regularite';
-    const niveau = RULES_TABLE[objectif][a.niveau] ? a.niveau : 'debutant';
-    const subdivision = SUBDIV_TABLE[a.subdivision] ? a.subdivision : 'binaire';
-    const instrument = PERC_INSTR[a.instrument] ? a.instrument : 'djembe';
-
-    const rule = RULES_TABLE[objectif][niveau];
-    const count = SUBDIV_TABLE[subdivision].count;
-    const family = count === 12 ? 'tern' : 'bin';
-    const def = PERC_INSTR[instrument];
-    const base = def.base[count] || def.base[16];
-
-    // latéralité : override utilisateur prioritaire sur la valeur par défaut de la règle
-    let handRule = rule.handRuleDefault, lefty = false;
-    if (a.lateralite === 'gaucher') lefty = true;
-    else if (a.lateralite === 'alternance') handRule = 'alt';
-    else if (a.lateralite === 'droitier') lefty = false;
-
-    const period = (Number.isInteger(a.periodOverride) && a.periodOverride > 0)
-      ? Math.min(16, a.periodOverride) : rule.period;
-    const dynamics = (a.dynamicsOverride === 'accentuee' || a.dynamicsOverride === 'progressive')
-      ? a.dynamicsOverride : rule.dynamics;
-
-    const keptN = Math.max(1, Math.min(rule.voiceCount, def.voices.length));
-    const accentStep = Math.max(1, Math.round(count / 4)); // 4 (bin) / 3 (tern) = les temps
-
-    const voices = def.voices.map((v, idx) => {
-      const grid = new Array(count).fill(0);
-      (base[v.id] || []).forEach(s => { if (s >= 0 && s < count) grid[s] = 1; });
-      // dynamique « accentuée » : les frappes sur les temps deviennent des accents.
-      // « progressive » = rampe multi-mesures → différée (pas de rendu statique), grille neutre.
-      if (dynamics === 'accentuee') {
-        for (let i = 0; i < count; i += accentStep) if (grid[i] === 1) grid[i] = 2;
-      }
-      return {
-        id: v.id, label: v.label, timbre: v.id, freq: null,
-        role: kitRoleForVoice(v.id),
-        grid: grid,
-        offsets: new Array(count).fill(0),
-        muted: idx >= keptN
-      };
-    });
-
-    return {
-      kitId: objectif + '-' + niveau + '-' + instrument,
-      label: def.label + ' · ' + objectif,
-      family: family, count: count,
-      voices: voices,
-      handRule: handRule, lefty: lefty,
-      meta: { objectif: objectif, niveau: niveau },
-      gen: {
-        mode: rule.mode, period: period, density: 0.4,
-        targetHandOrVoice: 'all', dynamics: dynamics,
-        regularity: 0.0, anchors: {}, startNote: ''
-      }
-    };
-  }
-
-  // applyKitProfile(profile, instr) — pose le profil sur l'état vivant. Réutilise le
-  // chemin des presets : setFamily aligne clave+perc, percSetInstr bâtit le squelette,
-  // puis les grilles/mutes/paramètres du profil font foi. Ne touche pas au moteur audio.
-  function applyKitProfile(profile, instr) {
-    instr = PERC_INSTR[instr] ? instr : 'djembe';
-    S.perc.instr = instr;
-    $('percInstr').value = instr;
-    setFamily(profile.family);                 // aligne clave + perc, rebâtit les rangées
-    S.perc.count = profile.count;
-    $('percCount').value = String(profile.count);
-
-    percGrids = {}; percOffsets = {}; percMuted = {};
-    profile.voices.forEach(v => {
-      percGrids[v.id] = v.grid.slice();
-      percOffsets[v.id] = (v.offsets && v.offsets.slice()) || new Array(profile.count).fill(0);
-      percMuted[v.id] = !!v.muted;
-    });
-
-    percWork = profile.gen.targetHandOrVoice || 'all';
-    S.perc.mode = profile.gen.mode;       $('percMode').value = profile.gen.mode;
-    S.perc.period = profile.gen.period;   $('percPeriod').value = profile.gen.period;
-    S.perc.handRule = profile.handRule;   $('percHandRule').value = profile.handRule;
-    S.perc.lefty = profile.lefty;         $('percLefty').checked = profile.lefty;
-    S.perc.on = true;                     $('percOn').checked = true;
-
-    percAdded = []; percMeasures = 0; percCallSilent = false;
-    percGuide = null; percStyleCur = null;
-    percResetBreakState();
-    buildPercGrids();                          // reconstruit les rangées (grilles + mutes)
-    percModeUI();
-    $('percWork').value = percWork;
-    if (S.perc.mode === 'guide') percGuideBuild();
-    // paramètres de génération non encore consommés par le moteur (densité, régularité,
-    // ancres, startNote, rampe « progressive ») : conservés pour les passes 3-4, sans invention.
-    S.perc.gen = profile.gen;
-    percStatusSet(fmTr('Kit généré :') + ' ' + profile.label + '.');
-    if (!isPlaying) drawStatic();
-  }
 
   // ---- plein écran percussion ----
   let percFsOpen = false;
@@ -4992,7 +4663,7 @@ swing 62
     } else { fout.innerHTML = ''; }
 
     tsRankRender();
-    playWhoRender();   // écran de jeu (4.1) : le sélecteur « Je suis » suit les participants
+    // R-4b (pratiquer) : plus de sélecteur « Je suis » (écran de jeu retiré §9.4)
     percLineRender();
     tsWire();
   }
@@ -5103,278 +4774,7 @@ swing 62
       .map(g => '<option value="' + g.id + '">' + tsEsc(g.label) + '</option>').join('');
   }
 
-  // ============ ÉCRAN DE JEU (passe 4, étape 4.1) ============
-  // Le mode simple recomposé : l'écran répond à « qui je suis » puis montre MA ligne
-  // en grand (briques pleine couleur, hauteur double, main D/G inscrite — doigté =
-  // tsHandsMerged, la phrase fusionnée du joueur) ; tout le reste, lignes écartées
-  // comprises, s'affiche en accompagnement atténué et masquable. L'AUDIO ne dépend
-  // jamais de cet affichage (backing/sourdine restent pilotés par tsMuted).
-  // Réutilisation stricte : tsWizDistribute (répartition déterministe),
-  // tsHandsMerged (doigté fusionné), plVoiceList (voix + couleurs), curseur existant.
 
-  function playSave() {
-    store.set('fm-metro-play', JSON.stringify(S.play));
-  }
-
-  // sélecteur « Je suis : Solo | Participant 1…N | Tous » — suit TS.participants ;
-  // un who orphelin (participant disparu) retombe sur Solo, de façon persistée.
-  function playWhoRender() {
-    const sel = $('playWho'); if (!sel) return;
-    let h = '<option value="solo">Solo</option>';
-    TS.participants.forEach(p => { h += '<option value="' + p.id + '">' + tsEsc(p.label) + '</option>'; });
-    if (TS.participants.length) h += '<option value="tous">Tous</option>';
-    sel.innerHTML = h;
-    if (!Array.prototype.some.call(sel.options, o => o.value === S.play.who)) {
-      S.play.who = 'solo'; playSave();
-    }
-    sel.value = S.play.who;
-    // 0.6.6 (C15) : à option unique (Solo), le sélecteur n'apporte rien — on le masque
-    const wrap = $('playWhoWrap');
-    if (wrap) wrap.style.display = sel.options.length > 1 ? 'inline-flex' : 'none';
-  }
-
-  // MES voix selon S.play.who : { ids: {voiceId:1}, hands: {voiceId: mains[]} }.
-  // - participant : ses voix, doigtées sur SA phrase fusionnée ;
-  // - solo : tout ce qui est assigné (= tout ce qui est jouable par un joueur une
-  //   fois la répartition à 1 joueur faite) ;
-  // - tous : toutes les voix non écartées, mains fusionnées par joueur (voix
-  //   communes : doigté par voix) ;
-  // - répertoire libre (pas de participants actifs) : toute la ligne est à moi ;
-  // - sans groove chargé : les voix audibles du focal (l'écran de jeu sert aussi
-  //   les grooves édités à la main).
-  function playMine() {
-    const who = S.play.who, ids = {}, hands = {};
-    if (TS.loaded && TS.on) {
-      if (who === 'tous') {
-        const merged = tsMergedMap();
-        TS.voices.forEach(v => {
-          if (v.dropped) return;   // écartée : personne ne la joue → accompagnement
-          ids[TS_PREFIX + v.gid] = 1;
-          hands[TS_PREFIX + v.gid] = merged[v.gid] || percHandsFor(v.grid);
-        });
-      } else {
-        const mine = (who !== 'solo' && TS.participants.some(p => p.id === who))
-          ? TS.voices.filter(v => v.participant === who)
-          : TS.voices.filter(v => v.participant != null);   // solo : tout l'assigné
-        const merged = tsHandsMerged(mine);
-        mine.forEach(v => { ids[TS_PREFIX + v.gid] = 1; hands[TS_PREFIX + v.gid] = merged[v.gid]; });
-      }
-    } else if (TS.loaded) {
-      // répertoire libre : tout audible, une seule personne joue → tout est à moi
-      const merged = tsHandsMerged(TS.voices);
-      TS.voices.forEach(v => { ids[TS_PREFIX + v.gid] = 1; hands[TS_PREFIX + v.gid] = merged[v.gid]; });
-    } else {
-      const def = PERC_INSTR[S.perc.instr];
-      const mine = def.voices
-        .filter(v => percGrids[v.id] && !percMuted[v.id] && percGrids[v.id].some(x => x > 0))
-        .map(v => ({ gid: v.id, grid: percGrids[v.id] }));
-      const merged = tsHandsMerged(mine);
-      mine.forEach(v => { ids[v.gid] = 1; hands[v.gid] = merged[v.gid]; });
-    }
-    return { ids, hands };
-  }
-
-  // rendu de l'écran de jeu — mêmes groupes de coïncidence que la ligne de réduction ;
-  // mes briques (hauteur double, main inscrite) s'empilent sous celles du backing.
-  function playLineRender() {
-    const line = $('playLine'), leg = $('playLegend');
-    if (!line) return;
-    line.querySelectorAll('.pl-brick, .pl-beat').forEach(e => e.remove());
-    if (!line.querySelector('.pl-cursor')) {
-      const cu = document.createElement('div'); cu.className = 'pl-cursor'; line.appendChild(cu);
-    }
-    for (let b = 0; b < S.beats; b++) {
-      const d = document.createElement('div'); d.className = 'pl-beat';
-      d.style.left = (b / S.beats * 100) + '%';
-      line.appendChild(d);
-    }
-    const m = playMine();
-    const voices = plVoiceList();
-    const audible = id => !percMuted[id] && !(typeof tsMuted === 'function' && tsMuted(id, false));
-    // lignes écartées : visibles en accompagnement même quand elles ne sonnent pas
-    const dropSet = {};
-    if (TS.loaded && TS.on) TS.voices.forEach(v => { if (v.dropped) dropSet[TS_PREFIX + v.gid] = 1; });
-    const groups = {};
-    voices.forEach(v => {
-      const g = percGrids[v.id];
-      if (!g) return;
-      const mine = !!m.ids[v.id];
-      if (!mine && !audible(v.id) && !dropSet[v.id]) return;   // backing = ce qui sonne + les écartées
-      const n = g.length;
-      for (let i = 0; i < n; i++) {
-        if (!g[i]) continue;
-        const key = Math.round(i / n * 4800);
-        (groups[key] = groups[key] || []).push({
-          v, mine, acc: g[i] === 2,
-          hand: mine ? ((m.hands[v.id] || [])[i] || '') : '',
-          off: (percOffsets[v.id] && percOffsets[v.id][i]) || 0,
-          w: 100 / n
-        });
-      }
-    });
-    for (const key in groups) {
-      // mes briques en bas (sur la ligne de base), l'accompagnement au-dessus
-      const arr = groups[key].slice().sort((a, b) => (b.mine ? 1 : 0) - (a.mine ? 1 : 0));
-      let bottom = 11;
-      arr.forEach(b => {
-        const el = document.createElement('div');
-        el.className = 'pl-brick' + (b.mine ? ' mine' : ' back') + (b.acc ? ' acc' : '');
-        el.style.left = (key / 48) + '%';
-        el.style.width = 'calc(' + b.w + '% - 2px)';
-        el.style.bottom = bottom + 'px';
-        el.style.background = b.v.color;
-        if (b.off) el.style.transform = 'translateX(' + (b.off * 100) + '%)';
-        if (b.mine && b.hand) el.textContent = b.hand;
-        line.appendChild(el);
-        bottom += b.mine ? 22 : 11;
-      });
-    }
-    // légende réduite à MES voix
-    if (leg) leg.innerHTML = voices.map(v => {
-      const g = percGrids[v.id];
-      if (!m.ids[v.id] || !g || !g.some(x => x > 0)) return '';
-      return '<span><span class="chip" style="background:' + v.color + '"></span>' + v.label + '</span>';
-    }).join('') || '<span>Ma ligne est vide — charge un groove (Configurer ▸ Répertoire) ou répartis les voix.</span>';
-    // proposition « Répartir selon priorités (1 joueur) » : solo, groove chargé,
-    // mais répartition absente ou faite pour plusieurs (spec §3.3, premier passage)
-    const need = TS.loaded && TS.on && S.play.who === 'solo' &&
-      (TS.participants.length !== 1 || !TS.voices.some(v => v.participant != null));
-    $('playHintRow').classList.toggle('hide', !need);
-    fingerVizRender();   // chantier B : même chemin de mise à jour que la ligne de jeu
-  }
-
-  // ---- encart fingerViz (chantier B) : MA ligne projetée sur les paliers de
-  //      l'instrument cible (focal), grave en bas → aigu en haut. Statique v1,
-  //      rafraîchi par playLineRender. La basse funk n'y entre jamais (instrument
-  //      de référence, jamais imité) : elle n'est pas dans plVoiceList/percGrids.
-  function fingerVizRender() {
-    const box = $('fingerViz');
-    if (!box) return;
-    const instr = S.perc.instr, T = instrTiers(instr);
-    const m = playMine();
-    const audible = id => !percMuted[id] && !(typeof tsMuted === 'function' && tsMuted(id, false));
-    const lanes = Array.from({ length: T }, () => []);
-    plVoiceList().forEach(v => {
-      if (!m.ids[v.id] || !audible(v.id)) return;   // seulement ce que l'élève joue
-      const g = percGrids[v.id]; if (!g) return;
-      const t = voicePalier(v.rank, T);              // OPTION A : clamp absolu
-      const n = g.length;
-      for (let i = 0; i < n; i++) if (g[i]) lanes[t].push({ frac: i / n, acc: g[i] === 2, color: v.color });
-    });
-    let html = '';
-    for (let t = T - 1; t >= 0; t--) {               // aigu en haut, grave en bas
-      let track = '';
-      lanes[t].forEach(h => {
-        track += '<i class="fv-hit' + (h.acc ? ' acc' : '') + '" style="left:' + (h.frac * 100) + '%;background:' + h.color + '"></i>';
-      });
-      html += '<div class="fv-lane' + (lanes[t].length ? '' : ' empty') + '">' +
-              '<span class="fv-label">' + palierLabel(instr, t, T) + '</span>' +
-              '<div class="fv-track">' + track + '<i class="fv-cursor"></i></div></div>';
-    }
-    box.innerHTML = html;
-    box.classList.toggle('hide', !lanes.some(l => l.length));   // rien à montrer → masqué
-  }
-  // chantier B (finition 0.6.1) : curseur temps réel, piloté par draw() avec la même
-  // phase que #playLine. frac des pastilles (i/n) et phase partagent le repère mesure ;
-  // un curseur par piste (toutes démarrent au même x, libellés ≤ 70 px) → ligne continue.
-  function fingerVizCursor(phase) {
-    const box = $('fingerViz');
-    if (!box) return;
-    const show = !box.classList.contains('hide');
-    box.querySelectorAll('.fv-cursor').forEach(c => {
-      c.style.display = show ? 'block' : 'none';
-      if (show) c.style.left = (phase * 100) + '%';
-    });
-  }
-  // Couche d'action de recette (distincte du hook de diagnostic lecture seule
-  // fmMetroReg) : pilote le curseur headless comme draw() le ferait en jeu.
-  window.fmMetroFvCursor = fingerVizCursor;
-
-  // ---- écran d'accueil (setup) : 2 choix, mémorisés (fm-metro-play) ----
-  let psMulti = false, psLearn = false;
-  function playSetupSync() {
-    $('psSolo').classList.toggle('sel', !psMulti);
-    $('psMulti').classList.toggle('sel', psMulti);
-    $('psNRow').classList.toggle('hide', !psMulti);
-    $('psLearnYes').classList.toggle('sel', psLearn);
-    $('psLearnNo').classList.toggle('sel', !psLearn);
-  }
-  function openPlaySetup() {
-    psMulti = S.play.n > 1;
-    psLearn = S.play.learn;
-    $('psN').value = String(Math.max(2, S.play.n));
-    playSetupSync();
-    $('playSetup').classList.add('open');
-  }
-  function closePlaySetup() { $('playSetup').classList.remove('open'); }
-  function applyPlaySetup() {
-    S.play.n = psMulti ? Math.max(2, Math.min(12, parseInt($('psN').value, 10) || 2)) : 1;
-    S.play.learn = psLearn;
-    S.play.learnPaused = false;
-    $('tsWizN').value = String(S.play.n);
-    if (TS.loaded) {
-      // groove chargé : répartition immédiate — déterministe, donc identique sur
-      // chaque appareil qui indique le même groove, le même N et le même classement.
-      tsWizDistribute();
-    } else {
-      // pas de groove : on prépare les participants pour le sélecteur « Je suis »
-      while (TS.participants.length < S.play.n) tsAddParticipantSilent();
-      while (TS.participants.length > S.play.n) {
-        const p = TS.participants.pop();
-        TS.voices.forEach(v => { if (v.participant === p.id) v.participant = null; });
-      }
-      tsRefresh();
-    }
-    S.play.who = (psMulti && TS.participants.length) ? TS.participants[0].id : 'solo';
-    playSave();
-    playWhoRender();
-    closePlaySetup();
-    setMode('simple');
-    if (!isPlaying) drawStatic();
-  }
-
-  // restauration au chargement : état sauvegardé → écran de jeu ; sinon → accueil.
-  function playRestore() {
-    let saved = null;
-    try { saved = JSON.parse(store.get('fm-metro-play') || 'null'); } catch (e) {}
-    if (!saved) { openPlaySetup(); return; }
-    S.play.who = saved.who || 'solo';
-    S.play.learn = !!saved.learn;
-    S.play.learnPaused = !!saved.learnPaused;
-    S.play.n = Math.max(1, Math.min(12, parseInt(saved.n, 10) || 1));
-    S.play.showBacking = saved.showBacking !== false;
-    $('playBacking').checked = S.play.showBacking;
-    $('playScreen').classList.toggle('no-back', !S.play.showBacking);
-    $('tsWizN').value = String(S.play.n);
-    // les participants renaissent déterministes (p1…pN) — la répartition, elle,
-    // se refait en rechargeant le même groove (tsWizDistribute est déterministe).
-    while (TS.participants.length < S.play.n) tsAddParticipantSilent();
-    tsRefresh();   // rafraîchit sélecteur + écran de jeu (playWhoRender coerce si besoin)
-  }
-
-  $('playWho').addEventListener('change', e => {
-    S.play.who = e.target.value; playSave(); playLineRender();
-  });
-  $('playBacking').addEventListener('change', e => {
-    S.play.showBacking = e.target.checked;
-    $('playScreen').classList.toggle('no-back', !S.play.showBacking);
-    playSave();
-  });
-  $('playSetupBtn').addEventListener('click', openPlaySetup);
-  $('playDist1').addEventListener('click', () => {
-    $('tsWizN').value = '1';
-    S.play.n = 1; playSave();
-    tsWizDistribute();
-  });
-  $('psSolo').addEventListener('click', () => { psMulti = false; playSetupSync(); });
-  $('psMulti').addEventListener('click', () => { psMulti = true; playSetupSync(); });
-  $('psLearnYes').addEventListener('click', () => { psLearn = true; playSetupSync(); });
-  $('psLearnNo').addEventListener('click', () => { psLearn = false; playSetupSync(); });
-  $('psGo').addEventListener('click', applyPlaySetup);
-  $('playSetup').addEventListener('click', e => {
-    // fermer sans valider n'est permis que si un état existe déjà (sinon premier lancement)
-    if (e.target === $('playSetup') && store.get('fm-metro-play')) closePlaySetup();
-  });
 
   // ============ TEMPO ============
   function nameOf(bpm) {
@@ -5512,10 +4912,8 @@ swing 62
   $('bassFeel').addEventListener('input', e => setBassFeel(e.target.value));
   $('bassFeelMinus').addEventListener('click', () => setBassFeel(S.bass.feelMs - 1));
   $('bassFeelPlus').addEventListener('click', () => setBassFeel(S.bass.feelMs + 1));
-  // 5.4 : écran de jeu — mêmes champs d'état, synchro miroir vers secBass
-  $('playBassOn').addEventListener('change', e => { S.bass.on = e.target.checked; $('bassOn').checked = S.bass.on; bassUpdateChordLabel(); bassPersist(); });
-  $('playBassDensity').addEventListener('change', e => { S.bass.density = +e.target.value; $('bassDensity').value = String(S.bass.density); bassPersist(); });
-  $('playBassDrop').addEventListener('change', e => { S.bass.drop.on = e.target.checked; $('bassDropOn').checked = S.bass.drop.on; bassPersist(); });
+  // R-4b (pratiquer) : plus de groupe basse d'écran de jeu à synchroniser (retiré §9.4) —
+  // secBass est la seule surface basse de la page.
 
   $('pulseFreq').addEventListener('input', e => {
     S.sound.pulseFreq = +e.target.value; $('pulseFreqVal').textContent = S.sound.pulseFreq + ' Hz';
@@ -5543,7 +4941,7 @@ swing 62
   // ---- lint en direct des syntaxes expertes (0.7.0, C14 — L1/L2/L3/L4) ----
   // Lecture seule : le lint n'exécute rien et ne touche pas l'état du métronome.
   const SCRIPT_LINT_HELP = '80bpm 5min · 80->120bpm 10min · gap 2/16 · gap off · swing 62';
-  const BOW_LINT_HELP = 'T50x1 · P20x0.5 · Rx0.5 · T80x2n4';
+  // R-4b (pratiquer) : le lint archet (L2) vit sur index.html avec la section Archet.
   function scriptDurationEstimate(segs) {
     let s = 0, approx = false;
     segs.forEach(seg => {
@@ -5613,24 +5011,6 @@ swing 62
     const pre = $('scriptHl');
     if (pre) { pre.scrollTop = $('scriptArea').scrollTop; pre.scrollLeft = $('scriptArea').scrollLeft; }
   });
-  function bowLintRender() {
-    const el = $('bowLint'); if (!el) return;
-    const v = $('bowSeqInput').value;
-    if (!v.trim()) { el.textContent = ''; return; }
-    const res = parseBowSeq(v);
-    if (res.errors && res.errors.length) {
-      el.textContent = '✖ « ' + res.errors[0] + ' » — ' + fmTr('attendu :') + ' ' + BOW_LINT_HELP +
-        (res.errors.length > 1 ? ' — ' + (res.errors.length - 1) + ' ' + fmTr('autre(s) jeton(s) en erreur') : '');
-    } else {
-      const beats = res.seq.reduce((a, st) => a + st.beats, 0);
-      el.textContent = '✔ ' + res.seq.length + ' ' + fmTr('pas') + ' · ' + beats + ' ' + fmTr('temps');
-    }
-  }
-  let bowLintT = null;
-  $('bowSeqInput').addEventListener('input', () => {
-    clearTimeout(bowLintT); bowLintT = setTimeout(bowLintRender, 300);
-  });
-  // L3 : insertion d'exemples — les hésitants partent d'une ligne qui marche.
   function scriptInsertExample(lineTxt) {
     const ta = $('scriptArea');
     const v = ta.value;
@@ -5647,29 +5027,13 @@ swing 62
   }
   document.querySelectorAll('.script-chip').forEach(b =>
     b.addEventListener('click', () => scriptInsertExample(b.dataset.ins)));
-  function bowInsertToken(tok) {
-    const inp = $('bowSeqInput');
-    const v = inp.value;
-    const s = inp.selectionStart != null ? inp.selectionStart : v.length;
-    const e = inp.selectionEnd != null ? inp.selectionEnd : s;
-    const before = v.slice(0, s), after = v.slice(e);
-    const ins = (before.trim() && !/[,\n]\s*$/.test(before) ? ', ' : '') + tok +
-      (after.trim() && !/^\s*[,\n]/.test(after) ? ', ' : '');
-    inp.value = before + ins + after;
-    inp.dispatchEvent(new Event('input', { bubbles: true }));
-    if (inp.focus) inp.focus();
-  }
-  document.querySelectorAll('.bow-chip').forEach(b =>
-    b.addEventListener('click', () => bowInsertToken(b.dataset.ins)));
   // premier rendu : l'exemple par défaut est valide, le lint l'affiche d'emblée
   hlSyncStyles();
   scriptLintRender();
-  bowLintRender();
 
   document.addEventListener('keydown', e => {
     const tag = e.target.tagName;
     if (tag === 'TEXTAREA' || tag === 'INPUT' || tag === 'SELECT') return;
-    if (e.key === 'Escape' && fsOpen) { closeBowFs(); return; }
     if (e.key === 'Escape' && percFsOpen) { closePercFs(); return; }
     if (e.key === 'Escape' && atelierOpen) { closeAtelier(); return; }
     if (e.code === 'Space') { e.preventDefault(); toggle(); }
@@ -5678,785 +5042,22 @@ swing 62
     else if (e.key === 't' || e.key === 'T') tap();
   });
 
-  // ============ ARCHET ============
-  const INSTR = {
-    violon: { label: 'Violon / Alto', bal: 0.34, power: 0,
-      note: 'Archet léger et agile — les coups rapides (spiccato, sautillé) vivent autour du point d\'équilibre ◆.' },
-    cello:  { label: 'Violoncelle', bal: 0.32, power: 0.25,
-      note: 'Plus de poids nécessaire, inertie de la corde plus grande au démarrage : soigne l\'accroche au début de chaque tiré.' },
-    cbfr:   { label: 'Contrebasse — archet français', bal: 0.30, power: 0.33,
-      note: 'Poids et engagement de l\'épaule ; l\'accroche de la corde est cruciale. Zone de puissance au talon (ombrée).' },
-    cbde:   { label: 'Contrebasse — archet allemand', bal: 0.28, power: 0.33,
-      note: 'Tenue par en dessous : grande puissance au talon (zone ombrée), gestion de la pointe plus exigeante.' }
-  };
-
-  const BOW_PRESETS = {
-    debutant:   { label: 'Débutant — chaque noire = archet complet', seq: 'T92x1, P92x1', tech: 'detache' },
-    det_noires: { label: 'Détaché — noires (moitié d\'archet)', seq: 'T50x1, P50x1', tech: 'detache' },
-    grand_det:  { label: 'Grand détaché — blanches (tout l\'archet)', seq: 'T90x2, P90x2', tech: 'detache' },
-    det_croches:{ label: 'Détaché — croches au milieu', seq: 'T25x0.5, P25x0.5', tech: 'detache' },
-    liaison4:   { label: 'Liaisons — 4 croches par archet', seq: 'T80x2n4, P80x2n4', tech: 'legato' },
-    asym:       { label: 'Asymétrie — dérive (démo)', seq: 'T50x1.5, P20x0.5', tech: 'detache' },
-    asym_fix:   { label: 'Asymétrie corrigée — reprise', seq: 'T50x1.5, P20x0.5, T45x1.5, Rx0.5', tech: 'detache' },
-    martele_x:  { label: 'Martelé — noires', seq: 'T40x1, P40x1', tech: 'martele' },
-    spiccato_x: { label: 'Spiccato — croches au point d\'équilibre', seq: 'T10x0.5, P10x0.5', tech: 'spiccato' }
-  };
-
-  let bowSeq = [], bowTech = 'detache', bowInstr = 'violon';
-  let bowIdx = 0, bowStepStart = 0, bowPos0 = 0;
-
-  // L2 0.7.0 (C14) : comme parseScript, le parseur collecte TOUS les jetons fautifs
-  // (champ `errors`) ; `error` reste la première erreur bloquante (contrat bowCompile).
-  function parseBowSeq(text) {
-    const seq = [], errors = [];
-    for (const tok of text.split(/[,\n]+/)) {
-      const t = tok.trim();
-      if (!t) continue;
-      const m = t.match(/^([tpr])\s*(\d+)?\s*x\s*(\d+(?:[.,]\d+)?)\s*(?:n\s*(\d+))?$/i);
-      if (!m) { errors.push(t); continue; }
-      const kind = m[1].toLowerCase();
-      seq.push({
-        retake: kind === 'r',
-        dir: kind === 't' ? 1 : (kind === 'p' ? -1 : 0),
-        len: (m[2] ? +m[2] : 0) / 100,
-        beats: parseFloat(m[3].replace(',', '.')),
-        notes: m[4] ? Math.max(1, +m[4]) : 1
-      });
-    }
-    if (errors.length) return { error: 'Élément non reconnu : « ' + errors[0] + ' »', errors, seq };
-    if (!seq.length) return { error: 'Séquence vide.', errors, seq };
-    return { seq, errors };
-  }
-
-  function bowReset() {
-    bowIdx = 0; bowStepStart = 0;
-    bowPos0 = (bowTech === 'spiccato' && bowSeq.length) ? INSTR[bowInstr].bal : 0;
-  }
-
-  function bowCompile(showOk) {
-    const res = parseBowSeq($('bowSeqInput').value);
-    if (res.error) { $('bowStatus').textContent = '✖ ' + res.error; return false; }
-    bowSeq = res.seq;
-    bowReset();
-    if (showOk) $('bowStatus').textContent = '✔ Séquence chargée (' + bowSeq.length + ' pas).';
-    if (!isPlaying) drawBowStatic();
-    return true;
-  }
-
-  function applyBowPreset(name) {
-    const p = BOW_PRESETS[name];
-    if (!p) return;
-    $('bowSeqInput').value = p.seq;
-    bowTech = p.tech;
-    $('bowTech').value = p.tech;
-    $('bowPreset').value = name;
-    bowCompile(false);
-  }
-
-  // ---- exports élèves (0.7.0, C13 — E3) : la séquence d'archet sur un pupitre ----
-  const BOW_TECH_LABELS = { detache: 'Détaché', legato: 'Legato / liaisons', martele: 'Martelé', spiccato: 'Spiccato' };
-  // rejoue la machine à pas (même logique que bowStateAt) pour obtenir départ/arrivée de chaque jeton
-  function bowSeqTrace(seq) {
-    let pos = (bowTech === 'spiccato' && seq.length) ? INSTR[bowInstr].bal : 0;
-    return seq.map(st => {
-      const from = pos;
-      let to;
-      if (st.retake) { to = 0.05; pos = 0.05; }
-      else if (bowTech === 'spiccato') { to = INSTR[bowInstr].bal; pos = to; }
-      else { to = Math.min(1, Math.max(0, pos + st.dir * st.len)); pos = to; }
-      return { st, from, to };
-    });
-  }
-  function bowTokenText(st) {
-    if (st.retake) return fmTr('reprise (retour au talon, archet levé)') + ' — ' + st.beats + ' ' + fmTr('temps');
-    return (st.dir > 0 ? fmTr('tiré') : fmTr('poussé')) + ' ' + Math.round(st.len * 100) + ' % — ' +
-      st.beats + ' ' + fmTr('temps') + (st.notes > 1 ? ' — ' + st.notes + ' ' + fmTr('notes liées') : '');
-  }
-  function bowPrintableHTML() {
-    const res = parseBowSeq($('bowSeqInput').value);
-    if (res.error) return '';
-    const trace = bowSeqTrace(res.seq);
-    let h = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>' + fmTr('Coup d\'archet') +
-      '</title><style>' + fmPrintCss() +
-      '.bar{position:relative;height:22px;border:1px solid #000;margin:4px 0 14px;}' +
-      '.seg{position:absolute;top:0;bottom:0;background:#bbb;border:1px solid #000;}' +
-      '.tok{font-family:Consolas,Menlo,monospace;font-size:13px;}' +
-      '</style></head><body>';
-    h += '<h1>' + fmTr('Coup d\'archet') + '</h1>';
-    h += '<div class="meta">' + tsEsc(INSTR[bowInstr].label) + ' · ' + tsEsc(fmTr(BOW_TECH_LABELS[bowTech] || bowTech)) +
-      ' · <span class="tok">' + tsEsc($('bowSeqInput').value) + '</span></div>';
-    trace.forEach((t, i) => {
-      h += '<div class="voice"><b>' + (i + 1) + '.</b> <span class="tok">' + tsEsc(tokenSrc(t.st)) + '</span> — ' +
-        tsEsc(bowTokenText(t.st)) + '</div>';
-      const l = Math.min(t.from, t.to) * 100, w = Math.max(2, Math.abs(t.to - t.from) * 100);
-      h += '<div class="bar"><div class="seg" style="left:' + l.toFixed(1) + '%;width:' + w.toFixed(1) + '%;"></div></div>';
-    });
-    h += '<div class="legend">' + fmTr('Jauge : talon à gauche, pointe à droite.') + ' T = ' + fmTr('tiré') +
-      ' · P = ' + fmTr('poussé') + ' · R = ' + fmTr('reprise') + '</div>';
-    h += '</body></html>';
-    return h;
-  }
-  function tokenSrc(st) {
-    if (st.retake) return 'Rx' + st.beats;
-    return (st.dir > 0 ? 'T' : 'P') + Math.round(st.len * 100) + 'x' + st.beats + (st.notes > 1 ? 'n' + st.notes : '');
-  }
-  function bowSeqCanvas() {
-    const res = parseBowSeq($('bowSeqInput').value);
-    if (res.error) return null;
-    const trace = bowSeqTrace(res.seq);
-    const W = 1600, PADX = 40, TITLEH = 110, ROWH = 92, LEGH = 70;
-    const H = TITLEH + trace.length * ROWH + LEGH;
-    const c = document.createElement('canvas'); c.width = W; c.height = H;
-    const x = c.getContext('2d');
-    if (!x) return null;
-    x.fillStyle = '#ffffff'; x.fillRect(0, 0, W, H);
-    x.fillStyle = '#1c1712'; x.font = 'bold 40px Georgia, serif';
-    x.fillText(fmTr('Coup d\'archet'), PADX, 56);
-    x.font = '24px Georgia, serif'; x.fillStyle = '#555';
-    x.fillText(fmTr(INSTR[bowInstr].label) + ' · ' + fmTr(BOW_TECH_LABELS[bowTech] || bowTech) + ' · ' + $('bowSeqInput').value, PADX, 92);
-    let y = TITLEH;
-    trace.forEach((t, i) => {
-      x.font = '22px Georgia, serif'; x.fillStyle = '#333';
-      x.fillText((i + 1) + '. ' + tokenSrc(t.st) + ' — ' + bowTokenText(t.st), PADX, y + 26);
-      const bx = PADX, bw = W - PADX * 2, by = y + 40, bh = 26;
-      x.strokeStyle = '#1c1712'; x.lineWidth = 2; x.strokeRect(bx, by, bw, bh);
-      const x0 = bx + t.from * bw, x1 = bx + t.to * bw;
-      x.fillStyle = t.st.retake ? '#999' : '#6b4a23';
-      x.fillRect(Math.min(x0, x1), by + 3, Math.max(4, Math.abs(x1 - x0)), bh - 6);
-      // pointe de flèche vers la destination
-      x.beginPath();
-      const dir = x1 >= x0 ? 1 : -1;
-      x.moveTo(x1, by + bh / 2); x.lineTo(x1 - dir * 14, by + 3); x.lineTo(x1 - dir * 14, by + bh - 3);
-      x.closePath(); x.fillStyle = '#1c1712'; x.fill();
-      y += ROWH;
-    });
-    x.font = '20px Georgia, serif'; x.fillStyle = '#555';
-    x.fillText(fmTr('Jauge : talon à gauche, pointe à droite.') + ' T = ' + fmTr('tiré') +
-      ' · P = ' + fmTr('poussé') + ' · R = ' + fmTr('reprise'), PADX, H - 28);
-    return c;
-  }
-  $('bowPrintBtn').addEventListener('click', () => {
-    const html = bowPrintableHTML();
-    if (!html) { $('bowStatus').textContent = '✖ ' + fmTr('Corrige d\'abord la séquence.'); return; }
-    fmPrintDoc(html);
-    $('bowStatus').textContent = fmTr('Vue imprimable ouverte — imprime ou « Enregistre en PDF ».');
-  });
-  $('bowPngBtn').addEventListener('click', () => {
-    const c = bowSeqCanvas();
-    if (!c) { $('bowStatus').textContent = '✖ ' + fmTr('Corrige d\'abord la séquence.'); return; }
-    fmDownloadDataURL(c.toDataURL('image/png'), 'archet-sequence.png');
-    $('bowStatus').textContent = fmTr('Séquence exportée en PNG.');
-  });
-
-  // avance la machine à états jusqu'au temps « beats » et calcule la position
-  function bowStateAt(beats) {
-    if (!bowSeq.length) return null;
-    let guard = 0;
-    while (guard++ < 128) {
-      const st = bowSeq[bowIdx];
-      if (beats < bowStepStart + st.beats) break;
-      if (st.retake) bowPos0 = 0.05;
-      else if (bowTech === 'spiccato') bowPos0 = INSTR[bowInstr].bal;
-      else bowPos0 = Math.min(1, Math.max(0, bowPos0 + st.dir * st.len));
-      bowStepStart += st.beats;
-      bowIdx = (bowIdx + 1) % bowSeq.length;
-    }
-    const st = bowSeq[bowIdx];
-    const p = Math.min(1, Math.max(0, (beats - bowStepStart) / st.beats));
-    let target, blocked = false, lifted = false, hop = 0, pos;
-    if (st.retake) {
-      target = 0.05; lifted = true;
-      const e = p * p * (3 - 2 * p);
-      pos = bowPos0 + (target - bowPos0) * e;
-      hop = Math.sin(p * Math.PI);
-    } else if (bowTech === 'spiccato') {
-      const bal = INSTR[bowInstr].bal;
-      pos = bal + st.dir * st.len * (p - 0.5);
-      hop = Math.abs(Math.sin(p * Math.PI));
-      target = pos;
-    } else {
-      const raw = bowPos0 + st.dir * st.len;
-      target = Math.min(1, Math.max(0, raw));
-      blocked = raw > 1.001 || raw < -0.001;
-      let e;
-      if (bowTech === 'legato') e = p * p * (3 - 2 * p);
-      else if (bowTech === 'martele') { const q = Math.min(1, p / 0.65); e = 1 - Math.pow(1 - q, 4); }
-      else e = p;
-      pos = bowPos0 + (target - bowPos0) * e;
-    }
-    return { st, p, pos, target, blocked, lifted, hop, from: bowPos0 };
-  }
-
-  // ---- rendu de la jauge d'archet ----
-  const bcv = $('bowCv'), bctx = bcv.getContext('2d');
-  bcv.width = 760 * DPR; bcv.height = 150 * DPR;
-  bcv.style.width = '100%'; bcv.style.maxWidth = '760px';
-  bctx.scale(DPR, DPR);
-
-  function renderBow(r) {
-    const c = bctx, W = 760, H = 150, x0 = 56, x1 = W - 40, tw = x1 - x0, y = 88;
-    const ins = INSTR[bowInstr];
-    c.clearRect(0, 0, W, H);
-    // zone de puissance (talon) pour les graves
-    if (ins.power > 0) {
-      c.globalAlpha = 0.12;
-      c.fillStyle = PAL.accent;
-      c.fillRect(x0, y - 16, tw * ins.power, 32);
-      c.globalAlpha = 1;
-    }
-    // mèche
-    c.fillStyle = PAL.panel2;
-    c.fillRect(x0, y - 5, tw, 10);
-    c.strokeStyle = PAL.line; c.lineWidth = 1;
-    c.strokeRect(x0, y - 5, tw, 10);
-    // baguette (courbe au-dessus)
-    c.beginPath();
-    c.moveTo(x0, y - 14);
-    c.quadraticCurveTo(x0 + tw / 2, y - 28, x1, y - 12);
-    c.strokeStyle = PAL.sub; c.lineWidth = 2; c.stroke();
-    // hausse (talon)
-    c.fillStyle = PAL.accent2;
-    c.fillRect(x0 - 13, y - 14, 11, 26);
-    // séparations des tiers + libellés
-    c.font = '600 9px "Work Sans", sans-serif';
-    c.fillStyle = PAL.sub;
-    c.textAlign = 'center'; c.textBaseline = 'top';
-    for (const f of [1/3, 2/3]) {
-      c.beginPath();
-      c.moveTo(x0 + tw * f, y - 8); c.lineTo(x0 + tw * f, y + 8);
-      c.strokeStyle = PAL.line; c.lineWidth = 1; c.stroke();
-    }
-    c.fillText('T A L O N', x0 + tw / 6, y + 14);
-    c.fillText('M I L I E U', x0 + tw / 2, y + 14);
-    c.fillText('P O I N T E', x0 + tw * 5 / 6, y + 14);
-    // point d'équilibre ◆
-    const bx = x0 + tw * ins.bal;
-    c.save();
-    c.translate(bx, y - 34);
-    c.rotate(Math.PI / 4);
-    c.fillStyle = PAL.accent;
-    c.fillRect(-4, -4, 8, 8);
-    c.restore();
-    c.fillStyle = PAL.sub;
-    c.fillText('équilibre', bx, y - 62);
-
-    if (!r) {
-      // état statique : curseur au talon
-      c.beginPath(); c.arc(x0, y, 9, 0, Math.PI * 2);
-      c.fillStyle = PAL.accent; c.fill();
-      c.strokeStyle = PAL.ink; c.lineWidth = 1.5; c.stroke();
-      c.fillStyle = PAL.sub; c.font = '12px "Work Sans", sans-serif';
-      c.fillText('Choisis un exercice, puis ▶ Démarrer', W / 2, y + 34);
-      return;
-    }
-
-    // trajet prévu du coup courant + notes liées
-    const fx = x0 + tw * r.from, tx = x0 + tw * r.target;
-    c.globalAlpha = 0.45;
-    c.beginPath(); c.moveTo(fx, y + 24); c.lineTo(tx, y + 24);
-    c.strokeStyle = PAL.accent; c.lineWidth = 3; c.stroke();
-    c.globalAlpha = 1;
-    if (r.st.notes > 1) {
-      for (let k = 0; k <= r.st.notes; k++) {
-        const nx = fx + (tx - fx) * k / r.st.notes;
-        c.beginPath(); c.arc(nx, y + 24, 2.5, 0, Math.PI * 2);
-        c.fillStyle = (k <= r.p * r.st.notes) ? PAL.accent2 : PAL.line;
-        c.fill();
-      }
-    }
-    // curseur (point de contact)
-    const cx = x0 + tw * Math.min(1, Math.max(0, r.pos));
-    const cy = y - r.hop * 26;
-    if (r.hop > 0.02) { // archet levé : lien pointillé vers la corde
-      c.setLineDash([3, 4]);
-      c.beginPath(); c.moveTo(cx, cy + 9); c.lineTo(cx, y);
-      c.strokeStyle = PAL.sub; c.lineWidth = 1; c.stroke();
-      c.setLineDash([]);
-    }
-    c.beginPath(); c.arc(cx, cy, 9, 0, Math.PI * 2);
-    c.fillStyle = r.blocked ? '#c0392b' : PAL.accent;
-    c.fill();
-    c.strokeStyle = PAL.ink; c.lineWidth = 1.5; c.stroke();
-    // direction + consommation
-    c.font = '600 12px "Work Sans", sans-serif';
-    c.fillStyle = r.blocked ? '#c0392b' : PAL.ink;
-    c.textBaseline = 'bottom';
-    const lbl = r.st.retake ? '↺ REPRISE'
-      : (r.st.dir === 1 ? '⊓ TIRÉ · ' + Math.round(r.st.len * 100) + ' %'
-                        : 'V POUSSÉ · ' + Math.round(r.st.len * 100) + ' %');
-    c.fillText(lbl, Math.min(Math.max(cx, x0 + 45), x1 - 45), cy - 14);
-    c.textBaseline = 'top';
-  }
-
-  function drawBow(beats) {
-    const r = bowStateAt(beats);
-    renderBow(r);
-    if (r) {
-      $('bowStatus').innerHTML = 'Pas ' + (bowIdx + 1) + '/' + bowSeq.length +
-        (r.blocked ? ' — <b style="color:#c0392b;">⚠ plus d\'archet ! Répartis autrement ou ajoute une reprise (Rx…)</b>' : '');
-    }
-  }
-
-  function drawBowStatic() { renderBow(null); }
-
-  $('bowInstr').addEventListener('change', e => {
-    bowInstr = e.target.value;
-    $('bowNote').textContent = INSTR[bowInstr].note;
-    if (bowTech === 'spiccato') bowReset();
-    if (!isPlaying) drawBowStatic();
-  });
-  $('bowTech').addEventListener('change', e => {
-    bowTech = e.target.value;
-    bowReset();
-    if (!isPlaying) drawBowStatic();
-  });
-  $('bowPreset').addEventListener('change', e => applyBowPreset(e.target.value));
-  $('bowApply').addEventListener('click', () => bowCompile(true));
-  $('bowSeqInput').addEventListener('change', () => bowCompile(true));
-  $('secArchet').addEventListener('toggle', () => {
-    if ($('secArchet').open && !isPlaying) drawBowStatic();
-  });
-
-  // ---- plein écran ----
-  const fsEl = $('bowFs'), fcv = $('bowFsCv'), fctx = fcv.getContext('2d');
-  let fsOpen = false, fsRaf = 0, fsW = 0, fsH = 0;
-
-  function sizeFs() {
-    fsW = fcv.clientWidth || window.innerWidth;
-    fsH = fcv.clientHeight || (window.innerHeight - 80);
-    fcv.width = fsW * DPR; fcv.height = fsH * DPR;
-    fctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-  }
-
-  // dessin réaliste de l'archet, grand format
-  function renderBowBig(r) {
-    const c = fctx, W = fsW, H = fsH;
-    c.clearRect(0, 0, W, H);
-    const ins = INSTR[bowInstr];
-    const x0 = W * 0.09, x1 = W * 0.91, tw = x1 - x0, y = H * 0.5;
-    const mh = Math.max(14, H * 0.035);          // épaisseur de la mèche
-    const lift = H * 0.16;                        // hauteur de levée (reprise/spiccato)
-
-    // zone de puissance (graves)
-    if (ins.power > 0) {
-      c.globalAlpha = 0.10;
-      c.fillStyle = PAL.accent;
-      c.fillRect(x0, y - mh * 2.4, tw * ins.power, mh * 4.8);
-      c.globalAlpha = 1;
-    }
-    // mèche (crins)
-    c.fillStyle = currentTheme() === 'sombre' ? '#e9e2d0' : '#fbf7ee';
-    c.fillRect(x0, y - mh / 2, tw, mh);
-    c.strokeStyle = PAL.line; c.lineWidth = 1;
-    c.strokeRect(x0, y - mh / 2, tw, mh);
-    // baguette galbée (bois), épaisse au talon, fine à la pointe
-    c.beginPath();
-    c.moveTo(x0 - 4, y - mh / 2 - mh * 0.9);
-    c.quadraticCurveTo(x0 + tw * 0.5, y - mh / 2 - mh * 2.4, x1, y - mh / 2 - mh * 0.55);
-    c.quadraticCurveTo(x0 + tw * 0.5, y - mh / 2 - mh * 1.9, x0 - 4, y - mh / 2 - mh * 0.35);
-    c.closePath();
-    c.fillStyle = PAL.accent2; c.fill();
-    // pointe (tête)
-    c.beginPath();
-    c.moveTo(x1, y - mh / 2 - mh * 0.55);
-    c.quadraticCurveTo(x1 + mh * 0.9, y - mh / 2 - mh * 0.4, x1 + mh * 0.5, y + mh / 2);
-    c.lineTo(x1, y - mh / 2);
-    c.closePath();
-    c.fillStyle = PAL.accent2; c.fill();
-    // hausse (talon) + bouton
-    c.fillStyle = PAL.ink;
-    c.fillRect(x0 - mh * 1.4, y - mh / 2 - mh * 0.5, mh * 1.2, mh * 1.9);
-    c.fillStyle = PAL.accent;
-    c.beginPath(); c.arc(x0 - mh * 0.8, y + mh * 0.35, mh * 0.22, 0, Math.PI * 2); c.fill();
-    // repères des tiers + libellés
-    const fz = Math.max(12, Math.round(H * 0.026));
-    c.font = '600 ' + fz + 'px "Work Sans", sans-serif';
-    c.textAlign = 'center'; c.textBaseline = 'top';
-    c.fillStyle = PAL.sub;
-    for (const f of [1/3, 2/3]) {
-      c.beginPath();
-      c.moveTo(x0 + tw * f, y - mh); c.lineTo(x0 + tw * f, y + mh);
-      c.strokeStyle = PAL.line; c.lineWidth = 1; c.stroke();
-    }
-    c.fillText('T A L O N', x0 + tw / 6, y + mh * 1.6);
-    c.fillText('M I L I E U', x0 + tw / 2, y + mh * 1.6);
-    c.fillText('P O I N T E', x0 + tw * 5 / 6, y + mh * 1.6);
-    // point d'équilibre
-    const bx = x0 + tw * ins.bal;
-    c.save(); c.translate(bx, y - mh * 3.4); c.rotate(Math.PI / 4);
-    c.fillStyle = PAL.accent; c.fillRect(-5, -5, 10, 10); c.restore();
-
-    if (!r) {
-      c.fillStyle = PAL.sub;
-      c.font = '500 ' + Math.round(fz * 1.3) + 'px "Work Sans", sans-serif';
-      c.fillText('Appuie sur ▶ pour démarrer', W / 2, y + mh * 4);
-      return;
-    }
-
-    const now = performance.now() / 1000;
-    const fx = x0 + tw * r.from, tx = x0 + tw * r.target;
-
-    // ---- LE REPÈRE DE RETOUR : « le retour commence là » ----
-    if (!r.st.retake) {
-      const approaching = r.p > 0.7;
-      const pulse = approaching ? 0.55 + 0.45 * Math.abs(Math.sin(now * 7)) : 0.5;
-      c.globalAlpha = pulse;
-      c.strokeStyle = r.blocked ? '#c0392b' : PAL.accent;
-      c.lineWidth = approaching ? 4 : 2;
-      c.setLineDash([8, 7]);
-      c.beginPath();
-      c.moveTo(tx, y - H * 0.20); c.lineTo(tx, y + H * 0.14);
-      c.stroke();
-      c.setLineDash([]);
-      c.globalAlpha = 1;
-      c.fillStyle = r.blocked ? '#c0392b' : PAL.accent;
-      c.font = '600 ' + fz + 'px "Work Sans", sans-serif';
-      c.textBaseline = 'bottom';
-      c.fillText('↩ le retour commence là', Math.min(Math.max(tx, x0 + W * 0.09), x1 - W * 0.09), y - H * 0.21);
-      c.textBaseline = 'top';
-    }
-
-    // trajet du coup courant + notes liées
-    c.globalAlpha = 0.35;
-    c.beginPath(); c.moveTo(fx, y + mh * 2.6); c.lineTo(tx, y + mh * 2.6);
-    c.strokeStyle = PAL.accent; c.lineWidth = 5; c.stroke();
-    c.globalAlpha = 1;
-    if (r.st.notes > 1) {
-      for (let k = 0; k <= r.st.notes; k++) {
-        const nx = fx + (tx - fx) * k / r.st.notes;
-        c.beginPath(); c.arc(nx, y + mh * 2.6, 5, 0, Math.PI * 2);
-        c.fillStyle = (k <= r.p * r.st.notes) ? PAL.accent2 : PAL.line;
-        c.fill();
-      }
-    }
-
-    // curseur : barre de contact verticale avec halo
-    const cx = x0 + tw * Math.min(1, Math.max(0, r.pos));
-    const cy = y - r.hop * lift;
-    if (r.hop > 0.02) {
-      c.setLineDash([4, 6]);
-      c.beginPath(); c.moveTo(cx, cy + mh); c.lineTo(cx, y);
-      c.strokeStyle = PAL.sub; c.lineWidth = 1.5; c.stroke();
-      c.setLineDash([]);
-    }
-    c.save();
-    c.shadowColor = r.blocked ? '#c0392b' : PAL.accent;
-    c.shadowBlur = 22;
-    c.fillStyle = r.blocked ? '#c0392b' : PAL.accent;
-    const bw = Math.max(7, W * 0.007);
-    c.fillRect(cx - bw / 2, cy - mh * 1.7, bw, mh * 3.4);
-    c.restore();
-
-    // direction, en grand
-    c.font = '600 ' + Math.round(H * 0.085) + 'px "Cormorant Garamond", Georgia, serif';
-    c.fillStyle = r.blocked ? '#c0392b' : PAL.ink;
-    const dLbl = r.st.retake ? '↺ reprise' : (r.st.dir === 1 ? '⟶ tiré' : '⟵ poussé');
-    c.fillText(dLbl, W / 2, H * 0.07);
-    // sous-titre : consommation + alerte
-    c.font = '500 ' + fz + 'px "Work Sans", sans-serif';
-    c.fillStyle = PAL.sub;
-    const sub = r.st.retake ? 'archet levé — retour au talon'
-      : Math.round(r.st.len * 100) + ' % d\'archet' + (r.blocked ? '   ⚠ PLUS D\'ARCHET !' : '');
-    c.fillText(sub, W / 2, H * 0.07 + H * 0.1);
-  }
-
-  function fsLoop() {
-    if (!fsOpen) return;
-    let r = null;
-    if (isPlaying && audioCtx) {
-      const beats = totalBeats + Math.max(0, audioCtx.currentTime - cycleStart) * S.tempo / 60;
-      r = bowStateAt(beats);
-    }
-    renderBowBig(r);
-    $('bowFsPlay').textContent = isPlaying ? '■' : '▶';
-    $('bowFsTempo').textContent = S.tempo + ' BPM' + (isPlaying ? ' · mes. ' + measureCount : '');
-    fsRaf = requestAnimationFrame(fsLoop);
-  }
-
-  function openBowFs() {
-    fsOpen = true;
-    fsEl.classList.add('open');
-    $('bowFsInstr').textContent = INSTR[bowInstr].label;
-    if (fsEl.requestFullscreen) fsEl.requestFullscreen().catch(() => {});
-    requestAnimationFrame(() => { sizeFs(); fsLoop(); });
-  }
-
-  function closeBowFs() {
-    fsOpen = false;
-    cancelAnimationFrame(fsRaf);
-    fsEl.classList.remove('open');
-    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
-    if (!isPlaying) drawStatic();
-  }
-
-  $('bowFsBtn').addEventListener('click', openBowFs);
-  $('bowFsClose').addEventListener('click', closeBowFs);
-  $('bowFsPlay').addEventListener('click', toggle);
+  // ============ ARCHET — RETIRÉ DE CETTE PAGE (R-4b) ============
+  // L'archet vit sur index.html (option du premier niveau de l'accueil, spec R-4 §4.1) ;
+  // seul reste le hook du contrat moteur (stop() appelle bowReset) — no-op ici, patron
+  // apprendre.html. Le plein écran percussion garde son retour de fullscreenchange.
+  function bowReset() {}
   document.addEventListener('fullscreenchange', () => {
-    if (document.fullscreenElement && fsOpen) requestAnimationFrame(sizeFs);
-    else if (!document.fullscreenElement && fsOpen) closeBowFs();
-    else if (!document.fullscreenElement && percFsOpen) closePercFs();
+    if (!document.fullscreenElement && percFsOpen) closePercFs();
   });
-  window.addEventListener('resize', () => { if (fsOpen) sizeFs(); });
 
-  // ============ WIZARD ============
-  // Restructuré : le wizard pose UNIQUEMENT le contexte et la famille (+ surcouches).
-  // Plus d'écrans de réglage fin par couche : clave, groove perc, etc. se posent
-  // AU JUGÉ, en direct, dans les sections, sur le socle qui tourne.
-  const wiz = {
-    step: 0,
-    context: null,       // 'simple' | 'pile' | 'archet'
-    family: 'bin',       // 'bin' | 'tern'  (si pile)
-    over: { gap: false, routine: false },  // surcouches cochées
-    tempo: 92, beats: 4, subdiv: 1,
-    perso: false,        // programme percussion personnalisé (questionnaire, si pile)
-    answers: null        // réponses du questionnaire → buildKitProfile
-  };
 
-  // Contextes = premier écran. Trois choix exclusifs.
-  const CONTEXTS = [
-    { id: 'simple', t: 'Un tempo, un clic', d: 'Métronome nu — tempo, mesure, subdivision. Rien d\u2019autre.' },
-    { id: 'pile',   t: 'Pile rythmique',    d: 'Pulsation, claves et percussions se posent ensemble sur le même cycle.' },
-    { id: 'archet', t: 'Coups d\u2019archet', d: 'Aller-retour de l\u2019archet visualisés — du violon à la contrebasse. Mode à part.' }
-  ];
-
-  const wizOverlay = $('wizOverlay');
-
-  function openWizard() {
-    wiz.step = 0;
-    wiz.context = null;
-    wiz.family = (S.family === 'tern') ? 'tern' : 'bin';
-    wiz.over = { gap: false, routine: false };
-    wiz.tempo = S.tempo; wiz.beats = S.beats; wiz.subdiv = S.subdiv;
-    wiz.perso = false;
-    wiz.answers = { objectif: 'regularite', niveau: 'debutant', instrument: 'djembe',
-                    periodOverride: 4, dynamicsOverride: 'accentuee', lateralite: 'alternance' };
-    wizOverlay.classList.add('open');
-    renderWizard();
-  }
-  function closeWizard() {
-    wizOverlay.classList.remove('open');
-    store.set('fm-metro-wizard-done', '1');
-  }
-
-  // écrans dynamiques : contexte → tempo/mesure (+ famille & surcouches si pile)
-  //   → [questionnaire pédagogique, si pile + programme perso] → récap
-  function wizStepKeys() {
-    const keys = ['context', 'tempo'];
-    if (wiz.context === 'pile' && wiz.perso) keys.push('quiz');
-    keys.push('recap');
-    return keys;
-  }
-  function wizSteps() { return wizStepKeys().length; }
-
-  // Questionnaire pédagogique (passe 2, §3) : libellés musiciens ; valeurs = entrées de buildKitProfile.
-  const QUIZ_OBJECTIFS = [
-    { id: 'separation',   t: 'Séparation mains / baguettes' },
-    { id: 'independance', t: 'Indépendance des voix' },
-    { id: 'dynamique',    t: 'Nuances et accents' },
-    { id: 'regularite',   t: 'Régularité / stabilité du tempo' }
-  ];
-  const QUIZ_NIVEAUX = { debutant: 'Débutant', intermediaire: 'Intermédiaire', avance: 'Avancé' };
-  const QUIZ_INSTRS = [
-    ['djembe', 'Djembé (basse · tone · slap)'],
-    ['cajon', 'Cajón (grave · aigu)'],
-    ['dunduns', 'Dunduns & cloche']
-  ];
-
-  // réponses du wizard → signature de buildKitProfile (la famille vient de l'écran tempo).
-  function quizAnswers() {
-    return Object.assign({}, wiz.answers, {
-      subdivision: wiz.family === 'tern' ? 'ternaire' : 'binaire'
-    });
-  }
-
-  function renderWizard() {
-    const body = $('wizBody'), dots = $('wizDots');
-    const keys = wizStepKeys();
-    const total = keys.length;
-    if (wiz.step > total - 1) wiz.step = total - 1;
-    const key = keys[wiz.step];
-    dots.innerHTML = '';
-    for (let i = 0; i < total; i++) {
-      const s = document.createElement('span');
-      if (i <= wiz.step) s.className = 'done';
-      dots.appendChild(s);
-    }
-    $('wizBack').style.visibility = wiz.step === 0 ? 'hidden' : 'visible';
-    $('wizNext').textContent = wiz.step === total - 1 ? '\u2713 C\u2019est parti' : 'Continuer \u2192';
-
-    if (key === 'context') {
-      $('wizTitle').textContent = 'Que veux-tu travailler ?';
-      $('wizSub').textContent = 'Choisis un contexte — tu poseras tout le reste à la main, en direct.';
-      body.innerHTML = '<div class="wiz-options">' + CONTEXTS.map(c =>
-        '<button class="wiz-opt' + (wiz.context === c.id ? ' sel' : '') + '" data-ctx="' + c.id + '"><b>' + c.t + '</b><small>' + c.d + '</small></button>'
-      ).join('') + '</div>';
-      body.querySelectorAll('.wiz-opt').forEach(b => b.addEventListener('click', () => {
-        wiz.context = b.dataset.ctx; renderWizard();
-      }));
-    }
-    else if (key === 'tempo') {
-      $('wizTitle').textContent = 'Tempo et mesure';
-      $('wizSub').textContent = 'Le point de départ de ta session.';
-      let html =
-        '<div class="row"><label>Tempo</label><input type="range" id="wTempo" min="30" max="260" value="' + wiz.tempo + '"><span class="val" id="wTempoVal">' + wiz.tempo + ' BPM</span></div>' +
-        '<div class="row"><label>Temps par cycle</label><select id="wBeats" style="width:auto;">' +
-          [2,3,4,5,6,7].map(n => '<option' + (n === wiz.beats ? ' selected' : '') + '>' + n + '</option>').join('') +
-        '</select><label style="min-width:auto;">Subdivision</label><select id="wSubdiv" style="width:auto;">' +
-          '<option value="1"' + (wiz.subdiv===1?' selected':'') + '>Noires</option>' +
-          '<option value="2"' + (wiz.subdiv===2?' selected':'') + '>Croches</option>' +
-          '<option value="3"' + (wiz.subdiv===3?' selected':'') + '>Triolets</option>' +
-          '<option value="4"' + (wiz.subdiv===4?' selected':'') + '>Doubles</option>' +
-        '</select></div>';
-      // famille + surcouches : seulement en contexte « pile rythmique »
-      if (wiz.context === 'pile') {
-        html +=
-          '<div class="row" style="margin-top:14px;"><label>Grille rythmique</label>' +
-          '<select id="wFamily" style="width:auto;">' +
-            '<option value="bin"' + (wiz.family==='bin'?' selected':'') + '>Binaire · 16 pas</option>' +
-            '<option value="tern"' + (wiz.family==='tern'?' selected':'') + '>Ternaire · 12 pas</option>' +
-          '</select></div>' +
-          '<div class="hint">Clave et percussion partageront cette grille.</div>' +
-          '<div class="row" style="margin-top:12px;"><label>Surcouches</label>' +
-          '<label class="check"><input type="checkbox" id="wOverGap"' + (wiz.over.gap ? ' checked' : '') + '> Horloge interne (gap)</label>' +
-          '<label class="check"><input type="checkbox" id="wOverRoutine"' + (wiz.over.routine ? ' checked' : '') + '> Routine programmée</label></div>' +
-          '<div class="hint">Optionnelles — elles se posent par-dessus la pile, tu peux les activer plus tard.</div>' +
-          '<div class="row" style="margin-top:12px;"><label>Programme percussion</label>' +
-          '<label class="check"><input type="checkbox" id="wPerso"' + (wiz.perso ? ' checked' : '') + '> Assistant pédagogique (questionnaire)</label></div>' +
-          '<div class="hint">Coché : un court questionnaire choisit un objectif et l’app génère un kit de percussion adapté (groove, variations, mains). Décoché : tu poses tout à la main.</div>';
-      }
-      body.innerHTML = html;
-      $('wTempo').addEventListener('input', e => {
-        wiz.tempo = +e.target.value; $('wTempoVal').textContent = wiz.tempo + ' BPM';
-      });
-      $('wBeats').addEventListener('change', e => wiz.beats = +e.target.value);
-      $('wSubdiv').addEventListener('change', e => wiz.subdiv = +e.target.value);
-      if (wiz.context === 'pile') {
-        $('wFamily').addEventListener('change', e => wiz.family = e.target.value);
-        $('wOverGap').addEventListener('change', e => wiz.over.gap = e.target.checked);
-        $('wOverRoutine').addEventListener('change', e => wiz.over.routine = e.target.checked);
-        $('wPerso').addEventListener('change', e => wiz.perso = e.target.checked);
-      }
-    }
-    else if (key === 'quiz') {
-      $('wizTitle').textContent = 'Programme personnalisé';
-      $('wizSub').textContent = 'Quelques réponses — l’app génère ton kit de percussion.';
-      const a = wiz.answers;
-      let html =
-        '<div class="row"><label>Objectif</label><select id="qObj" style="flex:1;min-width:200px;">' +
-          QUIZ_OBJECTIFS.map(o => '<option value="' + o.id + '"' + (a.objectif===o.id?' selected':'') + '>' + o.t + '</option>').join('') +
-        '</select></div>' +
-        '<div class="row"><label>Niveau</label><select id="qNiv" style="width:auto;">' +
-          Object.keys(QUIZ_NIVEAUX).map(n => '<option value="' + n + '"' + (a.niveau===n?' selected':'') + '>' + QUIZ_NIVEAUX[n] + '</option>').join('') +
-        '</select></div>' +
-        '<div class="row"><label>Instrument</label><select id="qInstr" style="width:auto;">' +
-          QUIZ_INSTRS.map(p => '<option value="' + p[0] + '"' + (a.instrument===p[0]?' selected':'') + '>' + p[1] + '</option>').join('') +
-        '</select></div>' +
-        '<div class="row"><label>Stabilité avant complexification</label><input type="range" id="qPeriod" min="1" max="8" value="' + a.periodOverride + '"><span class="val" id="qPeriodVal">' + a.periodOverride + ' mes.</span></div>';
-      if (a.objectif === 'dynamique') {
-        html +=
-          '<div class="row"><label>Contrastes de nuances</label><select id="qDyn" style="width:auto;">' +
-            '<option value="accentuee"' + (a.dynamicsOverride==='accentuee'?' selected':'') + '>Marqués (accents francs)</option>' +
-            '<option value="progressive"' + (a.dynamicsOverride==='progressive'?' selected':'') + '>Progressifs (montée graduelle)</option>' +
-          '</select></div>';
-      }
-      html +=
-        '<div class="row"><label>Mains</label><select id="qLat" style="width:auto;">' +
-          '<option value="droitier"' + (a.lateralite==='droitier'?' selected':'') + '>Droitier</option>' +
-          '<option value="gaucher"' + (a.lateralite==='gaucher'?' selected':'') + '>Gaucher</option>' +
-          '<option value="alternance"' + (a.lateralite==='alternance'?' selected':'') + '>Alternance stricte D-G</option>' +
-        '</select></div>' +
-        '<div class="hint">La grille (' + (wiz.family==='tern'?'ternaire · 12':'binaire · 16') + ') vient de l’écran précédent. Tu pourras tout retoucher ensuite dans la section Percussion.</div>';
-      body.innerHTML = html;
-      $('qObj').addEventListener('change', e => { a.objectif = e.target.value; renderWizard(); });
-      $('qNiv').addEventListener('change', e => a.niveau = e.target.value);
-      $('qInstr').addEventListener('change', e => a.instrument = e.target.value);
-      $('qPeriod').addEventListener('input', e => {
-        a.periodOverride = +e.target.value; $('qPeriodVal').textContent = a.periodOverride + ' mes.';
-      });
-      if (a.objectif === 'dynamique') $('qDyn').addEventListener('change', e => a.dynamicsOverride = e.target.value);
-      $('qLat').addEventListener('change', e => a.lateralite = e.target.value);
-    }
-    else {
-      // récapitulatif
-      $('wizTitle').textContent = 'Récapitulatif';
-      $('wizSub').textContent = 'Vérifie, puis lance-toi.';
-      const c = CONTEXTS.find(x => x.id === wiz.context) || CONTEXTS[0];
-      let extra = '';
-      if (wiz.context === 'pile') {
-        const over = [];
-        if (wiz.over.gap) over.push('horloge interne');
-        if (wiz.over.routine) over.push('routine');
-        extra = 'Grille : <b>' + (wiz.family === 'tern' ? 'ternaire (12)' : 'binaire (16)') + '</b>' +
-          (over.length ? '<br>Surcouches : <b>' + over.join(', ') + '</b>' : '');
-        if (wiz.perso) {
-          const obj = (QUIZ_OBJECTIFS.find(o => o.id === wiz.answers.objectif) || {}).t || wiz.answers.objectif;
-          const instr = PERC_INSTR[wiz.answers.instrument] ? PERC_INSTR[wiz.answers.instrument].label : wiz.answers.instrument;
-          extra += '<br>Programme perso : <b>' + obj + '</b> · ' + QUIZ_NIVEAUX[wiz.answers.niveau] + ' · kit ' + instr;
-        }
-      }
-      body.innerHTML = '<div class="wiz-recap">' +
-        'Contexte : <b>' + c.t + '</b><br>' +
-        'Tempo : <b>' + wiz.tempo + ' BPM</b> · ' + wiz.beats + ' temps · ' +
-        ({1:'noires',2:'croches',3:'triolets',4:'doubles'}[wiz.subdiv]) +
-        (extra ? '<br>' + extra : '') +
-        '<br>Mode : <b>' + (wiz.context === 'simple' ? 'Simple' : 'Expert') + '</b></div>';
-    }
-  }
-
-  function applyWizard() {
-    setTempo(wiz.tempo);
-    S.beats = wiz.beats; $('beatsSel').value = wiz.beats;
-    S.subdiv = wiz.subdiv; $('subdivSel').value = wiz.subdiv;
-
-    if (wiz.context === 'simple') {
-      setContext('');
-      setMode('simple');
-    }
-    else if (wiz.context === 'archet') {
-      setMode('expert');
-      setContext('archet');
-      document.querySelectorAll('details.section').forEach(d => d.open = false);
-      $('secArchet').open = true;
-    }
-    else { // pile rythmique
-      setMode('expert');
-      setContext('pile');
-      setFamily(wiz.family);          // aligne clave + perc sur la grille choisie
-      // programme personnalisé : le moteur de règles génère et pose le kit de percussion
-      if (wiz.perso) applyKitProfile(buildKitProfile(quizAnswers()), wiz.answers.instrument);
-      document.querySelectorAll('details.section').forEach(d => d.open = false);
-      // on ouvre les couches pour poser au jugé ; le socle reste accessible replié
-      $('secClave').open = true;
-      $('secPerc').open = true;
-      if (wiz.over.gap) $('secGap').open = true;
-      if (wiz.over.routine) $('secScript').open = true;
-    }
-
-    buildStepGrid();
-    drawStatic();
-    closeWizard();
-    // on démarre pour entendre le socle tourner, sauf si une routine est prévue à lancer à la main
-    if (!(wiz.context === 'pile' && wiz.over.routine) && !isPlaying) start();
-  }
-
-  $('wizardBtn').addEventListener('click', openWizard);
-  $('wizSkip').addEventListener('click', closeWizard);
-  $('wizBack').addEventListener('click', () => { if (wiz.step > 0) { wiz.step--; renderWizard(); } });
-  $('wizNext').addEventListener('click', () => {
-    if (wiz.step === 0 && !wiz.context) return; // il faut choisir un contexte
-    if (wiz.step >= wizSteps() - 1) { applyWizard(); return; }
-    wiz.step++;
-    renderWizard();
-  });
-  wizOverlay.addEventListener('click', e => { if (e.target === wizOverlay) closeWizard(); });
 
   // ============ INIT ============
   refreshPalette();
   $('themeBtn').textContent = currentTheme() === 'sombre' ? '◐ Mode clair' : '◐ Mode sombre';
-  /* R-3b (pratiquer) : pas de mode simple ici — l'écran de jeu vit sur index.html (→ R-4).
-     Mise en page expert forcée SANS toucher au réglage partagé fm-metro-mode. */
-  document.body.classList.remove('mode-simple');
+  // R-4b (pratiquer) : l'écran de jeu et le mode simple sont retirés de l'application
+  // (§9.4) — plus de classe de mise en page à forcer, la page est toujours complète.
   setTempo(92);
   setSwing(50);
   // famille (bin/tern) : restaurée sans rebuild (les grilles sont bâties juste après)
@@ -6464,7 +5065,6 @@ swing 62
   // contexte : restauré ; par défaut « pile rythmique » pour ne rien masquer d'emblée
   setContext(store.get('fm-metro-context') || 'pile');
   buildStepGrid();
-  bowCompile(false);
   percSetInstr('djembe');
   tsInit();
   bassRestore();
@@ -6472,14 +5072,11 @@ swing 62
   accompMuteRender();           // R-3b (pratiquer) : état initial du mute maître (session, toujours levé au chargement)
   { const _bs = $('buildStamp'); if (_bs) _bs.textContent = 'build ' + BUILD + ' · ' + BUILD_DATE; }
   drawStatic();
-  // passe 4.1 : l'écran d'accueil « Je joue » est la porte d'entrée — il restaure
-  // l'état sauvegardé (fm-metro-play) ou s'ouvre au premier lancement. L'assistant
-  // ne s'ouvre plus automatiquement ; il reste accessible via ✦ Assistant.
-  playRestore();
+  // R-4b (pratiquer) : plus d'écran d'accueil « Je joue » (retiré §9.4) — la page
+  // s'ouvre directement sur la pratique libre.
 
-  // ============ SALVE UX 0.6.6 — câblages (C5 ⛶ / C6 sommaire / C8 réinitialisation / C15) ============
-  // C5 : le bouton ⛶ posé sur le canvas archet relaie le bouton plein écran existant.
-  { const b2 = $('bowFsBtn2'); if (b2) b2.addEventListener('click', () => $('bowFsBtn').click()); }
+  // ============ SALVE UX 0.6.6 — câblages (C6 sommaire / C8 réinitialisation / C15) ============
+  // R-4b (pratiquer) : C5 (⛶ posé sur le canvas archet) est parti avec l'archet sur index.html.
   // C6 : sommaire sticky — ouvre la section visée et s'y rend ; « ↑ Haut » remonte la page.
   document.querySelectorAll('#tocBar .toc-chip').forEach(chip => {
     chip.addEventListener('click', () => {
@@ -6505,20 +5102,10 @@ swing 62
     try { location.reload(); } catch (e) {}
   });
   volRender();          // C15 : valeur de volume affichée dès le chargement
-  playWhoRender();      // C15 : masque « Je suis » tant qu'il n'a que Solo
 
-  // ============ SALVE UX 0.6.7 — câblages (C1 bandeau première visite + mode focus) ============
-  // C1 : bandeau « Débutant ? » — première visite seulement (ni état de jeu, ni wizard fait,
-  // ni bandeau déjà écarté). « ⟲ Tout réinitialiser » (C8) le fait naturellement réapparaître.
-  {
-    const ob = $('onboardBanner');
-    if (!store.get('fm-metro-play') && !store.get('fm-metro-wizard-done') &&
-        !store.get('fm-metro-onboard-dismissed')) ob.classList.remove('hide');
-    $('obGuide').addEventListener('click', () => { ob.classList.add('hide'); openWizard(); });
-    $('obLater').addEventListener('click', () => {
-      ob.classList.add('hide'); store.set('fm-metro-onboard-dismissed', '1');
-    });
-  }
+  // ============ SALVE UX 0.6.7 — câblages (mode focus) ============
+  // R-4b (pratiquer) : le bandeau « Débutant ? » (C1) est parti avec le wizard (retrait
+  // §9.4) — l'invitation au novice, c'est l'accueil refondu et sa porte « Apprendre ».
   // C1 : mode focus « une section à la fois » — ouvrir une section referme les autres ;
   // le sommaire C6 reste fonctionnel (il ouvre la section visée). Décoché par défaut, persistant.
   {
@@ -6542,293 +5129,126 @@ swing 62
     });
   });
 
-  // ============ PARCOURS FUNK (P-4) — surcouche additive, module 6 (Intermédiaire) ============
-  // Deux modules (cajón/djembé), preset d'un bloc, acquis local par position, double couleur pour
-  // les EX-SOCLE partagés, vote de fin → pf_vote/pf_promotion en réutilisant window.fmSupabase().
-  // Hors de l'écran « Cours funk », strictement no-op : ne lit/écrit que ses propres clés.
-  const PF_PARC = FM_ASM.instruments;
-  const PF_NIVEAUX = ['debutant', 'intermediaire', 'avance', 'artiste'];
-  // P-6 : parcours multi-niveaux. Chaque niveau a son infixe d'ID, son ordre de modules et son libellé.
-  const PF_NIV_INFIX = { debutant:'D', intermediaire:'I', avance:'Av', artiste:'Ar' };
-  const PF_NIV_LABEL = { debutant:'Débutant', intermediaire:'Intermédiaire', avance:'Avancé', artiste:'Artiste' };
-  const PF_NIV_ORDER = FM_ASM.niveaux;
-  const PF_EX = FM_ASM.exercices;
-  const PF_MOD = FM_ASM.modules;
-  function pfSharedSet(){
-    const c = {};
-    Object.keys(PF_MOD).forEach(mid => PF_MOD[mid].exercices.forEach(e => c[e] = (c[e]||0) + 1));
-    return Object.keys(c).filter(e => c[e] >= 2);
-  }
-  // ---- état local, jamais synchronisé ----
-  function pfAcquisAll(){ try { return JSON.parse(store.get('fm-metro-parcours')||'{}'); } catch(e){ return {}; } }
-  function pfIsAcquis(p, ex){ const a = pfAcquisAll()[p+'|'+ex]; return !!(a && a.acquis); }
-  function pfAcquisSet(p, ex, val){
-    const all = pfAcquisAll();
-    if (val) all[p+'|'+ex] = { acquis:true, ts:Date.now() }; else delete all[p+'|'+ex];
-    store.set('fm-metro-parcours', JSON.stringify(all));
-  }
-  function pfPromoAll(){ try { return JSON.parse(store.get('fm-metro-parcours-promo')||'{}'); } catch(e){ return {}; } }
-  function pfPromoGet(p, ex, c){ return pfPromoAll()[p+'|'+ex+'|'+c] || null; }
-  function pfPromoSet(p, ex, c, rec){
-    const all = pfPromoAll(); all[p+'|'+ex+'|'+c] = Object.assign({ ts:Date.now() }, rec);
-    store.set('fm-metro-parcours-promo', JSON.stringify(all));
-  }
-  // P-6 : niveau de base d'un exercice = niveau du (premier) module qui le référence.
-  function pfExNiveau(ex){
-    for (const mid in PF_MOD){ if (PF_MOD[mid].exercices.indexOf(ex) >= 0) return PF_MOD[mid].niveau; }
-    return 'intermediaire';
-  }
-  function pfNiveauEffectif(p, ex, c){
-    const promo = pfPromoGet(p, ex, c);
-    let base = PF_NIVEAUX.indexOf(pfExNiveau(ex)); if (base < 0) base = PF_NIVEAUX.indexOf('intermediaire');
-    const eff = base + ((promo && promo.promu) ? 1 : 0);
-    return PF_NIVEAUX[Math.min(Math.max(eff, 0), PF_NIVEAUX.length - 1)];
-  }
-  // P-6 : niveaux « peuplés » = ceux qui ont au moins un module déclaré. Niveau affiché : persistant, défaut = 1er peuplé.
-  function pfPopulatedNiveaux(){ return PF_NIVEAUX.filter(n => Object.keys(PF_MOD).some(mid => PF_MOD[mid].niveau === n)); }
-  function pfNivGet(){
-    const pop = pfPopulatedNiveaux(); const def = pop[0] || 'intermediaire';
-    let n = null; try { n = store.get('fm-metro-parcours-niveau'); } catch(e){}
-    return (n && pop.indexOf(n) >= 0) ? n : def;
-  }
-  function pfNivSet(n){ try { store.set('fm-metro-parcours-niveau', n); } catch(e){} }
-  // ---- file de votes offline-first ----
-  function pfQueueAll(){ try { return JSON.parse(store.get('pf_vote_queue')||'[]'); } catch(e){ return []; } }
-  function pfQueueWrite(arr){ store.set('pf_vote_queue', JSON.stringify(arr)); }
-  function pfVoteItem(p, ex, c, v){ return { parcours:p, exercise_id:ex, cible:c, verdict:v, ts:Date.now() }; }
-  function pfQueuePush(item){
-    const q = pfQueueAll().filter(x => !(x.parcours===item.parcours && x.exercise_id===item.exercise_id && x.cible===item.cible));
-    q.push(item); pfQueueWrite(q);
-  }
-  // ---- Supabase : réutilise le client existant (aucun second client, aucun jeton maison) ----
-  function pfSb(){ try { return (window.fmSupabase && window.fmSupabase()) || null; } catch(e){ return null; } }
-  async function pfEnsureUid(sb){
-    try {
-      if (window.fmCurrentUser && window.fmCurrentUser.id) return window.fmCurrentUser.id;
-      const s = await sb.auth.getSession();
-      const u = s && s.data && s.data.session && s.data.session.user;
-      if (u && u.id) return u.id;
-      const a = await sb.auth.signInAnonymously();
-      if (a && a.error) return null;
-      const au = a && a.data && a.data.user; return (au && au.id) || null;
-    } catch(e){ return null; }
-  }
-  let pfFlushing = false;
-  async function pfFlushVotes(){
-    if (pfFlushing) return; const sb = pfSb(); if (!sb) return;
-    const q = pfQueueAll(); if (!q.length) return;
-    pfFlushing = true;
-    try {
-      const uid = await pfEnsureUid(sb); if (!uid) return;
-      const remain = [], touched = {};
-      for (const it of q){
-        try {
-          const r = await sb.from('pf_vote').upsert(
-            { client_id:uid, parcours:it.parcours, exercise_id:it.exercise_id, cible:it.cible, verdict:it.verdict },
-            { onConflict:'client_id,parcours,exercise_id,cible' });
-          if (r && r.error) remain.push(it); else touched[it.parcours+'|'+it.exercise_id+'|'+it.cible] = it;
-        } catch(e){ remain.push(it); }
-      }
-      pfQueueWrite(remain);
-      for (const k in touched){ const it = touched[k]; await pfRefreshPromo(it.parcours, it.exercise_id, it.cible); }
-    } finally { pfFlushing = false; try { pfRender(); } catch(e){} }
-  }
-  async function pfRefreshPromo(p, ex, c){
-    const sb = pfSb(); if (!sb) return;
-    try {
-      const r = await sb.rpc('pf_promotion', { parcours:p, exercise_id:ex, cible:c });
-      if (r && r.error) return; let d = r && r.data; if (Array.isArray(d)) d = d[0];
-      if (d) pfPromoSet(p, ex, c, { promu:!!d.promu, part:d.part, n_votes:d.n_votes, dormant:!!d.dormant });
-    } catch(e){}
-  }
-  function pfVote(p, ex, c, v){ pfQueuePush(pfVoteItem(p, ex, c, v)); pfFlushVotes(); try { pfRender(); } catch(e){} }
-  // ---- application d'un preset d'un bloc (mute rien de l'existant : mêmes points d'ancrage que l'UI) ----
-  function pfSyncBassUI(){
-    const b = S.bass;
-    const set = (id, val) => { const el = $(id); if (el){ if (el.type==='checkbox') el.checked = !!val; else el.value = val; } };
-    set('bassOn', b.on); set('bassPattern', b.pattern); set('bassKey', b.key); set('bassProg', b.prog);
-    set('bassDensity', String(b.density)); set('bassVel', b.vel); set('bassVary', b.vary);
-    set('bassLegato', Math.round((b.legato!=null ? b.legato : 0.25) * 100));
-    set('bassSpace', b.space); set('bassSwingFollow', b.swingFollow);
-    set('bassDropOn', !!(b.drop && b.drop.on));
-    if (b.drop){ set('bassDropEvery', b.drop.everyN); set('bassDropLen', b.drop.lenBeats); }
-    try { bassUpdateChordLabel(); } catch(e){}
-  }
-  // P-6 : sync des contrôles métronome pilotés par un preset Débutant (subdivision + gap).
-  function pfSyncMetroUI(){
-    const ss = $('subdivSel'); if (ss) ss.value = String(S.subdiv);
-    const gm = $('gapMode'); if (gm) gm.value = S.gap.mode;
-    try { gapTargetRefresh(); } catch(e){}
-    const gp = $('gapPlay'); if (gp) gp.value = String(S.gap.playN);
-    const gmv = $('gapMute'); if (gmv) gmv.value = String(S.gap.muteM);
-    try { if (typeof drawStatic === 'function' && !isPlaying) drawStatic(); } catch(e){}
-  }
-  function pfLoadPreset(ex){
-    const E = PF_EX[ex]; if (!E) return; const P = E.preset;
-    setTempo(P.tempo || 90); setSwing(P.swing || 50);
-    S.family = 'bin'; setFamily('bin', true);
-    S.perc.on = false;
-    if (P.metro) {
-      // Débutant : clic seul (jamais de basse funk). Subdivisions + gap pilotés par le preset.
-      S.bass.on = false;
-      S.subdiv = (P.subdiv != null) ? P.subdiv : 1;
-      if (P.gap) {
-        S.gap = Object.assign({}, S.gap, { mode:'fixed', target:(P.gap.target || 'pulse'),
-          playN:(P.gap.playN || 4), muteM:(P.gap.muteM || 1) });
-      } else {
-        S.gap = Object.assign({}, S.gap, { mode:'off', target:'all' });
-      }
-      try { resetGap(); } catch(e){}
-    } else {
-      S.bass.on = true; S.bass.key = 'E'; S.bass.density = (P.dens != null ? P.dens : 2); S.bass.vel = 'mixte'; S.bass.vary = false;
-      S.bass.pattern = P.pattern; S.bass.prog = P.prog;
-      S.bass.drop = Object.assign({ on:false, everyN:4, lenBeats:2 }, P.drop || {});
-    }
-    try { buildPercGrids(); } catch(e){}
-    try { bassResetCycle(); } catch(e){}
-    try { if (typeof bassPersist === 'function') bassPersist(); } catch(e){}
-    pfSyncBassUI();
-    if (P.metro) pfSyncMetroUI();
-    pfStatus('Chargé : ' + E.objet + ' — lance le métronome.');
-  }
-  function pfStatus(msg){ const el = $('pfStatus'); if (el) el.textContent = msg || ''; }
-  // ---- rendu ----
-  function pfEsc(s){ const d = document.createElement('div'); d.textContent = (s==null ? '' : String(s)); return d.innerHTML; }
-  const PF_KEYS = ['E','F','F#','G','G#','A','A#','B','C','C#','D','D#'];
-  function pfRender(){
-    const root = $('pfRoot'); if (!root) return;
-    const shared = pfSharedSet();
-    const niv = pfNivGet(); const pop = pfPopulatedNiveaux();
-    const order = PF_NIV_ORDER[niv] || [];
-    let html = '';
-    // P-6 : sélecteur de niveau — n'apparaît que si plus d'un niveau est peuplé.
-    if (pop.length > 1) {
-      html += '<div class="pf-niv-tabs" role="tablist" aria-label="Niveau du parcours">';
-      pop.forEach(n => {
-        html += '<button type="button" class="pf-niv-tab' + (n === niv ? ' active' : '') + '" data-niv="' + n + '"' +
-          (n === niv ? ' aria-selected="true"' : '') + '>' + pfEsc(PF_NIV_LABEL[n] || n) + '</button>';
-      });
-      html += '</div>';
-    }
-    html += '<div class="pf-grid" data-niv="' + niv + '">';
-    ['cajon','djembe'].forEach(pk => {
-      const parc = PF_PARC[pk];
-      const pref = 'MOD-' + (pk === 'cajon' ? 'CJ' : 'DJ') + '-' + (PF_NIV_INFIX[niv] || 'I') + '-';
-      html += '<div class="pf-col" style="--pf-c:' + parc.couleur + '">';
-      html += '<div class="pf-col-head"><span class="pf-dot"></span>' + pfEsc(parc.label) + '</div>';
-      let mi = 0;
-      order.forEach(code => {
-        const mid = pref + code; const M = PF_MOD[mid]; if (!M) return;
-        let done = 0; M.exercices.forEach(ex => { if (pfIsAcquis(pk, ex)) done++; });
-        const total = M.exercices.length; const open = (mi === 0);
-        html += '<div class="pf-mod' + (open ? ' open' : '') + '" data-parc="' + pk + '" data-mid="' + mid + '">';
-        html += '<button type="button" class="pf-mod-head"><span class="pf-mod-idx">' + (mi + 1) + '</span>';
-        html += '<span class="pf-mod-objet">' + pfEsc(M.objet) + '</span>';
-        html += '<span class="pf-mod-count">' + done + '/' + total + '</span>';
-        html += '<span class="pf-mod-chev">&#9662;</span></button>';
-        html += '<div class="pf-mod-body">';
-        M.exercices.forEach((ex, i) => {
-          const E = PF_EX[ex]; const isShared = shared.indexOf(ex) >= 0;
-          const acq = pfIsAcquis(pk, ex);
-          const promo = pfPromoGet(pk, ex, E.kind); const promu = !!(promo && promo.promu);
-          html += '<div class="pf-card' + (isShared ? ' pf-shared' : '') + (acq ? ' pf-acq' : '') + '" data-ex="' + ex + '" data-parc="' + pk + '">';
-          html += '<div class="pf-card-top"><span class="pf-rang">' + (E.kind === 'synthese' ? '&#9733;' : (i + 1)) + '</span>';
-          html += '<span class="pf-objet">' + pfEsc(E.objet) + '</span>';
-          if (isShared) html += '<span class="pf-badge-shared" title="Deja rencontre dans l\'autre parcours">deja rencontre</span>';
-          if (promu) html += '<span class="pf-badge-promo" title="Monte d\'un niveau par les votes">&#8593; niveau</span>';
-          html += '</div>';
-          html += '<div class="pf-consigne">' + pfEsc(E.consigne) + '</div>';
-          html += '<div class="pf-critere">&laquo; ' + pfEsc(E.critere) + ' &raquo;</div>';
-          html += '<div class="pf-actions"><button class="btn-sm primary pf-load">Charger</button>';
-          html += '<label class="check pf-acq-lbl"><input type="checkbox" class="pf-acquis"' + (acq ? ' checked' : '') + '> acquis</label></div>';
-          html += '<details class="pf-perso"><summary>Personnaliser</summary><div class="pf-perso-body">';
-          html += '<label>Tempo <input type="range" class="pf-tempo" min="70" max="110" value="' + (E.preset.tempo || 90) + '"></label>';
-          html += '<label>Densite <select class="pf-dens"><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option></select></label>';
-          html += '<label class="check"><input type="checkbox" class="pf-drop"' + (E.preset.drop && E.preset.drop.on ? ' checked' : '') + '> Drop-outs</label>';
-          html += '<label>Tonalite <select class="pf-key">' + PF_KEYS.map(k => '<option' + (k === 'E' ? ' selected' : '') + '>' + k + '</option>').join('') + '</select></label>';
-          html += '</div></details>';
-          html += '<div class="pf-vote"><span>Difficulte :</span>';
-          html += '<button class="btn-sm pf-v" data-v="facile">facile</button>';
-          html += '<button class="btn-sm pf-v" data-v="ok">ok</button>';
-          html += '<button class="btn-sm pf-v" data-v="difficile">difficile</button></div>';
-          html += '</div>';
-        });
-        html += '</div></div>';
-        mi++;
-      });
-      html += '</div>';
-    });
-    html += '</div>';
-    root.innerHTML = html;
-    // P-6 : sélecteur de niveau — un seul niveau rendu à la fois, choix persistant.
-    root.querySelectorAll('.pf-niv-tab').forEach(tab => {
-      tab.addEventListener('click', () => { pfNivSet(tab.getAttribute('data-niv')); pfRender(); });
-    });
-    root.querySelectorAll('.pf-mod-head').forEach(head => {
-      head.addEventListener('click', () => {
-        const mod = head.parentElement, col = mod.parentElement;
-        const wasOpen = mod.classList.contains('open');
-        col.querySelectorAll('.pf-mod').forEach(m => m.classList.remove('open'));
-        if (!wasOpen) mod.classList.add('open');
-      });
-    });
-    root.querySelectorAll('.pf-card').forEach(card => {
-      const ex = card.getAttribute('data-ex'), pk = card.getAttribute('data-parc'), E = PF_EX[ex];
-      card.querySelector('.pf-load').addEventListener('click', () => pfLoadPreset(ex));
-      card.querySelector('.pf-acquis').addEventListener('change', e => {
-        pfAcquisSet(pk, ex, e.target.checked); card.classList.toggle('pf-acq', e.target.checked);
-        const modDiv = card.closest('.pf-mod');
-        if (modDiv){ const MM = PF_MOD[modDiv.getAttribute('data-mid')];
-          if (MM){ let d = 0; MM.exercices.forEach(x => { if (pfIsAcquis(pk, x)) d++; });
-            const cnt = modDiv.querySelector('.pf-mod-count'); if (cnt) cnt.textContent = d + '/' + MM.exercices.length; } }
-      });
-      card.querySelector('.pf-tempo').addEventListener('input', e => setTempo(+e.target.value));
-      card.querySelector('.pf-dens').addEventListener('change', e => { S.bass.density = +e.target.value; try { bassResetCycle(); } catch(_){} });
-      card.querySelector('.pf-drop').addEventListener('change', e => { S.bass.drop = S.bass.drop || { on:false, everyN:4, lenBeats:2 }; S.bass.drop.on = e.target.checked; try { bassResetCycle(); } catch(_){} });
-      card.querySelector('.pf-key').addEventListener('change', e => { S.bass.key = e.target.value; try { bassResetCycle(); bassUpdateChordLabel(); } catch(_){} });
-      card.querySelectorAll('.pf-v').forEach(b => b.addEventListener('click', () => { pfVote(pk, ex, E.kind, b.getAttribute('data-v')); pfStatus('Vote enregistre : ' + b.getAttribute('data-v') + '.'); }));
-    });
-  }
-
-  function pfInit(){
-    if (!$('pfRoot')) return;
-    pfRender();
-    try { document.addEventListener('fm-auth', () => pfFlushVotes()); } catch(e){}
-    try { window.addEventListener('online', () => pfFlushVotes()); } catch(e){}
-    setTimeout(() => { try { pfFlushVotes(); } catch(e){} }, 1200);
-  }
-  window.fmMetroParcours = function(){
-    return {
-      data: { PARC:PF_PARC, MODULES:PF_MOD, EXERCISES:PF_EX, NIVEAUX:PF_NIVEAUX },
-      shared: pfSharedSet(),
-      progress: pfAcquisAll,
-      promoCache: pfPromoAll,
-      voteQueue: pfQueueAll,
-      presetFor: function(ex){
-        const E = PF_EX[ex]; if (!E) return null;
-        return { tempo:90, family:'bin', swing:50, perc:{ on:false },
-          bass: Object.assign({ on:true, key:'E', density:2, vel:'mixte', vary:false },
-            { pattern:E.preset.pattern, prog:E.preset.prog, drop:Object.assign({ on:false, everyN:4, lenBeats:2 }, E.preset.drop || {}) }) };
-      },
-      buildVote: function(p, ex, c, v){ return pfVoteItem(p, ex, c, v); },
-      loadPreset: function(ex){ pfLoadPreset(ex); },
-      vote: function(p, ex, c, v){ pfVote(p, ex, c, v); },
-      flush: function(){ return pfFlushVotes(); },
-      isAcquis: pfIsAcquis,
-      setAcquis: pfAcquisSet,
-      niveauEffectif: pfNiveauEffectif,
-      niveau: pfNivGet,
-      niveauxPeuples: pfPopulatedNiveaux,
-      showNiveau: function(n){ pfNivSet(n); try { pfRender(); } catch(e){} }
-    };
-  };
-
-  pfInit();
 
   // 0.6.6 (C8) : l'init est terminée — les prochains enregistrements viennent d'un geste
   // utilisateur, le toast « réglages enregistrés » peut se montrer (une fois par session).
   window.__fmReady = true;
 </script>
+
+<!-- ===================== COMPTE (Supabase · lien magique) =====================
+     R-4b : markup de page (carte + styles, patron R-4a) ; la LOGIQUE vit dans
+     coquille/fm-compte.js — une seule source, partagée avec index et apprendre. -->
+<style id="acctCss">
+  #acctDim{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9500;display:none}
+  #acctDim.show{display:block}
+  #acctCard{position:fixed;z-index:9502;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:min(92vw,380px);background:var(--fm-panel);border:1px solid var(--fm-line);border-radius:14px;
+    padding:20px 20px 16px;box-shadow:0 18px 50px rgba(0,0,0,.35);color:var(--fm-ink)}
+  #acctCard h3{margin:0 0 6px;font-family:var(--fm-font-display);font-size:1.35rem;color:var(--fm-ink)}
+  #acctCard p{margin:0 0 12px;color:var(--fm-sub);font-size:.85rem;line-height:1.5}
+  #acctCard input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--fm-line);
+    background:var(--fm-panel-2);color:var(--fm-ink);font:inherit;font-size:16px;margin-bottom:10px}
+  #acctCard input:focus-visible{outline:2px solid var(--fm-accent);outline-offset:1px}
+  #acctCard .acct-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:6px;flex-wrap:wrap}
+  #acctCard .acct-actions button{background:var(--fm-panel-2);border:1px solid var(--fm-line);color:var(--fm-ink);
+    padding:8px 14px;border-radius:7px;cursor:pointer;font-family:var(--fm-font-ui);font-size: .8125rem;letter-spacing:.04em}
+  #acctCard .acct-actions button:hover{border-color:var(--fm-accent)}
+  #acctCard .acct-actions button.acct-primary{background:var(--fm-accent);border-color:var(--fm-accent);color:var(--fm-accent-ink);font-weight:600}
+  #acctFb{min-height:20px;font-size:.82rem;font-weight:600;margin:2px 0 4px}
+  #acctFb.good{color:var(--fm-accent-text)} #acctFb.bad{color:var(--fm-danger-text)}
+</style>
+<div id="acctDim" aria-hidden="true"></div>
+<div id="acctCard" role="dialog" aria-modal="true" aria-labelledby="acctTitle" style="display:none">
+  <h3 id="acctTitle">Se connecter</h3>
+  <div id="acctBody"></div>
+</div>
+<script src="coquille/fm-compte.js"></script>
+<script>
+/* ===== Bibliothèque partagée (Supabase) : routines canon/classe + publication =====
+   R-4b : bloc migré d'index.html avec la section #secBiblio — verbatim. */
+(function(){
+  function el(id){ return document.getElementById(id); }
+  function esc(s){ var d=document.createElement('div'); d.textContent=(s==null?'':String(s)); return d.innerHTML; }
+  function fb(msg,ok){ var e=el('biblioFb'); if(e){ e.textContent=msg||''; e.style.color=ok?'var(--fm-accent-text)':'var(--fm-danger-text)'; } }
+  function sb(){ return (window.fmSupabase&&window.fmSupabase())||null; }
+  function user(){ return window.fmCurrentUser||null; }
+
+  function tagFor(row){
+    if(row.canon) return 'Référence';
+    var u=user();
+    if(u && row.owner===u.id) return 'Moi';
+    if(row.partage_classe) return 'Classe';
+    return '';
+  }
+  async function loadBiblio(){
+    var list=el('biblioList'); if(!list) return;
+    var c=sb(); if(!c){ fb('Client Supabase indisponible (réseau ?).',false); return; }
+    fb('Chargement…',true);
+    try{
+      var res=await c.from('mt_routines')
+        .select('id,titre,script,owner,canon,partage_classe,updated_at')
+        .order('canon',{ascending:false}).order('titre',{ascending:true});
+      if(res.error){ fb('Erreur : '+res.error.message,false); return; }
+      var data=res.data||[]; list.innerHTML='';
+      if(!data.length){ fb(user()?'Bibliothèque vide pour l\'instant.':'Aucune routine de référence pour l\'instant.',true); return; }
+      fb(data.length+' routine(s)'+(user()?'':' · connecte-toi pour voir la classe'),true);
+      data.forEach(function(row){
+        var r=document.createElement('div');
+        r.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid rgba(128,128,128,.2)';
+        var left=document.createElement('span');
+        var tag=tagFor(row);
+        left.innerHTML='<b>'+esc(row.titre||'(sans titre)')+'</b>'+(tag?' <span class="sec-sub">· '+tag+'</span>':'');
+        var b=document.createElement('button'); b.className='btn-sm'; b.textContent='Importer';
+        b.onclick=function(){
+          var ta=el('scriptArea');
+          if(!ta){ fb('Éditeur de routine introuvable.',false); return; }
+          ta.value=(row.script||'');
+          try{ ta.dispatchEvent(new Event('input',{bubbles:true})); }catch(e){}
+          var sec=el('secScript'); if(sec&&!sec.open) sec.open=true;
+          fb('« '+(row.titre||'routine')+' » chargée dans l\'éditeur ✓',true);
+        };
+        r.appendChild(left); r.appendChild(b); list.appendChild(r);
+      });
+    }catch(e){ fb('Échec : '+(e&&e.message||e),false); }
+  }
+
+  async function publish(){
+    var c=sb(); if(!c){ fb('Client Supabase indisponible (réseau ?).',false); return; }
+    var u=user(); if(!u){ fb('Connecte-toi (en haut) pour publier tes routines.',false); return; }
+    var ta=el('scriptArea'); var script=ta?(ta.value||'').trim():'';
+    if(!script){ fb('L\'éditeur de routine est vide.',false); return; }
+    var ti=el('biblioTitre'); var titre=(ti?(ti.value||''):'').trim();
+    if(!titre){
+      var lines=script.split('\n');
+      var cm=lines.find(function(l){ return /^#\s*\S/.test(l); });
+      titre=(cm?cm.replace(/^#\s*/,''):(lines.find(function(l){return l.trim();})||'Routine')).slice(0,120);
+    }
+    titre=titre.slice(0,120);
+    fb('Publication…',true);
+    try{
+      var res=await c.from('mt_routines')
+        .insert({ owner:u.id, titre:titre, script:script, partage_classe:true, canon:false })
+        .select().maybeSingle();
+      if(res.error){ fb('Erreur : '+res.error.message,false); return; }
+      fb('« '+titre+' » publiée dans la classe ✓',true);
+      loadBiblio();
+    }catch(e){ fb('Échec : '+(e&&e.message||e),false); }
+  }
+
+  function updatePublishBtn(){
+    var pb=el('btnBiblioPublish'); if(!pb) return;
+    pb.title=user()?'Publier la routine de l\'éditeur dans la bibliothèque de la classe':'Connecte-toi (en haut) pour publier';
+  }
+  function wire(){
+    var rb=el('btnBiblioRefresh'); if(rb&&!rb._wired){ rb._wired=true; rb.addEventListener('click',loadBiblio); }
+    var pb=el('btnBiblioPublish'); if(pb&&!pb._wired){ pb._wired=true; pb.addEventListener('click',publish); }
+    updatePublishBtn();
+  }
+  document.addEventListener('fm-auth', updatePublishBtn);
+  if(document.readyState!=='loading') wire(); else document.addEventListener('DOMContentLoaded', wire);
+})();
+</script>
+<!-- =================== FIN COMPTE (Supabase · lien magique) =================== -->
 
 <!-- ===================== EXPORT AUDIO (WAV hors-ligne · MP3 via encodeur) ===================== -->
 <script>

@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Métronome — Apprendre · Formation Musicale</title>
+
+<!-- Polices du portail -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  /* ============ CONTRAT DE THÈME PORTAIL FM ============ */
+  :root {
+    /* défauts = thème clair du portail */
+    --fm-bg:         #efe7d8;
+    --fm-panel:      #f7f1e6;
+    --fm-panel-2:    #f0e7d6;
+    --fm-ink:        #2a221b;
+    --fm-sub:        #6b5d4c;
+    --fm-line:       rgba(107,74,46,.16);
+    --fm-accent:     #b3763b;
+    --fm-accent-2:   #6b4a2e;
+    --fm-accent-text:#875627;   /* A2 0.6.9 : accent lisible en texte (>= 4.5:1) */
+    --fm-danger-text:#b23530;
+    --fm-accent-ink: #f7f1e6;
+    --fm-staff:      rgba(107,74,46,.06);
+    --fm-font-display: 'Cormorant Garamond', Georgia, serif;
+    --fm-font-ui:      'Work Sans', system-ui, sans-serif;
+  }
+  html[data-fm-theme="clair"] {
+    --fm-bg:#efe7d8; --fm-panel:#f7f1e6; --fm-panel-2:#f0e7d6;
+    --fm-ink:#2a221b; --fm-sub:#6b5d4c; --fm-line:rgba(107,74,46,.16);
+    --fm-accent:#b3763b; --fm-accent-2:#6b4a2e; --fm-accent-ink:#f7f1e6;
+    --fm-accent-text:#875627; --fm-danger-text:#b23530;
+    --fm-staff:rgba(107,74,46,.06);
+  }
+  html[data-fm-theme="sombre"] {
+    --fm-bg:#0e0e10; --fm-panel:#17151a; --fm-panel-2:#1c1a1f;
+    --fm-ink:#f5f0e6; --fm-sub:#b5aea2; --fm-line:rgba(201,162,75,.18);
+    --fm-accent:#c9a24b; --fm-accent-2:#7a6a3a; --fm-accent-ink:#0e0e10;
+    --fm-accent-text:#c9a24b; --fm-danger-text:#d9534f;
+    --fm-staff:rgba(201,162,75,.05);
+  }
+
+  /* ============ BASE ============ */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: var(--fm-font-ui);
+    background: var(--fm-bg);
+    color: var(--fm-ink);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 28px 14px 40px;
+    transition: background-color .5s ease, color .5s ease;
+  }
+  .app { width: 100%; max-width: 860px; }
+
+  /* ============ EN-TÊTE ============ */
+  header { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
+  .brand h1 {
+    font-family: var(--fm-font-display);
+    font-weight: 600;
+    font-size: 2.1rem;
+    line-height: 1.05;
+  }
+  .kicker {
+    font-size: .8125rem; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--fm-accent-text); font-weight: 600; margin-top: 4px;
+  }
+  .header-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .btn-ghost {
+    background: var(--fm-panel); border: 1px solid var(--fm-line); color: var(--fm-ink);
+    padding: 8px 14px; border-radius: 7px; cursor: pointer;
+    font-family: var(--fm-font-ui); font-size: .8125rem; letter-spacing: .04em;
+  }
+  .btn-ghost:hover { border-color: var(--fm-accent); }
+
+  /* ============ CARTES & TRANSPORT ============ */
+  .card {
+    background: var(--fm-panel);
+    border: 1px solid var(--fm-line);
+    border-radius: 12px;
+    padding: 22px;
+    margin-bottom: 16px;
+    transition: background-color .5s ease, border-color .5s ease;
+  }
+  .tempo-value {
+    font-family: var(--fm-font-display); font-weight: 700;
+    font-size: 4.2rem; line-height: 1; text-align: center; font-variant-numeric: tabular-nums;
+  }
+  .tempo-label {
+    text-align: center; color: var(--fm-sub); font-size: .8125rem;
+    letter-spacing: .14em; text-transform: uppercase; margin: 6px 0 10px;
+  }
+  .tempo-label em { font-family: var(--fm-font-display); font-style: italic; font-size: 1.05rem; letter-spacing: 0; text-transform: none; color: var(--fm-accent-text); }
+  .slider-row { display: flex; align-items: center; gap: 10px; margin: 10px 0; max-width: 460px; margin-left: auto; margin-right: auto; }
+  .slider-row button {
+    background: var(--fm-panel-2); border: 1px solid var(--fm-line); color: var(--fm-ink);
+    width: 38px; height: 38px; border-radius: 50%; font-size: 1.25rem; cursor: pointer; flex-shrink: 0;
+  }
+  .slider-row button:hover { border-color: var(--fm-accent); }
+  input[type=range] { flex: 1; -webkit-appearance: none; height: 4px; border-radius: 2px; background: var(--fm-line); outline: none; }
+  :focus-visible { outline: 2px solid var(--fm-accent); outline-offset: 2px; }
+  input[type=range]:focus-visible { outline: 2px solid var(--fm-accent); outline-offset: 2px; }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
+    background: var(--fm-accent); border: 2px solid var(--fm-panel); cursor: pointer;
+  }
+  input[type=range]::-moz-range-thumb {
+    width: 18px; height: 18px; border-radius: 50%; background: var(--fm-accent);
+    border: 2px solid var(--fm-panel); cursor: pointer;
+  }
+  .main-buttons { display: flex; gap: 10px; margin-top: 12px; max-width: 460px; margin-left: auto; margin-right: auto; }
+  .btn-start {
+    flex: 2; background: var(--fm-accent); border: none; color: var(--fm-accent-ink);
+    padding: 14px; border-radius: 7px; font-family: var(--fm-font-ui);
+    font-size: .95rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; cursor: pointer;
+  }
+  .btn-start:hover { filter: brightness(1.06); }
+  .btn-start.playing { background: var(--fm-accent-2); color: var(--fm-accent-ink); }
+  .status-line { color: var(--fm-sub); font-size: .8125rem; margin-top: 10px; min-height: 1.2em; text-align: center; }
+  select, input[type=number], input[type=text] {
+    background: var(--fm-panel-2); color: var(--fm-ink);
+    border: 1px solid var(--fm-line); border-radius: 7px; padding: 8px;
+    font-family: var(--fm-font-ui); font-size: .9rem;
+  }
+  .sec-title { font-family: var(--fm-font-display); font-weight: 600; font-size: 1.25rem; }
+  .sec-sub { color: var(--fm-sub); font-size: .8125rem; letter-spacing: .1em; text-transform: uppercase; }
+  .check { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: .88rem; }
+  .check input { accent-color: var(--fm-accent); width: 16px; height: 16px; }
+  .hint { color: var(--fm-sub); font-size: .8125rem; line-height: 1.55; margin-top: 6px; }
+  .btn-sm {
+    background: var(--fm-panel-2); border: 1px solid var(--fm-line); color: var(--fm-ink);
+    padding: 8px 14px; border-radius: 7px; cursor: pointer; font-family: var(--fm-font-ui); font-size: .82rem;
+  }
+  .btn-sm:hover { border-color: var(--fm-accent); }
+  .btn-sm.primary { background: var(--fm-accent); border-color: var(--fm-accent); color: var(--fm-accent-ink); font-weight: 600; }
+  .hide { display: none !important; }
+  .fm-toast { position:fixed; left:50%; transform:translateX(-50%); bottom:18px; z-index:200;
+    background:var(--fm-panel); color:var(--fm-ink); border:1px solid var(--fm-line);
+    border-radius:10px; padding:8px 14px; font-size:.85rem; box-shadow:0 4px 14px rgba(0,0,0,.18);
+    opacity:0; transition:opacity .3s; pointer-events:none; }
+  .fm-toast.show { opacity:1; }
+
+  /* ===== Parcours funk (P-4) — surcouche additive ===== */
+  :root { --pf-cajon:#C8722E; --pf-djembe:#2E86C8; }
+  /* P-6 : sélecteur de niveau (Débutant / Intermédiaire / …) */
+  .pf-niv-tabs { display:flex; flex-wrap:wrap; gap:6px; margin:2px 0 4px; }
+  .pf-niv-tab { font-family:var(--fm-font-ui); font-size:.8125rem; letter-spacing:.02em; padding:6px 14px; border-radius:20px;
+    border:1px solid var(--fm-line); background:var(--fm-panel-2); color:var(--fm-sub); cursor:pointer; }
+  .pf-niv-tab:hover { border-color:var(--fm-accent); color:var(--fm-ink); }
+  .pf-niv-tab.active { background:var(--fm-accent); border-color:var(--fm-accent); color:var(--fm-accent-ink); font-weight:600; }
+  .pf-niv-tab:focus-visible { outline:2px solid var(--fm-accent); outline-offset:1px; }
+  .pf-grid { display:grid; grid-template-columns:1fr; gap:14px; margin-top:6px; }
+  @media (min-width:640px){ .pf-grid { grid-template-columns:1fr 1fr; } }
+  .pf-col { border:1px solid var(--fm-line); border-radius:12px; padding:10px; background:var(--fm-panel-2); border-top:3px solid var(--pf-c); }
+  .pf-col-head { font-weight:700; font-size:.9rem; margin-bottom:8px; display:flex; align-items:center; gap:6px; color:var(--fm-ink); }
+  .pf-dot { width:10px; height:10px; border-radius:50%; background:var(--pf-c); display:inline-block; }
+  .pf-card { border:1px solid var(--fm-line); border-left:4px solid var(--pf-c); border-radius:10px; padding:8px 10px; margin:8px 0; background:var(--fm-panel); }
+  .pf-card.pf-shared { border-left:4px solid transparent; border-image:linear-gradient(var(--pf-cajon),var(--pf-djembe)) 1; }
+  .pf-card.pf-acq { box-shadow:inset 0 0 0 1px var(--fm-accent); }
+  .pf-card-top { display:flex; align-items:center; gap:8px; }
+  .pf-rang { min-width:1.5em; height:1.5em; border-radius:50%; background:var(--pf-c); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size: .8125rem; font-weight:700; }
+  .pf-objet { font-weight:600; font-size:.86rem; flex:1; }
+  .pf-badge-shared, .pf-badge-promo { font-size: .8125rem; padding:1px 6px; border-radius:20px; white-space:nowrap; }
+  .pf-badge-shared { background:linear-gradient(90deg,var(--pf-cajon),var(--pf-djembe)); color:#fff; }
+  .pf-badge-promo { background:var(--fm-accent); color:var(--fm-accent-ink); }
+  .pf-consigne { font-size: .8125rem; color:var(--fm-ink); margin:6px 0 2px; }
+  .pf-critere { font-size: .8125rem; color:var(--fm-sub); font-style:italic; margin-bottom:6px; }
+  .pf-actions { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .pf-perso { margin-top:6px; font-size: .8125rem; }
+  .pf-perso summary { cursor:pointer; color:var(--fm-sub); }
+  .pf-perso-body { display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; align-items:center; }
+  .pf-perso-body label { display:flex; align-items:center; gap:4px; }
+  .pf-vote { display:flex; align-items:center; gap:6px; margin-top:8px; font-size: .8125rem; color:var(--fm-sub); flex-wrap:wrap; }
+  .pf-vote .pf-v { font-size: .8125rem; padding:2px 8px; }
+  #pfStatus { font-size: .8125rem; color:var(--fm-accent-2); margin-top:8px; min-height:1em; }
+  .pf-mod { border:1px solid var(--fm-line); border-radius:10px; margin:8px 0; overflow:hidden; background:var(--fm-panel); }
+  .pf-mod-head { width:100%; display:flex; align-items:center; gap:8px; padding:9px 10px; background:transparent; border:none; cursor:pointer; color:var(--fm-ink); font:inherit; text-align:left; }
+  .pf-mod-idx { min-width:1.6em; height:1.6em; border-radius:50%; background:var(--pf-c); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size: .8125rem; font-weight:700; }
+  .pf-mod-objet { flex:1; font-weight:700; font-size:.85rem; }
+  .pf-mod-count { font-size: .8125rem; color:var(--fm-sub); font-variant-numeric:tabular-nums; }
+  .pf-mod-chev { color:var(--fm-sub); transition:transform .18s ease; }
+  .pf-mod.open .pf-mod-chev { transform:rotate(180deg); }
+  .pf-mod-body { display:none; padding:0 8px 6px; }
+  .pf-mod.open .pf-mod-body { display:block; }
+
+  /* R-4a (apprendre) : mention « démo à venir » sur les fiches sans champ demo */
+  .pf-nodemo { font-size: .8125rem; color: var(--fm-sub); font-style: italic; }
+
+  #fmStubs { display: none !important; }
+
+  /* M1 — petits écrans : reflow seulement, aucun contenu masqué */
+  @media (max-width: 480px) {
+    body { padding: 16px 8px 24px; }
+    .card { padding: 14px; }
+  }
+</style>
+
+<script>
+  /* Chargeur de thème du portail : ?theme= → localStorage → défaut */
+  (function () {
+    try {
+      var q = new URLSearchParams(location.search);
+      var t = q.get('theme');
+      if (t) { localStorage.setItem('fm-theme', t); }
+      else   { t = localStorage.getItem('fm-theme'); }
+      if (t === 'clair' || t === 'sombre') {
+        document.documentElement.setAttribute('data-fm-theme', t);
+      }
+      var href = q.get('themeUrl');
+      if (href) {
+        var link = document.createElement('link');
+        link.rel = 'stylesheet'; link.href = href;
+        document.head.appendChild(link);
+      }
+    } catch (e) { /* silencieux */ }
+  })();
+</script>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">
+      <h1>Métronome — Apprendre</h1>
+      <div class="kicker">Le parcours · mode écoute — mode pratique</div>
+      <div class="build-stamp" id="buildStamp" style="font-size:13px;opacity:.75;margin-top:2px;font-variant-numeric:tabular-nums;"></div>
+      <div style="font-size:12px;margin-top:2px;">
+        <a href="index.html" style="color:inherit;opacity:.7;" title="Revenir à la page d'accueil du métronome">← Accueil du métronome</a>
+        · <a href="pratiquer.html" style="color:inherit;opacity:.7;" title="La pratique libre : instruments, styles, réglages complets">Pratique libre</a>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-ghost" id="themeBtn" title="Basculer entre thème clair et thème sombre">◐ Mode sombre</button>
+      <button class="btn-ghost" id="btnAccount" title="Recevoir un lien de connexion par e-mail">Se connecter</button>
+    </div>
+  </header>
+
+  <!-- Transport minimal (R-4a) : la leçon règle tout — ici, seulement démarrer/arrêter et le tempo. -->
+  <div class="card" id="transport">
+    <div class="tempo-value" id="tempoValue">92</div>
+    <div class="tempo-label">BPM · <em id="tempoName">Moderato</em></div>
+    <div class="slider-row" role="group" aria-label="Réglage du tempo">
+      <button id="minusBtn" aria-label="Tempo -1">−</button>
+      <input type="range" id="tempoSlider" min="30" max="260" value="92" aria-label="Tempo (BPM)">
+      <button id="plusBtn" aria-label="Tempo +1">+</button>
+    </div>
+    <div class="main-buttons">
+      <button class="btn-start" id="startBtn">▶ Démarrer</button>
+    </div>
+    <div class="status-line" id="statusLine" role="status" aria-live="polite">Prêt</div>
+  </div>
+
+  <!-- Le parcours : la surcouche P-4 (transplantée d'index.html 0.12.0) rend ici. -->
+  <div class="card" id="secParcours">
+    <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;">
+      <span class="sec-title">Le parcours</span>
+      <span class="sec-sub">cajón · djembé — leçons par niveaux</span>
+    </div>
+    <div class="hint">Choisis un exercice. « ▶ Écouter » fait entendre le modèle par-dessus l'accompagnement — imprègne-toi, puis « Charger » installe l'accompagnement seul : à toi de jouer. Coche « acquis » quand le critère est atteint ; le vote de difficulté aide à recalibrer le niveau pour tout le monde.</div>
+    <div id="pfRoot"></div>
+    <div id="pfStatus" aria-live="polite"></div>
+  </div>
+</div>
+
+<!-- ============ R-4a — STUBS INERTES : le STRICT contrat moteur (annexe R-3a) ============
+     Contrairement au patron R-3b de pratiquer.html (coquille verbatim → stubs de toutes les
+     surfaces d'index), la coquille de cette page est NOUVELLE et minimale : seuls restent
+     les éléments que moteur/*.js référence sans garde — stop() écrit #percFsPlay,
+     gapTargetRefresh() remplit #gapTarget (appelé par le chargeur de preset Débutant). -->
+<div id="fmStubs" hidden aria-hidden="true">
+  <button id="percFsPlay">▶</button>
+  <select id="gapTarget" aria-hidden="true"></select>
+</div>
+
+<!-- ===================== COMPTE (Supabase · lien magique) ===================== -->
+<style id="acctCss">
+  #acctDim{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9500;display:none}
+  #acctDim.show{display:block}
+  #acctCard{position:fixed;z-index:9502;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:min(92vw,380px);background:var(--fm-panel);border:1px solid var(--fm-line);border-radius:14px;
+    padding:20px 20px 16px;box-shadow:0 18px 50px rgba(0,0,0,.35);color:var(--fm-ink)}
+  #acctCard h3{margin:0 0 6px;font-family:var(--fm-font-display);font-size:1.35rem;color:var(--fm-ink)}
+  #acctCard p{margin:0 0 12px;color:var(--fm-sub);font-size:.85rem;line-height:1.5}
+  #acctCard input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--fm-line);
+    background:var(--fm-panel-2);color:var(--fm-ink);font:inherit;font-size:16px;margin-bottom:10px}
+  #acctCard input:focus-visible{outline:2px solid var(--fm-accent);outline-offset:1px}
+  #acctCard .acct-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:6px;flex-wrap:wrap}
+  #acctCard .acct-actions button{background:var(--fm-panel-2);border:1px solid var(--fm-line);color:var(--fm-ink);
+    padding:8px 14px;border-radius:7px;cursor:pointer;font-family:var(--fm-font-ui);font-size: .8125rem;letter-spacing:.04em}
+  #acctCard .acct-actions button:hover{border-color:var(--fm-accent)}
+  #acctCard .acct-actions button.acct-primary{background:var(--fm-accent);border-color:var(--fm-accent);color:var(--fm-accent-ink);font-weight:600}
+  #acctFb{min-height:20px;font-size:.82rem;font-weight:600;margin:2px 0 4px}
+  #acctFb.good{color:var(--fm-accent-text)} #acctFb.bad{color:var(--fm-danger-text)}
+</style>
+<div id="acctDim" aria-hidden="true"></div>
+<div id="acctCard" role="dialog" aria-modal="true" aria-labelledby="acctTitle" style="display:none">
+  <h3 id="acctTitle">Se connecter</h3>
+  <div id="acctBody"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="corpus/socle-technique.js"></script>
+<script src="corpus/funk.js"></script>
+<script src="moteur/fm-etat.js"></script>
+<script src="moteur/fm-audio.js"></script>
+<script src="moteur/fm-accomp.js"></script>
+<script src="coquille/fm-compte.js"></script>
+<script>
+'use strict';
+  /* ============================================================================
+     apprendre.html — scénario 2 (R-4a) : l'apprenant au milieu de ses leçons.
+     Coquille de PAGE, nouvelle et minimale (la coquille évolue librement depuis
+     R-3b ; le moteur, lui, reste verbatim — recette-extraction.js) :
+       1. contrat moteur (annexe R-3a) : état + hooks référencés par moteur/*.js ;
+       2. thème + transport minimal (le preset de la leçon règle le reste) ;
+       3. mode écoute « demo » (R-4a) : injection dans les grilles de coquille
+          (percGrids/percMeta) que computeCycle lit déjà — ZÉRO retouche moteur ;
+       4. surcouche PARCOURS FUNK (P-4) transplantée VERBATIM d'index.html 0.12.0,
+          déviations marquées « R-4a (apprendre) » uniquement.
+     ============================================================================ */
+
+  // ============ CONTRAT MOTEUR (annexe R-3a) — état de coquille requis ============
+  // Le moteur verbatim lit/écrit ces globals et appelle ces hooks. Les surfaces
+  // correspondantes (séquenceur, clave, breaks, team spirit, archet, routine,
+  // atelier, visualisation) n'existent pas sur cette page : état neutre + no-op.
+  let percGrids = {};          // voix -> grille de pas (0/1/2) — porte les voix de la démo (R-4a)
+  let percOffsets = {};        // voix -> décalage par pas (fraction de pas) — swing de la démo
+  let percMuted = {};
+  let percMeta = {};           // voix -> { instr, voiceKind } — identité de timbre par voix
+  let percWork = '';
+  let percMeasures = 0;
+  let percCallSilent = false;
+  let percBreakActive = false, percBreakEchoNow = false;
+  let statusLineLast = null;
+  let atelierOpen = false;
+  let accompMuted = false;     // état de coquille consommé par playClick (contrat R-3a étendu)
+  const claveData = {};        // aucune voix clave sur cette page
+  const CLAVE_VOICES = [];
+  // palette minimale : gapTargetRefresh (chargeur Débutant) lit PERC_INSTR[S.perc.instr].voices
+  const PERC_INSTR = {
+    djembe: { label: 'Djembé', voices: [
+      { id: 'basse', label: 'Basse' }, { id: 'tone', label: 'Tone' }, { id: 'slap', label: 'Slap' }] },
+    cajon: { label: 'Cajón', voices: [
+      { id: 'grave', label: 'Grave' }, { id: 'aigu', label: 'Aigu' }] }
+  };
+  function scriptOnNewMeasure() {}
+  function percOnNewMeasure() {}
+  function percBreakEvents() { return []; }
+  function percResetBreakState() {}
+  function bowReset() {}
+  function atelierRender() {}
+  function tsMuted() { return false; }
+  function draw() {}
+  function drawStatic() {}
+
+  // ---- wake lock (0.7.0, C11 — W2), repris de la coquille : écran maintenu en lecture.
+  // Amélioration progressive pure : silencieux si l'API est absente.
+  let fmWakeLock = null, fmWakeLockWanted = false;
+  function wakeLockShow(on) {
+    const w = $('atelierWl'); if (w) w.hidden = !on;
+  }
+  function wakeLockUpdate() {
+    fmWakeLockWanted = isPlaying || atelierOpen;
+    if (!('wakeLock' in navigator) || !navigator.wakeLock || !navigator.wakeLock.request) {
+      wakeLockShow(false); return;
+    }
+    if (fmWakeLockWanted && !fmWakeLock) {
+      navigator.wakeLock.request('screen').then(wl => {
+        fmWakeLock = wl;
+        wakeLockShow(true);
+        if (wl.addEventListener) wl.addEventListener('release', () => { fmWakeLock = null; wakeLockShow(false); });
+        if (!fmWakeLockWanted) wakeLockUpdate();
+      }).catch(() => { wakeLockShow(false); });
+    } else if (!fmWakeLockWanted && fmWakeLock) {
+      const wl = fmWakeLock; fmWakeLock = null;
+      try { wl.release().catch(() => {}); } catch (e) {}
+      wakeLockShow(false);
+    }
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && fmWakeLockWanted) { fmWakeLock = null; wakeLockUpdate(); }
+  });
+
+  // ============ THÈME ============
+  function currentTheme() {
+    return document.documentElement.getAttribute('data-fm-theme') || 'clair';
+  }
+  function setTheme(t) {
+    document.documentElement.setAttribute('data-fm-theme', t);
+    store.set('fm-theme', t);
+    $('themeBtn').textContent = t === 'sombre' ? '◐ Mode clair' : '◐ Mode sombre';
+  }
+  $('themeBtn').addEventListener('click', () => setTheme(currentTheme() === 'sombre' ? 'clair' : 'sombre'));
+
+  // ============ TRANSPORT (R-4a — version de page) ============
+  function nameOf(bpm) {
+    if (bpm < 40) return 'Grave'; if (bpm < 60) return 'Largo';
+    if (bpm < 66) return 'Larghetto'; if (bpm < 76) return 'Adagio';
+    if (bpm < 108) return 'Moderato'; if (bpm < 120) return 'Allegretto';
+    if (bpm < 156) return 'Allegro'; if (bpm < 176) return 'Vivace';
+    if (bpm < 200) return 'Presto'; return 'Prestissimo';
+  }
+  function setTempo(bpm) {
+    S.tempo = Math.min(260, Math.max(30, bpm));
+    $('tempoValue').textContent = S.tempo;
+    $('tempoName').textContent = nameOf(S.tempo);
+    $('tempoSlider').value = S.tempo;
+  }
+  function setSwing(v) {
+    S.swing = Math.min(85, Math.max(50, v));
+  }
+  function statusRender() {
+    if (isPlaying) {
+      $('statusLine').textContent = demoActive
+        ? 'Écoute — le modèle joue par-dessus l\'accompagnement'
+        : 'Lecture — à toi de jouer';
+    }
+    // à l'arrêt, stop() (moteur) écrit déjà « Arrêté »
+  }
+  $('tempoSlider').addEventListener('input', e => setTempo(+e.target.value));
+  $('minusBtn').addEventListener('click', () => setTempo(S.tempo - 1));
+  $('plusBtn').addEventListener('click', () => setTempo(S.tempo + 1));
+  $('startBtn').addEventListener('click', () => { toggle(); statusRender(); });
+
+  // ============ FAMILLE & GRILLES (R-4a — versions de page) ============
+  // Pas de clave ni de séquenceur ici : setFamily tient S.family (et le miroir
+  // basse gardé du moteur) ; buildPercGrids n'a rien à reconstruire — les seules
+  // voix de la page sont celles de la démo, posées/retirées par demoApply/demoClear.
+  function setFamily(fam, rebuild) {
+    S.family = fam !== 'tern' ? 'bin' : 'tern';
+    bassPlayRefresh();
+  }
+  function buildPercGrids() {}
+
+  // ============ MODE ÉCOUTE (R-4a) — le champ demo du corpus ============
+  // demo = { instr, steps, voix: { <voiceKind>: [0/1/2 × steps], … } } ou, pour les
+  // EX-SOCLE partagés dont le geste diffère, { cajon: {…}, djembe: {…} }.
+  // L'app joue la partie de l'élève par les voix percussives du moteur : injection
+  // dans percGrids/percMeta (le chemin que computeCycle lit déjà) — zéro moteur.
+  let demoActive = false, demoVoices = [], demoEx = null;
+  function demoFor(E, pk) {
+    const d = E && E.demo; if (!d) return null;
+    return d.voix ? d : (d[pk] || null);
+  }
+  function demoClear() {
+    for (const vid of demoVoices) { delete percGrids[vid]; delete percMeta[vid]; delete percOffsets[vid]; }
+    demoVoices = []; demoActive = false; demoEx = null;
+    S.perc.on = false;
+  }
+  function demoApply(ex, pk) {
+    demoClear();
+    const E = PF_EX[ex], d = demoFor(E, pk);
+    if (!d) return false;
+    for (const vk of Object.keys(d.voix)) {
+      const vid = 'demo.' + vk;
+      percGrids[vid] = d.voix[vk].slice();
+      percMeta[vid] = { instr: d.instr, voiceKind: vk };
+      // swing : les pas impairs de la grille suivent le swing de la démo (champ
+      // optionnel demo.swing), sinon S.swing — même formule par paires que la
+      // basse, identité stricte à 50 % ; S.swing n'est jamais modifié.
+      const sw = d.swing != null ? d.swing : S.swing;
+      if (d.steps === 16 && sw !== 50) {
+        const off = 2 * (sw / 100) - 1;
+        percOffsets[vid] = d.voix[vk].map((_, i) => (i % 2 === 1 ? off : 0));
+      }
+      demoVoices.push(vid);
+    }
+    S.perc.instr = d.instr;   // cohérence de palette (gapTargetRefresh)
+    S.perc.on = true;         // les voix d'instrument exigent S.perc.on (computeCycle)
+    demoActive = true; demoEx = ex;
+    return true;
+  }
+
+  // ============ PARCOURS FUNK (P-4) — surcouche additive, module 6 (Intermédiaire) ============
+  // Deux modules (cajón/djembé), preset d'un bloc, acquis local par position, double couleur pour
+  // les EX-SOCLE partagés, vote de fin → pf_vote/pf_promotion en réutilisant window.fmSupabase().
+  // Hors de l'écran « Cours funk », strictement no-op : ne lit/écrit que ses propres clés.
+  const PF_PARC = FM_ASM.instruments;
+  const PF_NIVEAUX = ['debutant', 'intermediaire', 'avance', 'artiste'];
+  // P-6 : parcours multi-niveaux. Chaque niveau a son infixe d'ID, son ordre de modules et son libellé.
+  const PF_NIV_INFIX = { debutant:'D', intermediaire:'I', avance:'Av', artiste:'Ar' };
+  const PF_NIV_LABEL = { debutant:'Débutant', intermediaire:'Intermédiaire', avance:'Avancé', artiste:'Artiste' };
+  const PF_NIV_ORDER = FM_ASM.niveaux;
+  const PF_EX = FM_ASM.exercices;
+  const PF_MOD = FM_ASM.modules;
+  function pfSharedSet(){
+    const c = {};
+    Object.keys(PF_MOD).forEach(mid => PF_MOD[mid].exercices.forEach(e => c[e] = (c[e]||0) + 1));
+    return Object.keys(c).filter(e => c[e] >= 2);
+  }
+  // ---- état local, jamais synchronisé ----
+  function pfAcquisAll(){ try { return JSON.parse(store.get('fm-metro-parcours')||'{}'); } catch(e){ return {}; } }
+  function pfIsAcquis(p, ex){ const a = pfAcquisAll()[p+'|'+ex]; return !!(a && a.acquis); }
+  function pfAcquisSet(p, ex, val){
+    const all = pfAcquisAll();
+    if (val) all[p+'|'+ex] = { acquis:true, ts:Date.now() }; else delete all[p+'|'+ex];
+    store.set('fm-metro-parcours', JSON.stringify(all));
+  }
+  function pfPromoAll(){ try { return JSON.parse(store.get('fm-metro-parcours-promo')||'{}'); } catch(e){ return {}; } }
+  function pfPromoGet(p, ex, c){ return pfPromoAll()[p+'|'+ex+'|'+c] || null; }
+  function pfPromoSet(p, ex, c, rec){
+    const all = pfPromoAll(); all[p+'|'+ex+'|'+c] = Object.assign({ ts:Date.now() }, rec);
+    store.set('fm-metro-parcours-promo', JSON.stringify(all));
+  }
+  // P-6 : niveau de base d'un exercice = niveau du (premier) module qui le référence.
+  function pfExNiveau(ex){
+    for (const mid in PF_MOD){ if (PF_MOD[mid].exercices.indexOf(ex) >= 0) return PF_MOD[mid].niveau; }
+    return 'intermediaire';
+  }
+  function pfNiveauEffectif(p, ex, c){
+    const promo = pfPromoGet(p, ex, c);
+    let base = PF_NIVEAUX.indexOf(pfExNiveau(ex)); if (base < 0) base = PF_NIVEAUX.indexOf('intermediaire');
+    const eff = base + ((promo && promo.promu) ? 1 : 0);
+    return PF_NIVEAUX[Math.min(Math.max(eff, 0), PF_NIVEAUX.length - 1)];
+  }
+  // P-6 : niveaux « peuplés » = ceux qui ont au moins un module déclaré. Niveau affiché : persistant, défaut = 1er peuplé.
+  function pfPopulatedNiveaux(){ return PF_NIVEAUX.filter(n => Object.keys(PF_MOD).some(mid => PF_MOD[mid].niveau === n)); }
+  function pfNivGet(){
+    const pop = pfPopulatedNiveaux(); const def = pop[0] || 'intermediaire';
+    let n = null; try { n = store.get('fm-metro-parcours-niveau'); } catch(e){}
+    return (n && pop.indexOf(n) >= 0) ? n : def;
+  }
+  function pfNivSet(n){ try { store.set('fm-metro-parcours-niveau', n); } catch(e){} }
+  // ---- file de votes offline-first ----
+  function pfQueueAll(){ try { return JSON.parse(store.get('pf_vote_queue')||'[]'); } catch(e){ return []; } }
+  function pfQueueWrite(arr){ store.set('pf_vote_queue', JSON.stringify(arr)); }
+  function pfVoteItem(p, ex, c, v){ return { parcours:p, exercise_id:ex, cible:c, verdict:v, ts:Date.now() }; }
+  function pfQueuePush(item){
+    const q = pfQueueAll().filter(x => !(x.parcours===item.parcours && x.exercise_id===item.exercise_id && x.cible===item.cible));
+    q.push(item); pfQueueWrite(q);
+  }
+  // ---- Supabase : réutilise le client existant (aucun second client, aucun jeton maison) ----
+  function pfSb(){ try { return (window.fmSupabase && window.fmSupabase()) || null; } catch(e){ return null; } }
+  async function pfEnsureUid(sb){
+    try {
+      if (window.fmCurrentUser && window.fmCurrentUser.id) return window.fmCurrentUser.id;
+      const s = await sb.auth.getSession();
+      const u = s && s.data && s.data.session && s.data.session.user;
+      if (u && u.id) return u.id;
+      const a = await sb.auth.signInAnonymously();
+      if (a && a.error) return null;
+      const au = a && a.data && a.data.user; return (au && au.id) || null;
+    } catch(e){ return null; }
+  }
+  let pfFlushing = false;
+  async function pfFlushVotes(){
+    if (pfFlushing) return; const sb = pfSb(); if (!sb) return;
+    const q = pfQueueAll(); if (!q.length) return;
+    pfFlushing = true;
+    try {
+      const uid = await pfEnsureUid(sb); if (!uid) return;
+      const remain = [], touched = {};
+      for (const it of q){
+        try {
+          const r = await sb.from('pf_vote').upsert(
+            { client_id:uid, parcours:it.parcours, exercise_id:it.exercise_id, cible:it.cible, verdict:it.verdict },
+            { onConflict:'client_id,parcours,exercise_id,cible' });
+          if (r && r.error) remain.push(it); else touched[it.parcours+'|'+it.exercise_id+'|'+it.cible] = it;
+        } catch(e){ remain.push(it); }
+      }
+      pfQueueWrite(remain);
+      for (const k in touched){ const it = touched[k]; await pfRefreshPromo(it.parcours, it.exercise_id, it.cible); }
+    } finally { pfFlushing = false; try { pfRender(); } catch(e){} }
+  }
+  async function pfRefreshPromo(p, ex, c){
+    const sb = pfSb(); if (!sb) return;
+    try {
+      const r = await sb.rpc('pf_promotion', { parcours:p, exercise_id:ex, cible:c });
+      if (r && r.error) return; let d = r && r.data; if (Array.isArray(d)) d = d[0];
+      if (d) pfPromoSet(p, ex, c, { promu:!!d.promu, part:d.part, n_votes:d.n_votes, dormant:!!d.dormant });
+    } catch(e){}
+  }
+  function pfVote(p, ex, c, v){ pfQueuePush(pfVoteItem(p, ex, c, v)); pfFlushVotes(); try { pfRender(); } catch(e){} }
+  // ---- application d'un preset d'un bloc (mute rien de l'existant : mêmes points d'ancrage que l'UI) ----
+  function pfSyncBassUI(){
+    const b = S.bass;
+    const set = (id, val) => { const el = $(id); if (el){ if (el.type==='checkbox') el.checked = !!val; else el.value = val; } };
+    set('bassOn', b.on); set('bassPattern', b.pattern); set('bassKey', b.key); set('bassProg', b.prog);
+    set('bassDensity', String(b.density)); set('bassVel', b.vel); set('bassVary', b.vary);
+    set('bassLegato', Math.round((b.legato!=null ? b.legato : 0.25) * 100));
+    set('bassSpace', b.space); set('bassSwingFollow', b.swingFollow);
+    set('bassDropOn', !!(b.drop && b.drop.on));
+    if (b.drop){ set('bassDropEvery', b.drop.everyN); set('bassDropLen', b.drop.lenBeats); }
+    try { bassUpdateChordLabel(); } catch(e){}
+  }
+  // P-6 : sync des contrôles métronome pilotés par un preset Débutant (subdivision + gap).
+  function pfSyncMetroUI(){
+    const ss = $('subdivSel'); if (ss) ss.value = String(S.subdiv);
+    const gm = $('gapMode'); if (gm) gm.value = S.gap.mode;
+    try { gapTargetRefresh(); } catch(e){}
+    const gp = $('gapPlay'); if (gp) gp.value = String(S.gap.playN);
+    const gmv = $('gapMute'); if (gmv) gmv.value = String(S.gap.muteM);
+    try { if (typeof drawStatic === 'function' && !isPlaying) drawStatic(); } catch(e){}
+  }
+  function pfLoadPreset(ex){
+    const E = PF_EX[ex]; if (!E) return; const P = E.preset;
+    setTempo(P.tempo || 90); setSwing(P.swing || 50);
+    S.family = 'bin'; setFamily('bin', true);
+    S.perc.on = false;
+    if (P.metro) {
+      // Débutant : clic seul (jamais de basse funk). Subdivisions + gap pilotés par le preset.
+      S.bass.on = false;
+      S.subdiv = (P.subdiv != null) ? P.subdiv : 1;
+      if (P.gap) {
+        S.gap = Object.assign({}, S.gap, { mode:'fixed', target:(P.gap.target || 'pulse'),
+          playN:(P.gap.playN || 4), muteM:(P.gap.muteM || 1) });
+      } else {
+        S.gap = Object.assign({}, S.gap, { mode:'off', target:'all' });
+      }
+      try { resetGap(); } catch(e){}
+    } else {
+      S.bass.on = true; S.bass.key = 'E'; S.bass.density = (P.dens != null ? P.dens : 2); S.bass.vel = 'mixte'; S.bass.vary = false;
+      S.bass.pattern = P.pattern; S.bass.prog = P.prog;
+      S.bass.drop = Object.assign({ on:false, everyN:4, lenBeats:2 }, P.drop || {});
+    }
+    try { buildPercGrids(); } catch(e){}
+    try { bassResetCycle(); } catch(e){}
+    try { if (typeof bassPersist === 'function') bassPersist(); } catch(e){}
+    pfSyncBassUI();
+    if (P.metro) pfSyncMetroUI();
+    pfStatus('Chargé : ' + E.objet + ' — lance le métronome.');
+  }
+  function pfStatus(msg){ const el = $('pfStatus'); if (el) el.textContent = msg || ''; }
+  // ---- rendu ----
+  function pfEsc(s){ const d = document.createElement('div'); d.textContent = (s==null ? '' : String(s)); return d.innerHTML; }
+  const PF_KEYS = ['E','F','F#','G','G#','A','A#','B','C','C#','D','D#'];
+  function pfRender(){
+    const root = $('pfRoot'); if (!root) return;
+    const shared = pfSharedSet();
+    const niv = pfNivGet(); const pop = pfPopulatedNiveaux();
+    const order = PF_NIV_ORDER[niv] || [];
+    let html = '';
+    // P-6 : sélecteur de niveau — n'apparaît que si plus d'un niveau est peuplé.
+    if (pop.length > 1) {
+      html += '<div class="pf-niv-tabs" role="tablist" aria-label="Niveau du parcours">';
+      pop.forEach(n => {
+        html += '<button type="button" class="pf-niv-tab' + (n === niv ? ' active' : '') + '" data-niv="' + n + '"' +
+          (n === niv ? ' aria-selected="true"' : '') + '>' + pfEsc(PF_NIV_LABEL[n] || n) + '</button>';
+      });
+      html += '</div>';
+    }
+    html += '<div class="pf-grid" data-niv="' + niv + '">';
+    ['cajon','djembe'].forEach(pk => {
+      const parc = PF_PARC[pk];
+      const pref = 'MOD-' + (pk === 'cajon' ? 'CJ' : 'DJ') + '-' + (PF_NIV_INFIX[niv] || 'I') + '-';
+      html += '<div class="pf-col" style="--pf-c:' + parc.couleur + '">';
+      html += '<div class="pf-col-head"><span class="pf-dot"></span>' + pfEsc(parc.label) + '</div>';
+      let mi = 0;
+      order.forEach(code => {
+        const mid = pref + code; const M = PF_MOD[mid]; if (!M) return;
+        let done = 0; M.exercices.forEach(ex => { if (pfIsAcquis(pk, ex)) done++; });
+        const total = M.exercices.length; const open = (mi === 0);
+        html += '<div class="pf-mod' + (open ? ' open' : '') + '" data-parc="' + pk + '" data-mid="' + mid + '">';
+        html += '<button type="button" class="pf-mod-head"><span class="pf-mod-idx">' + (mi + 1) + '</span>';
+        html += '<span class="pf-mod-objet">' + pfEsc(M.objet) + '</span>';
+        html += '<span class="pf-mod-count">' + done + '/' + total + '</span>';
+        html += '<span class="pf-mod-chev">&#9662;</span></button>';
+        html += '<div class="pf-mod-body">';
+        M.exercices.forEach((ex, i) => {
+          const E = PF_EX[ex]; const isShared = shared.indexOf(ex) >= 0;
+          const acq = pfIsAcquis(pk, ex);
+          const promo = pfPromoGet(pk, ex, E.kind); const promu = !!(promo && promo.promu);
+          html += '<div class="pf-card' + (isShared ? ' pf-shared' : '') + (acq ? ' pf-acq' : '') + '" data-ex="' + ex + '" data-parc="' + pk + '">';
+          html += '<div class="pf-card-top"><span class="pf-rang">' + (E.kind === 'synthese' ? '&#9733;' : (i + 1)) + '</span>';
+          html += '<span class="pf-objet">' + pfEsc(E.objet) + '</span>';
+          if (isShared) html += '<span class="pf-badge-shared" title="Deja rencontre dans l\'autre parcours">deja rencontre</span>';
+          if (promu) html += '<span class="pf-badge-promo" title="Monte d\'un niveau par les votes">&#8593; niveau</span>';
+          html += '</div>';
+          html += '<div class="pf-consigne">' + pfEsc(E.consigne) + '</div>';
+          html += '<div class="pf-critere">&laquo; ' + pfEsc(E.critere) + ' &raquo;</div>';
+          html += '<div class="pf-actions">';
+          // R-4a (apprendre) : mode écoute — « ▶ Écouter » quand l'exercice porte une démo, sinon mention discrète
+          html += demoFor(E, pk) ? '<button class="btn-sm primary pf-ecouter">\u25B6 \u00C9couter</button>' : '<span class="pf-nodemo">d\u00E9mo \u00E0 venir</span>';
+          html += '<button class="btn-sm pf-load">Charger</button>';
+          html += '<label class="check pf-acq-lbl"><input type="checkbox" class="pf-acquis"' + (acq ? ' checked' : '') + '> acquis</label></div>';
+          html += '<details class="pf-perso"><summary>Personnaliser</summary><div class="pf-perso-body">';
+          html += '<label>Tempo <input type="range" class="pf-tempo" min="70" max="110" value="' + (E.preset.tempo || 90) + '"></label>';
+          html += '<label>Densite <select class="pf-dens"><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option></select></label>';
+          html += '<label class="check"><input type="checkbox" class="pf-drop"' + (E.preset.drop && E.preset.drop.on ? ' checked' : '') + '> Drop-outs</label>';
+          html += '<label>Tonalite <select class="pf-key">' + PF_KEYS.map(k => '<option' + (k === 'E' ? ' selected' : '') + '>' + k + '</option>').join('') + '</select></label>';
+          html += '</div></details>';
+          html += '<div class="pf-vote"><span>Difficulte :</span>';
+          html += '<button class="btn-sm pf-v" data-v="facile">facile</button>';
+          html += '<button class="btn-sm pf-v" data-v="ok">ok</button>';
+          html += '<button class="btn-sm pf-v" data-v="difficile">difficile</button></div>';
+          html += '</div>';
+        });
+        html += '</div></div>';
+        mi++;
+      });
+      html += '</div>';
+    });
+    html += '</div>';
+    root.innerHTML = html;
+    // P-6 : sélecteur de niveau — un seul niveau rendu à la fois, choix persistant.
+    root.querySelectorAll('.pf-niv-tab').forEach(tab => {
+      tab.addEventListener('click', () => { pfNivSet(tab.getAttribute('data-niv')); pfRender(); });
+    });
+    root.querySelectorAll('.pf-mod-head').forEach(head => {
+      head.addEventListener('click', () => {
+        const mod = head.parentElement, col = mod.parentElement;
+        const wasOpen = mod.classList.contains('open');
+        col.querySelectorAll('.pf-mod').forEach(m => m.classList.remove('open'));
+        if (!wasOpen) mod.classList.add('open');
+      });
+    });
+    root.querySelectorAll('.pf-card').forEach(card => {
+      const ex = card.getAttribute('data-ex'), pk = card.getAttribute('data-parc'), E = PF_EX[ex];
+      // R-4a (apprendre) : « Charger » = mode pratique — retire la démo avant d'installer l'accompagnement
+      card.querySelector('.pf-load').addEventListener('click', () => { demoClear(); pfLoadPreset(ex); statusRender(); });
+      // R-4a (apprendre) : « ▶ Écouter » = mode écoute — accompagnement + modèle joué par l'app
+      { const ec = card.querySelector('.pf-ecouter');
+        if (ec) ec.addEventListener('click', () => {
+          pfLoadPreset(ex);
+          if (demoApply(ex, pk)) {
+            pfStatus('\u00C9coute : ' + E.objet + ' \u2014 le mod\u00E8le joue par-dessus l\u2019accompagnement.');
+            if (!isPlaying) toggle();
+            statusRender();
+          }
+        }); }
+      card.querySelector('.pf-acquis').addEventListener('change', e => {
+        pfAcquisSet(pk, ex, e.target.checked); card.classList.toggle('pf-acq', e.target.checked);
+        const modDiv = card.closest('.pf-mod');
+        if (modDiv){ const MM = PF_MOD[modDiv.getAttribute('data-mid')];
+          if (MM){ let d = 0; MM.exercices.forEach(x => { if (pfIsAcquis(pk, x)) d++; });
+            const cnt = modDiv.querySelector('.pf-mod-count'); if (cnt) cnt.textContent = d + '/' + MM.exercices.length; } }
+      });
+      card.querySelector('.pf-tempo').addEventListener('input', e => setTempo(+e.target.value));
+      card.querySelector('.pf-dens').addEventListener('change', e => { S.bass.density = +e.target.value; try { bassResetCycle(); } catch(_){} });
+      card.querySelector('.pf-drop').addEventListener('change', e => { S.bass.drop = S.bass.drop || { on:false, everyN:4, lenBeats:2 }; S.bass.drop.on = e.target.checked; try { bassResetCycle(); } catch(_){} });
+      card.querySelector('.pf-key').addEventListener('change', e => { S.bass.key = e.target.value; try { bassResetCycle(); bassUpdateChordLabel(); } catch(_){} });
+      card.querySelectorAll('.pf-v').forEach(b => b.addEventListener('click', () => { pfVote(pk, ex, E.kind, b.getAttribute('data-v')); pfStatus('Vote enregistre : ' + b.getAttribute('data-v') + '.'); }));
+    });
+  }
+
+  function pfInit(){
+    if (!$('pfRoot')) return;
+    pfRender();
+    try { document.addEventListener('fm-auth', () => pfFlushVotes()); } catch(e){}
+    try { window.addEventListener('online', () => pfFlushVotes()); } catch(e){}
+    setTimeout(() => { try { pfFlushVotes(); } catch(e){} }, 1200);
+  }
+  window.fmMetroParcours = function(){
+    return {
+      data: { PARC:PF_PARC, MODULES:PF_MOD, EXERCISES:PF_EX, NIVEAUX:PF_NIVEAUX },
+      shared: pfSharedSet(),
+      progress: pfAcquisAll,
+      promoCache: pfPromoAll,
+      voteQueue: pfQueueAll,
+      presetFor: function(ex){
+        const E = PF_EX[ex]; if (!E) return null;
+        return { tempo:90, family:'bin', swing:50, perc:{ on:false },
+          bass: Object.assign({ on:true, key:'E', density:2, vel:'mixte', vary:false },
+            { pattern:E.preset.pattern, prog:E.preset.prog, drop:Object.assign({ on:false, everyN:4, lenBeats:2 }, E.preset.drop || {}) }) };
+      },
+      buildVote: function(p, ex, c, v){ return pfVoteItem(p, ex, c, v); },
+      loadPreset: function(ex){ pfLoadPreset(ex); },
+      vote: function(p, ex, c, v){ pfVote(p, ex, c, v); },
+      flush: function(){ return pfFlushVotes(); },
+      isAcquis: pfIsAcquis,
+      setAcquis: pfAcquisSet,
+      niveauEffectif: pfNiveauEffectif,
+      niveau: pfNivGet,
+      niveauxPeuples: pfPopulatedNiveaux,
+      showNiveau: function(n){ pfNivSet(n); try { pfRender(); } catch(e){} },
+      // R-4a (apprendre) : diagnostic du mode écoute — même esprit que le reste de l'API
+      ecoute: { apply: demoApply, clear: demoClear,
+        active: function(){ return demoActive; },
+        voices: function(){ return demoVoices.slice(); },
+        resolve: function(ex, pk){ return demoFor(PF_EX[ex], pk); } }
+    };
+  };
+
+  pfInit();
+
+  // ============ INIT ============
+  $('themeBtn').textContent = currentTheme() === 'sombre' ? '◐ Mode clair' : '◐ Mode sombre';
+  setTempo(92);
+  setSwing(50);
+  { const _bs = $('buildStamp'); if (_bs) _bs.textContent = 'build ' + BUILD + ' · ' + BUILD_DATE; }
+
+  // 0.6.6 (C8) : l'init est terminée — les prochains enregistrements viennent d'un geste
+  // utilisateur, le toast « réglages enregistrés » peut se montrer (une fois par session).
+  window.__fmReady = true;
+</script>
+</body>
+</html>

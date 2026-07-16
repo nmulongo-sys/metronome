@@ -1,16 +1,19 @@
-/* recette-onboarding-0.6.7.js — salve UX 0.6.7 : onboarding (C1, C9 du panel v0.6.5).
+/* recette-onboarding-0.6.7.js — salve UX 0.6.7 : ce qui en survit à R-4b.
    Headless jsdom : mêmes stubs que recette-ux-0.6.6 (Web Audio / canvas / Supabase mocké).
-   Vérifie : bandeau « Débutant ? » à la première visite (C1), mode focus « une section à
-   la fois » (C1), hints hiérarchisés « phrase clé + En savoir plus » (C9), interaction
-   avec « ⟲ Tout réinitialiser » (C8), et la parité i18n EN/PT des chaînes nouvelles,
-   scindées ou re-clées. Un second DOM, amorcé avec un état existant, vérifie l'absence
-   du bandeau chez les utilisateurs installés et la persistance du mode focus.
-   Usage : node recette-onboarding-0.6.7.js [chemin/index.html]  (défaut ./index.html) */
+   R-4b : le bandeau « Débutant ? » et l'assistant (C1-onboarding) sont RETIRÉS de
+   l'application avec le wizard et l'écran de jeu (GO R-4 §9.4) — l'invitation au
+   novice, c'est l'accueil « métronome immédiat » et sa porte « Apprendre »
+   (recette-accueil.js). Restent vérifiés ici, sur pratiquer.html (la page qui
+   porte sommaire et sections) : le mode focus « une section à la fois » (C1),
+   les hints hiérarchisés « phrase clé + En savoir plus » (C9), l'interaction
+   avec « ⟲ Tout réinitialiser » (C8) et la parité i18n EN/PT des chaînes 0.6.7
+   encore vivantes.
+   Usage : node recette-onboarding-0.6.7.js [chemin/pratiquer.html]  (défaut ./pratiquer.html) */
 const fs = require('fs');
 const path = require('path');
 const { JSDOM, VirtualConsole } = require('jsdom');
 
-const FILE = process.argv[2] || path.join(__dirname, 'index.html');
+const FILE = process.argv[2] || path.join(__dirname, 'pratiquer.html');
 const html = require('./recette-harnais').chargeHtml(FILE);   // R-2 : inline les corpus/*.js
 
 let PASS = 0, FAIL = 0;
@@ -109,27 +112,9 @@ async function runTests() {
   ok('0.2 tampon de build ≥ 0.6.7', bnum >= 6007);
   ok('0.3 init terminée (__fmReady)', W.__fmReady === true);
 
-  // ---- 1. C1 — bandeau « Débutant ? » à la première visite ----
-  const ob = D.getElementById('onboardBanner');
-  ok('1.1 bandeau présent dans l\'écran de jeu', !!ob && !!ob.closest('#playScreen'));
-  ok('1.2 première visite (stockage vierge) → bandeau visible', !ob.classList.contains('hide'));
-  ok('1.3 texte : « Débutant ? Laisse-toi guider » + trois questions', /Débutant \? Laisse-toi guider/.test(txt(ob)) && /trois questions/.test(txt(ob)));
-  const obGuide = D.getElementById('obGuide'), obLater = D.getElementById('obLater');
-  ok('1.4 boutons « ✦ Guide-moi » et « Plus tard »', txt(obGuide) === '✦ Guide-moi' && txt(obLater) === 'Plus tard');
-  obGuide.click();
-  await tick();
-  const wizOverlay = D.getElementById('wizOverlay');
-  ok('1.5 « ✦ Guide-moi » du bandeau ouvre l\'assistant', wizOverlay.classList.contains('open'));
-  ok('1.6 le bandeau se masque en entrant dans l\'assistant', ob.classList.contains('hide'));
-  D.getElementById('wizSkip').click();
-  await tick();
-  ok('1.7 sortir de l\'assistant pose fm-metro-wizard-done', W.localStorage.getItem('fm-metro-wizard-done') === '1');
-  // « Plus tard » : on rejoue le scénario en réaffichant le bandeau à la main
-  ob.classList.remove('hide');
-  W.localStorage.removeItem('fm-metro-wizard-done');
-  obLater.click();
-  ok('1.8 « Plus tard » masque le bandeau', ob.classList.contains('hide'));
-  eq('1.9 « Plus tard » pose fm-metro-onboard-dismissed', W.localStorage.getItem('fm-metro-onboard-dismissed'), '1');
+  /* ---- 1. RETIRÉE (R-4b) : bandeau « Débutant ? » + assistant ----------------
+     Les 9 assertions du bandeau et de son entrée dans le wizard partent avec la
+     surface (retrait C1-onboarding/wizard, GO R-4 §9.4). */
 
   // ---- 2. C1 — mode focus « une section à la fois » ----
   const fm = D.getElementById('focusMode');
@@ -153,21 +138,24 @@ async function runTests() {
   await tick();
   ok('2.5 mode focus coché → une seule section ouverte (la visée)', openCount() === 1 && D.getElementById('secPerc').open);
   // le sommaire C6 reste fonctionnel en mode focus
-  const archetChip = Array.from(D.querySelectorAll('#tocBar .toc-chip')).find(c => c.getAttribute('data-toc') === 'secArchet');
-  archetChip.click();
+  // R-4b : la chip visée devient « Son » — l'archet vit sur index.html.
+  const sonChip = Array.from(D.querySelectorAll('#tocBar .toc-chip')).find(c => c.getAttribute('data-toc') === 'secSon');
+  sonChip.click();
   await tick();
-  ok('2.6 clic sommaire en mode focus → seule la section visée est ouverte', openCount() === 1 && D.getElementById('secArchet').open);
+  ok('2.6 clic sommaire en mode focus → seule la section visée est ouverte', openCount() === 1 && D.getElementById('secSon').open);
   // décocher rétablit l'indépendance
   fm.checked = false;
   fm.dispatchEvent(new W.Event('change', { bubbles: true }));
   D.getElementById('secGroove').open = true;
   await tick();
   eq('2.7 décoché → les sections redeviennent indépendantes', openCount(), 2);
-  ok('2.8 la case suit le sommaire : masquée en mode Jouer (CSS)', /body\.mode-simple \.toc-bar \{ display:none/.test(styleText()));
+  // 2.8 RETIRÉE (R-4b) : plus de mode « Jouer » — la règle CSS body.mode-simple
+  // est partie avec l'écran de jeu (§9.4), le sommaire est toujours visible.
 
   // ---- 3. C9 — aides hiérarchisées « phrase clé + En savoir plus » ----
   const mores = Array.from(D.querySelectorAll('details.hint-more'));
-  eq('3.1 huit aides repliables (les hints ≥ 300 caractères)', mores.length, 8);
+  // R-4b : 7 aides sur pratiquer — celle de l'archet vit sur index.html (recette-accueil).
+  eq('3.1 sept aides repliables (les hints ≥ 300 caractères)', mores.length, 7);
   ok('3.2 chaque repli est fermé par défaut', mores.every(d => !d.open));
   ok('3.3 chaque repli s\'ouvre par « En savoir plus »', mores.every(d => txt(d.querySelector('summary')) === 'En savoir plus'));
   ok('3.4 chaque repli vit dans un hint', mores.every(d => !!d.closest('.hint')));
@@ -184,11 +172,8 @@ async function runTests() {
   eq('3.8 basse : 5 rubriques en liste', bassHint.querySelectorAll('li').length, 5);
   ok('3.9 basse : phrase clé = rôle de la voix (FUNK-I2)', /caler le jeu sur ses syncopes et ses silences \(FUNK-I2\)\./.test(txt(bassHint.closest('.hint'))));
   ok('3.10 basse : drop-outs et swing conservés dans le repli', /re-rentre\s*sur le 1/.test(txt(bassHint)) && /section Micro-timing/.test(txt(bassHint)));
-  // archet : 1er exemple visible, 3 items + jauge dans le repli
-  const bowHint = hintOf('#secArchet .hint-more');
-  eq('3.11 archet : 3 exemples supplémentaires en liste', bowHint.querySelectorAll('li').length, 3);
-  ok('3.12 archet : phrase Jauge conservée dans le repli', /manquer d'archet/.test(txt(bowHint)));
-  ok('3.13 archet : le 1er exemple T50x1 reste visible', /T50x1.*tirer 50 % d'archet sur 1 temps/.test(txt(bowHint.closest('.hint'))));
+  /* 3.11–3.13 DÉPLACÉES (R-4b) : l'aide archet vit sur index.html avec sa
+     section — assertions équivalentes dans recette-accueil.js (A6). */
   // spot-checks de non-perte sur les 5 autres
   ok('3.14 claves : résolution sur le 1 conservée', /cycle suivant\./.test(txt(hintOf('#secClave .hint-more'))));
   ok('3.15 horloge : mode progressif conservé', /aucun filet de sécurité\./.test(txt(hintOf('#secGap .hint-more'))));
@@ -204,14 +189,13 @@ async function runTests() {
   ok('4.1 « ⟲ Tout réinitialiser » purge le refus du bandeau', W.localStorage.getItem('fm-metro-onboard-dismissed') === null);
   ok('4.2 …et l\'état de l\'assistant (le bandeau reviendra au prochain chargement)', W.localStorage.getItem('fm-metro-wizard-done') === null && W.localStorage.getItem('fm-metro-focus-mode') === null);
 
-  // ---- 5. second DOM : utilisateur installé (état de jeu existant + mode focus mémorisé) ----
+  // ---- 5. second DOM : utilisateur installé (mode focus mémorisé) ----
+  // R-4b : plus de bandeau à vérifier (5.1 retirée avec la surface, §9.4).
   const seeded = makeDom({
-    'fm-metro-play': JSON.stringify({ who: 'solo', learn: false, learnPaused: false, n: 1, showBacking: true }),
     'fm-metro-focus-mode': '1'
   });
   await tick(80);
   const D2 = seeded.dom.window.document;
-  ok('5.1 état de jeu existant → pas de bandeau', D2.getElementById('onboardBanner').classList.contains('hide'));
   ok('5.2 fm-metro-focus-mode=1 → case cochée au chargement', D2.getElementById('focusMode').checked === true);
   const s2 = Array.from(D2.querySelectorAll('details.section'));
   D2.getElementById('secGroove').open = true;
@@ -224,11 +208,10 @@ async function runTests() {
   // ---- 6. i18n — parité EN/PT des chaînes nouvelles, scindées ou re-clées ----
   const DICTS = W.__I18N || {};
   const en = DICTS.en || {}, pt = DICTS.pt || {};
+  // R-4b : les clés du bandeau/assistant (surfaces retirées §9.4) sortent de la
+  // liste — restent les chaînes 0.6.7 encore vivantes sur cette page.
   const NEW_KEYS = [
     'En savoir plus',
-    'Débutant ? Laisse-toi guider',
-    '— l\'assistant règle le métronome pour toi en trois questions.',
-    'Plus tard',
     'Une section à la fois',
     'Ouvrir une section referme les autres',
     // scissions C9 (phrase clé / suite du pavé)
