@@ -81,6 +81,7 @@
       legato: 0.25,        // 5.3c : curseur « lié ↔ très lié » (fraction 0–1 → L = 1+f) — durées + release
       space: true,         // 5.3-ter : réverb courte sur la basse seule (off/discret)
       swingFollow: true,   // 5.4 : les 16es de la basse suivent S.swing (pas impairs, FUNK-T3)
+      feelMs: 0,           // R-3b : feel — décalage ms de la couche basse (posé < 0 < poussé, −25…+25) ; 0 = grille stricte, chemin identique
       drop: { on: false, everyN: 4, lenBeats: 2 }   // 5.4 : trou de lenBeats temps en fin de période de everyN mesures
     },
     volume: 0.8
@@ -88,7 +89,7 @@
 
   // Identité du build affichée dans l'en-tête (5.3-bis). Bumper à chaque passe : elle sert à
   // savoir de quel build vient un enregistrement de validation.
-  const BUILD = 'metronomefunk-0.11.0', BUILD_DATE = '2026-07-16';
+  const BUILD = 'metronomefunk-0.12.0', BUILD_DATE = '2026-07-16';
 
   let audioCtx = null, masterGain = null, noiseBuf = null;
   let masterLimiter = null;                                   // 5.3-ter : limiteur de bus master
