@@ -1,6 +1,8 @@
 # Métronome FM — R-3 : moteur en fichiers + `pratiquer.html`
 
 > **Statut : PROPOSITION — spec avant code, Jean tranche (§9).** Rédigée le 2026-07-16.
+> v1.1 le même jour : §9.5 précisé (question Jean sur le passage à l'échelle du répertoire) —
+> extraction **par famille** dans un registre `FM_GROOVES` + validateur, pas de monolithe.
 > Base examinée : **main = 0.10.0** (`7d861f4`, merge de la PR #22 par Jean le 16/07 à 07:34 ;
 > déploiement Pages du commit de merge vérifié vert — run `pages-build-deployment` success).
 > Chantier **R-3** de la refonte B+ (spec R-1 VALIDÉE, GO global) — après R-2 (0.9.0) et
@@ -233,10 +235,20 @@ préempte ces chantiers.
    migration par page-cible, pas deux. Même question pour la bibliothèque partagée Supabase
    (reco : reste sur `index.html` jusqu'à R-4).
 5. **Bibliothèque de grooves** (l. 4323–6875, ~2 500 lignes de **données** dans la coquille) :
-   `pratiquer.html` en a besoin (répertoire). **Reco : l'extraire en fichier de données**
-   (`corpus/repertoire-grooves.js` ou registre dédié) en tête de R-3b, prouvée par recette
-   d'égalité valeur pour valeur (même patron que R-2) — sinon on duplique 2 500 lignes.
-   Alternative : duplication brute temporaire. Trancher.
+   `pratiquer.html` en a besoin (répertoire). **Reco (v1.1, question Jean « et à ×4 ? ») :
+   l'extraire en fichiers PAR FAMILLE** — `corpus/grooves/bresil.js`,
+   `grooves/ouest-africain.js`, … (la table `GROOVES` est déjà plate et famille-portée,
+   héritière des 6 `grooves-*.md`) — déclarés dans un registre global `FM_GROOVES`, même
+   mécanique que `FM_CORPUS` (balises `<script src>`, assemblage au boot, collision d'ID
+   bloquante). Extraction en tête de R-3b, prouvée par recette d'égalité valeur pour valeur
+   (patron R-2) + validateur dédié `recette-grooves.js` (IDs, `grid.length === count`,
+   `instr`/`voiceKind` connus du moteur, drapeaux `approx`/`uncertain`/`isBreak`).
+   **C'est la réponse au passage à l'échelle** : ×4 ≈ 350–400 Ko de données parsées une fois
+   au boot (la page actuelle pèse déjà 524 Ko) — le goulot n'est pas le navigateur mais la
+   revue, et le découpage par famille + validateur la garde unitaire (« ajouter une famille =
+   un fichier, zéro code ») ; au besoin futur, une page ne chargera que les familles qu'elle
+   propose (balises statiques, sans fetch). Alternative : duplication brute temporaire.
+   Trancher.
 6. **Retouches moteur additives** : la ligne mute maître dans `playClick` (§4.2) et la ligne
    feel dans `computeCycle` (§5) — deux lignes, deux drapeaux neutres par défaut, non-régression
    par construction à zéro. Compatibles avec la contrainte verbatim au sens R-1 §9 (« capacités
