@@ -159,9 +159,9 @@ async function runTests() {
   // 4. rendu niveau-aware + sélecteur (défaut = Débutant)
   P.showNiveau('debutant');
   eq('4.1 défaut = Débutant', P.niveau(), 'debutant');
-  eq('4.2 niveaux peuplés = [debutant, intermediaire]', JSON.stringify(P.niveauxPeuples()), JSON.stringify(['debutant','intermediaire']));
+  eq('4.2 niveaux peuplés = les 4 (P-7/P-8)', JSON.stringify(P.niveauxPeuples()), JSON.stringify(['debutant','intermediaire','avance','artiste']));
   const tabs = D.querySelectorAll('#pfRoot .pf-niv-tab');
-  eq('4.3 sélecteur : deux onglets', tabs.length, 2);
+  eq('4.3 sélecteur : quatre onglets (P-7/P-8)', tabs.length, 4);
   ok('4.4 onglet Débutant actif', !!D.querySelector('.pf-niv-tab.active[data-niv="debutant"]'));
   const cols = D.querySelectorAll('#pfRoot .pf-col');
   eq('4.5 deux colonnes', cols.length, 2);

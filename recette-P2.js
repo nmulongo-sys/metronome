@@ -160,7 +160,7 @@ async function runTests() {
   // 4. partage / double couleur
   // P-6 : l'ensemble partagé inclut désormais le socle Débutant (EX-SOCLE-D-PLS/SUB). On isole le
   // socle Intermédiaire (hors préfixe « EX-SOCLE-D- ») et on vérifie qu'il vaut exactement les 18 attendus.
-  const sharedInter = P.shared.filter(e => !/^EX-SOCLE-D-/.test(e)).slice().sort();
+  const sharedInter = P.shared.filter(e => /^EX-SOCLE-(T1|T2|B1|B2|D1|I2)-/.test(e)).slice().sort();   // P-7/P-8 : scope Intermédiaire
   const attendu = [
     'EX-SOCLE-D1-01','EX-SOCLE-D1-02','EX-SOCLE-D1-03','EX-SOCLE-D1-04','EX-SOCLE-D1-05',
     'EX-SOCLE-I2-01','EX-SOCLE-I2-03','EX-SOCLE-I2-04',

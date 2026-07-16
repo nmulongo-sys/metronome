@@ -44,23 +44,22 @@ for (const cid of Object.keys(CORPUS).sort()) {
   for (const niv of Object.keys(CORPUS[cid].niveaux || {}))
     if ((CORPUS[cid].niveaux[niv] || []).length) niveaux[niv] = CORPUS[cid].niveaux[niv];
 }
-// égalité par ID (l'ordre d'insertion diffère : socle avant funk ; aucune
-// fonctionnalité n'itère PF_EX/PF_MOD dans l'ordre d'insertion — l'ordre
-// d'affichage vient de PF_NIV_ORDER)
-const memesCles = (a, b) => egal(Object.keys(a).sort(), Object.keys(b).sort());
-ok(memesCles(union.exercices, REF.PF_EX),
-  `mêmes IDs d'exercices que 0.8.0 (${Object.keys(REF.PF_EX).length})`);
+// préservation par ID : chaque entrée du 0.8.0 est toujours présente, identique
+// valeur pour valeur (le peuplement P-7/P-8 AJOUTE, il ne modifie jamais).
+// L'ordre d'insertion n'importe pas — l'ordre d'affichage vient de PF_NIV_ORDER.
 ok(Object.keys(REF.PF_EX).every(id => egal(union.exercices[id], REF.PF_EX[id])),
-  'chaque exercice identique valeur pour valeur à 0.8.0');
-ok(memesCles(union.modules, REF.PF_MOD),
-  `mêmes IDs de modules que 0.8.0 (${Object.keys(REF.PF_MOD).length})`);
+  `chaque exercice 0.8.0 présent et identique valeur pour valeur (${Object.keys(REF.PF_EX).length})`);
 ok(Object.keys(REF.PF_MOD).every(id => egal(union.modules[id], REF.PF_MOD[id])),
-  'chaque module identique valeur pour valeur à 0.8.0');
-ok(egal(niveaux, REF.PF_NIV_ORDER), 'ordres de niveaux identiques à PF_NIV_ORDER 0.8.0');
+  `chaque module 0.8.0 présent et identique valeur pour valeur (${Object.keys(REF.PF_MOD).length})`);
+ok(egal(niveaux.debutant, REF.PF_NIV_ORDER.debutant) && egal(niveaux.intermediaire, REF.PF_NIV_ORDER.intermediaire),
+  'ordres Débutant/Intermédiaire identiques à 0.8.0');
 
-// ---- comptes attendus (spec R-2 §7.4, corrigés à l'extraction) ------------------
-ok(Object.keys(union.exercices).length === 82, '82 exercices au total (40 Débutant + 42 funk)');
-ok(Object.keys(union.modules).length === 22, '22 modules au total (10 Débutant + 12 funk)');
+// ---- comptes attendus (P-7/P-8 : spec metronome-parcours-funk-P7-P8) -------------
+ok(Object.keys(union.exercices).length === 152, '152 exercices au total (82 + 70 P-7/P-8)');
+ok(Object.keys(union.modules).length === 44, '44 modules au total (22 + 22 P-7/P-8)');
+ok(egal(niveaux.avance, ['B3','I1','R2','D3','CYM','CALL']) &&
+   egal(niveaux.artiste, ['P1','P2','P3','I4','R1','COL','SOLO']),
+  'ordres Avancé/Artiste conformes à la spec P-7/P-8 (codes asymétriques)');
 
 console.log(`\n--- registre : ${nOk} vertes, ${nKo} rouges (total ${nOk + nKo}) ---`);
 process.exit(nKo ? 1 : 0);

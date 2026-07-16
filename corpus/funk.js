@@ -1,17 +1,20 @@
 /* ============================================================================
-   Corpus « funk » — le style funk : parcours cajón/djembé, niveaux Intermédiaire
-   (P-2→P-4) puis Avancé/Artiste (P-7/P-8, à peupler ici, format corpus), et les
-   patterns/progressions d'accompagnement de la basse funk générative.
-   Schéma de corpus : spec R-1 §4.1 / spec R-2. Extrait à l'identique du build
-   0.8.0 : patterns et progressions copiés valeur pour valeur depuis le moteur
-   (recette-registre.js vérifie l'égalité stricte) ; chaînes inchangées (i18n ok).
+   Corpus « funk » — le style funk COMPLET (P-2→P-8) : parcours cajón/djembé,
+   niveaux Intermédiaire (P-2/P-4), Avancé (P-7 : syncope, hocketing, clave,
+   ornements, cimbalette / appel manding) et Artiste (P-8 : laid-back, pushed,
+   poche, tambour-voix + vocalisation, 3-contre-2 maîtrise, couleur cajón /
+   solo manding), et les patterns/progressions de la basse funk générative.
+   Schéma de corpus : spec R-1 §4.1 / spec R-2. Patterns et progressions copiés
+   valeur pour valeur depuis le moteur 0.8.0 (recette-registre.js vérifie
+   l'égalité stricte). Peuplement P-7/P-8 : spec
+   metronome-parcours-funk-P7-P8-modules-spec.md (VALIDÉE, carte P-5 réalisée).
    ============================================================================ */
 (function () {
   'use strict';
   window.FM_CORPUS = window.FM_CORPUS || {};
   window.FM_CORPUS['funk'] = {
-  meta: { id: 'funk', label: 'Funk', version: '1.0',
-    description: "Le parcours funk : verrouiller sur la basse, The One, la grille de 16es, le backbeat, les ghosts." },
+  meta: { id: 'funk', label: 'Funk', version: '2.0',
+    description: "Le parcours funk complet : verrouiller sur la basse, The One, la grille de 16es, le backbeat, les ghosts — puis syncope, hocketing, clave, ornements, cimbalette, appel manding, feel, tambour-voix, polyrythmie, couleur cajón, solo manding." },
   instruments: {
     cajon: {
       label: "Cajón",
@@ -22,7 +25,9 @@
       couleur: "var(--pf-djembe)"
     }
   },
-  niveaux: { intermediaire: ["T1", "T2", "B1", "B2", "D1", "I2"], avance: [], artiste: [] },
+  niveaux: { intermediaire: ["T1", "T2", "B1", "B2", "D1", "I2"],
+    avance: ["B3", "I1", "R2", "D3", "CYM", "CALL"],
+    artiste: ["P1", "P2", "P3", "I4", "R1", "COL", "SOLO"] },
   modules: {
     'MOD-CJ-I-I2': { parcours: 'cajon', niveau: 'intermediaire', objet: "Verrouiller sur la basse funk",
       exercices: ["EX-SOCLE-I2-01", "EX-CJ-I2-02", "EX-SOCLE-I2-03", "EX-SOCLE-I2-04", "EX-CJ-I2-05"] },
@@ -47,7 +52,51 @@
     'MOD-CJ-I-D1': { parcours: 'cajon', niveau: 'intermediaire', objet: "Ghost pendule",
       exercices: ["EX-SOCLE-D1-01", "EX-SOCLE-D1-02", "EX-SOCLE-D1-03", "EX-SOCLE-D1-04", "EX-SOCLE-D1-05"] },
     'MOD-DJ-I-D1': { parcours: 'djembe', niveau: 'intermediaire', objet: "Ghost pendule",
-      exercices: ["EX-SOCLE-D1-01", "EX-SOCLE-D1-02", "EX-SOCLE-D1-03", "EX-SOCLE-D1-04", "EX-SOCLE-D1-05"] }
+      exercices: ["EX-SOCLE-D1-01", "EX-SOCLE-D1-02", "EX-SOCLE-D1-03", "EX-SOCLE-D1-04", "EX-SOCLE-D1-05"] },
+    'MOD-CJ-Av-B3': { parcours: 'cajon', niveau: 'avance', objet: "Syncope du grave",
+      exercices: ["EX-SOCLE-B3-01", "EX-SOCLE-B3-02", "EX-SOCLE-B3-03", "EX-SOCLE-B3-04", "EX-SOCLE-B3-05"] },
+    'MOD-CJ-Av-I1': { parcours: 'cajon', niveau: 'avance', objet: "Hocketing / dialogue",
+      exercices: ["EX-SOCLE-I1-01", "EX-SOCLE-I1-02", "EX-SOCLE-I1-03", "EX-SOCLE-I1-04", "EX-SOCLE-I1-05"] },
+    'MOD-CJ-Av-R2': { parcours: 'cajon', niveau: 'avance', objet: "Ombre de la clave & 3-contre-2",
+      exercices: ["EX-SOCLE-R2-01", "EX-SOCLE-R2-02", "EX-SOCLE-R2-03", "EX-SOCLE-R2-04", "EX-SOCLE-R2-05"] },
+    'MOD-CJ-Av-D3': { parcours: 'cajon', niveau: 'avance', objet: "Fills & ornements",
+      exercices: ["EX-CJ-D3-01", "EX-CJ-D3-02", "EX-CJ-D3-03", "EX-CJ-D3-04", "EX-CJ-D3-05"] },
+    'MOD-DJ-Av-B3': { parcours: 'djembe', niveau: 'avance', objet: "Syncope du grave",
+      exercices: ["EX-SOCLE-B3-01", "EX-SOCLE-B3-02", "EX-SOCLE-B3-03", "EX-SOCLE-B3-04", "EX-SOCLE-B3-05"] },
+    'MOD-DJ-Av-I1': { parcours: 'djembe', niveau: 'avance', objet: "Hocketing / dialogue",
+      exercices: ["EX-SOCLE-I1-01", "EX-SOCLE-I1-02", "EX-SOCLE-I1-03", "EX-SOCLE-I1-04", "EX-SOCLE-I1-05"] },
+    'MOD-DJ-Av-R2': { parcours: 'djembe', niveau: 'avance', objet: "Ombre de la clave & 3-contre-2",
+      exercices: ["EX-SOCLE-R2-01", "EX-SOCLE-R2-02", "EX-SOCLE-R2-03", "EX-SOCLE-R2-04", "EX-SOCLE-R2-05"] },
+    'MOD-DJ-Av-D3': { parcours: 'djembe', niveau: 'avance', objet: "Fills & ornements",
+      exercices: ["EX-DJ-D3-01", "EX-DJ-D3-02", "EX-DJ-D3-03", "EX-DJ-D3-04", "EX-DJ-D3-05"] },
+    'MOD-CJ-Av-CYM': { parcours: 'cajon', niveau: 'avance', objet: "Le 4e son : la cimbalette",
+      exercices: ["EX-CJ-CYM-01", "EX-CJ-CYM-02", "EX-CJ-CYM-03", "EX-CJ-CYM-04", "EX-CJ-CYM-05"] },
+    'MOD-DJ-Av-CALL': { parcours: 'djembe', niveau: 'avance', objet: "Appel & call-and-response",
+      exercices: ["EX-DJ-CALL-01", "EX-DJ-CALL-02", "EX-DJ-CALL-03", "EX-DJ-CALL-04", "EX-DJ-CALL-05"] },
+    'MOD-CJ-Ar-P1': { parcours: 'cajon', niveau: 'artiste', objet: "Laid-back",
+      exercices: ["EX-SOCLE-P1-01", "EX-SOCLE-P1-02", "EX-SOCLE-P1-03", "EX-SOCLE-P1-04", "EX-SOCLE-P1-05"] },
+    'MOD-CJ-Ar-P2': { parcours: 'cajon', niveau: 'artiste', objet: "Pushed",
+      exercices: ["EX-SOCLE-P2-01", "EX-SOCLE-P2-02", "EX-SOCLE-P2-03", "EX-SOCLE-P2-04", "EX-SOCLE-P2-05"] },
+    'MOD-CJ-Ar-P3': { parcours: 'cajon', niveau: 'artiste', objet: "La poche & la tolérance",
+      exercices: ["EX-SOCLE-P3-01", "EX-SOCLE-P3-02", "EX-SOCLE-P3-03", "EX-SOCLE-P3-04", "EX-SOCLE-P3-05"] },
+    'MOD-CJ-Ar-I4': { parcours: 'cajon', niveau: 'artiste', objet: "Le tambour comme voix",
+      exercices: ["EX-SOCLE-I4-01", "EX-SOCLE-I4-02", "EX-SOCLE-I4-03", "EX-SOCLE-I4-04", "EX-SOCLE-I4-05"] },
+    'MOD-CJ-Ar-R1': { parcours: 'cajon', niveau: 'artiste', objet: "3-contre-2 & syncope perpétuelle",
+      exercices: ["EX-SOCLE-R1-01", "EX-SOCLE-R1-02", "EX-SOCLE-R1-03", "EX-SOCLE-R1-04", "EX-SOCLE-R1-05"] },
+    'MOD-DJ-Ar-P1': { parcours: 'djembe', niveau: 'artiste', objet: "Laid-back",
+      exercices: ["EX-SOCLE-P1-01", "EX-SOCLE-P1-02", "EX-SOCLE-P1-03", "EX-SOCLE-P1-04", "EX-SOCLE-P1-05"] },
+    'MOD-DJ-Ar-P2': { parcours: 'djembe', niveau: 'artiste', objet: "Pushed",
+      exercices: ["EX-SOCLE-P2-01", "EX-SOCLE-P2-02", "EX-SOCLE-P2-03", "EX-SOCLE-P2-04", "EX-SOCLE-P2-05"] },
+    'MOD-DJ-Ar-P3': { parcours: 'djembe', niveau: 'artiste', objet: "La poche & la tolérance",
+      exercices: ["EX-SOCLE-P3-01", "EX-SOCLE-P3-02", "EX-SOCLE-P3-03", "EX-SOCLE-P3-04", "EX-SOCLE-P3-05"] },
+    'MOD-DJ-Ar-I4': { parcours: 'djembe', niveau: 'artiste', objet: "Le tambour comme voix",
+      exercices: ["EX-SOCLE-I4-01", "EX-SOCLE-I4-02", "EX-SOCLE-I4-03", "EX-SOCLE-I4-04", "EX-SOCLE-I4-05"] },
+    'MOD-DJ-Ar-R1': { parcours: 'djembe', niveau: 'artiste', objet: "3-contre-2 & syncope perpétuelle",
+      exercices: ["EX-SOCLE-R1-01", "EX-SOCLE-R1-02", "EX-SOCLE-R1-03", "EX-SOCLE-R1-04", "EX-SOCLE-R1-05"] },
+    'MOD-CJ-Ar-COL': { parcours: 'cajon', niveau: 'artiste', objet: "Couleur cajón",
+      exercices: ["EX-CJ-COL-01", "EX-CJ-COL-02", "EX-CJ-COL-03", "EX-CJ-COL-04", "EX-CJ-COL-05"] },
+    'MOD-DJ-Ar-SOLO': { parcours: 'djembe', niveau: 'artiste', objet: "Le solo manding",
+      exercices: ["EX-DJ-SOLO-01", "EX-DJ-SOLO-02", "EX-DJ-SOLO-03", "EX-DJ-SOLO-04", "EX-DJ-SOLO-05"] }
   },
   exercices: {
     'EX-SOCLE-I2-01': {
@@ -301,7 +350,427 @@
       objet: "Nappe de ghosts complete",
       consigne: "Tisse le pendule complet (e + a) sur les deux mesures, sous la basse.",
       critere: "quand la nappe de ghosts tient toute seule et donne le groove.",
-      preset: {pattern: "ghostPendule", prog: "vamp2", drop: {on: false}} }
+      preset: {pattern: "ghostPendule", prog: "vamp2", drop: {on: false}} },
+    'EX-SOCLE-B3-01': {
+      kind: "atome",
+      objet: "L'ancrage d'abord",
+      consigne: "La basse joue un grave qui bouge autour du 1. Toi, pose ton grave exactement sur le 1, imperturbable.",
+      critere: "quand le grave mobile de la basse ne déplace jamais le tien.",
+      preset: {pattern: "syncopeGrave", prog: "vamp1", drop: {on: false}} },
+    'EX-SOCLE-B3-02': {
+      kind: "atome",
+      objet: "Le grave anticipé",
+      consigne: "Déplace ton grave sur le « et » juste avant le 1, et laisse le 1 sonner vide.",
+      critere: "quand ton anticipation retombe au même endroit à chaque mesure, sans précipiter la suite.",
+      preset: {pattern: "theOne", prog: "vamp1", drop: {on: false}} },
+    'EX-SOCLE-B3-03': {
+      kind: "atome",
+      objet: "Le grave retardé",
+      consigne: "Retiens ton grave jusqu'au « e » juste après le 1 : le temps passe, puis ton grave répond.",
+      critere: "quand le retard est un choix audible, pas un raté.",
+      preset: {pattern: "theOne", prog: "vamp1", drop: {on: false}} },
+    'EX-SOCLE-B3-04': {
+      kind: "atome",
+      objet: "Bouger sans se perdre",
+      consigne: "Alterne : une mesure anticipé, une mesure retardé. Quand la basse disparaît, garde le cap.",
+      critere: "quand la basse revient et que ton grave mobile est toujours à sa place.",
+      preset: {pattern: "syncopeGrave", prog: "vamp1", drop: {on: true, everyN: 4, lenBeats: 2}} },
+    'EX-SOCLE-B3-05': {
+      kind: "synthese",
+      objet: "Le grave libéré",
+      consigne: "Sur deux accords, promène ton grave autour du 1 — anticipé, posé, retardé — sans jamais lâcher l'ancrage.",
+      critere: "quand on entend un choix à chaque mesure et le même time du début à la fin.",
+      preset: {pattern: "syncopeGrave", prog: "vamp2", drop: {on: false}} },
+    'EX-SOCLE-I1-01': {
+      kind: "atome",
+      objet: "L'espace négatif",
+      consigne: "Interdiction de jouer en même temps que la basse : ne joue QUE dans ses silences.",
+      critere: "quand tes notes et les siennes ne se marchent jamais dessus.",
+      preset: {pattern: "theOne", prog: "vamp1", drop: {on: false}} },
+    'EX-SOCLE-I1-02': {
+      kind: "atome",
+      objet: "Répondre sur le « a »",
+      consigne: "Chaque fois que la basse accentue, réponds sur la double-croche juste après, légère et précise.",
+      critere: "quand ta réponse tombe si près qu'elle semble faire partie de la basse.",
+      preset: {pattern: "syncopeGrave", prog: "vamp1", drop: {on: false}} },
+    'EX-SOCLE-I1-03': {
+      kind: "atome",
+      objet: "L'ostinato scratch",
+      consigne: "Installe un petit motif répété, sec et léger, qui se faufile entre les notes de la basse sans jamais grossir.",
+      critere: "quand ton motif tourne en boucle identique et que la basse reste la voix principale.",
+      preset: {pattern: "theOne", prog: "vamp1", drop: {on: false}} },
+    'EX-SOCLE-I1-04': {
+      kind: "atome",
+      objet: "Dialogue sous drop-out",
+      consigne: "Continue le dialogue même quand la basse se tait : laisse ses espaces vides à leur place.",
+      critere: "quand, au retour de la basse, vos deux voix s'emboîtent comme si elle n'était jamais partie.",
+      preset: {pattern: "theOne", prog: "vamp1", drop: {on: true, everyN: 4, lenBeats: 4}} },
+    'EX-SOCLE-I1-05': {
+      kind: "synthese",
+      objet: "La conversation",
+      consigne: "Sur deux accords : réponses, ostinato, silences assumés. Deux voix qui parlent, jamais en même temps.",
+      critere: "quand un auditeur entend une seule musique faite de deux voix distinctes.",
+      preset: {pattern: "syncopeGrave", prog: "vamp2", drop: {on: false}} },
+    'EX-SOCLE-R2-01': {
+      kind: "atome",
+      objet: "La cellule 3+3+2",
+      consigne: "Frappe le cycle 3+3+2 en boucle sur le clic : deux appuis longs, un court. C'est la clave qui se cache dans le funk.",
+      critere: "quand le cycle tourne sans que tu comptes.",
+      preset: {metro: true, tempo: 76} },
+    'EX-SOCLE-R2-02': {
+      kind: "atome",
+      objet: "La clave d'une main",
+      consigne: "Une main tient la cellule 3+3+2, l'autre pose la pulsation. Deux étages, un seul joueur.",
+      critere: "quand chaque main garde son rôle sans se laisser aspirer par l'autre.",
+      preset: {metro: true, tempo: 72} },
+    'EX-SOCLE-R2-03': {
+      kind: "atome",
+      objet: "La clave sous la basse",
+      consigne: "Tiens la cellule 3+3+2 pendant que la basse joue son groove : la structure sous la chanson.",
+      critere: "quand la clave reste ton squelette même quand la basse syncope.",
+      preset: {pattern: "theOne", prog: "vamp1", drop: {on: false}} },
+    'EX-SOCLE-R2-04': {
+      kind: "atome",
+      objet: "3-contre-2, premiers pas",
+      consigne: "Sur deux temps, frappe trois coups égaux. Repère le point où tout retombe ensemble, et retrouve-le à chaque fois.",
+      critere: "quand le point de convergence retombe pile, cycle après cycle.",
+      preset: {metro: true, tempo: 69} },
+    'EX-SOCLE-R2-05': {
+      kind: "synthese",
+      objet: "L'indépendance",
+      consigne: "Une main garde la clave, l'autre varie librement par-dessus, sur deux accords.",
+      critere: "quand la main libre invente sans que la clave tremble.",
+      preset: {pattern: "theOne", prog: "vamp2", drop: {on: false}} },
+    'EX-CJ-D3-01': {
+      kind: "atome",
+      objet: "Le flam",
+      consigne: "Deux mains presque ensemble, une seule intention : épaissis ton accent d'un flam, sans le retarder.",
+      critere: "quand le flam sonne comme un seul coup plus large, jamais comme deux coups.",
+      preset: {metro: true, tempo: 80} },
+    'EX-CJ-D3-02': {
+      kind: "atome",
+      objet: "Le finger roll",
+      consigne: "Égrène tes doigts sur la tapa, du petit doigt à l'index : une rafale courte, régulière, qui coule.",
+      critere: "quand la rafale est égale et se termine exactement où tu l'as décidé.",
+      preset: {metro: true, tempo: 76} },
+    'EX-CJ-D3-03': {
+      kind: "atome",
+      objet: "Le rumble",
+      consigne: "Fais gronder la caisse : un roulement continu qui enfle et s'éteint sur commande.",
+      critere: "quand le grondement respire avec toi, sans trou ni à-coup.",
+      preset: {metro: true, tempo: 76} },
+    'EX-CJ-D3-04': {
+      kind: "atome",
+      objet: "Le fill qui annonce",
+      consigne: "Fin de mesure : une rafale courte qui vise le 1 suivant et le fait briller.",
+      critere: "quand le fill atterrit pile sur le 1, jamais par-dessus.",
+      preset: {pattern: "theOne", prog: "vamp1", drop: {on: false}} },
+    'EX-CJ-D3-05': {
+      kind: "synthese",
+      objet: "Orner sans charger",
+      consigne: "Groove entier : flams sur les accents, un fill toutes les quatre mesures, rien de plus.",
+      critere: "quand les ornements soulignent le groove au lieu de le recouvrir.",
+      preset: {pattern: "ghostPendule", prog: "vamp2", drop: {on: false}} },
+    'EX-DJ-D3-01': {
+      kind: "atome",
+      objet: "Le flam",
+      consigne: "Deux mains presque ensemble sur la peau : épaissis ton accent d'un flam, main faible d'abord, sans le retarder.",
+      critere: "quand le flam sonne comme un seul coup plus large, jamais comme deux coups.",
+      preset: {metro: true, tempo: 80} },
+    'EX-DJ-D3-02': {
+      kind: "atome",
+      objet: "Doubles & 3-stroke",
+      consigne: "Enchaîne les doubles main à main, puis le 3-stroke : la fin de la cellule doit sonner aussi nette que le début.",
+      critere: "quand droite et gauche sont indiscernables à l'oreille.",
+      preset: {metro: true, tempo: 76} },
+    'EX-DJ-D3-03': {
+      kind: "atome",
+      objet: "Les rolls : du tonnerre au feu",
+      consigne: "Fais rouler la peau : ronronnement doux, tonnerre plein, feu brûlant — trois intensités du même roulement.",
+      critere: "quand tu passes d'une intensité à l'autre sans casser le roulement.",
+      preset: {metro: true, tempo: 76} },
+    'EX-DJ-D3-04': {
+      kind: "atome",
+      objet: "Le fill qui annonce",
+      consigne: "Fin de mesure : une rafale courte qui vise le 1 suivant et le fait briller.",
+      critere: "quand le fill atterrit pile sur le 1, jamais par-dessus.",
+      preset: {pattern: "theOne", prog: "vamp1", drop: {on: false}} },
+    'EX-DJ-D3-05': {
+      kind: "synthese",
+      objet: "Orner sans charger",
+      consigne: "Groove entier : flams sur les accents, un roll toutes les quatre mesures, rien de plus.",
+      critere: "quand les ornements soulignent le groove au lieu de le recouvrir.",
+      preset: {pattern: "ghostPendule", prog: "vamp2", drop: {on: false}} },
+    'EX-CJ-CYM-01': {
+      kind: "atome",
+      objet: "Réveiller les jingles",
+      consigne: "Frappe dans la zone haute de la tapa : écoute la cimbalette s'ajouter à ta frappe, comme une ombre brillante.",
+      critere: "quand tu sais, avant de frapper, si les jingles vont sonner.",
+      preset: {metro: true, tempo: 80} },
+    'EX-CJ-CYM-02': {
+      kind: "atome",
+      objet: "Le son propre",
+      consigne: "Joue tes tones et slaps à l'écart de la zone : le son reste sec, les jingles muets.",
+      critere: "quand plus aucun coup ne réveille la cimbalette par accident.",
+      preset: {metro: true, tempo: 80} },
+    'EX-CJ-CYM-03': {
+      kind: "atome",
+      objet: "Choisir",
+      consigne: "Alterne à volonté : un slap qui fait chanter les jingles, un tone propre juste à côté. Le choix, pas le hasard.",
+      critere: "quand chaque coup sonne exactement comme tu l'avais décidé.",
+      preset: {metro: true, tempo: 84} },
+    'EX-CJ-CYM-04': {
+      kind: "atome",
+      objet: "Étouffer de la main libre",
+      consigne: "Pose la main libre sur les jingles pour les couper au vol : la cimbalette parle, puis se tait sur ordre.",
+      critere: "quand l'étouffement tombe au moment précis où tu le veux.",
+      preset: {metro: true, tempo: 76} },
+    'EX-CJ-CYM-05': {
+      kind: "synthese",
+      objet: "Le backbeat brillant",
+      consigne: "Sur le groove, seuls tes slaps du 2 et du 4 font parler la cimbalette ; tout le reste est sec.",
+      critere: "quand la brillance dessine exactement le backbeat, rien d'autre.",
+      preset: {pattern: "theOne", prog: "vamp2", drop: {on: false}} },
+    'EX-DJ-CALL-01': {
+      kind: "atome",
+      objet: "L'appel",
+      consigne: "Depuis le silence, lance la phrase d'appel : nette, franche, reconnaissable entre mille.",
+      critere: "quand ton appel sonne identique à chaque fois, prêt à être suivi.",
+      preset: {metro: true, tempo: 80} },
+    'EX-DJ-CALL-02': {
+      kind: "atome",
+      objet: "L'accompagnement stable",
+      consigne: "Tiens le motif d'accompagnement sans le varier : c'est le sol sur lequel les autres marchent.",
+      critere: "quand ton motif tourne si régulier qu'on pourrait l'oublier.",
+      preset: {pattern: "theOne", prog: "vamp1", drop: {on: false}} },
+    'EX-DJ-CALL-03': {
+      kind: "atome",
+      objet: "Lancer le cycle",
+      consigne: "Appel, puis enchaîne l'accompagnement sans trou : la phrase ouvre, le motif embraye.",
+      critere: "quand la couture entre l'appel et le motif est invisible.",
+      preset: {pattern: "theOne", prog: "vamp1", drop: {on: false}} },
+    'EX-DJ-CALL-04': {
+      kind: "atome",
+      objet: "Répondre",
+      consigne: "La basse se tait : c'est son appel. Réponds dans son silence, puis rends-lui la parole.",
+      critere: "quand ta réponse remplit le vide sans déborder sur son retour.",
+      preset: {pattern: "syncopeGrave", prog: "vamp1", drop: {on: true, everyN: 4, lenBeats: 4}} },
+    'EX-DJ-CALL-05': {
+      kind: "synthese",
+      objet: "Le cycle complet",
+      consigne: "Appel → accompagnement → réponse → appel de fin : conduis tout le cycle, sur deux accords.",
+      critere: "quand on entend clairement qui parle, qui répond, et quand ça se termine.",
+      preset: {pattern: "theOne", prog: "vamp2", drop: {on: true, everyN: 8, lenBeats: 4}} },
+    'EX-SOCLE-P1-01': {
+      kind: "atome",
+      objet: "L'arrière du temps",
+      consigne: "Joue ta frappe un cheveu derrière le clic, à chaque temps, régulière comme une ombre.",
+      critere: "quand le retard est constant — ni rattrapé, ni aggravé.",
+      preset: {metro: true, tempo: 84} },
+    'EX-SOCLE-P1-02': {
+      kind: "atome",
+      objet: "Derrière sans traîner",
+      consigne: "Reste derrière pendant que le clic disparaît par moments : à son retour, tu es toujours un cheveu derrière, jamais plus.",
+      critere: "quand le trou du clic ne t'a pas fait dériver.",
+      preset: {metro: true, tempo: 84, gap: {playN: 4, muteM: 2}} },
+    'EX-SOCLE-P1-03': {
+      kind: "atome",
+      objet: "Laid-back sur groove",
+      consigne: "Pose ton backbeat derrière la basse : elle avance, tu la laisses venir.",
+      critere: "quand ton retard donne du poids sans donner du retard au morceau.",
+      preset: {pattern: "theOne", prog: "vamp1", drop: {on: false}} },
+    'EX-SOCLE-P1-04': {
+      kind: "atome",
+      objet: "Le contraste",
+      consigne: "La basse pompe et pousse ; toi, reste assis derrière. Deux placements, un seul time.",
+      critere: "quand on entend deux feels superposés sans que le tempo bouge.",
+      preset: {pattern: "octaves", prog: "vamp1", drop: {on: false}} },
+    'EX-SOCLE-P1-05': {
+      kind: "synthese",
+      objet: "Le poids",
+      consigne: "Groove entier laid-back sur deux accords : lourd, paresseux en apparence, exact en réalité.",
+      critere: "quand ça sonne détendu ET que la fin arrive exactement à l'heure.",
+      preset: {pattern: "octaves", prog: "blues", drop: {on: false}} },
+    'EX-SOCLE-P2-01': {
+      kind: "atome",
+      objet: "L'avant du temps",
+      consigne: "Joue un cheveu devant le clic, à chaque temps, sans jamais accélérer.",
+      critere: "quand l'avance est constante et que le clic reste ton maître.",
+      preset: {metro: true, tempo: 84} },
+    'EX-SOCLE-P2-02': {
+      kind: "atome",
+      objet: "Devant sans courir",
+      consigne: "Garde l'avance pendant les trous du clic : à son retour, toujours un cheveu devant, jamais deux.",
+      critere: "quand le trou du clic ne t'a pas fait accélérer.",
+      preset: {metro: true, tempo: 84, gap: {playN: 4, muteM: 2}} },
+    'EX-SOCLE-P2-03': {
+      kind: "atome",
+      objet: "L'attaque incisive",
+      consigne: "Raccourcis tes sons, durcis l'attaque : chaque coup mord le temps par l'avant.",
+      critere: "quand l'urgence vient de l'attaque, pas du tempo.",
+      preset: {pattern: "theOne", prog: "vamp1", drop: {on: false}} },
+    'EX-SOCLE-P2-04': {
+      kind: "atome",
+      objet: "Pousser une basse posée",
+      consigne: "La basse est tranquille ; toi, tu presses. C'est toi qui crées la tension, elle qui la retient.",
+      critere: "quand la tension monte sans qu'aucun des deux ne cède sur le tempo.",
+      preset: {pattern: "theOne", prog: "vamp1", drop: {on: false}} },
+    'EX-SOCLE-P2-05': {
+      kind: "synthese",
+      objet: "L'urgence maîtrisée",
+      consigne: "Groove entier pushed sur deux accords : nerveux, pressant, jamais pressé.",
+      critere: "quand ça sonne urgent ET que la fin arrive exactement à l'heure.",
+      preset: {pattern: "syncopeGrave", prog: "mixo", drop: {on: false}} },
+    'EX-SOCLE-P3-01': {
+      kind: "atome",
+      objet: "La nappe immobile",
+      consigne: "Sous la basse, tisse une nappe de ghosts si régulière qu'on l'oublie : c'est le plancher de la poche.",
+      critere: "quand ta nappe ne bouge plus, même quand la basse vit.",
+      preset: {pattern: "ghostPendule", prog: "vamp1", drop: {on: false}} },
+    'EX-SOCLE-P3-02': {
+      kind: "atome",
+      objet: "Creuser la poche",
+      consigne: "Sur la nappe, fais saillir le 2 et le 4 ; tout le reste s'efface en dessous.",
+      critere: "quand le contraste fort/doux dessine la poche sans casser la nappe.",
+      preset: {pattern: "ghostPendule", prog: "vamp1", drop: {on: false}} },
+    'EX-SOCLE-P3-03': {
+      kind: "atome",
+      objet: "La tolérance",
+      consigne: "Explore : glisse légèrement derrière (l'oreille pardonne), légèrement devant (elle pardonne moins), puis reviens au centre — attaques douces.",
+      critere: "quand tu sens la frontière entre « vivant » et « faux » des deux côtés.",
+      preset: {pattern: "ghostPendule", prog: "vamp1", drop: {on: false}} },
+    'EX-SOCLE-P3-04': {
+      kind: "atome",
+      objet: "La poche sans témoin",
+      consigne: "La basse s'absente : la poche continue, aussi creuse, jusqu'à son retour.",
+      critere: "quand la basse revient dans TA poche, pas l'inverse.",
+      preset: {pattern: "ghostPendule", prog: "vamp1", drop: {on: true, everyN: 4, lenBeats: 4}} },
+    'EX-SOCLE-P3-05': {
+      kind: "synthese",
+      objet: "Habiter la poche",
+      consigne: "Deux accords, nappe vivante, accents qui respirent : installe-toi dans la poche et restes-y.",
+      critere: "quand on a envie que ça ne s'arrête pas.",
+      preset: {pattern: "ghostPendule", prog: "dorien", drop: {on: false}} },
+    'EX-SOCLE-I4-01': {
+      kind: "atome",
+      objet: "Chanter puis jouer",
+      consigne: "Chante une courte phrase de deux temps — puis rejoue-la sur le tambour, telle quelle, avec ses appuis et ses respirations.",
+      critere: "quand quelqu'un qui t'a entendu chanter reconnaît la phrase jouée.",
+      preset: {metro: true, tempo: 80} },
+    'EX-SOCLE-I4-02': {
+      kind: "atome",
+      objet: "Question, réponse",
+      consigne: "Pose une question sur une mesure, réponds-toi sur la suivante : deux phrases, deux intonations — chante-les d'abord si elles hésitent.",
+      critere: "quand on entend la différence entre celle qui demande et celle qui répond.",
+      preset: {metro: true, tempo: 80} },
+    'EX-SOCLE-I4-03': {
+      kind: "atome",
+      objet: "Parler par-dessus la basse",
+      consigne: "Énonce tes phrases dans les espaces de la basse : tu ne joues plus un rôle de batterie, tu prends la parole.",
+      critere: "quand tes interventions sonnent comme une voix, plus comme un kick/snare imité.",
+      preset: {pattern: "theOne", prog: "vamp1", drop: {on: false}} },
+    'EX-SOCLE-I4-04': {
+      kind: "atome",
+      objet: "Conduire",
+      consigne: "C'est toi qui mènes : élargis la phrase, monte l'intensité, puis ramène tout au calme. La basse te suit.",
+      critere: "quand la dynamique du morceau raconte l'histoire que tu as choisie.",
+      preset: {pattern: "syncopeGrave", prog: "vamp1", drop: {on: false}} },
+    'EX-SOCLE-I4-05': {
+      kind: "synthese",
+      objet: "Le chorus parlé",
+      consigne: "Un chorus entier : appelle, réponds, conduis, conclus — sur deux accords. Le tambour a la parole du début à la fin.",
+      critere: "quand on pourrait mettre des mots sur ce que tu viens de dire.",
+      preset: {pattern: "theOne", prog: "jazzfunk", drop: {on: false}} },
+    'EX-SOCLE-R1-01': {
+      kind: "atome",
+      objet: "Le 3 retrouvé",
+      consigne: "Reprends le 3-contre-2 posé à l'Avancé : une main en 3, l'autre en 2, jusqu'à l'aisance.",
+      critere: "quand tu peux sourire en le faisant.",
+      preset: {metro: true, tempo: 72} },
+    'EX-SOCLE-R1-02': {
+      kind: "atome",
+      objet: "Le 3 sous le groove",
+      consigne: "Tiens le 3 pendant que la basse groove en 2 : deux mondes superposés, un seul 1.",
+      critere: "quand les points de convergence retombent pile, cycle après cycle, sans que tu les guettes.",
+      preset: {pattern: "theOne", prog: "vamp1", drop: {on: false}} },
+    'EX-SOCLE-R1-03': {
+      kind: "atome",
+      objet: "La syncope perpétuelle",
+      consigne: "Accentue systématiquement les temps faibles : le 1 existe, mais c'est le contretemps qui parle.",
+      critere: "quand la syncope tourne sans que le 1 se perde.",
+      preset: {pattern: "syncopeGrave", prog: "vamp1", drop: {on: false}} },
+    'EX-SOCLE-R1-04': {
+      kind: "atome",
+      objet: "La bascule",
+      consigne: "Toutes les quatre mesures, bascule : binaire → 3-contre-2 → binaire. La couture doit être invisible.",
+      critere: "quand la bascule ne coûte ni un temps ni un accent.",
+      preset: {pattern: "theOne", prog: "vamp1", drop: {on: true, everyN: 4, lenBeats: 2}} },
+    'EX-SOCLE-R1-05': {
+      kind: "synthese",
+      objet: "La polyrythmie habitée",
+      consigne: "Deux accords : groove binaire, îlots de 3-contre-2, syncope perpétuelle — et des retombées propres à chaque fois.",
+      critere: "quand la complexité sonne évidente.",
+      preset: {pattern: "syncopeGrave", prog: "blues", drop: {on: false}} },
+    'EX-CJ-COL-01': {
+      kind: "atome",
+      objet: "Heel-toe",
+      consigne: "Talon puis pointe de la même main : deux hauteurs, un seul geste qui roule.",
+      critere: "quand le talon et la pointe sonnent comme deux notes voulues, pas comme un rebond.",
+      preset: {metro: true, tempo: 76} },
+    'EX-CJ-COL-02': {
+      kind: "atome",
+      objet: "Le pied qui glisse",
+      consigne: "Pose le pied sur la tapa et glisse-le pendant que la main frappe le grave : la note plie.",
+      critere: "quand la hauteur bouge exactement où tu glisses.",
+      preset: {metro: true, tempo: 69} },
+    'EX-CJ-COL-03': {
+      kind: "atome",
+      objet: "La frappe combinée",
+      consigne: "Grave et aigu ensemble, un seul geste, deux étages : l'accord du cajón.",
+      critere: "quand les deux étages sonnent ensemble sans flam.",
+      preset: {metro: true, tempo: 76} },
+    'EX-CJ-COL-04': {
+      kind: "atome",
+      objet: "Le rumble continu",
+      consigne: "Fais lever la vague : un grondement qui enfle, plane, s'éteint — au service d'un crescendo choisi.",
+      critere: "quand la vague obéit à ta dynamique, pas à ta fatigue.",
+      preset: {metro: true, tempo: 72} },
+    'EX-CJ-COL-05': {
+      kind: "synthese",
+      objet: "La plage de couleurs",
+      consigne: "Une plage solo : heel-toe, pitch bend, frappes combinées, rumble — enchaînés avec de l'espace, comme une palette qu'on déploie.",
+      critere: "quand chaque couleur arrive à son moment et que le silence en fait partie.",
+      preset: {metro: true, tempo: 72} },
+    'EX-DJ-SOLO-01': {
+      kind: "atome",
+      objet: "L'ancre",
+      consigne: "Installe ta phrase d'ancrage sur l'accompagnement : c'est la maison d'où partent et où reviennent toutes les phrases.",
+      critere: "quand ton ancre est assez solide pour qu'on la reconnaisse au retour.",
+      preset: {pattern: "theOne", prog: "vamp1", drop: {on: false}} },
+    'EX-DJ-SOLO-02': {
+      kind: "atome",
+      objet: "Le morphing",
+      consigne: "Écarte-toi de l'ancre par petites touches — une note déplacée, un accent — et reviens toujours.",
+      critere: "quand chaque écart s'entend comme une variation, jamais comme une perte.",
+      preset: {pattern: "theOne", prog: "vamp1", drop: {on: false}} },
+    'EX-DJ-SOLO-03': {
+      kind: "atome",
+      objet: "La chauffe",
+      consigne: "Monte l'intensité par paliers nets — densité, hauteur, volume — sans accélérer d'un cheveu.",
+      critere: "quand la fièvre monte et que le tempo ne bouge pas.",
+      preset: {pattern: "syncopeGrave", prog: "vamp1", drop: {on: false}} },
+    'EX-DJ-SOLO-04': {
+      kind: "atome",
+      objet: "Jouer les espaces",
+      consigne: "Place tes phrases dans les silences de l'accompagnement ; laisse respirer entre deux. Le solo est aussi fait de vides.",
+      critere: "quand tes silences sont aussi habités que tes notes.",
+      preset: {pattern: "theOne", prog: "vamp1", drop: {on: true, everyN: 4, lenBeats: 2}} },
+    'EX-DJ-SOLO-05': {
+      kind: "synthese",
+      objet: "Le solo construit",
+      consigne: "Un solo entier : ancre → morphing → chauffe → chute, sur deux accords. Une histoire avec un début et une fin.",
+      critere: "quand on peut raconter ton solo après l'avoir entendu.",
+      preset: {pattern: "syncopeGrave", prog: "jazzfunk", drop: {on: false}} }
   },
   patterns: {
     theOne: { steps: 16, hits: [
