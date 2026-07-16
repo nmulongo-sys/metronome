@@ -3,6 +3,12 @@
 > **Statut : PROPOSITION — spec avant code, Jean tranche (§9).** Rédigée le 2026-07-16.
 > v1.1 le même jour : §9.5 précisé (question Jean sur le passage à l'échelle du répertoire) —
 > extraction **par famille** dans un registre `FM_GROOVES` + validateur, pas de monolithe.
+> **GO Jean le 16/07 (découpe en deux sessions validée) — R-3a EXÉCUTÉE le jour même,
+> build 0.11.0.** v1.2 à l'exécution, deux recadrages documentés : (i) le script principal
+> était enveloppé dans une IIFE — déposée (2 lignes, hors blocs), les déclarations passent en
+> portée globale partagée, sans collision ni `return` top-level (vérifié), mode strict conservé
+> (§3.2, rapport 0.11.0) ; (ii) le 0.10.0 fait **10 789 lignes** (le « 11 424 » du §2 était
+> erroné) et l'extraction porte 1 034 lignes (158 + 518 + 358).
 > Base examinée : **main = 0.10.0** (`7d861f4`, merge de la PR #22 par Jean le 16/07 à 07:34 ;
 > déploiement Pages du commit de merge vérifié vert — run `pages-build-deployment` success).
 > Chantier **R-3** de la refonte B+ (spec R-1 VALIDÉE, GO global) — après R-2 (0.9.0) et
@@ -38,7 +44,8 @@ mode équipe (→ R-6) ; toute migration i18n ; toute réécriture moteur (inter
 
 ## 2. État des lieux — le moteur dans le 0.10.0 (cartographie vérifiée)
 
-`index.html` (11 424 lignes) est déjà organisé en sections commentées nettes. Celles qui
+`index.html` (10 789 lignes — chiffre v1.2, vérifié) est déjà organisé en sections commentées
+nettes ; le script principal les enveloppe d'une IIFE, déposée à l'exécution (v1.2, §3.2). Celles qui
 constituent le moteur au sens R-1 §3 :
 
 | Section (commentaire en tête) | Lignes 0.10.0 | Contenu | Destination |
