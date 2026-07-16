@@ -514,49 +514,6 @@
   .ts-rk-hits { margin-left: auto; color: var(--fm-sub); font-size: .8125rem; white-space: nowrap; }
   .ts-warn { color: var(--fm-accent-2); }
 
-  /* ===== Parcours funk (P-4) — surcouche additive ===== */
-  :root { --pf-cajon:#C8722E; --pf-djembe:#2E86C8; }
-  /* P-6 : sélecteur de niveau (Débutant / Intermédiaire / …) */
-  .pf-niv-tabs { display:flex; flex-wrap:wrap; gap:6px; margin:2px 0 4px; }
-  .pf-niv-tab { font-family:var(--fm-font-ui); font-size:.8125rem; letter-spacing:.02em; padding:6px 14px; border-radius:20px;
-    border:1px solid var(--fm-line); background:var(--fm-panel-2); color:var(--fm-sub); cursor:pointer; }
-  .pf-niv-tab:hover { border-color:var(--fm-accent); color:var(--fm-ink); }
-  .pf-niv-tab.active { background:var(--fm-accent); border-color:var(--fm-accent); color:var(--fm-accent-ink); font-weight:600; }
-  .pf-niv-tab:focus-visible { outline:2px solid var(--fm-accent); outline-offset:1px; }
-  .pf-grid { display:grid; grid-template-columns:1fr; gap:14px; margin-top:6px; }
-  @media (min-width:640px){ .pf-grid { grid-template-columns:1fr 1fr; } }
-  .pf-col { border:1px solid var(--fm-line); border-radius:12px; padding:10px; background:var(--fm-panel-2); border-top:3px solid var(--pf-c); }
-  .pf-col-head { font-weight:700; font-size:.9rem; margin-bottom:8px; display:flex; align-items:center; gap:6px; color:var(--fm-ink); }
-  .pf-dot { width:10px; height:10px; border-radius:50%; background:var(--pf-c); display:inline-block; }
-  .pf-card { border:1px solid var(--fm-line); border-left:4px solid var(--pf-c); border-radius:10px; padding:8px 10px; margin:8px 0; background:var(--fm-panel); }
-  .pf-card.pf-shared { border-left:4px solid transparent; border-image:linear-gradient(var(--pf-cajon),var(--pf-djembe)) 1; }
-  .pf-card.pf-acq { box-shadow:inset 0 0 0 1px var(--fm-accent); }
-  .pf-card-top { display:flex; align-items:center; gap:8px; }
-  .pf-rang { min-width:1.5em; height:1.5em; border-radius:50%; background:var(--pf-c); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size: .8125rem; font-weight:700; }
-  .pf-objet { font-weight:600; font-size:.86rem; flex:1; }
-  .pf-badge-shared, .pf-badge-promo { font-size: .8125rem; padding:1px 6px; border-radius:20px; white-space:nowrap; }
-  .pf-badge-shared { background:linear-gradient(90deg,var(--pf-cajon),var(--pf-djembe)); color:#fff; }
-  .pf-badge-promo { background:var(--fm-accent); color:var(--fm-accent-ink); }
-  .pf-consigne { font-size: .8125rem; color:var(--fm-ink); margin:6px 0 2px; }
-  .pf-critere { font-size: .8125rem; color:var(--fm-sub); font-style:italic; margin-bottom:6px; }
-  .pf-actions { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
-  .pf-perso { margin-top:6px; font-size: .8125rem; }
-  .pf-perso summary { cursor:pointer; color:var(--fm-sub); }
-  .pf-perso-body { display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; align-items:center; }
-  .pf-perso-body label { display:flex; align-items:center; gap:4px; }
-  .pf-vote { display:flex; align-items:center; gap:6px; margin-top:8px; font-size: .8125rem; color:var(--fm-sub); flex-wrap:wrap; }
-  .pf-vote .pf-v { font-size: .8125rem; padding:2px 8px; }
-  #pfStatus { font-size: .8125rem; color:var(--fm-accent-2); margin-top:8px; min-height:1em; }
-  .pf-mod { border:1px solid var(--fm-line); border-radius:10px; margin:8px 0; overflow:hidden; background:var(--fm-panel); }
-  .pf-mod-head { width:100%; display:flex; align-items:center; gap:8px; padding:9px 10px; background:transparent; border:none; cursor:pointer; color:var(--fm-ink); font:inherit; text-align:left; }
-  .pf-mod-idx { min-width:1.6em; height:1.6em; border-radius:50%; background:var(--pf-c); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size: .8125rem; font-weight:700; }
-  .pf-mod-objet { flex:1; font-weight:700; font-size:.85rem; }
-  .pf-mod-count { font-size: .8125rem; color:var(--fm-sub); font-variant-numeric:tabular-nums; }
-  .pf-mod-chev { color:var(--fm-sub); transition:transform .18s ease; }
-  .pf-mod.open .pf-mod-chev { transform:rotate(180deg); }
-  .pf-mod-body { display:none; padding:0 8px 6px; }
-  .pf-mod.open .pf-mod-body { display:block; }
-
   /* ==== Salve UX 0.6.6 (quick wins C2/C5/C6/C8/C15 du panel v0.6.5) ==== */
   /* C2 — infobulle de vocabulaire : natif (title) au survol, bulle CSS au focus (tap mobile) */
   .term { border-bottom:1px dotted var(--fm-sub); cursor:help; position:relative; }
@@ -1158,6 +1115,8 @@ window.__I18N = { "en": {
   "mesures, trou de": "measures, hole of",
   "temps": "beats",
   "parcours · plusieurs niveaux": "path · several levels",
+  "Le parcours d'apprentissage (cajón · djembé, mode écoute et mode pratique) vit désormais sur sa propre page.": "The learning path (cajón · djembé, listen mode and practice mode) now lives on its own page.",
+  "→ Ouvrir la page Apprendre": "→ Open the Learn page",
   "Deux parcours parallèles — cajón et djembé. « Charger » installe l'accompagnement de basse de l'exercice ; tu joues par-dessus. Coche « acquis » quand le critère est atteint ; le vote de difficulté aide à recalibrer le niveau pour tout le monde.": "Two parallel paths — cajón and djembé. “Load” installs the exercise's bass accompaniment; you play on top. Tick “done” when the criterion is met; the difficulty vote helps recalibrate the level for everyone.",
   "L'assistant règle le métronome pour toi — tu pourras tout ajuster ensuite.": "The assistant sets the metronome for you — you can adjust everything afterwards.",
   "Durée à enregistrer (la boucle en cours)": "Duration to record (the current loop)",
@@ -1720,6 +1679,8 @@ window.__I18N = { "en": {
   "mesures, trou de": "compassos, buraco de",
   "temps": "tempos",
   "parcours · plusieurs niveaux": "percurso · vários níveis",
+  "Le parcours d'apprentissage (cajón · djembé, mode écoute et mode pratique) vit désormais sur sa propre page.": "O percurso de aprendizagem (cajón · djembê, modo escuta e modo prática) agora vive na sua própria página.",
+  "→ Ouvrir la page Apprendre": "→ Abrir a página Aprender",
   "Deux parcours parallèles — cajón et djembé. « Charger » installe l'accompagnement de basse de l'exercice ; tu joues par-dessus. Coche « acquis » quand le critère est atteint ; le vote de difficulté aide à recalibrer le niveau pour tout le monde.": "Dois percursos paralelos — cajón e djembê. « Carregar » instala o acompanhamento de baixo do exercício; você toca por cima. Marque « adquirido » quando o critério for atingido; o voto de dificuldade ajuda a recalibrar o nível para todos.",
   "L'assistant règle le métronome pour toi — tu pourras tout ajuster ensuite.": "O assistente ajusta o metrônomo para você — depois você pode ajustar tudo.",
   "Durée à enregistrer (la boucle en cours)": "Duração a gravar (o loop atual)",
@@ -1932,7 +1893,7 @@ window.fmTr = (function(){
     <button class="toc-chip" data-toc="secTeam">Team Spirit</button>
     <button class="toc-chip" data-toc="secArchet">Archet</button>
     <button class="toc-chip" data-toc="secBass">Basse</button>
-    <button class="toc-chip" data-toc="secCours">Cours funk</button>
+    <button class="toc-chip" data-toc="carteApprendre">Cours funk</button>
     <button class="toc-chip" data-toc="secGap">Horloge</button>
     <button class="toc-chip" data-toc="secSon">Son</button>
     <button class="toc-chip" data-toc="secScript">Script</button>
@@ -2380,13 +2341,12 @@ window.fmTr = (function(){
     </div>
   </details>
 
-  <!-- Parcours funk (P-4) : surcouche pédagogique, module 6 (niveau Intermédiaire) -->
-  <details class="section" id="secCours" data-strate="couche">
+  <!-- R-4a : le parcours (ex-« Cours funk ») vit sur apprendre.html (scénario 2) — porte. -->
+  <details class="section" id="carteApprendre" data-strate="couche">
     <summary><span class="sec-title">Cours funk</span><span class="sec-sub">parcours · plusieurs niveaux</span></summary>
     <div class="section-body">
-      <div class="hint">Deux parcours parallèles — cajón et djembé. « Charger » installe l'accompagnement de basse de l'exercice ; tu joues par-dessus. Coche « acquis » quand le critère est atteint ; le vote de difficulté aide à recalibrer le niveau pour tout le monde.</div>
-      <div id="pfRoot"></div>
-      <div id="pfStatus" aria-live="polite"></div>
+      <div class="hint">Le parcours d'apprentissage (cajón · djembé, mode écoute et mode pratique) vit désormais sur sa propre page.</div>
+      <a class="btn-sm primary" href="apprendre.html" style="display:inline-block;text-decoration:none;">→ Ouvrir la page Apprendre</a>
     </div>
   </details>
 
@@ -6589,289 +6549,6 @@ swing 62
     });
   });
 
-  // ============ PARCOURS FUNK (P-4) — surcouche additive, module 6 (Intermédiaire) ============
-  // Deux modules (cajón/djembé), preset d'un bloc, acquis local par position, double couleur pour
-  // les EX-SOCLE partagés, vote de fin → pf_vote/pf_promotion en réutilisant window.fmSupabase().
-  // Hors de l'écran « Cours funk », strictement no-op : ne lit/écrit que ses propres clés.
-  const PF_PARC = FM_ASM.instruments;
-  const PF_NIVEAUX = ['debutant', 'intermediaire', 'avance', 'artiste'];
-  // P-6 : parcours multi-niveaux. Chaque niveau a son infixe d'ID, son ordre de modules et son libellé.
-  const PF_NIV_INFIX = { debutant:'D', intermediaire:'I', avance:'Av', artiste:'Ar' };
-  const PF_NIV_LABEL = { debutant:'Débutant', intermediaire:'Intermédiaire', avance:'Avancé', artiste:'Artiste' };
-  const PF_NIV_ORDER = FM_ASM.niveaux;
-  const PF_EX = FM_ASM.exercices;
-  const PF_MOD = FM_ASM.modules;
-  function pfSharedSet(){
-    const c = {};
-    Object.keys(PF_MOD).forEach(mid => PF_MOD[mid].exercices.forEach(e => c[e] = (c[e]||0) + 1));
-    return Object.keys(c).filter(e => c[e] >= 2);
-  }
-  // ---- état local, jamais synchronisé ----
-  function pfAcquisAll(){ try { return JSON.parse(store.get('fm-metro-parcours')||'{}'); } catch(e){ return {}; } }
-  function pfIsAcquis(p, ex){ const a = pfAcquisAll()[p+'|'+ex]; return !!(a && a.acquis); }
-  function pfAcquisSet(p, ex, val){
-    const all = pfAcquisAll();
-    if (val) all[p+'|'+ex] = { acquis:true, ts:Date.now() }; else delete all[p+'|'+ex];
-    store.set('fm-metro-parcours', JSON.stringify(all));
-  }
-  function pfPromoAll(){ try { return JSON.parse(store.get('fm-metro-parcours-promo')||'{}'); } catch(e){ return {}; } }
-  function pfPromoGet(p, ex, c){ return pfPromoAll()[p+'|'+ex+'|'+c] || null; }
-  function pfPromoSet(p, ex, c, rec){
-    const all = pfPromoAll(); all[p+'|'+ex+'|'+c] = Object.assign({ ts:Date.now() }, rec);
-    store.set('fm-metro-parcours-promo', JSON.stringify(all));
-  }
-  // P-6 : niveau de base d'un exercice = niveau du (premier) module qui le référence.
-  function pfExNiveau(ex){
-    for (const mid in PF_MOD){ if (PF_MOD[mid].exercices.indexOf(ex) >= 0) return PF_MOD[mid].niveau; }
-    return 'intermediaire';
-  }
-  function pfNiveauEffectif(p, ex, c){
-    const promo = pfPromoGet(p, ex, c);
-    let base = PF_NIVEAUX.indexOf(pfExNiveau(ex)); if (base < 0) base = PF_NIVEAUX.indexOf('intermediaire');
-    const eff = base + ((promo && promo.promu) ? 1 : 0);
-    return PF_NIVEAUX[Math.min(Math.max(eff, 0), PF_NIVEAUX.length - 1)];
-  }
-  // P-6 : niveaux « peuplés » = ceux qui ont au moins un module déclaré. Niveau affiché : persistant, défaut = 1er peuplé.
-  function pfPopulatedNiveaux(){ return PF_NIVEAUX.filter(n => Object.keys(PF_MOD).some(mid => PF_MOD[mid].niveau === n)); }
-  function pfNivGet(){
-    const pop = pfPopulatedNiveaux(); const def = pop[0] || 'intermediaire';
-    let n = null; try { n = store.get('fm-metro-parcours-niveau'); } catch(e){}
-    return (n && pop.indexOf(n) >= 0) ? n : def;
-  }
-  function pfNivSet(n){ try { store.set('fm-metro-parcours-niveau', n); } catch(e){} }
-  // ---- file de votes offline-first ----
-  function pfQueueAll(){ try { return JSON.parse(store.get('pf_vote_queue')||'[]'); } catch(e){ return []; } }
-  function pfQueueWrite(arr){ store.set('pf_vote_queue', JSON.stringify(arr)); }
-  function pfVoteItem(p, ex, c, v){ return { parcours:p, exercise_id:ex, cible:c, verdict:v, ts:Date.now() }; }
-  function pfQueuePush(item){
-    const q = pfQueueAll().filter(x => !(x.parcours===item.parcours && x.exercise_id===item.exercise_id && x.cible===item.cible));
-    q.push(item); pfQueueWrite(q);
-  }
-  // ---- Supabase : réutilise le client existant (aucun second client, aucun jeton maison) ----
-  function pfSb(){ try { return (window.fmSupabase && window.fmSupabase()) || null; } catch(e){ return null; } }
-  async function pfEnsureUid(sb){
-    try {
-      if (window.fmCurrentUser && window.fmCurrentUser.id) return window.fmCurrentUser.id;
-      const s = await sb.auth.getSession();
-      const u = s && s.data && s.data.session && s.data.session.user;
-      if (u && u.id) return u.id;
-      const a = await sb.auth.signInAnonymously();
-      if (a && a.error) return null;
-      const au = a && a.data && a.data.user; return (au && au.id) || null;
-    } catch(e){ return null; }
-  }
-  let pfFlushing = false;
-  async function pfFlushVotes(){
-    if (pfFlushing) return; const sb = pfSb(); if (!sb) return;
-    const q = pfQueueAll(); if (!q.length) return;
-    pfFlushing = true;
-    try {
-      const uid = await pfEnsureUid(sb); if (!uid) return;
-      const remain = [], touched = {};
-      for (const it of q){
-        try {
-          const r = await sb.from('pf_vote').upsert(
-            { client_id:uid, parcours:it.parcours, exercise_id:it.exercise_id, cible:it.cible, verdict:it.verdict },
-            { onConflict:'client_id,parcours,exercise_id,cible' });
-          if (r && r.error) remain.push(it); else touched[it.parcours+'|'+it.exercise_id+'|'+it.cible] = it;
-        } catch(e){ remain.push(it); }
-      }
-      pfQueueWrite(remain);
-      for (const k in touched){ const it = touched[k]; await pfRefreshPromo(it.parcours, it.exercise_id, it.cible); }
-    } finally { pfFlushing = false; try { pfRender(); } catch(e){} }
-  }
-  async function pfRefreshPromo(p, ex, c){
-    const sb = pfSb(); if (!sb) return;
-    try {
-      const r = await sb.rpc('pf_promotion', { parcours:p, exercise_id:ex, cible:c });
-      if (r && r.error) return; let d = r && r.data; if (Array.isArray(d)) d = d[0];
-      if (d) pfPromoSet(p, ex, c, { promu:!!d.promu, part:d.part, n_votes:d.n_votes, dormant:!!d.dormant });
-    } catch(e){}
-  }
-  function pfVote(p, ex, c, v){ pfQueuePush(pfVoteItem(p, ex, c, v)); pfFlushVotes(); try { pfRender(); } catch(e){} }
-  // ---- application d'un preset d'un bloc (mute rien de l'existant : mêmes points d'ancrage que l'UI) ----
-  function pfSyncBassUI(){
-    const b = S.bass;
-    const set = (id, val) => { const el = $(id); if (el){ if (el.type==='checkbox') el.checked = !!val; else el.value = val; } };
-    set('bassOn', b.on); set('bassPattern', b.pattern); set('bassKey', b.key); set('bassProg', b.prog);
-    set('bassDensity', String(b.density)); set('bassVel', b.vel); set('bassVary', b.vary);
-    set('bassLegato', Math.round((b.legato!=null ? b.legato : 0.25) * 100));
-    set('bassSpace', b.space); set('bassSwingFollow', b.swingFollow);
-    set('bassDropOn', !!(b.drop && b.drop.on));
-    if (b.drop){ set('bassDropEvery', b.drop.everyN); set('bassDropLen', b.drop.lenBeats); }
-    try { bassUpdateChordLabel(); } catch(e){}
-  }
-  // P-6 : sync des contrôles métronome pilotés par un preset Débutant (subdivision + gap).
-  function pfSyncMetroUI(){
-    const ss = $('subdivSel'); if (ss) ss.value = String(S.subdiv);
-    const gm = $('gapMode'); if (gm) gm.value = S.gap.mode;
-    try { gapTargetRefresh(); } catch(e){}
-    const gp = $('gapPlay'); if (gp) gp.value = String(S.gap.playN);
-    const gmv = $('gapMute'); if (gmv) gmv.value = String(S.gap.muteM);
-    try { if (typeof drawStatic === 'function' && !isPlaying) drawStatic(); } catch(e){}
-  }
-  function pfLoadPreset(ex){
-    const E = PF_EX[ex]; if (!E) return; const P = E.preset;
-    setTempo(P.tempo || 90); setSwing(P.swing || 50);
-    S.family = 'bin'; setFamily('bin', true);
-    S.perc.on = false;
-    if (P.metro) {
-      // Débutant : clic seul (jamais de basse funk). Subdivisions + gap pilotés par le preset.
-      S.bass.on = false;
-      S.subdiv = (P.subdiv != null) ? P.subdiv : 1;
-      if (P.gap) {
-        S.gap = Object.assign({}, S.gap, { mode:'fixed', target:(P.gap.target || 'pulse'),
-          playN:(P.gap.playN || 4), muteM:(P.gap.muteM || 1) });
-      } else {
-        S.gap = Object.assign({}, S.gap, { mode:'off', target:'all' });
-      }
-      try { resetGap(); } catch(e){}
-    } else {
-      S.bass.on = true; S.bass.key = 'E'; S.bass.density = (P.dens != null ? P.dens : 2); S.bass.vel = 'mixte'; S.bass.vary = false;
-      S.bass.pattern = P.pattern; S.bass.prog = P.prog;
-      S.bass.drop = Object.assign({ on:false, everyN:4, lenBeats:2 }, P.drop || {});
-    }
-    try { buildPercGrids(); } catch(e){}
-    try { bassResetCycle(); } catch(e){}
-    try { if (typeof bassPersist === 'function') bassPersist(); } catch(e){}
-    pfSyncBassUI();
-    if (P.metro) pfSyncMetroUI();
-    pfStatus('Chargé : ' + E.objet + ' — lance le métronome.');
-  }
-  function pfStatus(msg){ const el = $('pfStatus'); if (el) el.textContent = msg || ''; }
-  // ---- rendu ----
-  function pfEsc(s){ const d = document.createElement('div'); d.textContent = (s==null ? '' : String(s)); return d.innerHTML; }
-  const PF_KEYS = ['E','F','F#','G','G#','A','A#','B','C','C#','D','D#'];
-  function pfRender(){
-    const root = $('pfRoot'); if (!root) return;
-    const shared = pfSharedSet();
-    const niv = pfNivGet(); const pop = pfPopulatedNiveaux();
-    const order = PF_NIV_ORDER[niv] || [];
-    let html = '';
-    // P-6 : sélecteur de niveau — n'apparaît que si plus d'un niveau est peuplé.
-    if (pop.length > 1) {
-      html += '<div class="pf-niv-tabs" role="tablist" aria-label="Niveau du parcours">';
-      pop.forEach(n => {
-        html += '<button type="button" class="pf-niv-tab' + (n === niv ? ' active' : '') + '" data-niv="' + n + '"' +
-          (n === niv ? ' aria-selected="true"' : '') + '>' + pfEsc(PF_NIV_LABEL[n] || n) + '</button>';
-      });
-      html += '</div>';
-    }
-    html += '<div class="pf-grid" data-niv="' + niv + '">';
-    ['cajon','djembe'].forEach(pk => {
-      const parc = PF_PARC[pk];
-      const pref = 'MOD-' + (pk === 'cajon' ? 'CJ' : 'DJ') + '-' + (PF_NIV_INFIX[niv] || 'I') + '-';
-      html += '<div class="pf-col" style="--pf-c:' + parc.couleur + '">';
-      html += '<div class="pf-col-head"><span class="pf-dot"></span>' + pfEsc(parc.label) + '</div>';
-      let mi = 0;
-      order.forEach(code => {
-        const mid = pref + code; const M = PF_MOD[mid]; if (!M) return;
-        let done = 0; M.exercices.forEach(ex => { if (pfIsAcquis(pk, ex)) done++; });
-        const total = M.exercices.length; const open = (mi === 0);
-        html += '<div class="pf-mod' + (open ? ' open' : '') + '" data-parc="' + pk + '" data-mid="' + mid + '">';
-        html += '<button type="button" class="pf-mod-head"><span class="pf-mod-idx">' + (mi + 1) + '</span>';
-        html += '<span class="pf-mod-objet">' + pfEsc(M.objet) + '</span>';
-        html += '<span class="pf-mod-count">' + done + '/' + total + '</span>';
-        html += '<span class="pf-mod-chev">&#9662;</span></button>';
-        html += '<div class="pf-mod-body">';
-        M.exercices.forEach((ex, i) => {
-          const E = PF_EX[ex]; const isShared = shared.indexOf(ex) >= 0;
-          const acq = pfIsAcquis(pk, ex);
-          const promo = pfPromoGet(pk, ex, E.kind); const promu = !!(promo && promo.promu);
-          html += '<div class="pf-card' + (isShared ? ' pf-shared' : '') + (acq ? ' pf-acq' : '') + '" data-ex="' + ex + '" data-parc="' + pk + '">';
-          html += '<div class="pf-card-top"><span class="pf-rang">' + (E.kind === 'synthese' ? '&#9733;' : (i + 1)) + '</span>';
-          html += '<span class="pf-objet">' + pfEsc(E.objet) + '</span>';
-          if (isShared) html += '<span class="pf-badge-shared" title="Deja rencontre dans l\'autre parcours">deja rencontre</span>';
-          if (promu) html += '<span class="pf-badge-promo" title="Monte d\'un niveau par les votes">&#8593; niveau</span>';
-          html += '</div>';
-          html += '<div class="pf-consigne">' + pfEsc(E.consigne) + '</div>';
-          html += '<div class="pf-critere">&laquo; ' + pfEsc(E.critere) + ' &raquo;</div>';
-          html += '<div class="pf-actions"><button class="btn-sm primary pf-load">Charger</button>';
-          html += '<label class="check pf-acq-lbl"><input type="checkbox" class="pf-acquis"' + (acq ? ' checked' : '') + '> acquis</label></div>';
-          html += '<details class="pf-perso"><summary>Personnaliser</summary><div class="pf-perso-body">';
-          html += '<label>Tempo <input type="range" class="pf-tempo" min="70" max="110" value="' + (E.preset.tempo || 90) + '"></label>';
-          html += '<label>Densite <select class="pf-dens"><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option></select></label>';
-          html += '<label class="check"><input type="checkbox" class="pf-drop"' + (E.preset.drop && E.preset.drop.on ? ' checked' : '') + '> Drop-outs</label>';
-          html += '<label>Tonalite <select class="pf-key">' + PF_KEYS.map(k => '<option' + (k === 'E' ? ' selected' : '') + '>' + k + '</option>').join('') + '</select></label>';
-          html += '</div></details>';
-          html += '<div class="pf-vote"><span>Difficulte :</span>';
-          html += '<button class="btn-sm pf-v" data-v="facile">facile</button>';
-          html += '<button class="btn-sm pf-v" data-v="ok">ok</button>';
-          html += '<button class="btn-sm pf-v" data-v="difficile">difficile</button></div>';
-          html += '</div>';
-        });
-        html += '</div></div>';
-        mi++;
-      });
-      html += '</div>';
-    });
-    html += '</div>';
-    root.innerHTML = html;
-    // P-6 : sélecteur de niveau — un seul niveau rendu à la fois, choix persistant.
-    root.querySelectorAll('.pf-niv-tab').forEach(tab => {
-      tab.addEventListener('click', () => { pfNivSet(tab.getAttribute('data-niv')); pfRender(); });
-    });
-    root.querySelectorAll('.pf-mod-head').forEach(head => {
-      head.addEventListener('click', () => {
-        const mod = head.parentElement, col = mod.parentElement;
-        const wasOpen = mod.classList.contains('open');
-        col.querySelectorAll('.pf-mod').forEach(m => m.classList.remove('open'));
-        if (!wasOpen) mod.classList.add('open');
-      });
-    });
-    root.querySelectorAll('.pf-card').forEach(card => {
-      const ex = card.getAttribute('data-ex'), pk = card.getAttribute('data-parc'), E = PF_EX[ex];
-      card.querySelector('.pf-load').addEventListener('click', () => pfLoadPreset(ex));
-      card.querySelector('.pf-acquis').addEventListener('change', e => {
-        pfAcquisSet(pk, ex, e.target.checked); card.classList.toggle('pf-acq', e.target.checked);
-        const modDiv = card.closest('.pf-mod');
-        if (modDiv){ const MM = PF_MOD[modDiv.getAttribute('data-mid')];
-          if (MM){ let d = 0; MM.exercices.forEach(x => { if (pfIsAcquis(pk, x)) d++; });
-            const cnt = modDiv.querySelector('.pf-mod-count'); if (cnt) cnt.textContent = d + '/' + MM.exercices.length; } }
-      });
-      card.querySelector('.pf-tempo').addEventListener('input', e => setTempo(+e.target.value));
-      card.querySelector('.pf-dens').addEventListener('change', e => { S.bass.density = +e.target.value; try { bassResetCycle(); } catch(_){} });
-      card.querySelector('.pf-drop').addEventListener('change', e => { S.bass.drop = S.bass.drop || { on:false, everyN:4, lenBeats:2 }; S.bass.drop.on = e.target.checked; try { bassResetCycle(); } catch(_){} });
-      card.querySelector('.pf-key').addEventListener('change', e => { S.bass.key = e.target.value; try { bassResetCycle(); bassUpdateChordLabel(); } catch(_){} });
-      card.querySelectorAll('.pf-v').forEach(b => b.addEventListener('click', () => { pfVote(pk, ex, E.kind, b.getAttribute('data-v')); pfStatus('Vote enregistre : ' + b.getAttribute('data-v') + '.'); }));
-    });
-  }
-
-  function pfInit(){
-    if (!$('pfRoot')) return;
-    pfRender();
-    try { document.addEventListener('fm-auth', () => pfFlushVotes()); } catch(e){}
-    try { window.addEventListener('online', () => pfFlushVotes()); } catch(e){}
-    setTimeout(() => { try { pfFlushVotes(); } catch(e){} }, 1200);
-  }
-  window.fmMetroParcours = function(){
-    return {
-      data: { PARC:PF_PARC, MODULES:PF_MOD, EXERCISES:PF_EX, NIVEAUX:PF_NIVEAUX },
-      shared: pfSharedSet(),
-      progress: pfAcquisAll,
-      promoCache: pfPromoAll,
-      voteQueue: pfQueueAll,
-      presetFor: function(ex){
-        const E = PF_EX[ex]; if (!E) return null;
-        return { tempo:90, family:'bin', swing:50, perc:{ on:false },
-          bass: Object.assign({ on:true, key:'E', density:2, vel:'mixte', vary:false },
-            { pattern:E.preset.pattern, prog:E.preset.prog, drop:Object.assign({ on:false, everyN:4, lenBeats:2 }, E.preset.drop || {}) }) };
-      },
-      buildVote: function(p, ex, c, v){ return pfVoteItem(p, ex, c, v); },
-      loadPreset: function(ex){ pfLoadPreset(ex); },
-      vote: function(p, ex, c, v){ pfVote(p, ex, c, v); },
-      flush: function(){ return pfFlushVotes(); },
-      isAcquis: pfIsAcquis,
-      setAcquis: pfAcquisSet,
-      niveauEffectif: pfNiveauEffectif,
-      niveau: pfNivGet,
-      niveauxPeuples: pfPopulatedNiveaux,
-      showNiveau: function(n){ pfNivSet(n); try { pfRender(); } catch(e){} }
-    };
-  };
-
-  pfInit();
-
   // 0.6.6 (C8) : l'init est terminée — les prochains enregistrements viennent d'un geste
   // utilisateur, le toast « réglages enregistrés » peut se montrer (une fois par session).
   window.__fmReady = true;
@@ -6902,170 +6579,7 @@ swing 62
   <h3 id="acctTitle">Se connecter</h3>
   <div id="acctBody"></div>
 </div>
-<script>
-/* ===== Compte utilisateur : connexion par lien magique + profil (pseudo) ===== */
-(function(){
-  var SB_URL="https://hifqtzxhmboxbruraiab.supabase.co";
-  var SB_KEY="sb_publishable_HdA4ThMx_yDk7212nJ_sIg_J18wCNYK";
-  window.fmSupabase=function(){
-    if(window._fmSb) return window._fmSb;
-    if(!(window.supabase&&window.supabase.createClient)) return null;
-    window._fmSb=window.supabase.createClient(SB_URL,SB_KEY);
-    return window._fmSb;
-  };
-
-  var dim=document.getElementById('acctDim');
-  var card=document.getElementById('acctCard');
-  var titleEl=document.getElementById('acctTitle');
-  var bodyEl=document.getElementById('acctBody');
-  var btn=document.getElementById('btnAccount');
-  var currentUser=null, currentProfil=null, autoPrompted=false;
-
-  function openModal(){ dim.classList.add('show'); card.style.display='block'; }
-  function closeModal(){ dim.classList.remove('show'); card.style.display='none'; bodyEl.innerHTML=''; }
-  dim.addEventListener('click', closeModal);
-  document.addEventListener('keydown', function(e){ if(e.key==='Escape' && card.style.display==='block') closeModal(); });
-  function esc(s){ var d=document.createElement('div'); d.textContent=(s==null?'':String(s)); return d.innerHTML; }
-  function fb(msg,ok){ var el=document.getElementById('acctFb'); if(el){ el.textContent=msg; el.className=(ok?'good':'bad'); } }
-
-  function showLogin(){
-    titleEl.textContent="Se connecter";
-    bodyEl.innerHTML=
-      '<p>Reçois un lien de connexion par e-mail — aucun mot de passe à retenir.</p>'+
-      '<p style="opacity:.75;font-size:.85rem">L\'application fonctionne aussi sans compte : la connexion sert seulement à partager tes routines et suivre ta progression.</p>'+
-      '<input id="acctEmail" type="email" inputmode="email" autocomplete="email" placeholder="ton@email.fr">'+
-      '<div id="acctFb"></div>'+
-      '<div class="acct-actions">'+
-        '<button id="acctCancel">Annuler</button>'+
-        '<button class="acct-primary" id="acctSend">Envoyer le lien</button>'+
-      '</div>';
-    var email=document.getElementById('acctEmail');
-    document.getElementById('acctCancel').onclick=closeModal;
-    document.getElementById('acctSend').onclick=sendLink;
-    email.addEventListener('keydown', function(e){ if(e.key==='Enter') sendLink(); });
-    setTimeout(function(){ email.focus(); }, 30);
-  }
-  async function sendLink(){
-    var email=((document.getElementById('acctEmail')||{}).value||'').trim();
-    if(!/.+@.+\..+/.test(email)){ fb('Entre une adresse e-mail valide.',false); return; }
-    var sb=window.fmSupabase(); if(!sb){ fb('Connexion au serveur impossible (réseau ?).',false); return; }
-    fb('Envoi…',true);
-    try{
-      var redirect=location.href.split('#')[0];
-      var res=await sb.auth.signInWithOtp({ email:email, options:{ emailRedirectTo:redirect } });
-      if(res.error){ fb('Erreur : '+res.error.message,false); return; }
-      titleEl.textContent="Vérifie tes e-mails";
-      bodyEl.innerHTML='<p>Un lien de connexion a été envoyé à <b>'+esc(email)+'</b>. Ouvre-le sur cet appareil pour te connecter.</p>'+
-        '<p style="opacity:.75;font-size:.85rem">Pas reçu au bout d\'une minute ? Vérifie tes indésirables (spams), ou renvoie le lien.</p>'+
-        '<div class="acct-actions">'+
-          '<button id="acctResend">Renvoyer le lien</button>'+
-          '<button class="acct-primary" id="acctOk">Fermer</button>'+
-        '</div>';
-      document.getElementById('acctOk').onclick=closeModal;
-      document.getElementById('acctResend').onclick=function(){
-        showLogin();
-        var e2=document.getElementById('acctEmail'); if(e2){ e2.value=email; }
-      };
-    }catch(e){ fb('Échec : '+(e&&e.message||e),false); }
-  }
-
-  async function ensureProfil(user){
-    var sb=window.fmSupabase(); if(!sb) return null;
-    try{
-      var r=await sb.from('profils').select('id,pseudo,instrument').eq('id',user.id).maybeSingle();
-      if(r.error) return null;
-      return r.data;
-    }catch(e){ return null; }
-  }
-  function showPseudoPrompt(user, existing){
-    titleEl.textContent="Ton pseudo";
-    var cur=(existing&&existing.pseudo)||'';
-    bodyEl.innerHTML=
-      '<p>Le nom affiché à côté des routines que tu partageras.</p>'+
-      '<input id="acctPseudo" type="text" maxlength="40" placeholder="ex. Naomi" value="'+esc(cur)+'">'+
-      '<div id="acctFb"></div>'+
-      '<div class="acct-actions">'+
-        '<button id="acctSkip">Plus tard</button>'+
-        '<button class="acct-primary" id="acctSavePseudo">Enregistrer</button>'+
-      '</div>';
-    var inp=document.getElementById('acctPseudo');
-    document.getElementById('acctSkip').onclick=closeModal;
-    document.getElementById('acctSavePseudo').onclick=function(){ savePseudo(user); };
-    inp.addEventListener('keydown', function(e){ if(e.key==='Enter') savePseudo(user); });
-    setTimeout(function(){ inp.focus(); if(inp.select) inp.select(); }, 30);
-  }
-  async function savePseudo(user){
-    var sb=window.fmSupabase(); if(!sb) return;
-    var pseudo=((document.getElementById('acctPseudo')||{}).value||'').trim();
-    if(!pseudo){ fb('Choisis un pseudo (ou « Plus tard »).',false); return; }
-    fb('Enregistrement…',true);
-    try{
-      var res=await sb.from('profils').upsert({ id:user.id, pseudo:pseudo }, { onConflict:'id' }).select().maybeSingle();
-      if(res.error){ fb('Erreur : '+res.error.message,false); return; }
-      currentProfil=res.data||{ id:user.id, pseudo:pseudo };
-      renderAccount(); closeModal();
-    }catch(e){ fb('Échec : '+(e&&e.message||e),false); }
-  }
-
-  function showAccount(){
-    var name=(currentProfil&&currentProfil.pseudo)||'';
-    var mail=(currentUser&&currentUser.email)||'';
-    titleEl.textContent="Ton compte";
-    bodyEl.innerHTML=
-      '<p>Connecté'+(name?' comme <b>'+esc(name)+'</b>':'')+
-        (mail?'<br><span style="opacity:.7;font-size: .8125rem">'+esc(mail)+'</span>':'')+'</p>'+
-      '<div class="acct-actions" style="justify-content:space-between">'+
-        '<button id="acctEditPseudo">'+(name?'Changer de pseudo':'Choisir un pseudo')+'</button>'+
-        '<button id="acctLogout">Se déconnecter</button>'+
-      '</div>';
-    document.getElementById('acctEditPseudo').onclick=function(){ showPseudoPrompt(currentUser,currentProfil); };
-    document.getElementById('acctLogout').onclick=logout;
-  }
-  async function logout(){
-    var sb=window.fmSupabase(); if(sb){ try{ await sb.auth.signOut(); }catch(e){} }
-    currentUser=null; currentProfil=null; autoPrompted=false; renderAccount(); closeModal();
-  }
-
-  function renderAccount(){
-    window.fmCurrentUser=currentUser; window.fmCurrentProfil=currentProfil;
-    try{ document.dispatchEvent(new CustomEvent('fm-auth',{detail:{user:currentUser,profil:currentProfil}})); }catch(e){}
-    if(!btn) return;
-    if(currentUser){
-      var name=(currentProfil&&currentProfil.pseudo)||currentUser.email||'Compte';
-      btn.textContent='👤 '+name; btn.title='Ton compte';
-    }else{
-      btn.textContent='Se connecter'; btn.title='Recevoir un lien de connexion par e-mail';
-    }
-  }
-  if(btn){ btn.addEventListener('click', function(){ openModal(); if(currentUser) showAccount(); else showLogin(); }); }
-
-  async function onSession(user){
-    currentUser=user||null;
-    if(currentUser){
-      if(!currentProfil) currentProfil=await ensureProfil(currentUser);
-      renderAccount();
-      if(!autoPrompted && (!currentProfil || !currentProfil.pseudo)){
-        autoPrompted=true; openModal(); showPseudoPrompt(currentUser, currentProfil);
-      }
-    }else{
-      currentProfil=null; renderAccount();
-    }
-  }
-  function init(){
-    var sb=window.fmSupabase();
-    if(!sb){ renderAccount(); return; }
-    sb.auth.getSession().then(function(r){
-      var u=r&&r.data&&r.data.session&&r.data.session.user; onSession(u||null);
-    }).catch(function(){ renderAccount(); });
-    sb.auth.onAuthStateChange(function(evt, session){
-      var u=session&&session.user;
-      if(evt==='SIGNED_IN') onSession(u||null);
-      else if(evt==='SIGNED_OUT') onSession(null);
-    });
-  }
-  if(document.readyState!=='loading') init(); else document.addEventListener('DOMContentLoaded', init);
-})();
-</script>
+<script src="coquille/fm-compte.js"></script>
 <script>
 /* ===== Bibliothèque partagée (Supabase) : routines canon/classe + publication ===== */
 (function(){

@@ -1,12 +1,12 @@
 /* recette-P4.js — parcours funk, étape P-4 (UI parcours, module 6).
    Headless jsdom : stubs Web Audio / canvas + client Supabase mocké.
    Pilote le DOM et vérifie via window.fmMetroParcours() (+ window.fmMetroBass pour l'état basse).
-   Usage : node recette-P4.js [chemin/index.html]  (défaut ./index.html) */
+   Usage : node recette-P4.js [chemin/apprendre.html]  (défaut ./apprendre.html — R-4a : le parcours vit sur apprendre.html) */
 const fs = require('fs');
 const path = require('path');
 const { JSDOM, VirtualConsole } = require('jsdom');
 
-const FILE = process.argv[2] || path.join(__dirname, 'index.html');
+const FILE = process.argv[2] || path.join(__dirname, 'apprendre.html');   // R-4a : la surface parcours a déménagé
 const html = require('./recette-harnais').chargeHtml(FILE);   // R-2 : inline les corpus/*.js
 
 let PASS = 0, FAIL = 0;
@@ -108,7 +108,9 @@ async function runTests() {
   ok('0.1 aucun jsdomError hors chargement de ressource externe', realErrors.length === 0);
   if (realErrors.length) realErrors.forEach(m => console.log('     ! ' + m));
   ok('0.2 hook fmMetroBass conservé', typeof W.fmMetroBass === 'function');
-  ok('0.3 hook fmMetroReg conservé', typeof W.fmMetroReg === 'function');
+  // R-4a : fmMetroReg (rang de registre) est une surface d'index/pratiquer — sur la page
+  // parcours, le hook moteur fmMetroBass fait foi (même intention : environnement intact).
+  ok('0.3 hook moteur fmMetroBass conservé (fmMetroReg vit sur index/pratiquer)', typeof W.fmMetroBass === 'function');
   ok('0.4 nouveau hook fmMetroParcours présent', typeof W.fmMetroParcours === 'function');
 
   const P = W.fmMetroParcours();

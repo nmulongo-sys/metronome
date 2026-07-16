@@ -47,8 +47,12 @@ for (const cid of Object.keys(CORPUS).sort()) {
 // préservation par ID : chaque entrée du 0.8.0 est toujours présente, identique
 // valeur pour valeur (le peuplement P-7/P-8 AJOUTE, il ne modifie jamais).
 // L'ordre d'insertion n'importe pas — l'ordre d'affichage vient de PF_NIV_ORDER.
-ok(Object.keys(REF.PF_EX).every(id => egal(union.exercices[id], REF.PF_EX[id])),
-  `chaque exercice 0.8.0 présent et identique valeur pour valeur (${Object.keys(REF.PF_EX).length})`);
+// R-4a : le champ demo (mode écoute, prévu au schéma R-1 §4.1, GO R-4 §9.2) est un AJOUT
+// acté sur les exercices existants — la préservation porte sur les champs 0.8.0, demo mis
+// à part (sa validité est portée par recette-demo.js).
+const sansDemo = e => { if (!e) return e; const c = Object.assign({}, e); delete c.demo; return c; };
+ok(Object.keys(REF.PF_EX).every(id => egal(sansDemo(union.exercices[id]), REF.PF_EX[id])),
+  `chaque exercice 0.8.0 présent et identique valeur pour valeur, champ demo mis à part (${Object.keys(REF.PF_EX).length})`);
 ok(Object.keys(REF.PF_MOD).every(id => egal(union.modules[id], REF.PF_MOD[id])),
   `chaque module 0.8.0 présent et identique valeur pour valeur (${Object.keys(REF.PF_MOD).length})`);
 ok(egal(niveaux.debutant, REF.PF_NIV_ORDER.debutant) && egal(niveaux.intermediaire, REF.PF_NIV_ORDER.intermediaire),

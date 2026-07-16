@@ -4,12 +4,12 @@
    le rendu accordéon (6 modules/colonne, un seul ouvert), les presets des nouveaux exercices.
    P-6 : le parcours est multi-niveaux ; cette recette scope ses garanties à l'Intermédiaire
    (compteurs filtrés par niveau, sélecteur mis sur « intermédiaire »). Le Débutant → recette-P6.
-   Usage : node recette-P2.js [chemin/index.html]  (défaut ./index.html) */
+   Usage : node recette-P2.js [chemin/apprendre.html]  (défaut ./apprendre.html — R-4a : le parcours vit sur apprendre.html) */
 const fs = require('fs');
 const path = require('path');
 const { JSDOM, VirtualConsole } = require('jsdom');
 
-const FILE = process.argv[2] || path.join(__dirname, 'index.html');
+const FILE = process.argv[2] || path.join(__dirname, 'apprendre.html');   // R-4a : la surface parcours a déménagé
 const html = require('./recette-harnais').chargeHtml(FILE);   // R-2 : inline les corpus/*.js
 
 let PASS = 0, FAIL = 0;
@@ -97,7 +97,8 @@ async function runTests() {
   ok('0.1 aucun jsdomError hors ressource externe', realErrors.length === 0);
   if (realErrors.length) realErrors.forEach(m => console.log('     ! ' + m));
   ok('0.2 hook fmMetroParcours présent', typeof W.fmMetroParcours === 'function');
-  ok('0.3 hooks existants conservés (bass/reg)', typeof W.fmMetroBass === 'function' && typeof W.fmMetroReg === 'function');
+  // R-4a : fmMetroReg (rang de registre) vit sur index/pratiquer — ici le hook moteur fait foi.
+  ok('0.3 hooks existants conservés (bass ; reg vit sur index/pratiquer)', typeof W.fmMetroBass === 'function');
 
   const P = W.fmMetroParcours();
   const EX = P.data.EXERCISES, MOD = P.data.MODULES;

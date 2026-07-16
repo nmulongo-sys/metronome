@@ -3,12 +3,12 @@
    Vérifie l'intégrité des données Avancé (10 modules, 35 exercices, socle B3/I1/R2, 4+1),
    l'asymétrie idiomatique (CYM cajón seul / CALL djembé seul, codes asymétriques — décision
    Jean §9.2), les presets (basse, clic, drop), le partage, le rendu et l'onglet Avancé.
-   Usage : node recette-P7.js [chemin/index.html]  (défaut ./index.html) */
+   Usage : node recette-P7.js [chemin/apprendre.html]  (défaut ./apprendre.html — R-4a : le parcours vit sur apprendre.html) */
 const fs = require('fs');
 const path = require('path');
 const { JSDOM, VirtualConsole } = require('jsdom');
 
-const FILE = process.argv[2] || path.join(__dirname, 'index.html');
+const FILE = process.argv[2] || path.join(__dirname, 'apprendre.html');   // R-4a : la surface parcours a déménagé
 const html = require('./recette-harnais').chargeHtml(FILE);
 
 let PASS = 0, FAIL = 0;

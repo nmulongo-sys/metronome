@@ -4,12 +4,12 @@
    SOLO djembé), la vocalisation fondue dans I4 (décision P-5 §7.2, confirmée §9.6), les presets
    (gap laid-back/pushed, premier emploi d'octaves, progressions riches sur les synthèses —
    décision Jean §9.4), le rendu et l'onglet Artiste.
-   Usage : node recette-P8.js [chemin/index.html]  (défaut ./index.html) */
+   Usage : node recette-P8.js [chemin/apprendre.html]  (défaut ./apprendre.html — R-4a : le parcours vit sur apprendre.html) */
 const fs = require('fs');
 const path = require('path');
 const { JSDOM, VirtualConsole } = require('jsdom');
 
-const FILE = process.argv[2] || path.join(__dirname, 'index.html');
+const FILE = process.argv[2] || path.join(__dirname, 'apprendre.html');   // R-4a : la surface parcours a déménagé
 const html = require('./recette-harnais').chargeHtml(FILE);
 
 let PASS = 0, FAIL = 0;
@@ -159,7 +159,7 @@ function runTests() {
   // 6. chargement de presets via l'UI
   cardOf('cajon','EX-SOCLE-P1-02').querySelector('.pf-load').click();
   ok('6.1 P1-02 chargé : clic seul + machine gap (mode fixe, cible pulse)',
-     W.fmMetroBass().state.on === false && D.getElementById('gapMode').value === 'fixed' && D.getElementById('gapTarget').value === 'pulse');
+     W.fmMetroBass().state.on === false && W.eval('S.gap.mode') === 'fixed' && D.getElementById('gapTarget').value === 'pulse');   // R-4a : l'état gap fait foi
   cardOf('cajon','EX-SOCLE-P1-04').querySelector('.pf-load').click();
   let b = W.fmMetroBass().state;
   ok('6.2 P1-04 chargé : basse ON, pattern octaves', b.on === true && b.pattern === 'octaves');
