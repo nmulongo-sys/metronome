@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Métronome — Formation Musicale</title>
+<title>Métronome — Pratiquer · Formation Musicale</title>
 
 <!-- Polices du portail -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -433,129 +433,20 @@
   .script-status { font-size: .84rem; color: var(--fm-accent-text); margin-top: 8px; min-height: 1.2em; }
   .kbd-hint { text-align: center; color: var(--fm-sub); font-size: .8125rem; margin-top: 14px; }
 
-  /* ============ ARCHET PLEIN ÉCRAN ============ */
-  .bowfs {
-    position: fixed; inset: 0; background: var(--fm-bg);
-    display: none; flex-direction: column; z-index: 70;
-  }
-  .bowfs.open { display: flex; }
-  .bowfs-bar {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 22px; gap: 12px;
-  }
-  .bowfs-title { font-family: var(--fm-font-display); font-size: 1.4rem; font-weight: 600; }
-  .bowfs-bar .kicker { margin: 0; }
-  .bowfs-controls { display: flex; gap: 10px; align-items: center; }
-  .bowfs-tempo { font-variant-numeric: tabular-nums; color: var(--fm-sub); font-size: .9rem; letter-spacing: .08em; }
-  .bowfs-controls button {
-    background: var(--fm-panel); border: 1px solid var(--fm-line); color: var(--fm-ink);
-    padding: 10px 18px; border-radius: 7px; cursor: pointer; font-size: 1rem;
-  }
-  .bowfs-controls button.play { background: var(--fm-accent); border-color: var(--fm-accent); color: var(--fm-accent-ink); font-weight: 600; min-width: 64px; }
-  .bowfs canvas { flex: 1; width: 100%; height: 100%; display: block; }
-
-  /* ============ WIZARD ============ */
-  .wiz-overlay {
-    position: fixed; inset: 0; background: rgba(20,15,8,.55);
-    display: none; align-items: center; justify-content: center; padding: 16px; z-index: 50;
-  }
-  .wiz-overlay.open { display: flex; }
-  .wiz {
-    background: var(--fm-panel); border: 1px solid var(--fm-line);
-    border-radius: 16px; width: 100%; max-width: 560px; max-height: 92vh; overflow-y: auto;
-    padding: 28px;
-    background-image: repeating-linear-gradient(transparent 0 12px, var(--fm-staff) 12px 13px);
-  }
-  .wiz .kicker { margin-bottom: 4px; }
-  .wiz h2 { font-family: var(--fm-font-display); font-weight: 600; font-size: 1.7rem; margin-bottom: 4px; }
-  .wiz-sub { color: var(--fm-sub); font-size: .88rem; margin-bottom: 18px; }
-  .wiz-dots { display: flex; gap: 6px; margin-bottom: 18px; }
-  .wiz-dots span { width: 26px; height: 4px; border-radius: 2px; background: var(--fm-line); }
-  .wiz-dots span.done { background: var(--fm-accent); }
-  .wiz-options { display: grid; gap: 8px; }
-  .wiz-opt {
-    text-align: left; background: var(--fm-panel-2); border: 1px solid var(--fm-line);
-    border-radius: 10px; padding: 12px 14px; cursor: pointer; font-family: var(--fm-font-ui);
-    color: var(--fm-ink);
-  }
-  .wiz-opt:hover { border-color: var(--fm-accent); }
-  .wiz-opt.sel { border-color: var(--fm-accent); box-shadow: inset 0 0 0 1px var(--fm-accent); }
-  .wiz-opt b { display: block; font-size: .95rem; font-weight: 600; }
-  .wiz-opt small { color: var(--fm-sub); font-size: .8125rem; }
-  .wiz-nav { display: flex; justify-content: space-between; gap: 10px; margin-top: 22px; }
-  .wiz-recap { background: var(--fm-panel-2); border: 1px solid var(--fm-line); border-radius: 10px; padding: 14px 16px; font-size: .9rem; line-height: 1.7; }
-  .wiz-recap b { color: var(--fm-accent-text); }
-  /* Team Spirit & répertoire (passe 3, étape 4) */
-  .ts-parts { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 12px; }
-  .ts-part { border: 1px solid var(--fm-line); border-radius: 10px; padding: 8px 10px; background: var(--fm-panel-2); min-width: 190px; flex: 1 1 320px; }
-  .ts-part.solo { border-color: var(--fm-accent); box-shadow: inset 0 0 0 1px var(--fm-accent); }
-  .ts-part .ts-part-head { display: flex; align-items: center; gap: 6px; }
-  .ts-part input.ts-name { flex: 1; min-width: 60px; }
-  .ts-part .ts-line { color: var(--fm-sub); font-size: .8125rem; margin-top: 5px; line-height: 1.5; }
-  .ts-pline { margin-top: 7px; }
-  .ts-pline .ts-pline-label { color: var(--fm-sub); font-size: .8125rem; }
-  .ts-pline .steps { margin: 3px 0 0; }
-  .ts-chip { display: inline-block; font-size: .8125rem; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--fm-line); color: var(--fm-sub); }
-  .ts-chip.basse { background: var(--fm-voice-1, rgba(120,120,200,.18)); }
-  .ts-chip.medium { background: var(--fm-voice-2, rgba(120,200,140,.18)); }
-  .ts-chip.aigu { background: var(--fm-voice-3, rgba(210,170,90,.18)); }
-  .ts-chip.adapte { color: var(--fm-accent-2); border-color: var(--fm-accent-2); }
-  .ts-voice select.ts-assign { width: auto; min-width: 120px; }
-  .ts-voice.ts-dropped { opacity: .75; }
-  .ts-chip.backing { color: var(--fm-accent-2); border-color: var(--fm-accent-2); }
-  .ts-wizbox { border-top: 1px dashed var(--fm-line); margin-top: 10px; padding-top: 8px; }
-  .ts-rank { margin: 8px 0; }
-  .ts-rk { display: flex; align-items: center; gap: 8px; border: 1px solid var(--fm-line);
-    border-radius: 8px; padding: 6px 10px; margin: 4px 0; background: var(--fm-panel-2); font-size: .82rem; }
-  .ts-rk.dragging { opacity: .6; border-color: var(--fm-accent); }
-  .ts-rk-handle { cursor: grab; touch-action: none; user-select: none; color: var(--fm-sub);
-    font-size: 1.05rem; padding: 0 4px; }
-  .ts-rk-num { min-width: 1.4em; text-align: right; color: var(--fm-sub); }
-  .ts-rk-hits { margin-left: auto; color: var(--fm-sub); font-size: .8125rem; white-space: nowrap; }
-  .ts-warn { color: var(--fm-accent-2); }
-
-  /* ===== Parcours funk (P-4) — surcouche additive ===== */
-  :root { --pf-cajon:#C8722E; --pf-djembe:#2E86C8; }
-  /* P-6 : sélecteur de niveau (Débutant / Intermédiaire / …) */
-  .pf-niv-tabs { display:flex; flex-wrap:wrap; gap:6px; margin:2px 0 4px; }
-  .pf-niv-tab { font-family:var(--fm-font-ui); font-size:.8125rem; letter-spacing:.02em; padding:6px 14px; border-radius:20px;
-    border:1px solid var(--fm-line); background:var(--fm-panel-2); color:var(--fm-sub); cursor:pointer; }
-  .pf-niv-tab:hover { border-color:var(--fm-accent); color:var(--fm-ink); }
-  .pf-niv-tab.active { background:var(--fm-accent); border-color:var(--fm-accent); color:var(--fm-accent-ink); font-weight:600; }
-  .pf-niv-tab:focus-visible { outline:2px solid var(--fm-accent); outline-offset:1px; }
-  .pf-grid { display:grid; grid-template-columns:1fr; gap:14px; margin-top:6px; }
-  @media (min-width:640px){ .pf-grid { grid-template-columns:1fr 1fr; } }
-  .pf-col { border:1px solid var(--fm-line); border-radius:12px; padding:10px; background:var(--fm-panel-2); border-top:3px solid var(--pf-c); }
-  .pf-col-head { font-weight:700; font-size:.9rem; margin-bottom:8px; display:flex; align-items:center; gap:6px; color:var(--fm-ink); }
-  .pf-dot { width:10px; height:10px; border-radius:50%; background:var(--pf-c); display:inline-block; }
-  .pf-card { border:1px solid var(--fm-line); border-left:4px solid var(--pf-c); border-radius:10px; padding:8px 10px; margin:8px 0; background:var(--fm-panel); }
-  .pf-card.pf-shared { border-left:4px solid transparent; border-image:linear-gradient(var(--pf-cajon),var(--pf-djembe)) 1; }
-  .pf-card.pf-acq { box-shadow:inset 0 0 0 1px var(--fm-accent); }
-  .pf-card-top { display:flex; align-items:center; gap:8px; }
-  .pf-rang { min-width:1.5em; height:1.5em; border-radius:50%; background:var(--pf-c); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size: .8125rem; font-weight:700; }
-  .pf-objet { font-weight:600; font-size:.86rem; flex:1; }
-  .pf-badge-shared, .pf-badge-promo { font-size: .8125rem; padding:1px 6px; border-radius:20px; white-space:nowrap; }
-  .pf-badge-shared { background:linear-gradient(90deg,var(--pf-cajon),var(--pf-djembe)); color:#fff; }
-  .pf-badge-promo { background:var(--fm-accent); color:var(--fm-accent-ink); }
-  .pf-consigne { font-size: .8125rem; color:var(--fm-ink); margin:6px 0 2px; }
-  .pf-critere { font-size: .8125rem; color:var(--fm-sub); font-style:italic; margin-bottom:6px; }
-  .pf-actions { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
-  .pf-perso { margin-top:6px; font-size: .8125rem; }
-  .pf-perso summary { cursor:pointer; color:var(--fm-sub); }
-  .pf-perso-body { display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; align-items:center; }
-  .pf-perso-body label { display:flex; align-items:center; gap:4px; }
-  .pf-vote { display:flex; align-items:center; gap:6px; margin-top:8px; font-size: .8125rem; color:var(--fm-sub); flex-wrap:wrap; }
-  .pf-vote .pf-v { font-size: .8125rem; padding:2px 8px; }
-  #pfStatus { font-size: .8125rem; color:var(--fm-accent-2); margin-top:8px; min-height:1em; }
-  .pf-mod { border:1px solid var(--fm-line); border-radius:10px; margin:8px 0; overflow:hidden; background:var(--fm-panel); }
-  .pf-mod-head { width:100%; display:flex; align-items:center; gap:8px; padding:9px 10px; background:transparent; border:none; cursor:pointer; color:var(--fm-ink); font:inherit; text-align:left; }
-  .pf-mod-idx { min-width:1.6em; height:1.6em; border-radius:50%; background:var(--pf-c); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size: .8125rem; font-weight:700; }
-  .pf-mod-objet { flex:1; font-weight:700; font-size:.85rem; }
-  .pf-mod-count { font-size: .8125rem; color:var(--fm-sub); font-variant-numeric:tabular-nums; }
-  .pf-mod-chev { color:var(--fm-sub); transition:transform .18s ease; }
-  .pf-mod.open .pf-mod-chev { transform:rotate(180deg); }
-  .pf-mod-body { display:none; padding:0 8px 6px; }
-  .pf-mod.open .pf-mod-body { display:block; }
+  /* ============ R-3b — PRATIQUER : blocs J1 · mute maître · stubs ============
+     CSS additif de la page pratiquer (copie élaguée : les blocs archet plein
+     écran, wizard/accueil et parcours funk — surfaces index-only — sont retirés). */
+  .bloc { margin: 4px 0 14px; }
+  .bloc-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+               margin: 22px 0 10px; padding: 6px 2px; border-bottom: 2px solid var(--fm-line); }
+  .bloc-head h2 { margin: 0; font-family: inherit; font-size: 1.08rem; font-weight: 600; letter-spacing: .01em; }
+  .bloc-head .bloc-num { display: inline-flex; align-items: center; justify-content: center;
+               width: 24px; height: 24px; border-radius: 50%; flex: none;
+               background: var(--fm-accent); color: #fff; font-size: .8rem; font-weight: 700; }
+  .bloc-head .bloc-sub { color: var(--fm-sub); font-size: .8125rem; }
+  #accompMuteBtn[aria-pressed="true"], #accompMuteBtn2[aria-pressed="true"] {
+               background: var(--fm-accent); color: #fff; border-color: transparent; }
+  #fmStubs { display: none !important; }
 
   /* ==== Salve UX 0.6.6 (quick wins C2/C5/C6/C8/C15 du panel v0.6.5) ==== */
   /* C2 — infobulle de vocabulaire : natif (title) au survol, bulle CSS au focus (tap mobile) */
@@ -649,7 +540,6 @@
     } catch (e) { /* silencieux */ }
   })();
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* ===== i18n (0.6.9 I1) : dictionnaires EN/PT hoistés + helper fmTr() pour les chaînes
    composées en JS (statuts dynamiques, confirm, aria-labels construits). Le walker de
@@ -1790,22 +1680,14 @@ window.fmTr = (function(){
 <div class="app">
   <header>
     <div class="brand">
-      <h1>Métronome</h1>
-      <div class="kicker">Formation musicale · Groove &amp; horloge interne</div>
+      <h1>Métronome — Pratiquer</h1>
+      <div class="kicker">Pratique libre · ce que je joue — ce qui m'accompagne — le clic</div>
       <div class="build-stamp" id="buildStamp" style="font-size:13px;opacity:.75;margin-top:2px;font-variant-numeric:tabular-nums;"></div>
-      <!-- R-3b : lien discret vers la page de pratique libre (scénario 3) — la bascule
-           des usages vers les pages par scénario est l'affaire de R-4 (accueil). -->
-      <div style="font-size:12px;margin-top:2px;"><a href="pratiquer.html" style="color:inherit;opacity:.7;" title="La pratique libre sur une page dédiée : ce que je joue, ce qui m'accompagne, le clic">Pratiquer sur la page dédiée →</a></div>
+      <div style="font-size:12px;margin-top:2px;"><a href="index.html" style="color:inherit;opacity:.7;" title="Revenir à la page d'accueil du métronome (écran de jeu, parcours, team spirit, archet)">← Accueil du métronome</a></div>
     </div>
     <div class="header-actions">
-      <div class="seg" role="group" aria-label="Mode">
-        <button id="modeSimpleBtn" class="sel">▶ Jouer</button>
-        <button id="modeExpertBtn">Configurer</button>
-      </div>
-      <button class="btn-ghost" id="wizardBtn" title="L'assistant règle le métronome pour toi en trois questions">✦ Guide-moi</button>
       <button class="btn-ghost" id="themeBtn" title="Basculer entre thème clair et thème sombre">◐ Mode sombre</button>
       <button class="btn-ghost" id="btnResetAll" title="Tout remettre par défaut — la langue, le thème et ton compte sont conservés">⟲ Tout réinitialiser</button>
-      <button class="btn-ghost" id="btnAccount" title="Recevoir un lien de connexion par e-mail">Se connecter</button>
       <span id="langSwitch" class="lang-switch" role="group" aria-label="Langue / Language / Idioma">
         <button type="button" class="lang-btn" data-lang="fr" title="Français" aria-label="Français"><svg class="flag" viewBox="0 0 3 2" aria-hidden="true"><rect width="3" height="2" fill="#fff"/><rect width="1" height="2" fill="#0055A4"/><rect x="2" width="1" height="2" fill="#EF4135"/></svg>FR</button>
         <button type="button" class="lang-btn" data-lang="en" title="English" aria-label="English"><svg class="flag" viewBox="0 0 60 30" aria-hidden="true"><clipPath id="ukc"><path d="M0,0 v30 h60 v-30 z"/></clipPath><g clip-path="url(#ukc)"><path d="M0,0 v30 h60 v-30 z" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M30,0 v30 M0,15 h60" stroke="#fff" stroke-width="10"/><path d="M30,0 v30 M0,15 h60" stroke="#C8102E" stroke-width="6"/></g></svg>EN</button>
@@ -1853,6 +1735,7 @@ window.fmTr = (function(){
           <div style="display:flex;align-items:center;gap:6px">
             <input type="range" id="volSlider" min="0" max="100" value="80" style="flex:1;min-width:0">
             <button class="btn-sm" id="volMuteBtn" title="Sourdine générale (coupe tout le son en un clic)" aria-pressed="false">🔊</button>
+            <button class="btn-sm" id="accompMuteBtn2" title="Mute maître de l'accompagnement — coupe basse, claves et répertoire, le clic continue" aria-pressed="false">🔊 Accomp.</button>
           </div>
         </div>
         <div style="display:flex;flex-direction:column;justify-content:flex-end;gap:7px;">
@@ -1880,100 +1763,26 @@ window.fmTr = (function(){
     </div>
   </div>
 
-  <!-- ============ ÉCRAN DE JEU (passe 4.1) ============ -->
-  <div class="card" id="playScreen">
-    <!-- 0.6.7 (C1) : bandeau d'invitation à la première visite — disparaît après « ✦ Guide-moi »
-         (le wizard pose fm-metro-wizard-done) ou « Plus tard » (fm-metro-onboard-dismissed). -->
-    <div class="onboard-banner hide" id="onboardBanner">
-      <span class="ob-txt"><b>Débutant ? Laisse-toi guider</b> — l'assistant règle le métronome pour toi en trois questions.</span>
-      <button class="btn-sm primary" id="obGuide">✦ Guide-moi</button>
-      <button class="btn-sm" id="obLater">Plus tard</button>
-    </div>
-    <div class="play-bar">
-      <span id="playWhoWrap" style="display:none;align-items:center;gap:8px">
-        <label for="playWho" style="min-width:auto;">Je suis :</label>
-        <select id="playWho" style="width:auto;"><option value="solo">Solo</option></select>
-      </span>
-      <label class="check" title="L'accompagnement (backing track) : les voix que l'appli joue à ta place"><input type="checkbox" id="playBacking" checked> Voir l'accompagnement</label>
-      <span style="flex:1;"></span>
-      <button class="btn-sm" id="playSetupBtn" title="Rouvrir l'écran d'accueil (seul / à plusieurs · apprentissage)">⟲ Setup</button>
-    </div>
-    <!-- 5.4 : commandes basse de l'écran de jeu (spec de passe §5) — mêmes champs d'état
-         que secBass, synchro bidirectionnelle ; l'accord courant pulse sur les frappes. -->
-    <div class="play-bar play-bass" id="playBassGroup">
-      <label style="min-width:auto;">Basse :</label>
-      <label class="check"><input type="checkbox" id="playBassOn"> activer</label>
-      <select id="playBassDensity" style="width:auto;" aria-label="Densité de la basse">
-        <option value="1">1 — allégé</option>
-        <option value="2" selected>2 — normal</option>
-        <option value="3">3 — chargé</option>
-      </select>
-      <label class="check" title="Drop-outs : la basse se tait quelques mesures puis revient — garde le tempo pendant le silence"><input type="checkbox" id="playBassDrop"> silences (drop-outs)</label>
-      <span style="flex:1;"></span>
-      <span id="playBassChord" aria-live="polite">♪ —</span>
-    </div>
-    <div class="perc-line play-line" id="playLine"></div>
-    <div class="perc-line-legend" id="playLegend"></div>
-    <!-- chantier B : projection des frappes de ma ligne sur les paliers de l'instrument cible -->
-    <div class="finger-viz hide" id="fingerViz" aria-hidden="true"></div>
-    <div class="row hide" id="playHintRow" style="margin-bottom:0;">
-      <span class="hint" style="margin:0;" id="playHintTxt">Ma ligne n'est pas encore répartie.</span>
-      <button class="btn-sm primary" id="playDist1">Répartir selon priorités (1 joueur)</button>
-    </div>
-  </div>
-
   <!-- 1. Groove -->
   <!-- C6 (salve UX 0.6.6) : sommaire sticky du mode Configurer — ancres vers les sections -->
   <nav class="toc-bar" id="tocBar" aria-label="Sommaire des sections">
-    <button class="toc-chip" data-toc="secGroove">Groove</button>
-    <button class="toc-chip" data-toc="secClave">Claves</button>
     <button class="toc-chip" data-toc="secPerc">Percussion</button>
-    <button class="toc-chip" data-toc="secRepertoire">Répertoire</button>
-    <button class="toc-chip" data-toc="secTeam">Team Spirit</button>
-    <button class="toc-chip" data-toc="secArchet">Archet</button>
     <button class="toc-chip" data-toc="secBass">Basse</button>
-    <button class="toc-chip" data-toc="secCours">Cours funk</button>
+    <button class="toc-chip" data-toc="secClave">Claves</button>
+    <button class="toc-chip" data-toc="secRepertoire">Répertoire</button>
+    <button class="toc-chip" data-toc="secGroove">Groove</button>
     <button class="toc-chip" data-toc="secGap">Horloge</button>
     <button class="toc-chip" data-toc="secSon">Son</button>
     <button class="toc-chip" data-toc="secScript">Script</button>
-    <button class="toc-chip" data-toc="secBiblio">Bibliothèque</button>
     <button class="toc-chip" data-toc="expAudio">Export</button>
     <button class="toc-chip" data-toc="__top" title="Revenir en haut de la page">↑ Haut</button>
     <label class="check toc-focus" title="Ouvrir une section referme les autres"><input type="checkbox" id="focusMode"> Une section à la fois</label>
   </nav>
 
-  <details class="section" id="secGroove" data-strate="socle">
-    <summary><span class="sec-title"><span class="term" tabindex="0" title="Micro-timing : décaler certaines frappes de quelques millisecondes autour du temps — c'est ce qui fait « groover »">Micro-timing &amp; groove</span></span><span class="sec-sub"><span class="term" tabindex="0" title="Swing : on retarde une croche sur deux — 50 % = binaire droit, 66 % = ternaire. Placement : jouer un peu avant ou après le clic">swing · placement</span></span></summary>
-    <div class="section-body">
-      <div class="row">
-        <label>Swing (asymétrique, libre)</label>
-        <button class="nudge" id="swingMinus" aria-label="Swing -1 %">−</button>
-        <input type="range" id="swingSlider" min="50" max="85" value="50" aria-label="Swing (%)">
-        <button class="nudge" id="swingPlus" aria-label="Swing +1 %">+</button>
-        <span class="val" id="swingVal">50 %</span>
-      </div>
-      <div class="hint">50 % = binaire droit · 66 % = ternaire parfait · valeurs intermédiaires = swing « humain ».
-      S'applique aux croches et aux doubles-croches (par paires) — ex. ~58–62 % pour le placement samba/choro.</div>
-      <div class="row" style="margin-top:16px;">
-        <label class="check"><input type="checkbox" id="shiftCheck"> Clic de placement (behind/ahead the beat)</label>
-      </div>
-      <div class="row">
-        <label>Décalage</label>
-        <button class="nudge" id="shiftMinus" aria-label="Décalage -1 ms">−</button>
-        <input type="range" id="shiftSlider" min="-80" max="80" value="25" aria-label="Décalage de placement (ms)">
-        <button class="nudge" id="shiftPlus" aria-label="Décalage +1 ms">+</button>
-        <span class="val" id="shiftVal">+25 ms</span>
-      </div>
-      <div class="row">
-        <label for="shiftFreq">Fréquence du clic décalé</label>
-        <input type="range" id="shiftFreq" min="80" max="800" value="220">
-        <span class="val" id="shiftFreqVal">220 Hz</span>
-      </div>
-      <div class="hint">Un second clic grave, décalé du clic de référence. Décalage positif = au fond du temps
-      (contrebasse, surdo, dundun) · négatif = en avant du temps.</div>
-    </div>
-  </details>
-
+  <!-- ============ R-3b — HIÉRARCHIE J1 : trois blocs ============
+       « Ce que je joue » (l'UNIQUE sélecteur d'instrument) / « Ce qui m'accompagne »
+       (mute maître en tête) / « Le clic ». Sections EXISTANTES réorganisées —
+       aucune fonctionnalité nouvelle hors mute maître (J2) et feel basse (§5). -->
   <!-- Sélecteur de famille : conditionne clave ET percussion ensemble -->
   <div class="family-bar" id="familyBar">
     <span class="fb-label">Grille rythmique</span>
@@ -1985,49 +1794,13 @@ window.fmTr = (function(){
     on ne mélange pas binaire et ternaire (le mélange volontaire = polyrythmie superposée).</span>
   </div>
 
-  <!-- 2. Claves -->
-  <details class="section" id="secClave" data-strate="couche">
-    <summary><span class="sec-title"><span class="term" tabindex="0" title="Une clave est une courte cellule rythmique qui se répète et sert de repère à tout le morceau (son, rumba, tresillo…)">Claves &amp; cellules rythmiques</span></span><span class="sec-sub">séquenceur · polyrythmie</span></summary>
-    <div class="section-body">
-      <div class="preset-row">
-        <select id="clavePreset" aria-label="Presets de clave">
-          <option value="">— Presets —</option>
-          <option value="son32">Son clave 3-2 (16)</option>
-          <option value="son23">Son clave 2-3 (16)</option>
-          <option value="rumba32">Rumba clave 3-2 (16)</option>
-          <option value="bossa">Bossa (16)</option>
-          <option value="partido">Partido alto (variante, 16)</option>
-          <option value="tresillo">Tresillo (8)</option>
-          <option value="cinquillo">Cinquillo (8)</option>
-        </select>
-        <select id="claveCount" title="Nombre de pas du cycle — 12 ou 16 bascule la famille (clave + percussion) ; 8 = cellule courte propre à la clave">
-          <option value="8">8 pas</option>
-          <option value="12">12 pas</option>
-          <option value="16" selected>16 pas</option>
-        </select>
-        <button class="btn-sm" id="claveClear">Effacer</button>
-      </div>
-      <div id="claveSteps"></div>
-      <div class="hint">Clic sur un pas : silence → frappe → accent. Les points au-dessus marquent les temps.
-      <details class="hint-more"><summary>En savoir plus</summary><span class="hm-body">
-      <b>Deux voix</b> — cloche grave et cloche aiguë — comme n'importe quelle voix de percussion :
-      les presets se posent sur la grave, la seconde voix est libre (contre-clave, bombo…).
-      Le cercle montre comment la cellule se résout sur le 1 du cycle suivant.</span></details></div>
-      <div class="row" style="margin-top:14px;">
-        <label for="polySel">Polyrythmie superposée</label>
-        <select id="polySel" style="width:auto;">
-          <option value="0" selected>Aucune</option>
-          <option value="2">2 par cycle</option>
-          <option value="3">3 par cycle</option>
-          <option value="4">4 par cycle</option>
-          <option value="5">5 par cycle</option>
-          <option value="7">7 par cycle</option>
-        </select>
-        <span class="hint" style="margin:0;">n frappes également réparties (ex. 3 sur 4 temps)</span>
-      </div>
-    </div>
-  </details>
 
+  <section class="bloc" id="blocJoue" aria-labelledby="blocJoueTitre">
+    <div class="bloc-head">
+      <span class="bloc-num" aria-hidden="true">1</span>
+      <h2 id="blocJoueTitre">Ce que je joue</h2>
+      <span class="bloc-sub">mon instrument · mon séquenceur · mes exercices</span>
+    </div>
   <!-- 2b. Percussion & indépendance -->
   <details class="section" id="secPerc" data-strate="couche">
     <summary><span class="sec-title">Percussion &amp; indépendance</span><span class="sec-sub">groove · variations · appel-réponse</span></summary>
@@ -2141,9 +1914,171 @@ window.fmTr = (function(){
     </div>
   </details>
 
+  </section>
+
+  <section class="bloc" id="blocAccomp" aria-labelledby="blocAccompTitre">
+    <div class="bloc-head">
+      <span class="bloc-num" aria-hidden="true">2</span>
+      <h2 id="blocAccompTitre">Ce qui m'accompagne</h2>
+      <span class="bloc-sub">basse · claves · répertoire — l'accompagnement, pas moi</span>
+      <span style="flex:1"></span>
+      <button class="btn-ghost" id="accompMuteBtn" aria-pressed="false"
+        title="Mute maître : coupe d'un geste tout l'accompagnement (basse, claves, répertoire) — le clic continue ; chaque couche garde ses réglages">🔊 Accompagnement actif</button>
+    </div>
+  <!-- Basse funk (passe 5) -->
+  <details class="section" id="secBass" data-strate="couche">
+    <summary><span class="sec-title">Basse funk</span><span class="sec-sub">accompagnement génératif</span></summary>
+    <div class="section-body">
+      <div class="row">
+        <label class="check"><input type="checkbox" id="bassOn"> Activer la basse</label>
+      </div>
+      <div class="row">
+        <label for="bassPattern">Gabarit</label>
+        <select id="bassPattern" style="width:auto;">
+          <option value="theOne" selected>The One — ancre sur le 1</option>
+          <option value="syncopeGrave">Syncope grave — décalé autour du 1</option>
+          <option value="octaves">Octaves — pompe disco-funk</option>
+          <option value="ghostPendule">Ghost pendule — nappe de 16es</option>
+        </select>
+        <label for="bassKey" style="min-width:auto;">Tonalité</label>
+        <select id="bassKey" style="width:auto;">
+          <option value="C">Do (C)</option>
+          <option value="C#">Do♯ (C#)</option>
+          <option value="D">Ré (D)</option>
+          <option value="D#">Ré♯ (D#)</option>
+          <option value="E" selected>Mi (E)</option>
+          <option value="F">Fa (F)</option>
+          <option value="F#">Fa♯ (F#)</option>
+          <option value="G">Sol (G)</option>
+          <option value="G#">Sol♯ (G#)</option>
+          <option value="A">La (A)</option>
+          <option value="A#">La♯ (A#)</option>
+          <option value="B">Si (B)</option>
+        </select>
+      </div>
+      <div class="row">
+        <label for="bassProg">Progression</label>
+        <select id="bassProg" style="width:auto;">
+          <option value="vamp1" selected>Vamp 1 accord — James Brown</option>
+          <option value="vamp2">I⁷ → IV⁷ — Sex Machine</option>
+          <option value="dorien">i⁷ → IV⁷ — Chameleon (dorien)</option>
+          <option value="mixo">I⁷ → ♭VII — mixolydien (War)</option>
+          <option value="blues">Blues funk — 12 mesures</option>
+          <option value="jazzfunk">ii⁷ → V⁷ — jazz-funk</option>
+        </select>
+        <label style="min-width:auto;">Accord</label>
+        <span id="bassChord" aria-live="polite" style="font-weight:600;font-variant-numeric:tabular-nums;padding:2px 8px;">E7</span>
+      </div>
+      <div class="row">
+        <label for="bassDensity">Densité</label>
+        <select id="bassDensity" style="width:auto;">
+          <option value="1">1 — allégé</option>
+          <option value="2" selected>2 — normal</option>
+          <option value="3">3 — chargé</option>
+        </select>
+        <label for="bassVel" style="min-width:auto;">Dynamique</label>
+        <select id="bassVel" style="width:auto;">
+          <option value="plat">Plate — peu de contraste</option>
+          <option value="mixte" selected>Mixte</option>
+          <option value="contraste">Contrastée — poche accents/ghosts</option>
+        </select>
+      </div>
+      <div class="row">
+        <label class="check"><input type="checkbox" id="bassVary"> Variations (jeu vivant)</label>
+      </div>
+      <div class="row">
+        <label for="bassLegato">Lié ↔ très lié</label>
+        <input type="range" id="bassLegato" min="0" max="100" value="25" style="flex:1;min-width:120px;">
+        <label class="check" style="min-width:auto;"><input type="checkbox" id="bassSpace" checked> Espace (réverb courte)</label>
+      </div>
+      <div class="row">
+        <label class="check" title="Drop-outs : la basse se tait quelques mesures puis revient — garde le tempo pendant le silence"><input type="checkbox" id="bassDropOn"> Silences (drop-outs) — la basse se tait</label>
+        <label for="bassDropEvery" style="min-width:auto;">toutes les</label>
+        <input type="number" id="bassDropEvery" min="1" max="32" value="4" style="width:70px;">
+        <label for="bassDropLen" style="min-width:auto;">mesures, trou de</label>
+        <input type="number" id="bassDropLen" min="1" max="8" value="2" style="width:70px;">
+        <label style="min-width:auto;">temps</label>
+      </div>
+      <div class="row">
+        <label class="check"><input type="checkbox" id="bassSwingFollow" checked> La basse suit le swing</label>
+      </div>
+      <!-- R-3b (§5) : feel — la basse quelques ms devant/derrière la grille (offMs, mécanisme du clic décalé) -->
+      <div class="row">
+        <label for="bassFeel"><span class="term" tabindex="0" title="Feel : décale toute la couche basse de quelques millisecondes autour de la grille — posé (laid-back, derrière) ↔ poussé (on top, devant). 0 = calé sur la grille">Placement — posé ↔ poussé</span></label>
+        <button class="btn-sm" id="bassFeelMinus" aria-label="Placement -1 ms">−</button>
+        <input type="range" id="bassFeel" min="-25" max="25" value="0" style="flex:1;min-width:120px;" aria-label="Placement de la basse (millisecondes)">
+        <button class="btn-sm" id="bassFeelPlus" aria-label="Placement +1 ms">+</button>
+        <span class="val" id="bassFeelVal">0 ms</span>
+      </div>
+      <div class="hint">Une voix de basse funk synthétisée qui accompagne le percussionniste — pour
+      caler le jeu sur ses syncopes et ses silences (FUNK-I2).
+      <details class="hint-more"><summary>En savoir plus</summary><span class="hm-body">Choisis un <b>gabarit</b>, une
+      <b>progression</b> (du vamp 1 accord au blues 12 mesures), une <b>tonalité</b>, la
+      <b>densité</b> (allégé → chargé) et le profil de <b>dynamique</b>. L'<b>accord</b> courant
+      s'affiche pour travailler l'oreille : rejoue la même progression dans une autre tonalité et
+      tu entends la transposition.
+      <ul>
+        <li><b>Variations</b> activé, la ligne se joue de façon vivante (tirage des ornements) ;
+          désactivé, elle est régulière et prévisible. La ligne s'allège et se raccourcit
+          d'elle-même quand le tempo monte.</li>
+        <li>Le curseur <b>détaché ↔ lié</b> dose le liant entre les notes (les ghosts restent piqués).</li>
+        <li><b>Espace</b> ajoute une réverb très courte sur la basse seule — l'attaque et le
+          <i>time</i> restent nets.</li>
+        <li><b>Drop-outs</b> : la basse se tait périodiquement (trou en fin de période) et re-rentre
+          sur le 1 — tiens le <i>time</i> pendant le silence, la re-entrée te confirme ou te corrige ;
+          percussion et pulsation continuent.</li>
+        <li><b>La basse suit le swing</b> cale ses doubles-croches sur le swing du métronome
+          (section Micro-timing).</li>
+      </ul></span></details></div>
+    </div>
+  </details>
+
+  <!-- 2. Claves -->
+  <details class="section" id="secClave" data-strate="couche">
+    <summary><span class="sec-title"><span class="term" tabindex="0" title="Une clave est une courte cellule rythmique qui se répète et sert de repère à tout le morceau (son, rumba, tresillo…)">Claves &amp; cellules rythmiques</span></span><span class="sec-sub">séquenceur · polyrythmie</span></summary>
+    <div class="section-body">
+      <div class="preset-row">
+        <select id="clavePreset" aria-label="Presets de clave">
+          <option value="">— Presets —</option>
+          <option value="son32">Son clave 3-2 (16)</option>
+          <option value="son23">Son clave 2-3 (16)</option>
+          <option value="rumba32">Rumba clave 3-2 (16)</option>
+          <option value="bossa">Bossa (16)</option>
+          <option value="partido">Partido alto (variante, 16)</option>
+          <option value="tresillo">Tresillo (8)</option>
+          <option value="cinquillo">Cinquillo (8)</option>
+        </select>
+        <select id="claveCount" title="Nombre de pas du cycle — 12 ou 16 bascule la famille (clave + percussion) ; 8 = cellule courte propre à la clave">
+          <option value="8">8 pas</option>
+          <option value="12">12 pas</option>
+          <option value="16" selected>16 pas</option>
+        </select>
+        <button class="btn-sm" id="claveClear">Effacer</button>
+      </div>
+      <div id="claveSteps"></div>
+      <div class="hint">Clic sur un pas : silence → frappe → accent. Les points au-dessus marquent les temps.
+      <details class="hint-more"><summary>En savoir plus</summary><span class="hm-body">
+      <b>Deux voix</b> — cloche grave et cloche aiguë — comme n'importe quelle voix de percussion :
+      les presets se posent sur la grave, la seconde voix est libre (contre-clave, bombo…).
+      Le cercle montre comment la cellule se résout sur le 1 du cycle suivant.</span></details></div>
+      <div class="row" style="margin-top:14px;">
+        <label for="polySel">Polyrythmie superposée</label>
+        <select id="polySel" style="width:auto;">
+          <option value="0" selected>Aucune</option>
+          <option value="2">2 par cycle</option>
+          <option value="3">3 par cycle</option>
+          <option value="4">4 par cycle</option>
+          <option value="5">5 par cycle</option>
+          <option value="7">7 par cycle</option>
+        </select>
+        <span class="hint" style="margin:0;">n frappes également réparties (ex. 3 sur 4 temps)</span>
+      </div>
+    </div>
+  </details>
+
   <!-- 2 bis. Répertoire de grooves (passe 3 étape 4 — scindé de Team Spirit, rév. 2026-07-07) -->
   <details class="section" id="secRepertoire" data-strate="couche">
-    <summary><span class="sec-title">Répertoire de grooves</span><span class="sec-sub">choisis un groove · puis l'instrument de jeu</span></summary>
+    <summary><span class="sec-title">Répertoire de grooves</span><span class="sec-sub">choisis un groove · l'instrument de rendu de l'accompagnement</span></summary>
     <div class="section-body">
       <div class="row">
         <label for="tsFamily">Répertoire</label>
@@ -2153,7 +2088,7 @@ window.fmTr = (function(){
         <button class="btn-sm" id="tsUnload" title="Revenir à la percussion focale">Décharger</button>
       </div>
       <div class="row">
-        <label for="tsOverride">Jouer tout à</label>
+        <label for="tsOverride" title="L'instrument qui REND l'accompagnement — pas celui que je joue (bloc 1)">Accompagnement rendu à</label>
         <select id="tsOverride" style="width:auto;">
           <option value="authentique" selected>Instruments authentiques</option>
         </select>
@@ -2161,13 +2096,251 @@ window.fmTr = (function(){
       </div>
       <div id="tsVoices"></div>
       <div class="script-status" id="tsStatus"></div>
-      <div class="hint">Charge un groove de la bibliothèque puis choisis <b>l'instrument de jeu</b> :
+      <div class="hint">Charge un groove de la bibliothèque puis choisis <b>l'instrument de rendu</b> de l'accompagnement :
       rien n'oblige à rester sur l'instrument « authentique » — joue le répertoire du djembé au cajón si tu veux
       (les voix sont replacées par <b>tessiture</b>, marquées <i>adapté</i>).
       <details class="hint-more"><summary>En savoir plus</summary><span class="hm-body">Le répertoire s'écoute librement,
-      seul ou en groupe — la répartition entre participants se fait dans la section <b>Team Spirit</b>.</span></details></div>
+      seul ou en groupe — la répartition entre participants (<b>Team Spirit</b>) se fait sur la <a href="index.html">page d'accueil</a>.</span></details></div>
     </div>
   </details>
+
+  </section>
+
+  <section class="bloc" id="blocClic" aria-labelledby="blocClicTitre">
+    <div class="bloc-head">
+      <span class="bloc-num" aria-hidden="true">3</span>
+      <h2 id="blocClicTitre">Le clic</h2>
+      <span class="bloc-sub">micro-timing · coupures · son · routine — le métronome lui-même</span>
+    </div>
+  <details class="section" id="secGroove" data-strate="socle">
+    <summary><span class="sec-title"><span class="term" tabindex="0" title="Micro-timing : décaler certaines frappes de quelques millisecondes autour du temps — c'est ce qui fait « groover »">Micro-timing &amp; groove</span></span><span class="sec-sub"><span class="term" tabindex="0" title="Swing : on retarde une croche sur deux — 50 % = binaire droit, 66 % = ternaire. Placement : jouer un peu avant ou après le clic">swing · placement</span></span></summary>
+    <div class="section-body">
+      <div class="row">
+        <label>Swing (asymétrique, libre)</label>
+        <button class="nudge" id="swingMinus" aria-label="Swing -1 %">−</button>
+        <input type="range" id="swingSlider" min="50" max="85" value="50" aria-label="Swing (%)">
+        <button class="nudge" id="swingPlus" aria-label="Swing +1 %">+</button>
+        <span class="val" id="swingVal">50 %</span>
+      </div>
+      <div class="hint">50 % = binaire droit · 66 % = ternaire parfait · valeurs intermédiaires = swing « humain ».
+      S'applique aux croches et aux doubles-croches (par paires) — ex. ~58–62 % pour le placement samba/choro.</div>
+      <div class="row" style="margin-top:16px;">
+        <label class="check"><input type="checkbox" id="shiftCheck"> Clic de placement (behind/ahead the beat)</label>
+      </div>
+      <div class="row">
+        <label>Décalage</label>
+        <button class="nudge" id="shiftMinus" aria-label="Décalage -1 ms">−</button>
+        <input type="range" id="shiftSlider" min="-80" max="80" value="25" aria-label="Décalage de placement (ms)">
+        <button class="nudge" id="shiftPlus" aria-label="Décalage +1 ms">+</button>
+        <span class="val" id="shiftVal">+25 ms</span>
+      </div>
+      <div class="row">
+        <label for="shiftFreq">Fréquence du clic décalé</label>
+        <input type="range" id="shiftFreq" min="80" max="800" value="220">
+        <span class="val" id="shiftFreqVal">220 Hz</span>
+      </div>
+      <div class="hint">Un second clic grave, décalé du clic de référence. Décalage positif = au fond du temps
+      (contrebasse, surdo, dundun) · négatif = en avant du temps.</div>
+    </div>
+  </details>
+
+  <!-- 4. Gap clicks -->
+  <details class="section" id="secGap" data-strate="enveloppe">
+    <summary><span class="sec-title">Horloge interne</span><span class="sec-sub"><span class="term" tabindex="0" title="Gap clicks : le métronome se tait quelques mesures puis revient — à toi de tenir le tempo pendant le silence">coupures de clic (gap clicks)</span></span></summary>
+    <div class="section-body">
+      <div class="row">
+        <label for="gapMode">Mode</label>
+        <select id="gapMode" style="width:auto;">
+          <option value="off" selected>Désactivé</option>
+          <option value="fixed">Fixe (jouer N, couper M)</option>
+          <option value="prog">Progressif (coupures 1, 2, 4, 8…)</option>
+          <option value="rand">Aléatoire</option>
+        </select>
+        <label for="gapTarget" style="min-width:auto;">Cible</label>
+        <select id="gapTarget" style="width:auto;"></select>
+      </div>
+      <div class="row">
+        <label for="gapPlay">Mesures jouées (N)</label>
+        <input type="number" id="gapPlay" min="1" max="64" value="4" style="width:80px;">
+        <label for="gapMute" style="min-width:auto;">Mesures coupées (M)</label>
+        <input type="number" id="gapMute" min="1" max="32" value="1" style="width:80px;">
+      </div>
+      <div class="row">
+        <label for="gapProb">Probabilité de coupure (aléatoire)</label>
+        <input type="range" id="gapProb" min="5" max="80" value="25">
+        <span class="val" id="gapProbVal">25 %</span>
+      </div>
+      <div class="row">
+        <label title="Nombre de coupures traversées depuis le dernier départ — chaque silence tenu jusqu'au bout compte pour un">Coupures traversées</label>
+        <span class="val" id="gapCrossed">0</span>
+      </div>
+      <div class="hint">La cible se coupe, l'aiguille continue de tourner.
+      <details class="hint-more"><summary>En savoir plus</summary><span class="hm-body"><b>Cible</b> : tout le son
+      (gap classique), la pulsation seule, ou une seule voix (clave ou percussion) — les autres continuent,
+      pour tester la solidité de chaque voix. En mode progressif, la durée des
+      coupures double à chaque cycle (1, 2, 4, 8 mesures, plafonné à 16) : aucun filet de sécurité.</span></details></div>
+    </div>
+  </details>
+
+  <!-- 4. Son -->
+  <details class="section" id="secSon" data-strate="socle">
+    <summary><span class="sec-title">Son du clic</span><span class="sec-sub">fréquence · caractère</span></summary>
+    <div class="section-body">
+      <div class="row">
+        <label for="pulseFreq">Fréquence pulsation</label>
+        <input type="range" id="pulseFreq" min="100" max="3000" value="1000">
+        <span class="val" id="pulseFreqVal">1000 Hz</span>
+      </div>
+      <div class="row">
+        <label for="clickType">Caractère</label>
+        <select id="clickType" style="width:auto;">
+          <option value="ton" selected>Tonal (ping)</option>
+          <option value="sec">Sec (bruit, type rimshot)</option>
+        </select>
+      </div>
+      <div class="hint">Clic grave et sourd pour trancher avec un agogô · clic sec et brillant pour percer
+      face à une contrebasse ou des dunduns.</div>
+    </div>
+  </details>
+
+  <!-- 5. Script -->
+  <details class="section" id="secScript" data-strate="enveloppe">
+    <summary><span class="sec-title">Routine programmée</span><span class="sec-sub">script</span></summary>
+    <div class="section-body">
+      <div class="script-hl-wrap" id="scriptHlWrap">
+        <pre class="script-hl" id="scriptHl" aria-hidden="true"></pre>
+        <textarea id="scriptArea" spellcheck="false" aria-label="Script de routine"># Exemple de routine
+# 5 min à 80 BPM
+80bpm 5min
+# accelerando : 80 → 120 en 10 min
+80->120bpm 10min
+# gap : couper 2 mesures toutes les 16
+gap 2/16
+120bpm 32mes
+gap off
+swing 62
+100bpm 16mes</textarea>
+      </div>
+      <div class="script-status" id="scriptLint" role="status" aria-live="polite"></div>
+      <div class="lint-chips" role="group" aria-label="Insérer une ligne d'exemple">
+        <button class="btn-sm script-chip" data-ins="80bpm 5min">+ 5 min à 80</button>
+        <button class="btn-sm script-chip" data-ins="80->120bpm 10min">+ accelerando</button>
+        <button class="btn-sm script-chip" data-ins="gap 2/16">+ gap 2/16</button>
+        <button class="btn-sm script-chip" data-ins="swing 62">+ swing</button>
+      </div>
+      <div class="row" style="margin-top:10px;">
+        <button class="btn-sm primary" id="scriptRun">▶ Lancer la routine</button>
+        <button class="btn-sm" id="scriptStop">■ Arrêter la routine</button>
+      </div>
+      <div class="script-status" id="scriptStatus"></div>
+      <div class="hint">Syntaxe : <code>80bpm 5min</code> · <code>80->120bpm 10min</code> (rampe) ·
+      <code>100bpm 16mes</code> · <code>gap 2/16</code> · <code>gap off</code> · <code>swing 62</code> ·
+      lignes <code>#</code> = commentaires. Les changements s'appliquent à la mesure suivante.</div>
+    </div>
+  </details>
+  </section>
+
+  <div class="kbd-hint">Espace : lecture · ↑↓ : tempo ±1 · T : tap tempo</div>
+</div>
+
+<!-- ============ PERCUSSION PLEIN ÉCRAN ============ -->
+<div class="percfs" id="percFs">
+  <div class="bowfs-bar">
+    <div>
+      <div class="bowfs-title">Percussion</div>
+      <div class="kicker" id="percFsInstr">Djembé</div>
+    </div>
+    <div class="bowfs-controls">
+      <span class="bowfs-tempo" id="percFsTempo">92 BPM</span>
+      <button class="play" id="percFsPlay">▶</button>
+      <button id="percFsClose">✕ Fermer</button>
+    </div>
+  </div>
+  <div class="percfs-body">
+    <div id="percFsVoices"></div>
+    <div class="percfs-status" id="percFsStatus" role="status" aria-live="polite"></div>
+  </div>
+</div>
+
+<!-- ============ MODE ATELIER (0.7.0, C11) ============ -->
+<div class="atelierfs" id="atelierFs" role="dialog" aria-label="Mode atelier">
+  <div class="bowfs-bar">
+    <div>
+      <div class="bowfs-title">Atelier</div>
+      <div class="kicker" id="atelierMeasure"></div>
+    </div>
+    <div class="bowfs-controls">
+      <span class="atelier-wl" id="atelierWl" title="Écran maintenu allumé" hidden aria-hidden="true">☀</span>
+      <button id="atelierClose">✕ Fermer</button>
+    </div>
+  </div>
+  <div class="atelier-body">
+    <div class="atelier-bpm" id="atelierBpm">92</div>
+    <div class="atelier-sub">BPM · <em id="atelierName">Moderato</em></div>
+    <div class="atelier-status" id="atelierStatus" role="status" aria-live="polite"></div>
+  </div>
+  <div class="atelier-controls" role="group" aria-label="Transport atelier">
+    <button id="atelierMinus" aria-label="Tempo -1 (maintenir pour répéter)">−</button>
+    <button class="play" id="atelierPlay" aria-label="Lecture / arrêt">▶</button>
+    <button id="atelierPlus" aria-label="Tempo +1 (maintenir pour répéter)">+</button>
+  </div>
+</div>
+
+<!-- ============ R-3b — STUBS INERTES (contrat de coquille, annexe R-3a) ============
+     Surfaces index-only (écran de jeu, team spirit, archet, cours funk, wizard,
+     accueil « je joue », mode simple/expert) : leur JS de coquille reste VERBATIM
+     sur cette page — seuls quelques points marqués « R-3b (pratiquer) » dévient.
+     Leurs éléments vivent ici, INERTES et INVISIBLES (#fmStubs est display:none) :
+     ils satisfont les câblages existants sans offrir la fonctionnalité, qui reste
+     sur index.html. R-4 (pages par scénario) dissout cette duplication transitoire. -->
+<div id="fmStubs" hidden aria-hidden="true">
+      <div class="seg" role="group" aria-label="Mode">
+        <button id="modeSimpleBtn" class="sel">▶ Jouer</button>
+        <button id="modeExpertBtn">Configurer</button>
+      </div>
+      <button class="btn-ghost" id="wizardBtn" title="L'assistant règle le métronome pour toi en trois questions">✦ Guide-moi</button>
+
+  <!-- ============ ÉCRAN DE JEU (passe 4.1) ============ -->
+  <div class="card" id="playScreen">
+    <!-- 0.6.7 (C1) : bandeau d'invitation à la première visite — disparaît après « ✦ Guide-moi »
+         (le wizard pose fm-metro-wizard-done) ou « Plus tard » (fm-metro-onboard-dismissed). -->
+    <div class="onboard-banner hide" id="onboardBanner">
+      <span class="ob-txt"><b>Débutant ? Laisse-toi guider</b> — l'assistant règle le métronome pour toi en trois questions.</span>
+      <button class="btn-sm primary" id="obGuide">✦ Guide-moi</button>
+      <button class="btn-sm" id="obLater">Plus tard</button>
+    </div>
+    <div class="play-bar">
+      <span id="playWhoWrap" style="display:none;align-items:center;gap:8px">
+        <label for="playWho" style="min-width:auto;">Je suis :</label>
+        <select id="playWho" style="width:auto;"><option value="solo">Solo</option></select>
+      </span>
+      <label class="check" title="L'accompagnement (backing track) : les voix que l'appli joue à ta place"><input type="checkbox" id="playBacking" checked> Voir l'accompagnement</label>
+      <span style="flex:1;"></span>
+      <button class="btn-sm" id="playSetupBtn" title="Rouvrir l'écran d'accueil (seul / à plusieurs · apprentissage)">⟲ Setup</button>
+    </div>
+    <!-- 5.4 : commandes basse de l'écran de jeu (spec de passe §5) — mêmes champs d'état
+         que secBass, synchro bidirectionnelle ; l'accord courant pulse sur les frappes. -->
+    <div class="play-bar play-bass" id="playBassGroup">
+      <label style="min-width:auto;">Basse :</label>
+      <label class="check"><input type="checkbox" id="playBassOn"> activer</label>
+      <select id="playBassDensity" style="width:auto;" aria-label="Densité de la basse">
+        <option value="1">1 — allégé</option>
+        <option value="2" selected>2 — normal</option>
+        <option value="3">3 — chargé</option>
+      </select>
+      <label class="check" title="Drop-outs : la basse se tait quelques mesures puis revient — garde le tempo pendant le silence"><input type="checkbox" id="playBassDrop"> silences (drop-outs)</label>
+      <span style="flex:1;"></span>
+      <span id="playBassChord" aria-live="polite">♪ —</span>
+    </div>
+    <div class="perc-line play-line" id="playLine"></div>
+    <div class="perc-line-legend" id="playLegend"></div>
+    <!-- chantier B : projection des frappes de ma ligne sur les paliers de l'instrument cible -->
+    <div class="finger-viz hide" id="fingerViz" aria-hidden="true"></div>
+    <div class="row hide" id="playHintRow" style="margin-bottom:0;">
+      <span class="hint" style="margin:0;" id="playHintTxt">Ma ligne n'est pas encore répartie.</span>
+      <button class="btn-sm primary" id="playDist1">Répartir selon priorités (1 joueur)</button>
+    </div>
+  </div>
 
   <!-- 2 ter. Team Spirit -->
   <details class="section" id="secTeam" data-strate="couche">
@@ -2280,106 +2453,6 @@ window.fmTr = (function(){
     </div>
   </details>
 
-  <!-- Basse funk (passe 5) -->
-  <details class="section" id="secBass" data-strate="couche">
-    <summary><span class="sec-title">Basse funk</span><span class="sec-sub">accompagnement génératif</span></summary>
-    <div class="section-body">
-      <div class="row">
-        <label class="check"><input type="checkbox" id="bassOn"> Activer la basse</label>
-      </div>
-      <div class="row">
-        <label for="bassPattern">Gabarit</label>
-        <select id="bassPattern" style="width:auto;">
-          <option value="theOne" selected>The One — ancre sur le 1</option>
-          <option value="syncopeGrave">Syncope grave — décalé autour du 1</option>
-          <option value="octaves">Octaves — pompe disco-funk</option>
-          <option value="ghostPendule">Ghost pendule — nappe de 16es</option>
-        </select>
-        <label for="bassKey" style="min-width:auto;">Tonalité</label>
-        <select id="bassKey" style="width:auto;">
-          <option value="C">Do (C)</option>
-          <option value="C#">Do♯ (C#)</option>
-          <option value="D">Ré (D)</option>
-          <option value="D#">Ré♯ (D#)</option>
-          <option value="E" selected>Mi (E)</option>
-          <option value="F">Fa (F)</option>
-          <option value="F#">Fa♯ (F#)</option>
-          <option value="G">Sol (G)</option>
-          <option value="G#">Sol♯ (G#)</option>
-          <option value="A">La (A)</option>
-          <option value="A#">La♯ (A#)</option>
-          <option value="B">Si (B)</option>
-        </select>
-      </div>
-      <div class="row">
-        <label for="bassProg">Progression</label>
-        <select id="bassProg" style="width:auto;">
-          <option value="vamp1" selected>Vamp 1 accord — James Brown</option>
-          <option value="vamp2">I⁷ → IV⁷ — Sex Machine</option>
-          <option value="dorien">i⁷ → IV⁷ — Chameleon (dorien)</option>
-          <option value="mixo">I⁷ → ♭VII — mixolydien (War)</option>
-          <option value="blues">Blues funk — 12 mesures</option>
-          <option value="jazzfunk">ii⁷ → V⁷ — jazz-funk</option>
-        </select>
-        <label style="min-width:auto;">Accord</label>
-        <span id="bassChord" aria-live="polite" style="font-weight:600;font-variant-numeric:tabular-nums;padding:2px 8px;">E7</span>
-      </div>
-      <div class="row">
-        <label for="bassDensity">Densité</label>
-        <select id="bassDensity" style="width:auto;">
-          <option value="1">1 — allégé</option>
-          <option value="2" selected>2 — normal</option>
-          <option value="3">3 — chargé</option>
-        </select>
-        <label for="bassVel" style="min-width:auto;">Dynamique</label>
-        <select id="bassVel" style="width:auto;">
-          <option value="plat">Plate — peu de contraste</option>
-          <option value="mixte" selected>Mixte</option>
-          <option value="contraste">Contrastée — poche accents/ghosts</option>
-        </select>
-      </div>
-      <div class="row">
-        <label class="check"><input type="checkbox" id="bassVary"> Variations (jeu vivant)</label>
-      </div>
-      <div class="row">
-        <label for="bassLegato">Lié ↔ très lié</label>
-        <input type="range" id="bassLegato" min="0" max="100" value="25" style="flex:1;min-width:120px;">
-        <label class="check" style="min-width:auto;"><input type="checkbox" id="bassSpace" checked> Espace (réverb courte)</label>
-      </div>
-      <div class="row">
-        <label class="check" title="Drop-outs : la basse se tait quelques mesures puis revient — garde le tempo pendant le silence"><input type="checkbox" id="bassDropOn"> Silences (drop-outs) — la basse se tait</label>
-        <label for="bassDropEvery" style="min-width:auto;">toutes les</label>
-        <input type="number" id="bassDropEvery" min="1" max="32" value="4" style="width:70px;">
-        <label for="bassDropLen" style="min-width:auto;">mesures, trou de</label>
-        <input type="number" id="bassDropLen" min="1" max="8" value="2" style="width:70px;">
-        <label style="min-width:auto;">temps</label>
-      </div>
-      <div class="row">
-        <label class="check"><input type="checkbox" id="bassSwingFollow" checked> La basse suit le swing</label>
-      </div>
-      <div class="hint">Une voix de basse funk synthétisée qui accompagne le percussionniste — pour
-      caler le jeu sur ses syncopes et ses silences (FUNK-I2).
-      <details class="hint-more"><summary>En savoir plus</summary><span class="hm-body">Choisis un <b>gabarit</b>, une
-      <b>progression</b> (du vamp 1 accord au blues 12 mesures), une <b>tonalité</b>, la
-      <b>densité</b> (allégé → chargé) et le profil de <b>dynamique</b>. L'<b>accord</b> courant
-      s'affiche pour travailler l'oreille : rejoue la même progression dans une autre tonalité et
-      tu entends la transposition.
-      <ul>
-        <li><b>Variations</b> activé, la ligne se joue de façon vivante (tirage des ornements) ;
-          désactivé, elle est régulière et prévisible. La ligne s'allège et se raccourcit
-          d'elle-même quand le tempo monte.</li>
-        <li>Le curseur <b>détaché ↔ lié</b> dose le liant entre les notes (les ghosts restent piqués).</li>
-        <li><b>Espace</b> ajoute une réverb très courte sur la basse seule — l'attaque et le
-          <i>time</i> restent nets.</li>
-        <li><b>Drop-outs</b> : la basse se tait périodiquement (trou en fin de période) et re-rentre
-          sur le 1 — tiens le <i>time</i> pendant le silence, la re-entrée te confirme ou te corrige ;
-          percussion et pulsation continuent.</li>
-        <li><b>La basse suit le swing</b> cale ses doubles-croches sur le swing du métronome
-          (section Micro-timing).</li>
-      </ul></span></details></div>
-    </div>
-  </details>
-
   <!-- Parcours funk (P-4) : surcouche pédagogique, module 6 (niveau Intermédiaire) -->
   <details class="section" id="secCours" data-strate="couche">
     <summary><span class="sec-title">Cours funk</span><span class="sec-sub">parcours · plusieurs niveaux</span></summary>
@@ -2389,119 +2462,6 @@ window.fmTr = (function(){
       <div id="pfStatus" aria-live="polite"></div>
     </div>
   </details>
-
-  <!-- 4. Gap clicks -->
-  <details class="section" id="secGap" data-strate="enveloppe">
-    <summary><span class="sec-title">Horloge interne</span><span class="sec-sub"><span class="term" tabindex="0" title="Gap clicks : le métronome se tait quelques mesures puis revient — à toi de tenir le tempo pendant le silence">coupures de clic (gap clicks)</span></span></summary>
-    <div class="section-body">
-      <div class="row">
-        <label for="gapMode">Mode</label>
-        <select id="gapMode" style="width:auto;">
-          <option value="off" selected>Désactivé</option>
-          <option value="fixed">Fixe (jouer N, couper M)</option>
-          <option value="prog">Progressif (coupures 1, 2, 4, 8…)</option>
-          <option value="rand">Aléatoire</option>
-        </select>
-        <label for="gapTarget" style="min-width:auto;">Cible</label>
-        <select id="gapTarget" style="width:auto;"></select>
-      </div>
-      <div class="row">
-        <label for="gapPlay">Mesures jouées (N)</label>
-        <input type="number" id="gapPlay" min="1" max="64" value="4" style="width:80px;">
-        <label for="gapMute" style="min-width:auto;">Mesures coupées (M)</label>
-        <input type="number" id="gapMute" min="1" max="32" value="1" style="width:80px;">
-      </div>
-      <div class="row">
-        <label for="gapProb">Probabilité de coupure (aléatoire)</label>
-        <input type="range" id="gapProb" min="5" max="80" value="25">
-        <span class="val" id="gapProbVal">25 %</span>
-      </div>
-      <div class="row">
-        <label title="Nombre de coupures traversées depuis le dernier départ — chaque silence tenu jusqu'au bout compte pour un">Coupures traversées</label>
-        <span class="val" id="gapCrossed">0</span>
-      </div>
-      <div class="hint">La cible se coupe, l'aiguille continue de tourner.
-      <details class="hint-more"><summary>En savoir plus</summary><span class="hm-body"><b>Cible</b> : tout le son
-      (gap classique), la pulsation seule, ou une seule voix (clave ou percussion) — les autres continuent,
-      pour tester la solidité de chaque voix. En mode progressif, la durée des
-      coupures double à chaque cycle (1, 2, 4, 8 mesures, plafonné à 16) : aucun filet de sécurité.</span></details></div>
-    </div>
-  </details>
-
-  <!-- 4. Son -->
-  <details class="section" id="secSon" data-strate="socle">
-    <summary><span class="sec-title">Son du clic</span><span class="sec-sub">fréquence · caractère</span></summary>
-    <div class="section-body">
-      <div class="row">
-        <label for="pulseFreq">Fréquence pulsation</label>
-        <input type="range" id="pulseFreq" min="100" max="3000" value="1000">
-        <span class="val" id="pulseFreqVal">1000 Hz</span>
-      </div>
-      <div class="row">
-        <label for="clickType">Caractère</label>
-        <select id="clickType" style="width:auto;">
-          <option value="ton" selected>Tonal (ping)</option>
-          <option value="sec">Sec (bruit, type rimshot)</option>
-        </select>
-      </div>
-      <div class="hint">Clic grave et sourd pour trancher avec un agogô · clic sec et brillant pour percer
-      face à une contrebasse ou des dunduns.</div>
-    </div>
-  </details>
-
-  <!-- 5. Script -->
-  <details class="section" id="secScript" data-strate="enveloppe">
-    <summary><span class="sec-title">Routine programmée</span><span class="sec-sub">script</span></summary>
-    <div class="section-body">
-      <div class="script-hl-wrap" id="scriptHlWrap">
-        <pre class="script-hl" id="scriptHl" aria-hidden="true"></pre>
-        <textarea id="scriptArea" spellcheck="false" aria-label="Script de routine"># Exemple de routine
-# 5 min à 80 BPM
-80bpm 5min
-# accelerando : 80 → 120 en 10 min
-80->120bpm 10min
-# gap : couper 2 mesures toutes les 16
-gap 2/16
-120bpm 32mes
-gap off
-swing 62
-100bpm 16mes</textarea>
-      </div>
-      <div class="script-status" id="scriptLint" role="status" aria-live="polite"></div>
-      <div class="lint-chips" role="group" aria-label="Insérer une ligne d'exemple">
-        <button class="btn-sm script-chip" data-ins="80bpm 5min">+ 5 min à 80</button>
-        <button class="btn-sm script-chip" data-ins="80->120bpm 10min">+ accelerando</button>
-        <button class="btn-sm script-chip" data-ins="gap 2/16">+ gap 2/16</button>
-        <button class="btn-sm script-chip" data-ins="swing 62">+ swing</button>
-      </div>
-      <div class="row" style="margin-top:10px;">
-        <button class="btn-sm primary" id="scriptRun">▶ Lancer la routine</button>
-        <button class="btn-sm" id="scriptStop">■ Arrêter la routine</button>
-      </div>
-      <div class="script-status" id="scriptStatus"></div>
-      <div class="hint">Syntaxe : <code>80bpm 5min</code> · <code>80->120bpm 10min</code> (rampe) ·
-      <code>100bpm 16mes</code> · <code>gap 2/16</code> · <code>gap off</code> · <code>swing 62</code> ·
-      lignes <code>#</code> = commentaires. Les changements s'appliquent à la mesure suivante.</div>
-    </div>
-  </details>
-
-  <!-- Bibliothèque partagée -->
-  <details class="section" id="secBiblio">
-    <summary><span class="sec-title">Bibliothèque partagée</span><span class="sec-sub">routines · Supabase</span></summary>
-    <div class="section-body">
-      <div class="row" style="gap:8px;flex-wrap:wrap">
-        <input id="biblioTitre" type="text" maxlength="120" placeholder="Titre de la routine à publier" aria-label="Titre de la routine à publier" style="flex:1;min-width:160px">
-        <button class="btn-sm primary" id="btnBiblioPublish">Publier la routine</button>
-        <button class="btn-sm" id="btnBiblioRefresh">Charger la bibliothèque</button>
-      </div>
-      <div class="script-status" id="biblioFb"></div>
-      <div id="biblioList" style="margin-top:8px"></div>
-      <div class="hint" style="margin-top:8px">Le <b>canon</b> (routines de référence) est visible sans connexion. <b>Connecte-toi</b> (en haut) pour voir les routines de la classe et publier les tiennes. « Importer » place la routine dans l'éditeur ci-dessus.</div>
-    </div>
-  </details>
-
-  <div class="kbd-hint">Espace : lecture · ↑↓ : tempo ±1 · T : tap tempo</div>
-</div>
 
 <!-- ============ ARCHET PLEIN ÉCRAN ============ -->
 <div class="bowfs" id="bowFs">
@@ -2517,49 +2477,6 @@ swing 62
     </div>
   </div>
   <canvas id="bowFsCv"></canvas>
-</div>
-
-<!-- ============ PERCUSSION PLEIN ÉCRAN ============ -->
-<div class="percfs" id="percFs">
-  <div class="bowfs-bar">
-    <div>
-      <div class="bowfs-title">Percussion</div>
-      <div class="kicker" id="percFsInstr">Djembé</div>
-    </div>
-    <div class="bowfs-controls">
-      <span class="bowfs-tempo" id="percFsTempo">92 BPM</span>
-      <button class="play" id="percFsPlay">▶</button>
-      <button id="percFsClose">✕ Fermer</button>
-    </div>
-  </div>
-  <div class="percfs-body">
-    <div id="percFsVoices"></div>
-    <div class="percfs-status" id="percFsStatus" role="status" aria-live="polite"></div>
-  </div>
-</div>
-
-<!-- ============ MODE ATELIER (0.7.0, C11) ============ -->
-<div class="atelierfs" id="atelierFs" role="dialog" aria-label="Mode atelier">
-  <div class="bowfs-bar">
-    <div>
-      <div class="bowfs-title">Atelier</div>
-      <div class="kicker" id="atelierMeasure"></div>
-    </div>
-    <div class="bowfs-controls">
-      <span class="atelier-wl" id="atelierWl" title="Écran maintenu allumé" hidden aria-hidden="true">☀</span>
-      <button id="atelierClose">✕ Fermer</button>
-    </div>
-  </div>
-  <div class="atelier-body">
-    <div class="atelier-bpm" id="atelierBpm">92</div>
-    <div class="atelier-sub">BPM · <em id="atelierName">Moderato</em></div>
-    <div class="atelier-status" id="atelierStatus" role="status" aria-live="polite"></div>
-  </div>
-  <div class="atelier-controls" role="group" aria-label="Transport atelier">
-    <button id="atelierMinus" aria-label="Tempo -1 (maintenir pour répéter)">−</button>
-    <button class="play" id="atelierPlay" aria-label="Lecture / arrêt">▶</button>
-    <button id="atelierPlus" aria-label="Tempo +1 (maintenir pour répéter)">+</button>
-  </div>
 </div>
 
 <!-- ============ WIZARD ============ -->
@@ -2602,6 +2519,8 @@ swing 62
     </div>
     <div class="wiz-nav"><span></span><button class="btn-sm primary" id="psGo">C'est parti →</button></div>
   </div>
+</div>
+
 </div>
 
 <!-- Corpus de contenus (R-2) : un style = un fichier de données (schéma spec R-1 §4.1).
@@ -3332,9 +3251,28 @@ swing 62
   })();
 
   /* R-3b (J2) : mute maître de l'accompagnement — drapeau de coquille lu par playClick
-     (contrat de coquille). Sur CETTE page : stub inerte (pas d'UI, toujours false) —
-     l'UI vit sur pratiquer.html ; index.html reste inchangé fonctionnellement (R-4). */
+     (contrat de coquille). Drapeau de SESSION superposé (patron volMuted) : il n'écrase
+     AUCUN réglage (S.bass.on, mutes de voix, solo/muet team restent intacts) — le lever
+     rend l'accompagnement exactement tel qu'il était. Volontairement non persisté. */
   let accompMuted = false;
+  function accompMuteRender() {
+    const b1 = $('accompMuteBtn'), b2 = $('accompMuteBtn2');
+    if (b1) {
+      b1.textContent = accompMuted ? '🔇 Accompagnement coupé' : '🔊 Accompagnement actif';
+      b1.setAttribute('aria-pressed', accompMuted ? 'true' : 'false');
+    }
+    if (b2) {
+      b2.textContent = accompMuted ? '🔇 Accomp.' : '🔊 Accomp.';
+      b2.setAttribute('aria-pressed', accompMuted ? 'true' : 'false');
+    }
+  }
+  function accompMuteToggle() {
+    accompMuted = !accompMuted;
+    accompMuteRender();
+    fmToast(accompMuted ? '🔇 Accompagnement coupé — le clic continue' : '🔊 Accompagnement rétabli');
+  }
+  $('accompMuteBtn').addEventListener('click', accompMuteToggle);
+  $('accompMuteBtn2').addEventListener('click', accompMuteToggle);
 
   let percGrids = {};          // voix -> tableau de pas (0/1/2)
   let percOffsets = {};        // voix -> micro-décalage par pas (−0.45 … +0.45 pas)
@@ -5563,6 +5501,17 @@ swing 62
     e.target.value = String(S.bass.drop.lenBeats); bassPersist();
   });
   $('bassSwingFollow').addEventListener('change', e => { S.bass.swingFollow = e.target.checked; bassPersist(); });
+  // R-3b (pratiquer, §5) : feel basse — borné −25…+25 ms, défaut 0, persisté avec les
+  // réglages basse (bassPersist sérialise S.bass entier). À 0 : offMs vaut 0, chemin identique.
+  function setBassFeel(v) {
+    S.bass.feelMs = Math.max(-25, Math.min(25, Math.round(+v) || 0));
+    $('bassFeel').value = String(S.bass.feelMs);
+    $('bassFeelVal').textContent = (S.bass.feelMs > 0 ? '+' : '') + S.bass.feelMs + ' ms';
+    bassPersist();
+  }
+  $('bassFeel').addEventListener('input', e => setBassFeel(e.target.value));
+  $('bassFeelMinus').addEventListener('click', () => setBassFeel(S.bass.feelMs - 1));
+  $('bassFeelPlus').addEventListener('click', () => setBassFeel(S.bass.feelMs + 1));
   // 5.4 : écran de jeu — mêmes champs d'état, synchro miroir vers secBass
   $('playBassOn').addEventListener('change', e => { S.bass.on = e.target.checked; $('bassOn').checked = S.bass.on; bassUpdateChordLabel(); bassPersist(); });
   $('playBassDensity').addEventListener('change', e => { S.bass.density = +e.target.value; $('bassDensity').value = String(S.bass.density); bassPersist(); });
@@ -6505,7 +6454,9 @@ swing 62
   // ============ INIT ============
   refreshPalette();
   $('themeBtn').textContent = currentTheme() === 'sombre' ? '◐ Mode clair' : '◐ Mode sombre';
-  setMode(store.get('fm-metro-mode') === 'expert' ? 'expert' : 'simple');
+  /* R-3b (pratiquer) : pas de mode simple ici — l'écran de jeu vit sur index.html (→ R-4).
+     Mise en page expert forcée SANS toucher au réglage partagé fm-metro-mode. */
+  document.body.classList.remove('mode-simple');
   setTempo(92);
   setSwing(50);
   // famille (bin/tern) : restaurée sans rebuild (les grilles sont bâties juste après)
@@ -6517,6 +6468,8 @@ swing 62
   percSetInstr('djembe');
   tsInit();
   bassRestore();
+  setBassFeel(S.bass.feelMs);   // R-3b (pratiquer) : borne le feel restauré et synchronise curseur + valeur
+  accompMuteRender();           // R-3b (pratiquer) : état initial du mute maître (session, toujours levé au chargement)
   { const _bs = $('buildStamp'); if (_bs) _bs.textContent = 'build ' + BUILD + ' · ' + BUILD_DATE; }
   drawStatic();
   // passe 4.1 : l'écran d'accueil « Je joue » est la porte d'entrée — il restaure
@@ -6876,281 +6829,6 @@ swing 62
   // utilisateur, le toast « réglages enregistrés » peut se montrer (une fois par session).
   window.__fmReady = true;
 </script>
-
-<!-- ===================== COMPTE (Supabase · lien magique) ===================== -->
-<style id="acctCss">
-  #acctDim{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9500;display:none}
-  #acctDim.show{display:block}
-  #acctCard{position:fixed;z-index:9502;left:50%;top:50%;transform:translate(-50%,-50%);
-    width:min(92vw,380px);background:var(--fm-panel);border:1px solid var(--fm-line);border-radius:14px;
-    padding:20px 20px 16px;box-shadow:0 18px 50px rgba(0,0,0,.35);color:var(--fm-ink)}
-  #acctCard h3{margin:0 0 6px;font-family:var(--fm-font-display);font-size:1.35rem;color:var(--fm-ink)}
-  #acctCard p{margin:0 0 12px;color:var(--fm-sub);font-size:.85rem;line-height:1.5}
-  #acctCard input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--fm-line);
-    background:var(--fm-panel-2);color:var(--fm-ink);font:inherit;font-size:16px;margin-bottom:10px}
-  #acctCard input:focus-visible{outline:2px solid var(--fm-accent);outline-offset:1px}
-  #acctCard .acct-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:6px;flex-wrap:wrap}
-  #acctCard .acct-actions button{background:var(--fm-panel-2);border:1px solid var(--fm-line);color:var(--fm-ink);
-    padding:8px 14px;border-radius:7px;cursor:pointer;font-family:var(--fm-font-ui);font-size: .8125rem;letter-spacing:.04em}
-  #acctCard .acct-actions button:hover{border-color:var(--fm-accent)}
-  #acctCard .acct-actions button.acct-primary{background:var(--fm-accent);border-color:var(--fm-accent);color:var(--fm-accent-ink);font-weight:600}
-  #acctFb{min-height:20px;font-size:.82rem;font-weight:600;margin:2px 0 4px}
-  #acctFb.good{color:var(--fm-accent-text)} #acctFb.bad{color:var(--fm-danger-text)}
-</style>
-<div id="acctDim" aria-hidden="true"></div>
-<div id="acctCard" role="dialog" aria-modal="true" aria-labelledby="acctTitle" style="display:none">
-  <h3 id="acctTitle">Se connecter</h3>
-  <div id="acctBody"></div>
-</div>
-<script>
-/* ===== Compte utilisateur : connexion par lien magique + profil (pseudo) ===== */
-(function(){
-  var SB_URL="https://hifqtzxhmboxbruraiab.supabase.co";
-  var SB_KEY="sb_publishable_HdA4ThMx_yDk7212nJ_sIg_J18wCNYK";
-  window.fmSupabase=function(){
-    if(window._fmSb) return window._fmSb;
-    if(!(window.supabase&&window.supabase.createClient)) return null;
-    window._fmSb=window.supabase.createClient(SB_URL,SB_KEY);
-    return window._fmSb;
-  };
-
-  var dim=document.getElementById('acctDim');
-  var card=document.getElementById('acctCard');
-  var titleEl=document.getElementById('acctTitle');
-  var bodyEl=document.getElementById('acctBody');
-  var btn=document.getElementById('btnAccount');
-  var currentUser=null, currentProfil=null, autoPrompted=false;
-
-  function openModal(){ dim.classList.add('show'); card.style.display='block'; }
-  function closeModal(){ dim.classList.remove('show'); card.style.display='none'; bodyEl.innerHTML=''; }
-  dim.addEventListener('click', closeModal);
-  document.addEventListener('keydown', function(e){ if(e.key==='Escape' && card.style.display==='block') closeModal(); });
-  function esc(s){ var d=document.createElement('div'); d.textContent=(s==null?'':String(s)); return d.innerHTML; }
-  function fb(msg,ok){ var el=document.getElementById('acctFb'); if(el){ el.textContent=msg; el.className=(ok?'good':'bad'); } }
-
-  function showLogin(){
-    titleEl.textContent="Se connecter";
-    bodyEl.innerHTML=
-      '<p>Reçois un lien de connexion par e-mail — aucun mot de passe à retenir.</p>'+
-      '<p style="opacity:.75;font-size:.85rem">L\'application fonctionne aussi sans compte : la connexion sert seulement à partager tes routines et suivre ta progression.</p>'+
-      '<input id="acctEmail" type="email" inputmode="email" autocomplete="email" placeholder="ton@email.fr">'+
-      '<div id="acctFb"></div>'+
-      '<div class="acct-actions">'+
-        '<button id="acctCancel">Annuler</button>'+
-        '<button class="acct-primary" id="acctSend">Envoyer le lien</button>'+
-      '</div>';
-    var email=document.getElementById('acctEmail');
-    document.getElementById('acctCancel').onclick=closeModal;
-    document.getElementById('acctSend').onclick=sendLink;
-    email.addEventListener('keydown', function(e){ if(e.key==='Enter') sendLink(); });
-    setTimeout(function(){ email.focus(); }, 30);
-  }
-  async function sendLink(){
-    var email=((document.getElementById('acctEmail')||{}).value||'').trim();
-    if(!/.+@.+\..+/.test(email)){ fb('Entre une adresse e-mail valide.',false); return; }
-    var sb=window.fmSupabase(); if(!sb){ fb('Connexion au serveur impossible (réseau ?).',false); return; }
-    fb('Envoi…',true);
-    try{
-      var redirect=location.href.split('#')[0];
-      var res=await sb.auth.signInWithOtp({ email:email, options:{ emailRedirectTo:redirect } });
-      if(res.error){ fb('Erreur : '+res.error.message,false); return; }
-      titleEl.textContent="Vérifie tes e-mails";
-      bodyEl.innerHTML='<p>Un lien de connexion a été envoyé à <b>'+esc(email)+'</b>. Ouvre-le sur cet appareil pour te connecter.</p>'+
-        '<p style="opacity:.75;font-size:.85rem">Pas reçu au bout d\'une minute ? Vérifie tes indésirables (spams), ou renvoie le lien.</p>'+
-        '<div class="acct-actions">'+
-          '<button id="acctResend">Renvoyer le lien</button>'+
-          '<button class="acct-primary" id="acctOk">Fermer</button>'+
-        '</div>';
-      document.getElementById('acctOk').onclick=closeModal;
-      document.getElementById('acctResend').onclick=function(){
-        showLogin();
-        var e2=document.getElementById('acctEmail'); if(e2){ e2.value=email; }
-      };
-    }catch(e){ fb('Échec : '+(e&&e.message||e),false); }
-  }
-
-  async function ensureProfil(user){
-    var sb=window.fmSupabase(); if(!sb) return null;
-    try{
-      var r=await sb.from('profils').select('id,pseudo,instrument').eq('id',user.id).maybeSingle();
-      if(r.error) return null;
-      return r.data;
-    }catch(e){ return null; }
-  }
-  function showPseudoPrompt(user, existing){
-    titleEl.textContent="Ton pseudo";
-    var cur=(existing&&existing.pseudo)||'';
-    bodyEl.innerHTML=
-      '<p>Le nom affiché à côté des routines que tu partageras.</p>'+
-      '<input id="acctPseudo" type="text" maxlength="40" placeholder="ex. Naomi" value="'+esc(cur)+'">'+
-      '<div id="acctFb"></div>'+
-      '<div class="acct-actions">'+
-        '<button id="acctSkip">Plus tard</button>'+
-        '<button class="acct-primary" id="acctSavePseudo">Enregistrer</button>'+
-      '</div>';
-    var inp=document.getElementById('acctPseudo');
-    document.getElementById('acctSkip').onclick=closeModal;
-    document.getElementById('acctSavePseudo').onclick=function(){ savePseudo(user); };
-    inp.addEventListener('keydown', function(e){ if(e.key==='Enter') savePseudo(user); });
-    setTimeout(function(){ inp.focus(); if(inp.select) inp.select(); }, 30);
-  }
-  async function savePseudo(user){
-    var sb=window.fmSupabase(); if(!sb) return;
-    var pseudo=((document.getElementById('acctPseudo')||{}).value||'').trim();
-    if(!pseudo){ fb('Choisis un pseudo (ou « Plus tard »).',false); return; }
-    fb('Enregistrement…',true);
-    try{
-      var res=await sb.from('profils').upsert({ id:user.id, pseudo:pseudo }, { onConflict:'id' }).select().maybeSingle();
-      if(res.error){ fb('Erreur : '+res.error.message,false); return; }
-      currentProfil=res.data||{ id:user.id, pseudo:pseudo };
-      renderAccount(); closeModal();
-    }catch(e){ fb('Échec : '+(e&&e.message||e),false); }
-  }
-
-  function showAccount(){
-    var name=(currentProfil&&currentProfil.pseudo)||'';
-    var mail=(currentUser&&currentUser.email)||'';
-    titleEl.textContent="Ton compte";
-    bodyEl.innerHTML=
-      '<p>Connecté'+(name?' comme <b>'+esc(name)+'</b>':'')+
-        (mail?'<br><span style="opacity:.7;font-size: .8125rem">'+esc(mail)+'</span>':'')+'</p>'+
-      '<div class="acct-actions" style="justify-content:space-between">'+
-        '<button id="acctEditPseudo">'+(name?'Changer de pseudo':'Choisir un pseudo')+'</button>'+
-        '<button id="acctLogout">Se déconnecter</button>'+
-      '</div>';
-    document.getElementById('acctEditPseudo').onclick=function(){ showPseudoPrompt(currentUser,currentProfil); };
-    document.getElementById('acctLogout').onclick=logout;
-  }
-  async function logout(){
-    var sb=window.fmSupabase(); if(sb){ try{ await sb.auth.signOut(); }catch(e){} }
-    currentUser=null; currentProfil=null; autoPrompted=false; renderAccount(); closeModal();
-  }
-
-  function renderAccount(){
-    window.fmCurrentUser=currentUser; window.fmCurrentProfil=currentProfil;
-    try{ document.dispatchEvent(new CustomEvent('fm-auth',{detail:{user:currentUser,profil:currentProfil}})); }catch(e){}
-    if(!btn) return;
-    if(currentUser){
-      var name=(currentProfil&&currentProfil.pseudo)||currentUser.email||'Compte';
-      btn.textContent='👤 '+name; btn.title='Ton compte';
-    }else{
-      btn.textContent='Se connecter'; btn.title='Recevoir un lien de connexion par e-mail';
-    }
-  }
-  if(btn){ btn.addEventListener('click', function(){ openModal(); if(currentUser) showAccount(); else showLogin(); }); }
-
-  async function onSession(user){
-    currentUser=user||null;
-    if(currentUser){
-      if(!currentProfil) currentProfil=await ensureProfil(currentUser);
-      renderAccount();
-      if(!autoPrompted && (!currentProfil || !currentProfil.pseudo)){
-        autoPrompted=true; openModal(); showPseudoPrompt(currentUser, currentProfil);
-      }
-    }else{
-      currentProfil=null; renderAccount();
-    }
-  }
-  function init(){
-    var sb=window.fmSupabase();
-    if(!sb){ renderAccount(); return; }
-    sb.auth.getSession().then(function(r){
-      var u=r&&r.data&&r.data.session&&r.data.session.user; onSession(u||null);
-    }).catch(function(){ renderAccount(); });
-    sb.auth.onAuthStateChange(function(evt, session){
-      var u=session&&session.user;
-      if(evt==='SIGNED_IN') onSession(u||null);
-      else if(evt==='SIGNED_OUT') onSession(null);
-    });
-  }
-  if(document.readyState!=='loading') init(); else document.addEventListener('DOMContentLoaded', init);
-})();
-</script>
-<script>
-/* ===== Bibliothèque partagée (Supabase) : routines canon/classe + publication ===== */
-(function(){
-  function el(id){ return document.getElementById(id); }
-  function esc(s){ var d=document.createElement('div'); d.textContent=(s==null?'':String(s)); return d.innerHTML; }
-  function fb(msg,ok){ var e=el('biblioFb'); if(e){ e.textContent=msg||''; e.style.color=ok?'var(--fm-accent-text)':'var(--fm-danger-text)'; } }
-  function sb(){ return (window.fmSupabase&&window.fmSupabase())||null; }
-  function user(){ return window.fmCurrentUser||null; }
-
-  function tagFor(row){
-    if(row.canon) return 'Référence';
-    var u=user();
-    if(u && row.owner===u.id) return 'Moi';
-    if(row.partage_classe) return 'Classe';
-    return '';
-  }
-  async function loadBiblio(){
-    var list=el('biblioList'); if(!list) return;
-    var c=sb(); if(!c){ fb('Client Supabase indisponible (réseau ?).',false); return; }
-    fb('Chargement…',true);
-    try{
-      var res=await c.from('mt_routines')
-        .select('id,titre,script,owner,canon,partage_classe,updated_at')
-        .order('canon',{ascending:false}).order('titre',{ascending:true});
-      if(res.error){ fb('Erreur : '+res.error.message,false); return; }
-      var data=res.data||[]; list.innerHTML='';
-      if(!data.length){ fb(user()?'Bibliothèque vide pour l\'instant.':'Aucune routine de référence pour l\'instant.',true); return; }
-      fb(data.length+' routine(s)'+(user()?'':' · connecte-toi pour voir la classe'),true);
-      data.forEach(function(row){
-        var r=document.createElement('div');
-        r.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid rgba(128,128,128,.2)';
-        var left=document.createElement('span');
-        var tag=tagFor(row);
-        left.innerHTML='<b>'+esc(row.titre||'(sans titre)')+'</b>'+(tag?' <span class="sec-sub">· '+tag+'</span>':'');
-        var b=document.createElement('button'); b.className='btn-sm'; b.textContent='Importer';
-        b.onclick=function(){
-          var ta=el('scriptArea');
-          if(!ta){ fb('Éditeur de routine introuvable.',false); return; }
-          ta.value=(row.script||'');
-          try{ ta.dispatchEvent(new Event('input',{bubbles:true})); }catch(e){}
-          var sec=el('secScript'); if(sec&&!sec.open) sec.open=true;
-          fb('« '+(row.titre||'routine')+' » chargée dans l\'éditeur ✓',true);
-        };
-        r.appendChild(left); r.appendChild(b); list.appendChild(r);
-      });
-    }catch(e){ fb('Échec : '+(e&&e.message||e),false); }
-  }
-
-  async function publish(){
-    var c=sb(); if(!c){ fb('Client Supabase indisponible (réseau ?).',false); return; }
-    var u=user(); if(!u){ fb('Connecte-toi (en haut) pour publier tes routines.',false); return; }
-    var ta=el('scriptArea'); var script=ta?(ta.value||'').trim():'';
-    if(!script){ fb('L\'éditeur de routine est vide.',false); return; }
-    var ti=el('biblioTitre'); var titre=(ti?(ti.value||''):'').trim();
-    if(!titre){
-      var lines=script.split('\n');
-      var cm=lines.find(function(l){ return /^#\s*\S/.test(l); });
-      titre=(cm?cm.replace(/^#\s*/,''):(lines.find(function(l){return l.trim();})||'Routine')).slice(0,120);
-    }
-    titre=titre.slice(0,120);
-    fb('Publication…',true);
-    try{
-      var res=await c.from('mt_routines')
-        .insert({ owner:u.id, titre:titre, script:script, partage_classe:true, canon:false })
-        .select().maybeSingle();
-      if(res.error){ fb('Erreur : '+res.error.message,false); return; }
-      fb('« '+titre+' » publiée dans la classe ✓',true);
-      loadBiblio();
-    }catch(e){ fb('Échec : '+(e&&e.message||e),false); }
-  }
-
-  function updatePublishBtn(){
-    var pb=el('btnBiblioPublish'); if(!pb) return;
-    pb.title=user()?'Publier la routine de l\'éditeur dans la bibliothèque de la classe':'Connecte-toi (en haut) pour publier';
-  }
-  function wire(){
-    var rb=el('btnBiblioRefresh'); if(rb&&!rb._wired){ rb._wired=true; rb.addEventListener('click',loadBiblio); }
-    var pb=el('btnBiblioPublish'); if(pb&&!pb._wired){ pb._wired=true; pb.addEventListener('click',publish); }
-    updatePublishBtn();
-  }
-  document.addEventListener('fm-auth', updatePublishBtn);
-  if(document.readyState!=='loading') wire(); else document.addEventListener('DOMContentLoaded', wire);
-})();
-</script>
-<!-- =================== FIN COMPTE (Supabase · lien magique) =================== -->
 
 <!-- ===================== EXPORT AUDIO (WAV hors-ligne · MP3 via encodeur) ===================== -->
 <script>

@@ -365,6 +365,7 @@
     // clic muet : le métronome se tait (pulsation, subdivisions, clic décalé),
     // les couches à grille (clave, percussion) et la polyrythmie continuent
     if (S.sound.pulseMuted && (layer === 'beat' || layer === 'sub' || layer === 'shift')) return;
+    if (accompMuted && (layer === 'perc' || layer === 'bass')) return;
     if (percLayerMuted(layer, voice, brk)) return;
     if (layer === 'perc') { playPerc(t, voice, accent); return; }
     // passe 5 : basse funk (accompagnement) — la note porte freq/art/gain/dur (§4.3)
@@ -443,7 +444,7 @@
     // couche basse funk (passe 5) — accompagnement hors percGrids ; famille binaire (v1).
     // Les notes sont réalisées par mesure (bassOnNewMeasure/bassResetCycle) → simple recopie.
     if (S.bass.on && S.family === 'bin') {
-      for (const b of bassRealized) events.push({ frac: b.frac, layer: 'bass', note: b.note });
+      for (const b of bassRealized) events.push({ frac: b.frac, layer: 'bass', note: b.note, offMs: S.bass.feelMs || 0 });
     }
     events.sort((a, b) => a.frac - b.frac);
     evIdx = 0;
