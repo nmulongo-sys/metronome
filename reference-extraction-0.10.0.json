@@ -1,0 +1,71 @@
+{
+ "objet": "Référence d'extraction R-3a — build 0.10.0 (7d861f4), spec R-3 §3.4",
+ "reference": {
+  "build": "metronomefunk-0.10.0",
+  "commit": "7d861f4",
+  "nbLignes": 10789
+ },
+ "tolerances": [
+  "ligne `const BUILD = …` normalisée avant hachage (fm-etat.js suit le build courant)",
+  "en-tête de chaque fichier moteur (bannière + 'use strict') : hors hachage, le bloc commence à sa ligne d'ancre",
+  "index.html : 6 lignes insérées (commentaire + 3 balises moteur) et 2 lignes d'IIFE déposées ((() => { / })();)"
+ ],
+ "ancres": {
+  "fm-etat": "  // ============ CORPUS (R-2) ============",
+  "fm-audio": [
+   "  // ============ AUDIO ============",
+   "  // ============ ORDONNANCEUR ============"
+  ],
+  "fm-accomp": "  // ============ GAP (unifié, passe 2 étape 4) ============"
+ },
+ "blocs": {
+  "fm-etat": {
+   "lignes": [
+    [
+     2608,
+     2765
+    ]
+   ],
+   "md5": "8a113d9208d7d2863896cd7e839c9c0e",
+   "nb": 158
+  },
+  "fm-audio": {
+   "lignes": [
+    [
+     2841,
+     3281
+    ],
+    [
+     3736,
+     3812
+    ]
+   ],
+   "md5": "a676d76e1d2d6714a9977b8ca539d401",
+   "nb": 518
+  },
+  "fm-accomp": {
+   "lignes": [
+    [
+     3282,
+     3639
+    ]
+   ],
+   "md5": "25e786ee8f77209ab0a5a96434d6cafe",
+   "nb": 358
+  }
+ },
+ "residuMd5": "511ac7eb9770988a4fa1c891d6cf5bc0",
+ "residuNbLignes": 9753,
+ "lignesInserees": [
+  "<!-- Moteur (R-3a) : état/assemblage · synthèse+cycle+ordonnanceur · accompagnement.",
+  "     Transplantés VERBATIM du script principal (spec R-3 §3, preuve : recette-extraction.js).",
+  "     Portée globale partagée (l'IIFE historique du script principal est déposée). -->",
+  "<script src=\"moteur/fm-etat.js\"></script>",
+  "<script src=\"moteur/fm-audio.js\"></script>",
+  "<script src=\"moteur/fm-accomp.js\"></script>"
+ ],
+ "iife": {
+  "ouverture": "(() => {",
+  "fermeture": "})();"
+ }
+}
