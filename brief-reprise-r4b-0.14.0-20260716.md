@@ -4,6 +4,9 @@
 > Instantané au **2026-07-16**, fin du fil « R-4b : accueil métronome immédiat »
 > (exécution directe sur spec R-4 §4 validée — GO en bloc du 16/07 ; AUCUNE
 > nouvelle décision demandée à Jean, écarts motivés au rapport §5).
+> **Fait ensuite dans le même fil** : rejeu ANTICIPÉ du panel UX 30 sur l'accueil
+> (à la demande de Jean) — voir « Panel UX » plus bas. Dernier commit poussé sur
+> la branche = `a1eea6f` (le panel), sur `675a7b1` (R-4b) sur `6e5a743` (#25).
 
 ## Le projet
 `metronomefunk` (dépôt `nmulongo-sys/metronome`, GitHub Pages, **français**, livraison **fichiers
@@ -49,6 +52,24 @@ n'est mergé.
   (groove ts.* chargé, TS visible, mute maître, stubs vides), apprendre intact.
 - **Rapport** : `rapport-nonregression-0.14.0.md` (table §3, choix motivés §5).
 
+## Panel UX 30 — rejeu ANTICIPÉ sur l'accueil (commit `a1eea6f`)
+Jean a demandé le panel dans le fil ; rejoué avec le **panel FIXE** (mêmes 30 identités que
+la référence v0.6.5, scénarios conservés) sur `index.html` 0.14.0 (portes franchies quand le
+scénario l'exige). Dashboard : `panel-tests-ui-metronomefunk-accueil-0.14.0.html`.
+- **8,24/10** (réf. v0.6.5 = 7,17) ; **0 constat critique** (v0.6.5 en avait 2) ; les 7
+  novices IT 1 (dont 5 de 63–80 ans) réussissent SEULS — l'échec type « mur de texte » a disparu.
+- **Constats v0.6.5 constatés résolus** : surcharge Configurer, terminologie d'entrée, cibles
+  tactiles, sommaire, connexion, filet de sécurité, aides-pavés, atelier, exports élèves, lint.
+- **3 majeurs restants, effort faible** — candidats à une passe rapide (avant/pendant R-4c),
+  PAS un écart à la spec §9.8 mais des **ajouts** à arbitrer par Jean :
+  1. **Volume + sourdine absents de l'accueil** (7 testeurs gênés sur la tâche de base ;
+     réintégration chiffrée « quelques lignes » au rapport R-4b §5).
+  2. **Porte « En équipe — bientôt » contredit Team Spirit** (déjà vivant sur pratiquer) :
+     compléter le sous-titre + lien en attendant `equipe.html` (R-6). Une phrase suffit.
+  3. **Trilingue s'arrête à la porte Apprendre** (apprendre.html FR-seul) — déjà au transverse.
+- Simulé : à confirmer avec de vrais utilisateurs ; le **rejeu officiel reste prévu en R-5**
+  (app refondue EN PROD, les 3 pages).
+
 ## Questions à ne pas reposer (déjà tranchées)
 - **Langue / livraison ?** → Français ; fichiers complets ; Pages sans build.
 - **Workflow ?** → Spec avant code ; R-4 est SPÉCIFIÉE ET EXÉCUTÉE (R-4a + R-4b) ;
@@ -62,7 +83,9 @@ n'est mergé.
   éventuelle « à plusieurs » → equipe.html, R-6).
 - **i18n ?** → dicts d'index purgés + nouvelles clés EN et PT ; pratiquer désormais
   couvert (0.6.9 l'audite) ; apprendre FR-seul assumé (transverse).
-- **Panel UX ?** → Ne pas rejouer avant R-5 (référence 7,0/10 sur 0.8.0).
+- **Panel UX ?** → **Rejeu officiel en R-5** (app refondue en prod, les 3 pages). Un rejeu
+  ANTICIPÉ sur l'accueil seul a été fait ce fil (8,24/10, section « Panel UX » ci-dessus) —
+  ne pas le refaire à l'identique ; ses 3 P1 sont des pistes, pas des décisions actées.
 
 ## Points ouverts
 1. **Merge par Jean, DANS L'ORDRE : PR #25 (R-4a) puis PR R-4b** (empilée — après le
@@ -71,11 +94,14 @@ n'est mergé.
    `claude/new-session-oumssg`, mergées antérieures, et **PR #13 à fermer sans merger**).
 2. **Oreille de Jean** : échantillon pilote des 10 démos (porte de R-4c) ; mute maître +
    feel R-3b (±25 ms) ; **accueil à l'œil** (porte de sortie R-4b, spec §1).
-3. **R-4c** (lot de contenu, après l'oreille) : démos Avancé + Artiste
+3. **Décision de Jean sur les 3 P1 du panel** (volume/sourdine accueil, sous-titre porte
+   « En équipe », EN/PT apprendre) : les prendre en passe rapide ou les garder pour R-5 ?
+   Ce sont des ajouts, pas des correctifs d'écart — donc à arbitrer, pas à exécuter d'office.
+4. **R-4c** (lot de contenu, après l'oreille) : démos Avancé + Artiste
    (`corpus/socle-technique.js`, `corpus/funk.js`, validateur recette-demo).
-4. Ensuite : **R-5** (salve UX + rejeu panel 30 sur l'app refondue), **R-6** (equipe.html —
-   Team Spirit et l'esprit « à plusieurs » y renaissent). Transverses non planifiés :
-   traduction EN/PT d'apprendre, contenu « principes » en données de corpus.
+5. Ensuite : **R-5** (salve UX + rejeu panel 30 OFFICIEL sur l'app refondue en prod),
+   **R-6** (equipe.html — Team Spirit et l'esprit « à plusieurs » y renaissent). Transverses
+   non planifiés : traduction EN/PT d'apprendre, contenu « principes » en données de corpus.
 
 ## Reprise
 - **Titre suggéré** : « Métronome FM — R-4c : démos Avancé/Artiste (après oreille de
