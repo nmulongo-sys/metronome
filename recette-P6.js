@@ -9,7 +9,7 @@ const path = require('path');
 const { JSDOM, VirtualConsole } = require('jsdom');
 
 const FILE = process.argv[2] || path.join(__dirname, 'index.html');
-const html = fs.readFileSync(FILE, 'utf8');
+const html = require('./recette-harnais').chargeHtml(FILE);   // R-2 : inline les corpus/*.js
 
 let PASS = 0, FAIL = 0;
 const ok = (name, cond) => { if (cond) { PASS++; console.log('  ✓ ' + name); } else { FAIL++; console.log('  ✗ ' + name); } };

@@ -1,0 +1,1567 @@
+{
+ "build": "metronomefunk-0.8.0",
+ "BASS_PATTERNS": {
+  "theOne": {
+   "steps": 16,
+   "hits": [
+    {
+     "i": 0,
+     "deg": "R",
+     "art": "finger",
+     "w": 1,
+     "lvl": 1
+    },
+    {
+     "i": 6,
+     "deg": "5",
+     "art": "ghost",
+     "w": 0.5,
+     "lvl": 2
+    },
+    {
+     "i": 8,
+     "deg": "R",
+     "art": "finger",
+     "w": 0.8,
+     "lvl": 1
+    },
+    {
+     "i": 10,
+     "deg": "oct",
+     "art": "pop",
+     "w": 0.4,
+     "lvl": 3
+    },
+    {
+     "i": 14,
+     "deg": "5",
+     "art": "ghost",
+     "w": 0.5,
+     "lvl": 2
+    }
+   ]
+  },
+  "syncopeGrave": {
+   "steps": 16,
+   "hits": [
+    {
+     "i": 0,
+     "deg": "R",
+     "art": "finger",
+     "w": 1,
+     "lvl": 1
+    },
+    {
+     "i": 6,
+     "deg": "R",
+     "art": "finger",
+     "w": 0.7,
+     "lvl": 2
+    },
+    {
+     "i": 8,
+     "deg": "5",
+     "art": "ghost",
+     "w": 0.5,
+     "lvl": 2
+    },
+    {
+     "i": 11,
+     "deg": "R",
+     "art": "finger",
+     "w": 0.6,
+     "lvl": 3
+    },
+    {
+     "i": 14,
+     "deg": "oct",
+     "art": "pop",
+     "w": 0.5,
+     "lvl": 3
+    }
+   ]
+  },
+  "octaves": {
+   "steps": 16,
+   "hits": [
+    {
+     "i": 0,
+     "deg": "R",
+     "art": "finger",
+     "w": 1,
+     "lvl": 1
+    },
+    {
+     "i": 4,
+     "deg": "oct",
+     "art": "finger",
+     "w": 0.8,
+     "lvl": 2
+    },
+    {
+     "i": 8,
+     "deg": "R",
+     "art": "finger",
+     "w": 0.9,
+     "lvl": 1
+    },
+    {
+     "i": 12,
+     "deg": "oct",
+     "art": "finger",
+     "w": 0.8,
+     "lvl": 2
+    },
+    {
+     "i": 2,
+     "deg": "R",
+     "art": "ghost",
+     "w": 0.4,
+     "lvl": 3
+    },
+    {
+     "i": 10,
+     "deg": "oct",
+     "art": "ghost",
+     "w": 0.4,
+     "lvl": 3
+    }
+   ]
+  },
+  "ghostPendule": {
+   "steps": 16,
+   "hits": [
+    {
+     "i": 0,
+     "deg": "R",
+     "art": "finger",
+     "w": 1,
+     "lvl": 1
+    },
+    {
+     "i": 8,
+     "deg": "R",
+     "art": "finger",
+     "w": 0.9,
+     "lvl": 1
+    },
+    {
+     "i": 4,
+     "deg": "5",
+     "art": "ghost",
+     "w": 0.6,
+     "lvl": 2
+    },
+    {
+     "i": 12,
+     "deg": "5",
+     "art": "ghost",
+     "w": 0.6,
+     "lvl": 2
+    },
+    {
+     "i": 2,
+     "deg": "R",
+     "art": "ghost",
+     "w": 0.6,
+     "lvl": 3
+    },
+    {
+     "i": 6,
+     "deg": "R",
+     "art": "ghost",
+     "w": 0.6,
+     "lvl": 3
+    },
+    {
+     "i": 10,
+     "deg": "5",
+     "art": "ghost",
+     "w": 0.6,
+     "lvl": 3
+    },
+    {
+     "i": 14,
+     "deg": "5",
+     "art": "ghost",
+     "w": 0.6,
+     "lvl": 3
+    }
+   ]
+  }
+ },
+ "BASS_PROGS": {
+  "vamp1": {
+   "bars": [
+    {
+     "deg": "I",
+     "quality": "7"
+    }
+   ]
+  },
+  "vamp2": {
+   "bars": [
+    {
+     "deg": "I",
+     "quality": "7"
+    },
+    {
+     "deg": "IV",
+     "quality": "7"
+    }
+   ]
+  },
+  "dorien": {
+   "bars": [
+    {
+     "deg": "i",
+     "quality": "m7"
+    },
+    {
+     "deg": "IV",
+     "quality": "7"
+    }
+   ]
+  },
+  "mixo": {
+   "bars": [
+    {
+     "deg": "I",
+     "quality": "7"
+    },
+    {
+     "deg": "bVII",
+     "quality": ""
+    }
+   ]
+  },
+  "blues": {
+   "bars": [
+    {
+     "deg": "I",
+     "quality": "7"
+    },
+    {
+     "deg": "I",
+     "quality": "7"
+    },
+    {
+     "deg": "I",
+     "quality": "7"
+    },
+    {
+     "deg": "I",
+     "quality": "7"
+    },
+    {
+     "deg": "IV",
+     "quality": "7"
+    },
+    {
+     "deg": "IV",
+     "quality": "7"
+    },
+    {
+     "deg": "I",
+     "quality": "7"
+    },
+    {
+     "deg": "I",
+     "quality": "7"
+    },
+    {
+     "deg": "V",
+     "quality": "7"
+    },
+    {
+     "deg": "IV",
+     "quality": "7"
+    },
+    {
+     "deg": "I",
+     "quality": "7"
+    },
+    {
+     "deg": "I",
+     "quality": "7"
+    }
+   ]
+  },
+  "jazzfunk": {
+   "bars": [
+    {
+     "deg": "ii",
+     "quality": "m7"
+    },
+    {
+     "deg": "V",
+     "quality": "7"
+    }
+   ]
+  }
+ },
+ "PF_PARC": {
+  "cajon": {
+   "label": "Cajón",
+   "couleur": "var(--pf-cajon)"
+  },
+  "djembe": {
+   "label": "Djembé",
+   "couleur": "var(--pf-djembe)"
+  }
+ },
+ "PF_NIV_ORDER": {
+  "debutant": [
+   "POS",
+   "SON",
+   "PLS",
+   "SUB",
+   "DYN"
+  ],
+  "intermediaire": [
+   "T1",
+   "T2",
+   "B1",
+   "B2",
+   "D1",
+   "I2"
+  ],
+  "avance": [],
+  "artiste": []
+ },
+ "PF_EX": {
+  "EX-SOCLE-I2-01": {
+   "kind": "atome",
+   "objet": "Grave sur The One",
+   "consigne": "Pose ton grave exactement sur le 1, en même temps que la fondamentale de la basse.",
+   "critere": "quand ton grave et celui de la basse sonnent comme une seule frappe.",
+   "preset": {
+    "pattern": "theOne",
+    "prog": "vamp1",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-CJ-I2-02": {
+   "kind": "atome",
+   "objet": "Se loger dans le trou (slap catapulte)",
+   "consigne": "Place ton slap pile dans le trou laissé par la basse, sans la couvrir.",
+   "critere": "quand ton slap tombe dans le vide de la basse sans jamais marcher dessus.",
+   "preset": {
+    "pattern": "syncopeGrave",
+    "prog": "vamp1",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-DJ-I2-02": {
+   "kind": "atome",
+   "objet": "Se loger dans le trou (slap fouetté)",
+   "consigne": "Place ton slap dans le trou de la basse, poignet fouetté, sans la couvrir.",
+   "critere": "quand ton slap claque dans le vide de la basse sans marcher dessus.",
+   "preset": {
+    "pattern": "syncopeGrave",
+    "prog": "vamp1",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-SOCLE-I2-03": {
+   "kind": "atome",
+   "objet": "Nappe de ghosts sous la basse",
+   "consigne": "Tisse un tapis de ghosts en 16es sous la ligne de basse.",
+   "critere": "quand tes ghosts font un tapis régulier sans jamais bousculer la basse.",
+   "preset": {
+    "pattern": "ghostPendule",
+    "prog": "vamp1",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-SOCLE-I2-04": {
+   "kind": "atome",
+   "objet": "Drop-out : tenir le time",
+   "consigne": "Quand la basse disparaît, garde ta pulsation intérieure et retombe pile à son retour.",
+   "critere": "quand la basse revient et que tu es toujours exactement en place.",
+   "preset": {
+    "pattern": "theOne",
+    "prog": "vamp1",
+    "drop": {
+     "on": true,
+     "everyN": 4,
+     "lenBeats": 2
+    }
+   }
+  },
+  "EX-CJ-I2-05": {
+   "kind": "synthese",
+   "objet": "Synthèse — groove 2 cellules",
+   "consigne": "Enchaîne grave sur The One + slap dans le trou + nappe ghost, sur les deux mesures.",
+   "critere": "quand tu tiens le groove entier détendu, même quand la basse change d'accord.",
+   "preset": {
+    "pattern": "theOne",
+    "prog": "vamp2",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-DJ-I2-05": {
+   "kind": "synthese",
+   "objet": "Synthèse — groove 2 cellules",
+   "consigne": "Enchaîne bass sur The One + slap fouetté dans le trou + nappe ghost, sur les deux mesures.",
+   "critere": "quand tu tiens le groove entier détendu, même quand la basse change d'accord.",
+   "preset": {
+    "pattern": "theOne",
+    "prog": "vamp2",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-SOCLE-T1-01": {
+   "kind": "atome",
+   "objet": "Le grave sur le 1",
+   "consigne": "A chaque mesure, pose ton grave exactement sur le 1 - rien d'autre pour l'instant.",
+   "critere": "quand tu retrouves le 1 sans le chercher, mesure apres mesure.",
+   "preset": {
+    "pattern": "theOne",
+    "prog": "vamp1",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-SOCLE-T1-02": {
+   "kind": "atome",
+   "objet": "Le 1 comme repere, pas comme coup de force",
+   "consigne": "Rejoue ton grave sur le 1, mais doux : c'est une reference d'organisation, pas l'accent le plus fort.",
+   "critere": "quand le 1 continue de t'organiser meme joue en retrait.",
+   "preset": {
+    "pattern": "theOne",
+    "prog": "vamp1",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-SOCLE-T1-03": {
+   "kind": "atome",
+   "objet": "Tenir le 1 quand la basse s'efface",
+   "consigne": "Quand la basse disparait une mesure, garde ta pulsation interieure et retombe pile sur le 1 suivant.",
+   "critere": "quand ton 1 retombe juste sans avoir eu besoin de reentendre la basse.",
+   "preset": {
+    "pattern": "theOne",
+    "prog": "vamp1",
+    "drop": {
+     "on": true,
+     "everyN": 4,
+     "lenBeats": 4
+    }
+   }
+  },
+  "EX-SOCLE-T1-04": {
+   "kind": "atome",
+   "objet": "Le 1 ne bouge pas quand l'accord change",
+   "consigne": "Sur la progression a deux accords, garde ton 1 identique meme quand l'harmonie change a la 2e mesure.",
+   "critere": "quand le changement d'accord ne deplace jamais ton repere du 1.",
+   "preset": {
+    "pattern": "theOne",
+    "prog": "vamp2",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-SOCLE-T1-05": {
+   "kind": "synthese",
+   "objet": "Groove d'ancrage sur The One",
+   "consigne": "Enchaine grave sur chaque 1 + une nappe legere de touches entre les temps, sur les deux mesures.",
+   "critere": "quand le 1 reste ton point fixe pendant que la nappe tourne autour.",
+   "preset": {
+    "pattern": "theOne",
+    "prog": "vamp2",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-SOCLE-T2-01": {
+   "kind": "atome",
+   "objet": "Sentir les 4 doubles-croches",
+   "consigne": "Joue une touche tres legere sur chacune des 4 doubles-croches d'un temps, regulieres comme un moteur.",
+   "critere": "quand les 4 touches sont egales, sans trou ni bosse.",
+   "preset": {
+    "pattern": "ghostPendule",
+    "prog": "vamp1",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-SOCLE-T2-02": {
+   "kind": "atome",
+   "objet": "Etendre la grille sur la mesure",
+   "consigne": "Etale la nappe de 16es sur toute la mesure, sans repos, sous la basse.",
+   "critere": "quand la grille tourne en continu sans que tu y penses.",
+   "preset": {
+    "pattern": "ghostPendule",
+    "prog": "vamp1",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-SOCLE-T2-03": {
+   "kind": "atome",
+   "objet": "Le swing des 16es",
+   "consigne": "Laisse tes contretemps faibles glisser legerement en retard : un swing doux, ni tout a fait binaire ni ternaire.",
+   "critere": "quand la nappe respire avec un balancement regulier au lieu d'etre raide.",
+   "preset": {
+    "pattern": "ghostPendule",
+    "prog": "vamp1",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-SOCLE-T2-04": {
+   "kind": "atome",
+   "objet": "Accentuer un point de la grille",
+   "consigne": "Garde la nappe egale mais fais ressortir un seul point par temps (le e, puis le a).",
+   "critere": "quand l'accent choisi ressort sans casser la regularite du reste.",
+   "preset": {
+    "pattern": "ghostPendule",
+    "prog": "vamp1",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-SOCLE-T2-05": {
+   "kind": "synthese",
+   "objet": "Grille complete swinguee",
+   "consigne": "Tourne la grille complete sur les deux mesures : nappe reguliere + swing + un accent place, sous la basse.",
+   "critere": "quand la grille tient toute seule et donne envie de bouger.",
+   "preset": {
+    "pattern": "ghostPendule",
+    "prog": "vamp2",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-CJ-B1-01": {
+   "kind": "atome",
+   "objet": "Le slap seul sur 2 et 4 (catapulte)",
+   "consigne": "Place un slap catapulte franc sur le 2 et sur le 4, rien d'autre.",
+   "critere": "quand tes deux slaps claquent nets, toujours a la meme place.",
+   "preset": {
+    "pattern": "theOne",
+    "prog": "vamp1",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-CJ-B1-02": {
+   "kind": "atome",
+   "objet": "Slap tranchant contre grave rond",
+   "consigne": "Alterne grave rond sur le 1 et slap tranchant sur 2 & 4 : deux couleurs bien distinctes.",
+   "critere": "quand on entend clairement deux sons opposes, grave et claquant.",
+   "preset": {
+    "pattern": "theOne",
+    "prog": "vamp1",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-CJ-B1-03": {
+   "kind": "atome",
+   "objet": "Backbeat regulier sous la basse",
+   "consigne": "Garde tes slaps 2 & 4 exactement cales pendant que la basse bouge.",
+   "critere": "quand le backbeat ne bronche pas, quoi que fasse la basse.",
+   "preset": {
+    "pattern": "theOne",
+    "prog": "vamp1",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-CJ-B1-04": {
+   "kind": "atome",
+   "objet": "Backbeat quand la basse coupe",
+   "consigne": "Meme quand la basse coupe deux temps, tes slaps 2 & 4 restent a l'heure.",
+   "critere": "quand tes 2 & 4 retombent justes au retour de la basse.",
+   "preset": {
+    "pattern": "theOne",
+    "prog": "vamp1",
+    "drop": {
+     "on": true,
+     "everyN": 4,
+     "lenBeats": 2
+    }
+   }
+  },
+  "EX-CJ-B1-05": {
+   "kind": "synthese",
+   "objet": "Groove backbeat",
+   "consigne": "Enchaine grave sur 1 + slaps sur 2 & 4, sur les deux mesures de la progression.",
+   "critere": "quand le backbeat porte le groove sans effort.",
+   "preset": {
+    "pattern": "theOne",
+    "prog": "vamp2",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-DJ-B1-01": {
+   "kind": "atome",
+   "objet": "Le tone/slap seul sur 2 et 4 (fouette)",
+   "consigne": "Place un slap fouette (ou un tone claquant) sur le 2 et le 4, rien d'autre.",
+   "critere": "quand tes deux accents claquent nets, toujours a la meme place.",
+   "preset": {
+    "pattern": "theOne",
+    "prog": "vamp1",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-DJ-B1-02": {
+   "kind": "atome",
+   "objet": "Slap tranchant contre bass ronde",
+   "consigne": "Alterne bass ronde sur le 1 et slap fouette sur 2 & 4 : deux couleurs opposees.",
+   "critere": "quand on distingue clairement la bass et le slap.",
+   "preset": {
+    "pattern": "theOne",
+    "prog": "vamp1",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-DJ-B1-03": {
+   "kind": "atome",
+   "objet": "Backbeat regulier sous la basse",
+   "consigne": "Garde tes slaps 2 & 4 exactement cales pendant que la basse bouge.",
+   "critere": "quand le backbeat ne bronche pas, quoi que fasse la basse.",
+   "preset": {
+    "pattern": "theOne",
+    "prog": "vamp1",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-DJ-B1-04": {
+   "kind": "atome",
+   "objet": "Backbeat quand la basse coupe",
+   "consigne": "Meme quand la basse coupe deux temps, tes slaps 2 & 4 restent a l'heure.",
+   "critere": "quand tes 2 & 4 retombent justes au retour de la basse.",
+   "preset": {
+    "pattern": "theOne",
+    "prog": "vamp1",
+    "drop": {
+     "on": true,
+     "everyN": 4,
+     "lenBeats": 2
+    }
+   }
+  },
+  "EX-DJ-B1-05": {
+   "kind": "synthese",
+   "objet": "Groove backbeat",
+   "consigne": "Enchaine bass sur 1 + slaps fouettes sur 2 & 4, sur les deux mesures.",
+   "critere": "quand le backbeat porte le groove sans effort.",
+   "preset": {
+    "pattern": "theOne",
+    "prog": "vamp2",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-CJ-B2-01": {
+   "kind": "atome",
+   "objet": "Garder le 2, retirer le 4",
+   "consigne": "Garde le slap sur le 2, mais supprime celui du 4 - laisse le trou.",
+   "critere": "quand l'absence du 4 cree une tension au lieu d'un manque.",
+   "preset": {
+    "pattern": "syncopeGrave",
+    "prog": "vamp1",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-CJ-B2-02": {
+   "kind": "atome",
+   "objet": "Migrer le 4 sur le et",
+   "consigne": "Redonne le deuxieme slap, mais decale juste apres le 4 (sur le et).",
+   "critere": "quand le slap deplace tire le groove en avant sans le desequilibrer.",
+   "preset": {
+    "pattern": "syncopeGrave",
+    "prog": "vamp1",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-CJ-B2-03": {
+   "kind": "atome",
+   "objet": "Le deplacement contre la basse",
+   "consigne": "Cale ton slap deplace dans un silence de la basse, jamais sur sa note.",
+   "critere": "quand le slap deplace tombe dans le vide de la basse.",
+   "preset": {
+    "pattern": "syncopeGrave",
+    "prog": "vamp1",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-CJ-B2-04": {
+   "kind": "atome",
+   "objet": "Alterner backbeat droit / deplace",
+   "consigne": "Une mesure backbeat droit (2 & 4), une mesure backbeat deplace : alterne sans trou.",
+   "critere": "quand le passage droit-deplace est fluide, sans accroc de time.",
+   "preset": {
+    "pattern": "syncopeGrave",
+    "prog": "vamp2",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-CJ-B2-05": {
+   "kind": "synthese",
+   "objet": "Groove a backbeat deplace",
+   "consigne": "Installe le groove avec le backbeat deplace stabilise sur les deux cellules.",
+   "critere": "quand le deplacement devient le caractere du groove, pas une erreur.",
+   "preset": {
+    "pattern": "syncopeGrave",
+    "prog": "vamp2",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-DJ-B2-01": {
+   "kind": "atome",
+   "objet": "Garder le 2, retirer le 4",
+   "consigne": "Garde le slap fouette sur le 2, mais supprime celui du 4 - laisse le trou.",
+   "critere": "quand l'absence du 4 cree une tension au lieu d'un manque.",
+   "preset": {
+    "pattern": "syncopeGrave",
+    "prog": "vamp1",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-DJ-B2-02": {
+   "kind": "atome",
+   "objet": "Migrer le 4 sur le et",
+   "consigne": "Redonne le deuxieme slap, decale juste apres le 4 (sur le et), poignet fouette.",
+   "critere": "quand le slap deplace tire le groove en avant sans le desequilibrer.",
+   "preset": {
+    "pattern": "syncopeGrave",
+    "prog": "vamp1",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-DJ-B2-03": {
+   "kind": "atome",
+   "objet": "Le deplacement contre la basse",
+   "consigne": "Cale ton slap deplace dans un silence de la basse, jamais sur sa note.",
+   "critere": "quand le slap deplace tombe dans le vide de la basse.",
+   "preset": {
+    "pattern": "syncopeGrave",
+    "prog": "vamp1",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-DJ-B2-04": {
+   "kind": "atome",
+   "objet": "Alterner backbeat droit / deplace",
+   "consigne": "Une mesure backbeat droit (2 & 4), une mesure deplace : alterne sans trou.",
+   "critere": "quand le passage droit-deplace est fluide, sans accroc de time.",
+   "preset": {
+    "pattern": "syncopeGrave",
+    "prog": "vamp2",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-DJ-B2-05": {
+   "kind": "synthese",
+   "objet": "Groove a backbeat deplace",
+   "consigne": "Installe le groove avec le backbeat deplace stabilise sur les deux cellules.",
+   "critere": "quand le deplacement devient le caractere du groove, pas une erreur.",
+   "preset": {
+    "pattern": "syncopeGrave",
+    "prog": "vamp2",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-SOCLE-D1-01": {
+   "kind": "atome",
+   "objet": "Le ghost sur le e",
+   "consigne": "Glisse un ghost tres faible sur le e de chaque temps (juste apres le temps).",
+   "critere": "quand les ghosts du e sont reguliers et presque inaudibles.",
+   "preset": {
+    "pattern": "ghostPendule",
+    "prog": "vamp1",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-SOCLE-D1-02": {
+   "kind": "atome",
+   "objet": "Le ghost du a avant le 2",
+   "consigne": "Ajoute un ghost sur le a juste avant le 2, comme un elan vers le backbeat.",
+   "critere": "quand le a pousse naturellement vers le 2 sans le couvrir.",
+   "preset": {
+    "pattern": "ghostPendule",
+    "prog": "vamp1",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-SOCLE-D1-03": {
+   "kind": "atome",
+   "objet": "Le pendule : va-et-vient regulier",
+   "consigne": "Fais osciller tes ghosts en un balancement regulier, comme un pendule sous la basse.",
+   "critere": "quand le tapis de ghosts respire a intervalle egal.",
+   "preset": {
+    "pattern": "ghostPendule",
+    "prog": "vamp1",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-SOCLE-D1-04": {
+   "kind": "atome",
+   "objet": "Ghost + accent : contraste dynamique",
+   "consigne": "Garde les ghosts tres faibles et fais ressortir un seul accent : le contraste fait la poche.",
+   "critere": "quand l'ecart entre ghost et accent est net et constant.",
+   "preset": {
+    "pattern": "ghostPendule",
+    "prog": "vamp1",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-SOCLE-D1-05": {
+   "kind": "synthese",
+   "objet": "Nappe de ghosts complete",
+   "consigne": "Tisse le pendule complet (e + a) sur les deux mesures, sous la basse.",
+   "critere": "quand la nappe de ghosts tient toute seule et donne le groove.",
+   "preset": {
+    "pattern": "ghostPendule",
+    "prog": "vamp2",
+    "drop": {
+     "on": false
+    }
+   }
+  },
+  "EX-CJ-POS-01": {
+   "kind": "atome",
+   "objet": "S'installer, caler le cajón",
+   "consigne": "Assieds-toi en équilibre, cale le cajón entre tes jambes, épaules relâchées et mains libres.",
+   "critere": "quand tu tiens l'instrument sans le serrer et que tes deux mains tombent naturellement sur la tapa.",
+   "preset": {
+    "metro": true,
+    "tempo": 72
+   }
+  },
+  "EX-CJ-POS-02": {
+   "kind": "atome",
+   "objet": "Le relâchement fait le rebond",
+   "consigne": "Laisse ta main retomber sur la tapa et rebondir toute seule, bras lourd et poignet souple — ne la retiens pas.",
+   "critere": "quand la main rebondit d'elle-même au lieu de rester collée à la tapa.",
+   "preset": {
+    "metro": true,
+    "tempo": 72
+   }
+  },
+  "EX-CJ-POS-03": {
+   "kind": "atome",
+   "objet": "Tension = son mort",
+   "consigne": "Compare une frappe crispée (son court et mat) et une frappe relâchée (son qui sonne) — garde la relâchée.",
+   "critere": "quand tu sens que serrer étouffe le son et que relâcher le libère.",
+   "preset": {
+    "metro": true,
+    "tempo": 72
+   }
+  },
+  "EX-CJ-POS-04": {
+   "kind": "atome",
+   "objet": "Frapper au même endroit, sans forcer",
+   "consigne": "Pose dix frappes détendues au même point de la tapa, une par temps, sans chercher à taper fort.",
+   "critere": "quand les dix frappes tombent au même endroit, sans effort ni fatigue.",
+   "preset": {
+    "metro": true,
+    "tempo": 72
+   }
+  },
+  "EX-CJ-POS-05": {
+   "kind": "synthese",
+   "objet": "Assise + rebond, une main puis l'autre",
+   "consigne": "Alterne main gauche et main droite en frappes relâchées et rebondissantes sur le clic, épaules basses, une minute.",
+   "critere": "quand tu tiens une minute détendu, chaque frappe rebondit et rien ne se crispe.",
+   "preset": {
+    "metro": true,
+    "tempo": 72
+   }
+  },
+  "EX-DJ-POS-01": {
+   "kind": "atome",
+   "objet": "S'installer, incliner le djembé",
+   "consigne": "Cale le djembé incliné entre tes jambes pour que l'air passe dessous, dos droit, épaules relâchées, mains libres.",
+   "critere": "quand le fût est stable et incliné, et que tes mains tombent naturellement sur la peau.",
+   "preset": {
+    "metro": true,
+    "tempo": 72
+   }
+  },
+  "EX-DJ-POS-02": {
+   "kind": "atome",
+   "objet": "Le rebond « open »",
+   "consigne": "Frappe le bord de la peau et laisse la main rebondir aussitôt (open) — la peau sonne parce que la main repart.",
+   "critere": "quand la main repart toute seule après la frappe et laisse la peau résonner.",
+   "preset": {
+    "metro": true,
+    "tempo": 72
+   }
+  },
+  "EX-DJ-POS-03": {
+   "kind": "atome",
+   "objet": "Tension = son mort",
+   "consigne": "Compare une frappe crispée (mate et courte) et une frappe relâchée qui rebondit (ouverte) — garde la relâchée.",
+   "critere": "quand tu sens que la main qui reste sur la peau tue le son.",
+   "preset": {
+    "metro": true,
+    "tempo": 72
+   }
+  },
+  "EX-DJ-POS-04": {
+   "kind": "atome",
+   "objet": "Frapper au même endroit, sans forcer",
+   "consigne": "Pose dix frappes détendues au bord de la peau, une par temps, sans forcer.",
+   "critere": "quand les dix frappes sonnent pareil, au même endroit, sans fatigue.",
+   "preset": {
+    "metro": true,
+    "tempo": 72
+   }
+  },
+  "EX-DJ-POS-05": {
+   "kind": "synthese",
+   "objet": "Assise + rebond open, une main puis l'autre",
+   "consigne": "Alterne les mains en frappes open rebondissantes sur le clic, une minute, épaules basses.",
+   "critere": "quand tu tiens une minute détendu, chaque main rebondit et la peau sonne à chaque coup.",
+   "preset": {
+    "metro": true,
+    "tempo": 72
+   }
+  },
+  "EX-CJ-SON-01": {
+   "kind": "atome",
+   "objet": "Le grave (centre bas)",
+   "consigne": "Frappe le centre bas de la tapa, main pleine et relâchée : c'est le grave, rond et profond.",
+   "critere": "quand ton grave sort rond et profond, toujours au même endroit.",
+   "preset": {
+    "metro": true,
+    "tempo": 76
+   }
+  },
+  "EX-CJ-SON-02": {
+   "kind": "atome",
+   "objet": "Le tone (haut de tapa)",
+   "consigne": "Frappe plus haut sur la tapa, doigts joints : c'est le tone, plus clair et plus court que le grave.",
+   "critere": "quand ton tone sonne clair et bien distinct du grave.",
+   "preset": {
+    "metro": true,
+    "tempo": 76
+   }
+  },
+  "EX-CJ-SON-03": {
+   "kind": "atome",
+   "objet": "Le slap (catapulte)",
+   "consigne": "Fais claquer les doigts en catapulte sur le haut de la tapa : c'est le slap, sec et tranchant.",
+   "critere": "quand ton slap claque net, franchement différent du tone.",
+   "preset": {
+    "metro": true,
+    "tempo": 76
+   }
+  },
+  "EX-CJ-SON-04": {
+   "kind": "atome",
+   "objet": "Nommer les trois sons (vocalisation)",
+   "consigne": "Dis un mot de quatre syllabes, une par temps (« TA-KA-DI-MI »), et pose un son sur chaque syllabe.",
+   "critere": "quand chaque syllabe et chaque son tombent ensemble sur le temps.",
+   "preset": {
+    "metro": true,
+    "tempo": 76
+   }
+  },
+  "EX-CJ-SON-05": {
+   "kind": "synthese",
+   "objet": "Les trois sons à la suite, propres",
+   "consigne": "Enchaîne grave, tone, slap sur les trois premiers temps puis silence sur le 4, en boucle sur le clic.",
+   "critere": "quand les trois sons restent nets et distincts, toujours à leur place, tour après tour.",
+   "preset": {
+    "metro": true,
+    "tempo": 76
+   }
+  },
+  "EX-DJ-SON-01": {
+   "kind": "atome",
+   "objet": "La bass (centre)",
+   "consigne": "Frappe le centre de la peau, main pleine et relâchée : c'est la bass, grave et ronde.",
+   "critere": "quand ta bass sort grave et pleine, au centre de la peau.",
+   "preset": {
+    "metro": true,
+    "tempo": 76
+   }
+  },
+  "EX-DJ-SON-02": {
+   "kind": "atome",
+   "objet": "Le tone (bord)",
+   "consigne": "Frappe le bord, doigts joints et à plat : c'est le tone, clair et chantant.",
+   "critere": "quand ton tone sonne clair, bien distinct de la bass.",
+   "preset": {
+    "metro": true,
+    "tempo": 76
+   }
+  },
+  "EX-DJ-SON-03": {
+   "kind": "atome",
+   "objet": "Le slap (fouetté)",
+   "consigne": "Fouette le bord, doigts relâchés qui claquent : c'est le slap, sec et perçant.",
+   "critere": "quand ton slap claque net, franchement différent du tone.",
+   "preset": {
+    "metro": true,
+    "tempo": 76
+   }
+  },
+  "EX-DJ-SON-04": {
+   "kind": "atome",
+   "objet": "Nommer les trois sons (vocalisation)",
+   "consigne": "Dis un mot de quatre syllabes, une par temps (« TA-KA-DI-MI »), et pose un son sur chaque syllabe.",
+   "critere": "quand chaque syllabe et chaque son tombent ensemble sur le temps.",
+   "preset": {
+    "metro": true,
+    "tempo": 76
+   }
+  },
+  "EX-DJ-SON-05": {
+   "kind": "synthese",
+   "objet": "Les trois sons à la suite",
+   "consigne": "Enchaîne bass, tone, slap sur les trois premiers temps puis silence sur le 4, en boucle sur le clic.",
+   "critere": "quand les trois sons restent nets et distincts, tour après tour.",
+   "preset": {
+    "metro": true,
+    "tempo": 76
+   }
+  },
+  "EX-SOCLE-D-PLS-01": {
+   "kind": "atome",
+   "objet": "Compter les 4 temps (vocalisation)",
+   "consigne": "Frappe un coup par temps en comptant à voix haute « 1-2-3-4 », en boucle, calé sur le clic.",
+   "critere": "quand tu comptes et frappes ensemble, sans te presser ni traîner.",
+   "preset": {
+    "metro": true,
+    "tempo": 80
+   }
+  },
+  "EX-SOCLE-D-PLS-02": {
+   "kind": "atome",
+   "objet": "Retomber sur le 1",
+   "consigne": "Accentue le 1 de chaque mesure, un peu plus fort, les trois autres temps égaux.",
+   "critere": "quand le 1 revient tout seul, mesure après mesure.",
+   "preset": {
+    "metro": true,
+    "tempo": 80
+   }
+  },
+  "EX-SOCLE-D-PLS-03": {
+   "kind": "atome",
+   "objet": "Tenir sans se presser",
+   "consigne": "Ne joue que le 1 et le 3, en gardant l'intervalle exactement égal — le silence compte autant que la frappe.",
+   "critere": "quand les frappes espacées restent parfaitement régulières.",
+   "preset": {
+    "metro": true,
+    "tempo": 80
+   }
+  },
+  "EX-SOCLE-D-PLS-04": {
+   "kind": "atome",
+   "objet": "La coupure (machine gap)",
+   "consigne": "Le clic se tait une mesure entière : garde ta pulsation intérieure et retombe pile sur le 1 quand il revient.",
+   "critere": "quand le clic revient et que tu es toujours exactement en place.",
+   "preset": {
+    "metro": true,
+    "tempo": 80,
+    "gap": {
+     "playN": 4,
+     "muteM": 1
+    }
+   }
+  },
+  "EX-SOCLE-D-PLS-05": {
+   "kind": "synthese",
+   "objet": "Compter, tenir, retomber",
+   "consigne": "Sur des cycles où le clic coupe une mesure sur quatre, compte les temps, tiens le time et retombe juste à chaque 1.",
+   "critere": "quand tu traverses la coupure sans perdre le compte ni le 1.",
+   "preset": {
+    "metro": true,
+    "tempo": 80,
+    "gap": {
+     "playN": 3,
+     "muteM": 1
+    }
+   }
+  },
+  "EX-SOCLE-D-SUB-01": {
+   "kind": "atome",
+   "objet": "Deux frappes par temps (croches)",
+   "consigne": "Pose deux frappes égales par temps (« 1-et, 2-et… »), légères et régulières, sur les croches du clic.",
+   "critere": "quand les deux frappes par temps sont parfaitement égales.",
+   "preset": {
+    "metro": true,
+    "tempo": 80,
+    "subdiv": 2
+   }
+  },
+  "EX-SOCLE-D-SUB-02": {
+   "kind": "atome",
+   "objet": "Quatre frappes par temps (doubles)",
+   "consigne": "Passe à quatre frappes égales par temps (« 1-e-et-a »), toujours très légères.",
+   "critere": "quand les quatre frappes tiennent sans accélérer ni ralentir.",
+   "preset": {
+    "metro": true,
+    "tempo": 80,
+    "subdiv": 4
+   }
+  },
+  "EX-SOCLE-D-SUB-03": {
+   "kind": "atome",
+   "objet": "Alterner 2 et 4",
+   "consigne": "Une mesure en croches (2 par temps), une mesure en doubles (4 par temps), sans trou au changement.",
+   "critere": "quand tu passes de 2 à 4 frappes sans accroc de time.",
+   "preset": {
+    "metro": true,
+    "tempo": 80,
+    "subdiv": 4
+   }
+  },
+  "EX-SOCLE-D-SUB-04": {
+   "kind": "atome",
+   "objet": "Toucher léger, régulier",
+   "consigne": "Garde le tapis de doubles très léger et parfaitement égal, comme un moteur, sans aucun accent.",
+   "critere": "quand le tapis de doubles tourne, égal et sans bosse.",
+   "preset": {
+    "metro": true,
+    "tempo": 80,
+    "subdiv": 4
+   }
+  },
+  "EX-SOCLE-D-SUB-05": {
+   "kind": "synthese",
+   "objet": "La grille de 16es, amorce",
+   "consigne": "Tiens quatre frappes légères par temps sur deux mesures, régulières et détendues — c'est la future grille du funk.",
+   "critere": "quand la grille de doubles tient toute seule, légère et régulière.",
+   "preset": {
+    "metro": true,
+    "tempo": 80,
+    "subdiv": 4
+   }
+  },
+  "EX-CJ-DYN-01": {
+   "kind": "atome",
+   "objet": "Fort puis doux (contrôle dynamique)",
+   "consigne": "Joue le même tone quatre fois fort, quatre fois doux, sans changer de geste — seule l'intensité change.",
+   "critere": "quand l'écart fort/doux est net et que le son reste le même.",
+   "preset": {
+    "metro": true,
+    "tempo": 84
+   }
+  },
+  "EX-CJ-DYN-02": {
+   "kind": "atome",
+   "objet": "Le ghost (presque rien)",
+   "consigne": "Baisse encore : des touches à peine audibles (ghost) entre les temps, sous une frappe forte marquée.",
+   "critere": "quand tes ghosts sont réguliers et presque inaudibles.",
+   "preset": {
+    "metro": true,
+    "tempo": 84
+   }
+  },
+  "EX-CJ-DYN-03": {
+   "kind": "atome",
+   "objet": "Étouffer le son (mute)",
+   "consigne": "Frappe puis pose la main pour couper la résonance (mute) — un son court et sec, sur demande.",
+   "critere": "quand tu coupes le son exactement quand tu le décides.",
+   "preset": {
+    "metro": true,
+    "tempo": 84
+   }
+  },
+  "EX-CJ-DYN-04": {
+   "kind": "atome",
+   "objet": "Le press tone",
+   "consigne": "Frappe en laissant la main appuyée : un tone étouffé, plus mat (press tone) — alterne avec le tone ouvert.",
+   "critere": "quand tu obtiens deux couleurs, ouvert et étouffé, à volonté.",
+   "preset": {
+    "metro": true,
+    "tempo": 84
+   }
+  },
+  "EX-CJ-DYN-05": {
+   "kind": "synthese",
+   "objet": "Nappe fort/doux",
+   "consigne": "Sur deux mesures, place des accents forts sur un fond de ghosts, avec un son coupé de temps en temps.",
+   "critere": "quand le contraste fort/doux/coupé donne du relief sans casser le time.",
+   "preset": {
+    "metro": true,
+    "tempo": 84
+   }
+  },
+  "EX-DJ-DYN-01": {
+   "kind": "atome",
+   "objet": "Fort puis doux (contrôle dynamique)",
+   "consigne": "Joue le même tone quatre fois fort, quatre fois doux, sans changer de geste — seule l'intensité change.",
+   "critere": "quand l'écart fort/doux est net et que le son reste le même.",
+   "preset": {
+    "metro": true,
+    "tempo": 84
+   }
+  },
+  "EX-DJ-DYN-02": {
+   "kind": "atome",
+   "objet": "Le ghost/touch",
+   "consigne": "Baisse encore : des touches à peine audibles (ghost) entre les temps, sous une frappe forte marquée.",
+   "critere": "quand tes ghosts sont réguliers et presque inaudibles.",
+   "preset": {
+    "metro": true,
+    "tempo": 84
+   }
+  },
+  "EX-DJ-DYN-03": {
+   "kind": "atome",
+   "objet": "Le muffled slap",
+   "consigne": "Fais un slap étouffé, mat et court, en gardant les doigts un instant sur la peau — alterne avec le slap ouvert.",
+   "critere": "quand tu obtiens deux slaps, ouvert et étouffé, à volonté.",
+   "preset": {
+    "metro": true,
+    "tempo": 84
+   }
+  },
+  "EX-DJ-DYN-04": {
+   "kind": "atome",
+   "objet": "Doser bass, tone, slap",
+   "consigne": "Enchaîne bass douce, tone moyen, slap fort — trois sons, trois intensités croissantes.",
+   "critere": "quand chaque son garde sa couleur et son niveau d'intensité.",
+   "preset": {
+    "metro": true,
+    "tempo": 84
+   }
+  },
+  "EX-DJ-DYN-05": {
+   "kind": "synthese",
+   "objet": "Nappe fort/doux",
+   "consigne": "Sur deux mesures, place des accents forts sur un fond de ghosts, avec un slap étouffé de temps en temps.",
+   "critere": "quand le contraste fort/doux/étouffé donne du relief sans casser le time.",
+   "preset": {
+    "metro": true,
+    "tempo": 84
+   }
+  }
+ },
+ "PF_MOD": {
+  "MOD-CJ-I-I2": {
+   "parcours": "cajon",
+   "niveau": "intermediaire",
+   "objet": "Verrouiller sur la basse funk",
+   "exercices": [
+    "EX-SOCLE-I2-01",
+    "EX-CJ-I2-02",
+    "EX-SOCLE-I2-03",
+    "EX-SOCLE-I2-04",
+    "EX-CJ-I2-05"
+   ]
+  },
+  "MOD-DJ-I-I2": {
+   "parcours": "djembe",
+   "niveau": "intermediaire",
+   "objet": "Verrouiller sur la basse funk",
+   "exercices": [
+    "EX-SOCLE-I2-01",
+    "EX-DJ-I2-02",
+    "EX-SOCLE-I2-03",
+    "EX-SOCLE-I2-04",
+    "EX-DJ-I2-05"
+   ]
+  },
+  "MOD-CJ-I-T1": {
+   "parcours": "cajon",
+   "niveau": "intermediaire",
+   "objet": "The One",
+   "exercices": [
+    "EX-SOCLE-T1-01",
+    "EX-SOCLE-T1-02",
+    "EX-SOCLE-T1-03",
+    "EX-SOCLE-T1-04",
+    "EX-SOCLE-T1-05"
+   ]
+  },
+  "MOD-DJ-I-T1": {
+   "parcours": "djembe",
+   "niveau": "intermediaire",
+   "objet": "The One",
+   "exercices": [
+    "EX-SOCLE-T1-01",
+    "EX-SOCLE-T1-02",
+    "EX-SOCLE-T1-03",
+    "EX-SOCLE-T1-04",
+    "EX-SOCLE-T1-05"
+   ]
+  },
+  "MOD-CJ-I-T2": {
+   "parcours": "cajon",
+   "niveau": "intermediaire",
+   "objet": "Grille de 16es",
+   "exercices": [
+    "EX-SOCLE-T2-01",
+    "EX-SOCLE-T2-02",
+    "EX-SOCLE-T2-03",
+    "EX-SOCLE-T2-04",
+    "EX-SOCLE-T2-05"
+   ]
+  },
+  "MOD-DJ-I-T2": {
+   "parcours": "djembe",
+   "niveau": "intermediaire",
+   "objet": "Grille de 16es",
+   "exercices": [
+    "EX-SOCLE-T2-01",
+    "EX-SOCLE-T2-02",
+    "EX-SOCLE-T2-03",
+    "EX-SOCLE-T2-04",
+    "EX-SOCLE-T2-05"
+   ]
+  },
+  "MOD-CJ-I-B1": {
+   "parcours": "cajon",
+   "niveau": "intermediaire",
+   "objet": "Backbeat 2 & 4",
+   "exercices": [
+    "EX-CJ-B1-01",
+    "EX-CJ-B1-02",
+    "EX-CJ-B1-03",
+    "EX-CJ-B1-04",
+    "EX-CJ-B1-05"
+   ]
+  },
+  "MOD-DJ-I-B1": {
+   "parcours": "djembe",
+   "niveau": "intermediaire",
+   "objet": "Backbeat 2 & 4",
+   "exercices": [
+    "EX-DJ-B1-01",
+    "EX-DJ-B1-02",
+    "EX-DJ-B1-03",
+    "EX-DJ-B1-04",
+    "EX-DJ-B1-05"
+   ]
+  },
+  "MOD-CJ-I-B2": {
+   "parcours": "cajon",
+   "niveau": "intermediaire",
+   "objet": "Backbeat deplace",
+   "exercices": [
+    "EX-CJ-B2-01",
+    "EX-CJ-B2-02",
+    "EX-CJ-B2-03",
+    "EX-CJ-B2-04",
+    "EX-CJ-B2-05"
+   ]
+  },
+  "MOD-DJ-I-B2": {
+   "parcours": "djembe",
+   "niveau": "intermediaire",
+   "objet": "Backbeat deplace",
+   "exercices": [
+    "EX-DJ-B2-01",
+    "EX-DJ-B2-02",
+    "EX-DJ-B2-03",
+    "EX-DJ-B2-04",
+    "EX-DJ-B2-05"
+   ]
+  },
+  "MOD-CJ-I-D1": {
+   "parcours": "cajon",
+   "niveau": "intermediaire",
+   "objet": "Ghost pendule",
+   "exercices": [
+    "EX-SOCLE-D1-01",
+    "EX-SOCLE-D1-02",
+    "EX-SOCLE-D1-03",
+    "EX-SOCLE-D1-04",
+    "EX-SOCLE-D1-05"
+   ]
+  },
+  "MOD-DJ-I-D1": {
+   "parcours": "djembe",
+   "niveau": "intermediaire",
+   "objet": "Ghost pendule",
+   "exercices": [
+    "EX-SOCLE-D1-01",
+    "EX-SOCLE-D1-02",
+    "EX-SOCLE-D1-03",
+    "EX-SOCLE-D1-04",
+    "EX-SOCLE-D1-05"
+   ]
+  },
+  "MOD-CJ-D-POS": {
+   "parcours": "cajon",
+   "niveau": "debutant",
+   "objet": "Posture, ancrage, rebond",
+   "exercices": [
+    "EX-CJ-POS-01",
+    "EX-CJ-POS-02",
+    "EX-CJ-POS-03",
+    "EX-CJ-POS-04",
+    "EX-CJ-POS-05"
+   ]
+  },
+  "MOD-DJ-D-POS": {
+   "parcours": "djembe",
+   "niveau": "debutant",
+   "objet": "Posture, ancrage, rebond",
+   "exercices": [
+    "EX-DJ-POS-01",
+    "EX-DJ-POS-02",
+    "EX-DJ-POS-03",
+    "EX-DJ-POS-04",
+    "EX-DJ-POS-05"
+   ]
+  },
+  "MOD-CJ-D-SON": {
+   "parcours": "cajon",
+   "niveau": "debutant",
+   "objet": "La palette de sons",
+   "exercices": [
+    "EX-CJ-SON-01",
+    "EX-CJ-SON-02",
+    "EX-CJ-SON-03",
+    "EX-CJ-SON-04",
+    "EX-CJ-SON-05"
+   ]
+  },
+  "MOD-DJ-D-SON": {
+   "parcours": "djembe",
+   "niveau": "debutant",
+   "objet": "La palette de sons",
+   "exercices": [
+    "EX-DJ-SON-01",
+    "EX-DJ-SON-02",
+    "EX-DJ-SON-03",
+    "EX-DJ-SON-04",
+    "EX-DJ-SON-05"
+   ]
+  },
+  "MOD-CJ-D-PLS": {
+   "parcours": "cajon",
+   "niveau": "debutant",
+   "objet": "La pulse & le comptage",
+   "exercices": [
+    "EX-SOCLE-D-PLS-01",
+    "EX-SOCLE-D-PLS-02",
+    "EX-SOCLE-D-PLS-03",
+    "EX-SOCLE-D-PLS-04",
+    "EX-SOCLE-D-PLS-05"
+   ]
+  },
+  "MOD-DJ-D-PLS": {
+   "parcours": "djembe",
+   "niveau": "debutant",
+   "objet": "La pulse & le comptage",
+   "exercices": [
+    "EX-SOCLE-D-PLS-01",
+    "EX-SOCLE-D-PLS-02",
+    "EX-SOCLE-D-PLS-03",
+    "EX-SOCLE-D-PLS-04",
+    "EX-SOCLE-D-PLS-05"
+   ]
+  },
+  "MOD-CJ-D-SUB": {
+   "parcours": "cajon",
+   "niveau": "debutant",
+   "objet": "Les subdivisions",
+   "exercices": [
+    "EX-SOCLE-D-SUB-01",
+    "EX-SOCLE-D-SUB-02",
+    "EX-SOCLE-D-SUB-03",
+    "EX-SOCLE-D-SUB-04",
+    "EX-SOCLE-D-SUB-05"
+   ]
+  },
+  "MOD-DJ-D-SUB": {
+   "parcours": "djembe",
+   "niveau": "debutant",
+   "objet": "Les subdivisions",
+   "exercices": [
+    "EX-SOCLE-D-SUB-01",
+    "EX-SOCLE-D-SUB-02",
+    "EX-SOCLE-D-SUB-03",
+    "EX-SOCLE-D-SUB-04",
+    "EX-SOCLE-D-SUB-05"
+   ]
+  },
+  "MOD-CJ-D-DYN": {
+   "parcours": "cajon",
+   "niveau": "debutant",
+   "objet": "Fort & doux",
+   "exercices": [
+    "EX-CJ-DYN-01",
+    "EX-CJ-DYN-02",
+    "EX-CJ-DYN-03",
+    "EX-CJ-DYN-04",
+    "EX-CJ-DYN-05"
+   ]
+  },
+  "MOD-DJ-D-DYN": {
+   "parcours": "djembe",
+   "niveau": "debutant",
+   "objet": "Fort & doux",
+   "exercices": [
+    "EX-DJ-DYN-01",
+    "EX-DJ-DYN-02",
+    "EX-DJ-DYN-03",
+    "EX-DJ-DYN-04",
+    "EX-DJ-DYN-05"
+   ]
+  }
+ }
+}
