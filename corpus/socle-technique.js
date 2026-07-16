@@ -1,0 +1,280 @@
+/* ============================================================================
+   Corpus « socle-technique » — le primer technique neutre (pré-funk), niveau
+   Débutant (P-6, décision P-5) : posture, palette de sons, pulse, subdivisions,
+   dynamiques. Style-neutre par construction : socle commun de tous les styles.
+   Schéma de corpus : spec R-1 §4.1 / spec R-2. Extrait à l'identique du build
+   0.8.0 (chaînes strictement inchangées — l'i18n par chaîne reste valide).
+   ============================================================================ */
+(function () {
+  'use strict';
+  window.FM_CORPUS = window.FM_CORPUS || {};
+  window.FM_CORPUS['socle-technique'] = {
+  meta: { id: 'socle-technique', label: 'Socle technique', version: '1.0', socle: true,
+    description: "Primer technique neutre (pré-funk) : posture, sons, pulse, subdivisions, dynamiques. Clic seul, jamais de basse." },
+  niveaux: { debutant: ["POS", "SON", "PLS", "SUB", "DYN"] },
+  modules: {
+    'MOD-CJ-D-POS': { parcours: 'cajon', niveau: 'debutant', objet: "Posture, ancrage, rebond",
+      exercices: ["EX-CJ-POS-01", "EX-CJ-POS-02", "EX-CJ-POS-03", "EX-CJ-POS-04", "EX-CJ-POS-05"] },
+    'MOD-DJ-D-POS': { parcours: 'djembe', niveau: 'debutant', objet: "Posture, ancrage, rebond",
+      exercices: ["EX-DJ-POS-01", "EX-DJ-POS-02", "EX-DJ-POS-03", "EX-DJ-POS-04", "EX-DJ-POS-05"] },
+    'MOD-CJ-D-SON': { parcours: 'cajon', niveau: 'debutant', objet: "La palette de sons",
+      exercices: ["EX-CJ-SON-01", "EX-CJ-SON-02", "EX-CJ-SON-03", "EX-CJ-SON-04", "EX-CJ-SON-05"] },
+    'MOD-DJ-D-SON': { parcours: 'djembe', niveau: 'debutant', objet: "La palette de sons",
+      exercices: ["EX-DJ-SON-01", "EX-DJ-SON-02", "EX-DJ-SON-03", "EX-DJ-SON-04", "EX-DJ-SON-05"] },
+    'MOD-CJ-D-PLS': { parcours: 'cajon', niveau: 'debutant', objet: "La pulse & le comptage",
+      exercices: ["EX-SOCLE-D-PLS-01", "EX-SOCLE-D-PLS-02", "EX-SOCLE-D-PLS-03", "EX-SOCLE-D-PLS-04", "EX-SOCLE-D-PLS-05"] },
+    'MOD-DJ-D-PLS': { parcours: 'djembe', niveau: 'debutant', objet: "La pulse & le comptage",
+      exercices: ["EX-SOCLE-D-PLS-01", "EX-SOCLE-D-PLS-02", "EX-SOCLE-D-PLS-03", "EX-SOCLE-D-PLS-04", "EX-SOCLE-D-PLS-05"] },
+    'MOD-CJ-D-SUB': { parcours: 'cajon', niveau: 'debutant', objet: "Les subdivisions",
+      exercices: ["EX-SOCLE-D-SUB-01", "EX-SOCLE-D-SUB-02", "EX-SOCLE-D-SUB-03", "EX-SOCLE-D-SUB-04", "EX-SOCLE-D-SUB-05"] },
+    'MOD-DJ-D-SUB': { parcours: 'djembe', niveau: 'debutant', objet: "Les subdivisions",
+      exercices: ["EX-SOCLE-D-SUB-01", "EX-SOCLE-D-SUB-02", "EX-SOCLE-D-SUB-03", "EX-SOCLE-D-SUB-04", "EX-SOCLE-D-SUB-05"] },
+    'MOD-CJ-D-DYN': { parcours: 'cajon', niveau: 'debutant', objet: "Fort & doux",
+      exercices: ["EX-CJ-DYN-01", "EX-CJ-DYN-02", "EX-CJ-DYN-03", "EX-CJ-DYN-04", "EX-CJ-DYN-05"] },
+    'MOD-DJ-D-DYN': { parcours: 'djembe', niveau: 'debutant', objet: "Fort & doux",
+      exercices: ["EX-DJ-DYN-01", "EX-DJ-DYN-02", "EX-DJ-DYN-03", "EX-DJ-DYN-04", "EX-DJ-DYN-05"] }
+  },
+  exercices: {
+    'EX-CJ-POS-01': {
+      kind: "atome",
+      objet: "S'installer, caler le cajón",
+      consigne: "Assieds-toi en équilibre, cale le cajón entre tes jambes, épaules relâchées et mains libres.",
+      critere: "quand tu tiens l'instrument sans le serrer et que tes deux mains tombent naturellement sur la tapa.",
+      preset: {metro: true, tempo: 72} },
+    'EX-CJ-POS-02': {
+      kind: "atome",
+      objet: "Le relâchement fait le rebond",
+      consigne: "Laisse ta main retomber sur la tapa et rebondir toute seule, bras lourd et poignet souple — ne la retiens pas.",
+      critere: "quand la main rebondit d'elle-même au lieu de rester collée à la tapa.",
+      preset: {metro: true, tempo: 72} },
+    'EX-CJ-POS-03': {
+      kind: "atome",
+      objet: "Tension = son mort",
+      consigne: "Compare une frappe crispée (son court et mat) et une frappe relâchée (son qui sonne) — garde la relâchée.",
+      critere: "quand tu sens que serrer étouffe le son et que relâcher le libère.",
+      preset: {metro: true, tempo: 72} },
+    'EX-CJ-POS-04': {
+      kind: "atome",
+      objet: "Frapper au même endroit, sans forcer",
+      consigne: "Pose dix frappes détendues au même point de la tapa, une par temps, sans chercher à taper fort.",
+      critere: "quand les dix frappes tombent au même endroit, sans effort ni fatigue.",
+      preset: {metro: true, tempo: 72} },
+    'EX-CJ-POS-05': {
+      kind: "synthese",
+      objet: "Assise + rebond, une main puis l'autre",
+      consigne: "Alterne main gauche et main droite en frappes relâchées et rebondissantes sur le clic, épaules basses, une minute.",
+      critere: "quand tu tiens une minute détendu, chaque frappe rebondit et rien ne se crispe.",
+      preset: {metro: true, tempo: 72} },
+    'EX-DJ-POS-01': {
+      kind: "atome",
+      objet: "S'installer, incliner le djembé",
+      consigne: "Cale le djembé incliné entre tes jambes pour que l'air passe dessous, dos droit, épaules relâchées, mains libres.",
+      critere: "quand le fût est stable et incliné, et que tes mains tombent naturellement sur la peau.",
+      preset: {metro: true, tempo: 72} },
+    'EX-DJ-POS-02': {
+      kind: "atome",
+      objet: "Le rebond « open »",
+      consigne: "Frappe le bord de la peau et laisse la main rebondir aussitôt (open) — la peau sonne parce que la main repart.",
+      critere: "quand la main repart toute seule après la frappe et laisse la peau résonner.",
+      preset: {metro: true, tempo: 72} },
+    'EX-DJ-POS-03': {
+      kind: "atome",
+      objet: "Tension = son mort",
+      consigne: "Compare une frappe crispée (mate et courte) et une frappe relâchée qui rebondit (ouverte) — garde la relâchée.",
+      critere: "quand tu sens que la main qui reste sur la peau tue le son.",
+      preset: {metro: true, tempo: 72} },
+    'EX-DJ-POS-04': {
+      kind: "atome",
+      objet: "Frapper au même endroit, sans forcer",
+      consigne: "Pose dix frappes détendues au bord de la peau, une par temps, sans forcer.",
+      critere: "quand les dix frappes sonnent pareil, au même endroit, sans fatigue.",
+      preset: {metro: true, tempo: 72} },
+    'EX-DJ-POS-05': {
+      kind: "synthese",
+      objet: "Assise + rebond open, une main puis l'autre",
+      consigne: "Alterne les mains en frappes open rebondissantes sur le clic, une minute, épaules basses.",
+      critere: "quand tu tiens une minute détendu, chaque main rebondit et la peau sonne à chaque coup.",
+      preset: {metro: true, tempo: 72} },
+    'EX-CJ-SON-01': {
+      kind: "atome",
+      objet: "Le grave (centre bas)",
+      consigne: "Frappe le centre bas de la tapa, main pleine et relâchée : c'est le grave, rond et profond.",
+      critere: "quand ton grave sort rond et profond, toujours au même endroit.",
+      preset: {metro: true, tempo: 76} },
+    'EX-CJ-SON-02': {
+      kind: "atome",
+      objet: "Le tone (haut de tapa)",
+      consigne: "Frappe plus haut sur la tapa, doigts joints : c'est le tone, plus clair et plus court que le grave.",
+      critere: "quand ton tone sonne clair et bien distinct du grave.",
+      preset: {metro: true, tempo: 76} },
+    'EX-CJ-SON-03': {
+      kind: "atome",
+      objet: "Le slap (catapulte)",
+      consigne: "Fais claquer les doigts en catapulte sur le haut de la tapa : c'est le slap, sec et tranchant.",
+      critere: "quand ton slap claque net, franchement différent du tone.",
+      preset: {metro: true, tempo: 76} },
+    'EX-CJ-SON-04': {
+      kind: "atome",
+      objet: "Nommer les trois sons (vocalisation)",
+      consigne: "Dis un mot de quatre syllabes, une par temps (« TA-KA-DI-MI »), et pose un son sur chaque syllabe.",
+      critere: "quand chaque syllabe et chaque son tombent ensemble sur le temps.",
+      preset: {metro: true, tempo: 76} },
+    'EX-CJ-SON-05': {
+      kind: "synthese",
+      objet: "Les trois sons à la suite, propres",
+      consigne: "Enchaîne grave, tone, slap sur les trois premiers temps puis silence sur le 4, en boucle sur le clic.",
+      critere: "quand les trois sons restent nets et distincts, toujours à leur place, tour après tour.",
+      preset: {metro: true, tempo: 76} },
+    'EX-DJ-SON-01': {
+      kind: "atome",
+      objet: "La bass (centre)",
+      consigne: "Frappe le centre de la peau, main pleine et relâchée : c'est la bass, grave et ronde.",
+      critere: "quand ta bass sort grave et pleine, au centre de la peau.",
+      preset: {metro: true, tempo: 76} },
+    'EX-DJ-SON-02': {
+      kind: "atome",
+      objet: "Le tone (bord)",
+      consigne: "Frappe le bord, doigts joints et à plat : c'est le tone, clair et chantant.",
+      critere: "quand ton tone sonne clair, bien distinct de la bass.",
+      preset: {metro: true, tempo: 76} },
+    'EX-DJ-SON-03': {
+      kind: "atome",
+      objet: "Le slap (fouetté)",
+      consigne: "Fouette le bord, doigts relâchés qui claquent : c'est le slap, sec et perçant.",
+      critere: "quand ton slap claque net, franchement différent du tone.",
+      preset: {metro: true, tempo: 76} },
+    'EX-DJ-SON-04': {
+      kind: "atome",
+      objet: "Nommer les trois sons (vocalisation)",
+      consigne: "Dis un mot de quatre syllabes, une par temps (« TA-KA-DI-MI »), et pose un son sur chaque syllabe.",
+      critere: "quand chaque syllabe et chaque son tombent ensemble sur le temps.",
+      preset: {metro: true, tempo: 76} },
+    'EX-DJ-SON-05': {
+      kind: "synthese",
+      objet: "Les trois sons à la suite",
+      consigne: "Enchaîne bass, tone, slap sur les trois premiers temps puis silence sur le 4, en boucle sur le clic.",
+      critere: "quand les trois sons restent nets et distincts, tour après tour.",
+      preset: {metro: true, tempo: 76} },
+    'EX-SOCLE-D-PLS-01': {
+      kind: "atome",
+      objet: "Compter les 4 temps (vocalisation)",
+      consigne: "Frappe un coup par temps en comptant à voix haute « 1-2-3-4 », en boucle, calé sur le clic.",
+      critere: "quand tu comptes et frappes ensemble, sans te presser ni traîner.",
+      preset: {metro: true, tempo: 80} },
+    'EX-SOCLE-D-PLS-02': {
+      kind: "atome",
+      objet: "Retomber sur le 1",
+      consigne: "Accentue le 1 de chaque mesure, un peu plus fort, les trois autres temps égaux.",
+      critere: "quand le 1 revient tout seul, mesure après mesure.",
+      preset: {metro: true, tempo: 80} },
+    'EX-SOCLE-D-PLS-03': {
+      kind: "atome",
+      objet: "Tenir sans se presser",
+      consigne: "Ne joue que le 1 et le 3, en gardant l'intervalle exactement égal — le silence compte autant que la frappe.",
+      critere: "quand les frappes espacées restent parfaitement régulières.",
+      preset: {metro: true, tempo: 80} },
+    'EX-SOCLE-D-PLS-04': {
+      kind: "atome",
+      objet: "La coupure (machine gap)",
+      consigne: "Le clic se tait une mesure entière : garde ta pulsation intérieure et retombe pile sur le 1 quand il revient.",
+      critere: "quand le clic revient et que tu es toujours exactement en place.",
+      preset: {metro: true, tempo: 80, gap: {playN: 4, muteM: 1}} },
+    'EX-SOCLE-D-PLS-05': {
+      kind: "synthese",
+      objet: "Compter, tenir, retomber",
+      consigne: "Sur des cycles où le clic coupe une mesure sur quatre, compte les temps, tiens le time et retombe juste à chaque 1.",
+      critere: "quand tu traverses la coupure sans perdre le compte ni le 1.",
+      preset: {metro: true, tempo: 80, gap: {playN: 3, muteM: 1}} },
+    'EX-SOCLE-D-SUB-01': {
+      kind: "atome",
+      objet: "Deux frappes par temps (croches)",
+      consigne: "Pose deux frappes égales par temps (« 1-et, 2-et… »), légères et régulières, sur les croches du clic.",
+      critere: "quand les deux frappes par temps sont parfaitement égales.",
+      preset: {metro: true, tempo: 80, subdiv: 2} },
+    'EX-SOCLE-D-SUB-02': {
+      kind: "atome",
+      objet: "Quatre frappes par temps (doubles)",
+      consigne: "Passe à quatre frappes égales par temps (« 1-e-et-a »), toujours très légères.",
+      critere: "quand les quatre frappes tiennent sans accélérer ni ralentir.",
+      preset: {metro: true, tempo: 80, subdiv: 4} },
+    'EX-SOCLE-D-SUB-03': {
+      kind: "atome",
+      objet: "Alterner 2 et 4",
+      consigne: "Une mesure en croches (2 par temps), une mesure en doubles (4 par temps), sans trou au changement.",
+      critere: "quand tu passes de 2 à 4 frappes sans accroc de time.",
+      preset: {metro: true, tempo: 80, subdiv: 4} },
+    'EX-SOCLE-D-SUB-04': {
+      kind: "atome",
+      objet: "Toucher léger, régulier",
+      consigne: "Garde le tapis de doubles très léger et parfaitement égal, comme un moteur, sans aucun accent.",
+      critere: "quand le tapis de doubles tourne, égal et sans bosse.",
+      preset: {metro: true, tempo: 80, subdiv: 4} },
+    'EX-SOCLE-D-SUB-05': {
+      kind: "synthese",
+      objet: "La grille de 16es, amorce",
+      consigne: "Tiens quatre frappes légères par temps sur deux mesures, régulières et détendues — c'est la future grille du funk.",
+      critere: "quand la grille de doubles tient toute seule, légère et régulière.",
+      preset: {metro: true, tempo: 80, subdiv: 4} },
+    'EX-CJ-DYN-01': {
+      kind: "atome",
+      objet: "Fort puis doux (contrôle dynamique)",
+      consigne: "Joue le même tone quatre fois fort, quatre fois doux, sans changer de geste — seule l'intensité change.",
+      critere: "quand l'écart fort/doux est net et que le son reste le même.",
+      preset: {metro: true, tempo: 84} },
+    'EX-CJ-DYN-02': {
+      kind: "atome",
+      objet: "Le ghost (presque rien)",
+      consigne: "Baisse encore : des touches à peine audibles (ghost) entre les temps, sous une frappe forte marquée.",
+      critere: "quand tes ghosts sont réguliers et presque inaudibles.",
+      preset: {metro: true, tempo: 84} },
+    'EX-CJ-DYN-03': {
+      kind: "atome",
+      objet: "Étouffer le son (mute)",
+      consigne: "Frappe puis pose la main pour couper la résonance (mute) — un son court et sec, sur demande.",
+      critere: "quand tu coupes le son exactement quand tu le décides.",
+      preset: {metro: true, tempo: 84} },
+    'EX-CJ-DYN-04': {
+      kind: "atome",
+      objet: "Le press tone",
+      consigne: "Frappe en laissant la main appuyée : un tone étouffé, plus mat (press tone) — alterne avec le tone ouvert.",
+      critere: "quand tu obtiens deux couleurs, ouvert et étouffé, à volonté.",
+      preset: {metro: true, tempo: 84} },
+    'EX-CJ-DYN-05': {
+      kind: "synthese",
+      objet: "Nappe fort/doux",
+      consigne: "Sur deux mesures, place des accents forts sur un fond de ghosts, avec un son coupé de temps en temps.",
+      critere: "quand le contraste fort/doux/coupé donne du relief sans casser le time.",
+      preset: {metro: true, tempo: 84} },
+    'EX-DJ-DYN-01': {
+      kind: "atome",
+      objet: "Fort puis doux (contrôle dynamique)",
+      consigne: "Joue le même tone quatre fois fort, quatre fois doux, sans changer de geste — seule l'intensité change.",
+      critere: "quand l'écart fort/doux est net et que le son reste le même.",
+      preset: {metro: true, tempo: 84} },
+    'EX-DJ-DYN-02': {
+      kind: "atome",
+      objet: "Le ghost/touch",
+      consigne: "Baisse encore : des touches à peine audibles (ghost) entre les temps, sous une frappe forte marquée.",
+      critere: "quand tes ghosts sont réguliers et presque inaudibles.",
+      preset: {metro: true, tempo: 84} },
+    'EX-DJ-DYN-03': {
+      kind: "atome",
+      objet: "Le muffled slap",
+      consigne: "Fais un slap étouffé, mat et court, en gardant les doigts un instant sur la peau — alterne avec le slap ouvert.",
+      critere: "quand tu obtiens deux slaps, ouvert et étouffé, à volonté.",
+      preset: {metro: true, tempo: 84} },
+    'EX-DJ-DYN-04': {
+      kind: "atome",
+      objet: "Doser bass, tone, slap",
+      consigne: "Enchaîne bass douce, tone moyen, slap fort — trois sons, trois intensités croissantes.",
+      critere: "quand chaque son garde sa couleur et son niveau d'intensité.",
+      preset: {metro: true, tempo: 84} },
+    'EX-DJ-DYN-05': {
+      kind: "synthese",
+      objet: "Nappe fort/doux",
+      consigne: "Sur deux mesures, place des accents forts sur un fond de ghosts, avec un slap étouffé de temps en temps.",
+      critere: "quand le contraste fort/doux/étouffé donne du relief sans casser le time.",
+      preset: {metro: true, tempo: 84} }
+  }
+  };
+})();

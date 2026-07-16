@@ -61,7 +61,7 @@ class FakeAudioContext {
   resume() {}
 }
 
-const html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf-8');
+const html = require('./recette-harnais').chargeHtml();   // R-2 : inline les corpus/*.js
 const dom = new JSDOM(html, {
   url: 'http://localhost/', runScripts: 'dangerously', pretendToBeVisual: true,
   beforeParse(window) {
