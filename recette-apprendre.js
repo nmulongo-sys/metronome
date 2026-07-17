@@ -77,7 +77,7 @@ setTimeout(runTests, 120);
 function runTests() {
   /* ---------- A. chargement + page minimale ---------- */
   ok('chargement sans erreur jsdom (' + jsdomErrors.length + ')', jsdomErrors.length === 0);
-  ok('BUILD 0.17.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.17.0');
+  ok('BUILD 0.18.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.18.0');
   ok('2 corpus chargés (socle-technique + funk), 152 exercices assemblés',
     Object.keys(W.FM_CORPUS || {}).length === 2 && Object.keys(g('FM_ASM.exercices')).length === 152);
   ok('pas de répertoire ici : FM_GROOVES absent (la page ne charge pas les grooves)',
@@ -318,6 +318,13 @@ function runTests() {
   clic(D.querySelector('.lang-btn[data-lang="pt"]'));
   ok('F1.6 clic BR → langue partagée écrite (localStorage fm-lang = pt)',
     W.localStorage.getItem('fm-lang') === 'pt');
+  // P1-c (M1 court terme) : avis « leçons en français » — présent, MASQUÉ en FR (ce DOM
+  // est chargé sans lang), clé traduite dans les deux dictionnaires.
+  ok('F1.7 P1-c (M1) : avis « leçons en FR » présent et MASQUÉ en français',
+    !!$('pfLangNote') && $('pfLangNote').hidden === true);
+  ok('F1.8 P1-c : la clé de l\'avis est traduite EN et PT',
+    !!EN['Les leçons (objectif, consigne, critère) sont pour l\'instant en français ; le reste de la page suit ta langue.'] &&
+    !!PT['Les leçons (objectif, consigne, critère) sont pour l\'instant en français ; le reste de la page suit ta langue.']);
 
   /* ---- F2. second DOM en ?lang=pt : la page vit en portugais, le corpus reste FR ---- */
   const vc2 = new VirtualConsole();
@@ -363,7 +370,11 @@ function runTests() {
           txt2(D2.getElementById('pfStatus')) === 'Voto registrado: fácil.');
         ok('F2.8 re-rendu après vote TOUJOURS traduit (MutationObserver vivant, cartes fraîches)',
           /Ouvir/.test(txt2(D2.querySelector('.pf-ecouter'))));
-        console.log(`\n--- apprendre (R-4a) : ${PASS} vertes, ${FAIL} rouges (total ${PASS + FAIL}) ---`);
+        // P1-c (M1) : dans ce DOM ?lang=pt, l'avis « leçons en FR » est RÉVÉLÉ et traduit
+        ok('F2.9 P1-c (M1) : avis « leçons en FR » RÉVÉLÉ et traduit en PT (As lições…)',
+          D2.getElementById('pfLangNote').hidden === false &&
+          /^As lições/.test(txt2(D2.getElementById('pfLangNote'))));
+        console.log(`\n--- apprendre (R-4a, +R-5 P1) : ${PASS} vertes, ${FAIL} rouges (total ${PASS + FAIL}) ---`);
         process.exit(FAIL ? 1 : 0);
       }, 150);
     }, 150);

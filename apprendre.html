@@ -289,6 +289,10 @@
       <span class="sec-sub">cajón · djembé — leçons par niveaux</span>
     </div>
     <div class="hint">Choisis un exercice. « ▶ Écouter » fait entendre le modèle par-dessus l'accompagnement — imprègne-toi, puis « Charger » installe l'accompagnement seul : à toi de jouer. Coche « acquis » quand le critère est atteint ; le vote de difficulté aide à recalibrer le niveau pour tout le monde.</div>
+    <!-- P1-c (M1 court terme, salve R-5 P1) : rendre VISIBLE la limite de traduction —
+         les leçons (contenu de corpus) restent FR même en EN/PT. Masqué en français,
+         révélé au chargement si la langue active n'est pas le français (voir init). -->
+    <p class="hint pf-lang-note" id="pfLangNote" hidden>Les leçons (objectif, consigne, critère) sont pour l'instant en français ; le reste de la page suit ta langue.</p>
     <div id="pfRoot"></div>
     <div id="pfStatus" aria-live="polite"></div>
   </div>
@@ -367,6 +371,7 @@ window.__I18N = { "en": {
   "Le parcours": "The path",
   "cajón · djembé — leçons par niveaux": "cajón · djembé — lessons by level",
   "Choisis un exercice. « ▶ Écouter » fait entendre le modèle par-dessus l'accompagnement — imprègne-toi, puis « Charger » installe l'accompagnement seul : à toi de jouer. Coche « acquis » quand le critère est atteint ; le vote de difficulté aide à recalibrer le niveau pour tout le monde.": "Pick an exercise. \"▶ Listen\" plays the model over the accompaniment — soak it up, then \"Load\" sets up the accompaniment alone: your turn to play. Tick \"mastered\" when the criterion is met; the difficulty vote helps recalibrate the level for everyone.",
+  "Les leçons (objectif, consigne, critère) sont pour l'instant en français ; le reste de la page suit ta langue.": "The lessons (objective, instructions, criterion) are in French for now; the rest of the page follows your language.",
   /* — rendu du parcours (libellés générés par pfRender) — */
   "Niveau du parcours": "Path level",
   "Débutant": "Beginner",
@@ -454,6 +459,7 @@ window.__I18N = { "en": {
   "Le parcours": "O percurso",
   "cajón · djembé — leçons par niveaux": "cajón · djembê — lições por nível",
   "Choisis un exercice. « ▶ Écouter » fait entendre le modèle par-dessus l'accompagnement — imprègne-toi, puis « Charger » installe l'accompagnement seul : à toi de jouer. Coche « acquis » quand le critère est atteint ; le vote de difficulté aide à recalibrer le niveau pour tout le monde.": "Escolha um exercício. « ▶ Ouvir » faz soar o modelo por cima do acompanhamento — absorva, depois « Carregar » instala apenas o acompanhamento: sua vez de tocar. Marque « adquirido » quando o critério for atingido; o voto de dificuldade ajuda a recalibrar o nível para todos.",
+  "Les leçons (objectif, consigne, critère) sont pour l'instant en français ; le reste de la page suit ta langue.": "As lições (objetivo, instrução, critério) estão em francês por enquanto; o resto da página segue o seu idioma.",
   /* — rendu du parcours (libellés générés par pfRender) — */
   "Niveau du parcours": "Nível do percurso",
   "Débutant": "Iniciante",
@@ -1075,6 +1081,11 @@ window.fmTr = (function(){
   setTempo(92);
   setSwing(50);
   { const _bs = $('buildStamp'); if (_bs) _bs.textContent = 'build ' + BUILD + ' · ' + BUILD_DATE; }
+
+  // P1-c (M1 court terme) : l'avis « leçons en français » n'apparaît QUE si la langue
+  // active n'est pas le français — le contenu de corpus reste FR (transverse non ouvert).
+  { let _l = 'fr'; try { _l = new URLSearchParams(location.search).get('lang') || store.get('fm-lang') || 'fr'; } catch (e) {}
+    const _n = $('pfLangNote'); if (_n && _l !== 'fr') _n.hidden = false; }
 
   // 0.6.6 (C8) : l'init est terminée — les prochains enregistrements viennent d'un geste
   // utilisateur, le toast « réglages enregistrés » peut se montrer (une fois par session).
