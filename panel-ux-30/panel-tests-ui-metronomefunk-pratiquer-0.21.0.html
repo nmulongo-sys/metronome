@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panel UX — Métronome — Pratiquer</title>
+<style>
+  :root{
+    --bg:#f4f5f7; --card:#ffffff; --ink:#1c2430; --sub:#5b6675; --line:#e3e7ee;
+    --acc:#2f6df6; --acc-soft:#e8effe;
+    --crit:#d63b3b; --crit-bg:#fdeaea;
+    --maj:#e08a00; --maj-bg:#fdf3e2;
+    --min:#3c78c2; --min-bg:#e9f1fb;
+    --pos:#2c9a5b; --pos-bg:#e6f6ec;
+    --radius:12px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);line-height:1.45}
+  .wrap{max-width:1180px;margin:0 auto;padding:20px 16px 60px}
+  header.hd{margin-bottom:18px}
+  header.hd h1{margin:0;font-size:1.5rem}
+  header.hd .sub{color:var(--sub);font-size:.92rem;margin-top:4px}
+  .badge-v{display:inline-block;background:var(--acc-soft);color:var(--acc);border-radius:20px;padding:2px 10px;font-size:.78rem;font-weight:600;margin-left:8px;vertical-align:middle}
+  .note-methodo{background:#fff8e6;border:1px solid #f0dfae;border-radius:var(--radius);padding:10px 14px;font-size:.85rem;color:#6b5a1e;margin:12px 0 18px}
+
+  /* KPI */
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px}
+  .kpi .v{font-size:1.7rem;font-weight:700;font-variant-numeric:tabular-nums}
+  .kpi .l{font-size:.78rem;color:var(--sub);text-transform:uppercase;letter-spacing:.04em}
+  .kpi.crit .v{color:var(--crit)} .kpi.maj .v{color:var(--maj)} .kpi.pos .v{color:var(--pos)} .kpi.acc .v{color:var(--acc)}
+
+  /* Tabs */
+  .tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+  .tab{border:1px solid var(--line);background:var(--card);border-radius:22px;padding:8px 18px;cursor:pointer;font-size:.92rem;font-weight:600;color:var(--sub)}
+  .tab.sel{background:var(--acc);border-color:var(--acc);color:#fff}
+  .view{display:none} .view.sel{display:block}
+
+  /* Filtres */
+  .filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;margin-bottom:16px}
+  .filters label{font-size:.8rem;color:var(--sub);display:flex;flex-direction:column;gap:3px;font-weight:600}
+  .filters select,.filters input[type=search]{border:1px solid var(--line);border-radius:8px;padding:6px 8px;font-size:.88rem;background:#fff;color:var(--ink);min-width:130px}
+  .filters .reset{align-self:flex-end;border:none;background:none;color:var(--acc);cursor:pointer;font-size:.85rem;text-decoration:underline;padding:6px}
+  .count-line{font-size:.85rem;color:var(--sub);margin-bottom:10px}
+
+  /* Cartes personas */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px}
+  .pcard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;gap:10px}
+  .pcard .top{display:flex;gap:12px;align-items:center}
+  .avatar{width:46px;height:46px;border-radius:50%;background:var(--acc-soft);color:var(--acc);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.05rem;flex-shrink:0}
+  .pcard h3{margin:0;font-size:1.02rem}
+  .pcard .meta{font-size:.8rem;color:var(--sub)}
+  .chips{display:flex;gap:6px;flex-wrap:wrap}
+  .chip{font-size:.72rem;border-radius:14px;padding:2px 9px;background:var(--bg);border:1px solid var(--line);color:var(--sub);font-weight:600}
+  .chip.it1{background:#fdeaea;color:#a33;border-color:#f3caca}
+  .chip.it2{background:#fdf3e2;color:#96650a;border-color:#efd9a8}
+  .chip.it3{background:#eef3fb;color:#39599c;border-color:#ccd9f0}
+  .chip.it4{background:#e9f6ee;color:#256e43;border-color:#bfe3cc}
+  .chip.it5{background:#e6f0ea;color:#1b5e35;border-color:#a9d4b8}
+  .score{margin-left:auto;text-align:center}
+  .score .n{font-size:1.25rem;font-weight:700;font-variant-numeric:tabular-nums}
+  .score .d{font-size:.65rem;color:var(--sub)}
+  .quote{font-style:italic;font-size:.88rem;color:#38424f;border-left:3px solid var(--acc);padding:2px 0 2px 10px;background:var(--acc-soft);border-radius:0 8px 8px 0;padding:8px 10px}
+  .flist{display:flex;flex-direction:column;gap:6px;font-size:.85rem}
+  .fitem{display:flex;gap:8px;align-items:flex-start}
+  .sev{flex-shrink:0;font-size:.66rem;font-weight:700;border-radius:4px;padding:2px 6px;margin-top:2px;text-transform:uppercase;letter-spacing:.03em}
+  .sev.critique{background:var(--crit-bg);color:var(--crit)}
+  .sev.majeur{background:var(--maj-bg);color:var(--maj)}
+  .sev.mineur{background:var(--min-bg);color:var(--min)}
+  .sev.positif{background:var(--pos-bg);color:var(--pos)}
+  details.more{font-size:.83rem;color:var(--sub)}
+  details.more summary{cursor:pointer;color:var(--acc);font-weight:600}
+  details.more .box{margin-top:6px;background:var(--bg);border-radius:8px;padding:8px 10px}
+
+  /* Constats consolidés */
+  .issue{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:12px;border-left:5px solid var(--min)}
+  .issue.critique{border-left-color:var(--crit)} .issue.majeur{border-left-color:var(--maj)}
+  .issue .ihead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .issue h3{margin:0;font-size:1rem;flex:1}
+  .issue .freq{font-size:.8rem;color:var(--sub);white-space:nowrap}
+  .issue .desc{font-size:.88rem;color:#38424f;margin:8px 0}
+  .issue .reco{font-size:.86rem;background:var(--pos-bg);border-radius:8px;padding:8px 10px;color:#1d5c38}
+  .issue .who{font-size:.78rem;color:var(--sub);margin-top:8px}
+  .bar-out{height:7px;background:var(--bg);border-radius:4px;overflow:hidden;margin-top:6px}
+  .bar-in{height:100%;border-radius:4px;background:var(--acc)}
+  .effort{font-size:.72rem;font-weight:700;border-radius:4px;padding:2px 8px}
+  .effort.faible{background:var(--pos-bg);color:var(--pos)}
+  .effort.moyen{background:var(--maj-bg);color:var(--maj)}
+  .effort.eleve{background:var(--crit-bg);color:var(--crit)}
+
+  /* Synthèse */
+  .syn-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:820px){.syn-grid{grid-template-columns:1fr}}
+  .syn-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+  .syn-card h3{margin:0 0 12px;font-size:1rem}
+  .hbar{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:.82rem}
+  .hbar .lab{width:150px;flex-shrink:0;color:var(--sub);text-align:right}
+  .hbar .track{flex:1;background:var(--bg);border-radius:4px;height:16px;overflow:hidden}
+  .hbar .fill{height:100%;border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;color:#fff;font-size:.68rem;font-weight:700;min-width:22px}
+  .strengths li,.roadmap li{margin-bottom:7px;font-size:.88rem}
+  .roadmap{padding-left:18px} .strengths{padding-left:18px}
+  .prio-tag{font-weight:700}
+  .p1{color:var(--crit)} .p2{color:var(--maj)} .p3{color:var(--min)}
+  footer{margin-top:30px;font-size:.78rem;color:var(--sub);text-align:center}
+  @media(max-width:600px){
+    .grid{grid-template-columns:1fr}
+    .hbar .lab{width:105px;font-size:.72rem}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hd">
+    <h1>Panel de tests UI — Métronome — Pratiquer<span class="badge-v">0.21.0</span></h1>
+    <div class="sub">30 testeurs simulés · 9 à 80 ans · compétences numériques niveau 1 (novice) à 5 (expert) · mobile, tablette et ordinateur — tests menés sur <code>pratiquer.html</code></div>
+  </header>
+
+  <div class="note-methodo">⚠ <b>Méthodologie :</b> panel de personas simulés par IA à partir de l'analyse réelle du code et de l'interface de l'application. Les constats pointent des éléments vérifiables de l'UI (densité, tailles de police, breakpoints, libellés…), mais ne remplacent pas des tests avec de vrais utilisateurs — ils servent à préparer et prioriser ces tests.</div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="tabs">
+    <button class="tab sel" data-v="panel">👥 Le panel (30)</button>
+    <button class="tab" data-v="issues">🔍 Constats consolidés</button>
+    <button class="tab" data-v="syn">📊 Synthèse &amp; plan d'action</button>
+  </div>
+
+  <!-- ===== VUE PANEL ===== -->
+  <div class="view sel" id="v-panel">
+    <div class="filters">
+      <label>Tranche d'âge
+        <select id="fAge"><option value="">Toutes</option><option value="0-17">Moins de 18 ans</option><option value="18-35">18 – 35 ans</option><option value="36-55">36 – 55 ans</option><option value="56-99">56 ans et +</option></select>
+      </label>
+      <label>Compétence numérique
+        <select id="fIT"><option value="">Toutes</option><option value="1">1 · Novice</option><option value="2">2 · Basique</option><option value="3">3 · À l'aise</option><option value="4">4 · Avancé</option><option value="5">5 · Expert</option></select>
+      </label>
+      <label>Appareil
+        <select id="fDev"><option value="">Tous</option><option value="mobile">Smartphone</option><option value="tablette">Tablette</option><option value="ordinateur">Ordinateur</option></select>
+      </label>
+      <label>Sévérité rencontrée
+        <select id="fSev"><option value="">Toutes</option><option value="critique">Critique</option><option value="majeur">Majeur</option><option value="mineur">Mineur</option></select>
+      </label>
+      <label>Recherche
+        <input type="search" id="fTxt" placeholder="mot-clé, instrument…">
+      </label>
+      <button class="reset" id="fReset">Réinitialiser</button>
+    </div>
+    <div class="count-line" id="countLine"></div>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <!-- ===== VUE CONSTATS ===== -->
+  <div class="view" id="v-issues">
+    <div class="count-line">Constats consolidés à partir des 30 sessions, classés par score de priorité (sévérité × nombre de testeurs touchés). La barre indique la part du panel concernée.</div>
+    <div id="issueList"></div>
+  </div>
+
+  <!-- ===== VUE SYNTHÈSE ===== -->
+  <div class="view" id="v-syn">
+    <div class="syn-grid">
+      <div class="syn-card"><h3>Satisfaction moyenne par compétence numérique</h3><div id="chIT"></div></div>
+      <div class="syn-card"><h3>Satisfaction moyenne par tranche d'âge</h3><div id="chAge"></div></div>
+      <div class="syn-card"><h3>Problèmes par thème (occurrences)</h3><div id="chTheme"></div></div>
+      <div class="syn-card"><h3>Satisfaction moyenne par appareil</h3><div id="chDev"></div></div>
+    </div>
+    <div class="syn-grid" style="margin-top:14px">
+      <div class="syn-card">
+        <h3>✅ Points forts unanimes</h3>
+        <ul class="strengths">
+<li><b>« Par où commencer ? »</b> : un clic sur « ▶ Premier accompagnement » pose un djembé de base, ouvre la percussion et démarre — première réussite immédiate pour le novice, et le bandeau se masque une fois pour toutes.</li>
+<li><b>Trois blocs numérotés</b> (« Ce que je joue » / « Ce qui m'accompagne » / « Le clic ») avec sous-titres en français : la page dense devient un modèle mental clair — moi, l'accompagnement, le métronome.</li>
+<li><b>Modale de compte entièrement traduite</b> FR / EN / PT (lien magique, sans mot de passe) : Maria crée son compte de bout en bout en portugais, la dette de traduction R-5 est soldée.</li>
+<li><b>Mute maître de l'accompagnement</b> en tête du bloc 2 (et rappelé dans le transport) : couper d'un geste basse + claves + répertoire en gardant le clic.</li>
+<li><b>Richesse experte unique</b> : micro-timing/placement, gap clicks, « Routine programmée » scriptée, Team Spirit avec répartition et surtout <b>« ▶ Jouer en équipe »</b> qui ouvre enfin equipe.html (R-6).</li>
+<li><b>Soin d'accessibilité</b> : statuts aria-live, libellés sur canvas et curseurs, focus-visible, cibles 44 px en tactile, raccourcis clavier, et clic sur les « ? » qui n'ouvre plus la section par erreur.</li>
+</ul>
+      </div>
+      <div class="syn-card">
+        <h3>🗺 Plan d'action recommandé</h3>
+        <ol class="roadmap">
+<li><span class="prio-tag p1">P1 · Franciser les puces du sommaire</span> — « Team Spirit », « Groove », « Script » restent en anglais dans le TOC alors que les titres de section sont francisés ; les renommer (ou doubler d'un libellé FR) débloque les 63–80 ans à l'entrée. <i>Impact fort sur les novices âgés, effort faible.</i></li>
+<li><span class="prio-tag p1">P1 · Offrir un parcours « simple / classe »</span> — au-delà du guide, un mode qui replie tout sauf l'essentiel (ou « une section à la fois » par défaut pour les nouveaux venus) pour Léa, Aïcha et les novices. <i>Impact fort, effort moyen.</i></li>
+<li><span class="prio-tag p2">P2 · Relever les cibles tactiles résiduelles</span> — puces du sommaire, drapeaux de langue et ✕ du guide sous 44 px hors .btn-sm. <i>Impact moyen sur tablette/tactile, effort faible.</i></li>
+<li><span class="prio-tag p2">P2 · Marquer la section courante + « tout replier »</span> — état actif de puce synchronisé au scroll dans le sommaire. <i>Impact moyen, effort faible.</i></li>
+<li><span class="prio-tag p2">P2 · Alléger le premier rendu</span> — ~304 Ko + grooves + polices CDN : auto-héberger les polices, différer les corpus non affichés. <i>Impact moyen sur mobile modeste/3G, effort moyen.</i></li>
+<li><span class="prio-tag p3">P3 · Recherche/favoris au répertoire + preset de séance global</span> — pour les intensifs qui re-fouillent à chaque session. <i>Impact moyen, effort moyen.</i></li>
+<li><span class="prio-tag p3">P3 · « Jouer en équipe » : prévenir l'ouverture d'un nouvel onglet</span> — et prévoir un repli si le pop-up est bloqué. <i>Impact faible-moyen, effort faible.</i></li>
+</ol>
+      </div>
+    </div>
+  </div>
+
+  <footer>Dashboard généré le 17/07/2026 · Panel simulé (30 personas) sur pratiquer.html · Métronome — Pratiquer</footer>
+</div>
+
+<script>
+/* ================= DONNÉES ================= */
+const ITLBL = {1:"IT 1 · Novice",2:"IT 2 · Basique",3:"IT 3 · À l'aise",4:"IT 4 · Avancé",5:"IT 5 · Expert"};
+const P = [{"id":1,"nom":"Léa","age":9,"role":"Élève en éveil musical (percussions)","it":1,"dev":"tablette","devLbl":"iPad (école)","note":7.3,"duree":"12 min (avec un adulte)","quote":"Le bouton violet a fait jouer les tambours tout seuls ! Mais après, y a plein de tiroirs avec des mots de grands.","scenario":"Avec l'adulte, cliquer sur « ▶ Premier accompagnement » du bandeau d'accueil, écouter le djembé qui démarre, puis essayer de taper avec.","constats":[{"t":"Le bandeau « Par où commencer ? » lui donne enfin UNE réussite en un clic (djembé + départ) — sans lui, elle serait restée devant les dix tiroirs.","sev":"mineur","th":"Prise en main"},{"t":"Passé le clic, aucun chemin « enfant » : sitôt le groove lancé, rien ne l'invite à taper AVEC, et les sections restent des mots d'adultes.","sev":"majeur","th":"Prise en main"}],"aime":["Le bouton unique qui fait « jouer les tambours tout seuls »","Les couleurs de la roue du métronome"]},{"id":2,"nom":"Tom","age":12,"role":"Collégien, batterie 1re année","it":3,"dev":"mobile","devLbl":"Android Samsung A25","note":8.7,"duree":"18 min","quote":"L'accompagnement en un tap, c'est nickel. Sur le téléphone les gros boutons répondent bien, juste les petites puces du sommaire c'est fin.","scenario":"Charger un groove rock du répertoire, le jouer, monter le tempo au pouce, tester un break programmé dans Percussion.","constats":[{"t":"Les puces du sommaire et les onglets de langue restent petits au pouce (padding 3px 10px) alors que les gros boutons passent bien en 44 px.","sev":"mineur","th":"Mobile & tactile"},{"t":"Deux sections « Répertoire » et « Team Spirit » se ressemblent : il a ouvert la mauvaise avant de comprendre laquelle charge le groove.","sev":"mineur","th":"Navigation"}],"aime":["« ▶ Premier accompagnement » : direct un rythme, sans réfléchir","Le break programmé, façon jeu"]},{"id":3,"nom":"Inès","age":14,"role":"Flûtiste, conservatoire 2e cycle","it":3,"dev":"mobile","devLbl":"iPhone 13","note":8.4,"duree":"20 min","quote":"L'accent du 1er temps est là où on me le promet, et « Routine programmée » c'est plus clair que « Script ». Il me manque juste un mot que je connais pour « swing ».","scenario":"Retrouver l'accent du premier temps, régler une subdivision en croches, écrire une petite routine par paliers de tempo.","constats":[{"t":"« swing », « gap clicks », « feel » restent des mots d'anglais glosés par infobulle — corrects mais hors du vocabulaire du solfège qu'elle apprend.","sev":"mineur","th":"Terminologie"},{"t":"Le répertoire s'allonge sans recherche ni filtre : retrouver un groove précis demande de tout dérouler.","sev":"mineur","th":"Fonctions expertes"}],"aime":["« Routine programmée » enfin en français","L'accent 1er temps fidèle à la promesse de l'accueil"]},{"id":4,"nom":"Hugo","age":16,"role":"Bassiste autodidacte (YouTube)","it":4,"dev":"ordinateur","devLbl":"PC portable Windows","note":9.1,"duree":"30 min","quote":"Basse funk générative + gap clicks + export WAV : c'est un vrai atelier. Le seul truc, le répertoire mériterait une recherche.","scenario":"Session complète : activer la basse funk, régler le feel, poser des gap clicks, exporter un WAV de la boucle.","constats":[{"t":"Le Répertoire de grooves n'a ni recherche, ni favoris, ni « tout voir » — la liste devient longue à parcourir.","sev":"mineur","th":"Fonctions expertes"},{"t":"Aucune sauvegarde nommée d'une « séance » complète (basse + couches + routine ensemble), seulement les séquences de percussion.","sev":"mineur","th":"Fonctions expertes"}],"aime":["La basse funk générative et son feel « posé »","L'export WAV/MP3 sans logiciel externe"]},{"id":5,"nom":"Emma","age":17,"role":"Chanteuse de chorale lycéenne","it":2,"dev":"mobile","devLbl":"Android Xiaomi","note":7.8,"duree":"15 min","quote":"J'ai trouvé un accompagnement doux et le bouton pour couper l'accompagnement, mais rien pour ma voix : pas de note de départ, pas de guide chant.","scenario":"Chercher un accompagnement doux pour travailler un chant, couper l'accompagnement d'un geste pour s'entendre, revenir au clic seul.","constats":[{"t":"Rien pour la voix : pas de note de référence ni de guide chant — la page parle percussions et basse, pas chorale.","sev":"mineur","th":"Fonctions expertes"},{"t":"Elle cherche « couper le son de l'accompagnement » : le libellé « Mute maître » et « backing track » ne sont pas les mots qu'elle connaît.","sev":"mineur","th":"Terminologie"}],"aime":["Le mute maître de l'accompagnement, très visible en tête du bloc 2","Le « Clic muet (couches seules) » pour s'entraîner sur la pulsation"]},{"id":6,"nom":"Nathan","age":19,"role":"Étudiant STAPS, djembé en association","it":3,"dev":"mobile","devLbl":"Android milieu de gamme","note":8.8,"duree":"22 min","quote":"Djembé basse/tone/slap, règle des mains, appel-réponse : tout y est. Sur mon tel le premier chargement traîne un peu, après ça roule.","scenario":"Monter un groove djembé (voix basse/tone/slap), régler l'alternance des mains, lancer un exercice appel-réponse à tempo élevé.","constats":[{"t":"Premier rendu lourd sur téléphone modeste (HTML ~304 Ko + corpus de grooves + polices chargées d'un CDN) ; ensuite fluide et hors-ligne.","sev":"mineur","th":"Performance"},{"t":"Le mode « Une section à la fois » réglerait sa navigation à une main, mais il est décoché par défaut : il ne l'a pas vu.","sev":"mineur","th":"Navigation"}],"aime":["La règle des mains D/G affichée sur chaque frappe","L'appel-réponse pour bosser en autonomie"]},{"id":7,"nom":"Chloé","age":22,"role":"Étudiante en musicologie","it":3,"dev":"ordinateur","devLbl":"MacBook Air","note":9,"duree":"28 min","quote":"La hiérarchie en trois blocs — ce que je joue / ce qui m'accompagne / le clic — est limpide, et l'interface est enfin cohérente en anglais comme en français.","scenario":"Cartographier la logique des sections, vérifier la justesse des libellés, tester la bascule FR/EN/PT de bout en bout.","constats":[{"t":"Le sommaire ne signale pas la section courante au défilement : sur une page aussi longue, on perd le repère de position.","sev":"mineur","th":"Navigation"},{"t":"Les puces du sommaire gardent « Team Spirit », « Groove », « Script » en anglais alors que les titres de section sont francisés — petite incohérence de registre.","sev":"mineur","th":"Terminologie"}],"aime":["Les trois blocs numérotés, modèle mental clair","La bascule de langue complète, modale de compte comprise"]},{"id":8,"nom":"Yanis","age":24,"role":"DJ amateur, production MAO","it":5,"dev":"ordinateur","devLbl":"PC gamer, Chrome","note":9.1,"duree":"26 min","quote":"Swing libre, placement en ms, export MP3, JSON de répartition : ça s'intègre à mon workflow. Le bandeau d'accueil, je l'ai fermé en deux secondes.","scenario":"Construire un clic de studio (swing 54 %, placement +25 ms, couches), l'exporter en MP3 et sortir la répartition en JSON.","constats":[{"t":"Le bandeau « Par où commencer ? » s'affiche par défaut pour tout le monde, pas seulement pour qui arrive de la porte « En équipe » — inutile pour un habitué (mais masquable/persisté).","sev":"mineur","th":"Prise en main"},{"t":"Pas de preset de séance rappelant tout l'état (couches + basse + routine) d'un coup, au-delà des séquences de percussion.","sev":"mineur","th":"Fonctions expertes"}],"aime":["Le placement en millisecondes (behind/ahead the beat)","Les exports MP3 et JSON directs"]},{"id":9,"nom":"Maria","age":26,"role":"Prof de capoeira, brésilienne","it":2,"dev":"mobile","devLbl":"Android Motorola","note":8.9,"duree":"24 min","quote":"Dessa vez a tela de conta está toda em português — criei minha conta sem sair do PT-BR. Antes travava no inglês.","scenario":"En PT-BR : monter un accompagnement pour la roda, puis créer un compte par lien magique — modale entièrement en portugais.","constats":[{"t":"La modale de compte est désormais traduite jusqu'au bout en PT-BR (« Verifique seus e-mails ») — la dette de traduction signalée avant est soldée.","sev":"mineur","th":"Compte & connexion"},{"t":"« backing track » reste en anglais dans Team Spirit, glosé mais présent — un mot de plus à deviner pour une non-anglophone.","sev":"mineur","th":"Terminologie"}],"aime":["La modale de compte 100 % traduite en portugais","Le lien magique sans mot de passe à retenir"]},{"id":10,"nom":"Julien","age":28,"role":"Développeur web, guitariste","it":5,"dev":"ordinateur","devLbl":"laptop Linux, Firefox","note":9.2,"duree":"32 min","quote":"« ▶ Jouer en équipe » ouvre vraiment equipe.html maintenant (R-6) : la répartition devient partageable, plus juste un JSON. Il reste le poids de page et l'état actif du sommaire.","scenario":"Audit : liens profonds (#section), focus clavier, ouverture d'equipe.html depuis Team Spirit, poids de page, comportement hors-ligne.","constats":[{"t":"~304 Ko de HTML + grooves + polices CDN au premier rendu : sensible en 3G ; les polices Google gagneraient à être auto-hébergées.","sev":"mineur","th":"Performance"},{"t":"Le sommaire sticky n'a pas d'état actif au scroll et il manque un « tout replier » pour revenir à une vue d'ensemble.","sev":"mineur","th":"Navigation"}],"aime":["« Jouer en équipe » qui ouvre enfin equipe.html (R-6)","Le hash-open : chaque section a une URL, focus clavier propre"]},{"id":11,"nom":"Sofia","age":31,"role":"Violoniste semi-professionnelle","it":3,"dev":"tablette","devLbl":"iPad 10e gén.","note":8,"duree":"21 min","quote":"Le micro-timing et le placement sont excellents pour bosser mon coup d'archet contre le clic. Mais la jauge d'archet, elle, a déménagé sur l'accueil : ici, pour une cordiste, c'est moins.","scenario":"Chercher ce que la page offre à une violoniste : micro-timing pour le placement, gap clicks pour l'autonomie, en portrait sur iPad.","constats":[{"t":"L'archet et sa visualisation ont migré sur index.html : la pratique libre parle surtout percussions/basse, une cordiste y trouve moins qu'avant.","sev":"mineur","th":"Fonctions expertes"},{"t":"En portrait, les zones de visualisation (roue, ligne de réduction) sont un peu à l'étroit sur iPad.","sev":"mineur","th":"Visuel & lisibilité"}],"aime":["Le clic de placement (behind/ahead) pour travailler l'archet","Les gap clicks pour tenir le tempo seule"]},{"id":12,"nom":"Marc","age":33,"role":"Batteur de groupe rock","it":4,"dev":"mobile","devLbl":"Android Pixel","note":8.9,"duree":"27 min","quote":"Groove rock, progression 100→140, breaks toutes les 8 : ma séance tient dans la page. Il me manque des favoris pour ne pas re-fouiller le répertoire.","scenario":"Construire une séance : groove rock, rampe de tempo scriptée, breaks programmés toutes les 8 mesures, sauver la séquence.","constats":[{"t":"Répertoire sans recherche ni favoris : à chaque session il re-parcourt la liste pour retrouver son groove.","sev":"mineur","th":"Fonctions expertes"},{"t":"On sauve une séquence de percussion, pas une « séance » complète (groove + routine + basse) en un preset rappelable.","sev":"mineur","th":"Fonctions expertes"}],"aime":["Les breaks programmés avec progression de niveau","La rampe de tempo écrite dans « Routine programmée »"]},{"id":13,"nom":"Aïcha","age":35,"role":"Professeure des écoles (chorale de classe)","it":2,"dev":"ordinateur","devLbl":"PC école ancien, Firefox","note":8,"duree":"14 min","quote":"Le mode Atelier en BPM géant est parfait pour le fond de classe, et le guide d'accueil aide. Mais entre dix tiroirs, il me faudrait un « mode simple » tout prêt.","scenario":"Retrouver le mode Atelier (BPM géant, écran maintenu allumé) pour le fond de classe, poser un accompagnement simple et minimal.","constats":[{"t":"Malgré le guide, la page reste dense pour un usage de classe : pas de parcours « minimal / simple » qui replie tout sauf l'essentiel.","sev":"majeur","th":"Prise en main"},{"t":"Le vieux PC de l'école rame au premier chargement (poids HTML + grooves + polices CDN).","sev":"mineur","th":"Performance"}],"aime":["Le mode Atelier : BPM géant, écran qui reste allumé","Le guide « Premier accompagnement » pour démarrer vite"]},{"id":14,"nom":"Diego","age":38,"role":"Percussionniste cubain (son, timba)","it":3,"dev":"mobile","devLbl":"iPhone SE, petit écran","note":9.2,"duree":"25 min","quote":"Las claves 3-2 y 2-3, el son, la rumba: todo correcto. En la pantalla chica del SE, algunos pasos del secuenciador son finos para el dedo.","scenario":"Vérifier les claves (3-2/2-3, son, rumba), monter un montuno d'entraînement, éditer le séquenceur sur petit écran.","constats":[{"t":"Sur l'écran étroit du SE, certaines cases du séquenceur et le micro-décalage au glissé demandent de la précision au doigt.","sev":"mineur","th":"Mobile & tactile"},{"t":"L'appui long d'une demi-seconde pour glisser un pas est expliqué mais peu découvrable : un simple toucher fait défiler la page.","sev":"mineur","th":"Mobile & tactile"}],"aime":["L'exactitude des claves son/rumba et des tessitures","La ligne de réduction qui montre ce qui sonne vraiment"]},{"id":15,"nom":"Camille","age":40,"role":"Cheffe de chœur et d'ensemble percus","it":3,"dev":"ordinateur","devLbl":"laptop Windows","note":9.2,"duree":"29 min","quote":"Enfin ! « ▶ Jouer en équipe » ouvre une vraie page où chacun a sa ligne. Répartir mes 8, imprimer les pupitres, lancer en équipe : la boucle est bouclée.","scenario":"Répartir les voix d'un ensemble de 8, imprimer les pupitres, puis lancer « ▶ Jouer en équipe » vers equipe.html.","constats":[{"t":"« Jouer en équipe » ouvre equipe.html dans un nouvel onglet (window.open) : un bloqueur de pop-up ou l'onglet surprise peut désorienter en atelier.","sev":"mineur","th":"Navigation"},{"t":"La répartition auto équilibre bien la charge, mais rien ne prévient si un participant hérite de deux instruments distincts avant de valider.","sev":"mineur","th":"Fonctions expertes"}],"aime":["Le passage réel vers « En équipe » (R-6), chacun sur son appareil","L'export imprimable / PDF des pupitres pour les élèves"]},{"id":16,"nom":"Olivier","age":42,"role":"Ingénieur, trompettiste d'harmonie","it":5,"dev":"ordinateur","devLbl":"PC Windows, Edge","note":9.1,"duree":"30 min","quote":"La routine scriptée « 60→116 par paliers » est exactement ce que je veux, et « Routine programmée » est un bien meilleur nom que « Script ». Persistance et raccourcis clavier au top.","scenario":"Écrire une routine d'échauffement scriptée (paliers 60→116), la relancer, vérifier la persistance des réglages et les raccourcis clavier.","constats":[{"t":"Pas de sauvegarde nommée d'une configuration globale (couches + basse + claves + routine) réutilisable comme un preset de séance.","sev":"mineur","th":"Fonctions expertes"},{"t":"Le sommaire ne marque pas la section active : sur une page si longue, un ancrage visuel manquerait à qui script souvent.","sev":"mineur","th":"Navigation"}],"aime":["La DSL de routine (rampes, gap, swing) claire et lintée","Les raccourcis clavier Espace / ↑↓ / T"]},{"id":17,"nom":"Nadia","age":45,"role":"Pianiste amatrice (reprise après 15 ans)","it":2,"dev":"tablette","devLbl":"iPad ancien","note":8,"duree":"17 min","quote":"J'ai osé le bouton « Par où commencer ? » et ça a démarré tout seul — sans lui j'aurais refermé. La densité reste intimidante mais j'ai un point d'entrée.","scenario":"Oser la page « pour voir », cliquer le guide d'accueil, essayer une couche simple, vérifier qu'on peut tout remettre à zéro.","constats":[{"t":"Passé le guide, la densité des tiroirs reste intimidante : elle n'ose pas ouvrir plus d'une section à la fois.","sev":"mineur","th":"Prise en main"},{"t":"Le mode « Une section à la fois » la rassurerait, mais il est décoché par défaut et discret en fin de sommaire.","sev":"mineur","th":"Navigation"}],"aime":["Le guide « Premier accompagnement » qui lève la peur de la page blanche","« ⟲ Tout réinitialiser » qui préserve langue, thème et compte"]},{"id":18,"nom":"Pierre","age":47,"role":"Luthier, violoncelliste amateur","it":2,"dev":"ordinateur","devLbl":"PC Windows 10 ancien","note":8.3,"duree":"19 min","quote":"Le bouton « Tout réinitialiser » me rassure : je peux ouvrir les tiroirs sans peur de tout casser. Pour un support papier, il me faudrait plus qu'un export Team Spirit.","scenario":"Explorer les couches percussives sans peur de casser, imprimer une grille de Team Spirit pour son pupitre.","constats":[{"t":"L'impression existe pour Team Spirit, mais pas de manuel/fiche imprimable globale de la page pour un usage papier.","sev":"mineur","th":"Visuel & lisibilité"},{"t":"Beaucoup de sections dépliables : sans exemple préalable, il hésite avant de modifier un réglage inconnu.","sev":"mineur","th":"Prise en main"}],"aime":["« ⟲ Tout réinitialiser » : le filet qui l'autorise à explorer","L'impression / PDF des pupitres de Team Spirit"]},{"id":19,"nom":"Fatou","age":50,"role":"Animatrice d'ateliers djembé","it":2,"dev":"mobile","devLbl":"Android entrée de gamme","note":8.8,"duree":"23 min","quote":"Le mode Atelier garde l'écran allumé quand le tel est posé au sol au milieu du cercle — exactement mon besoin. Le premier chargement est juste long sur mon téléphone.","scenario":"Préparer l'atelier : répartir 6 participants sur un groove ouest-africain, passer en Atelier BPM géant, écran maintenu allumé.","constats":[{"t":"Premier chargement lent sur téléphone d'entrée de gamme (poids HTML + corpus + polices CDN) — gênant quand le groupe attend.","sev":"mineur","th":"Performance"},{"t":"« ▶ Jouer en équipe » ouvre un nouvel onglet : à distribuer aux participants, un nouvel onglet inattendu peut perdre les moins à l'aise.","sev":"mineur","th":"Navigation"}],"aime":["Le mode Atelier avec écran maintenu allumé (posé au sol)","La répartition auto qui équilibre la charge de jeu"]},{"id":20,"nom":"Laurent","age":52,"role":"Bassiste funk semi-pro","it":3,"dev":"ordinateur","devLbl":"laptop + interface audio","note":9.5,"duree":"33 min","quote":"Basse générative feel « posé », swing 54 %, gap clicks, placement dans le fond du temps : le contenu funk est juste et fin. Là, l'app parle ma langue.","scenario":"Session funk complète : basse générative feel posé, swing 54 %, gap clicks, clic de placement au fond du temps, export MP3.","constats":[{"t":"Un preset « feel » par style (funk, hip-hop, jazz) éviterait de re-régler swing + placement à chaque session.","sev":"mineur","th":"Fonctions expertes"},{"t":"Le répertoire mériterait des favoris pour rappeler ses grooves de prédilection sans re-fouiller.","sev":"mineur","th":"Fonctions expertes"}],"aime":["La basse funk générative et son feel « posé »","Le clic de placement au fond du temps, très musical"]},{"id":21,"nom":"Anne","age":55,"role":"Documentaliste, choriste","it":1,"dev":"ordinateur","devLbl":"PC familial, Chrome","note":8,"duree":"16 min","quote":"Le petit bouton « Par où commencer ? » et « Tout réinitialiser » m'ont mise en confiance. Mais dans le sommaire, « Team Spirit », « Groove », « Script » me parlent encore en anglais.","scenario":"Suivre le lien de la porte depuis l'accueil, cliquer le guide, regarder Team Spirit, s'assurer qu'on peut tout remettre en ordre.","constats":[{"t":"Les puces anglaises du sommaire (« Team Spirit », « Groove », « Script ») l'arrêtent, même si les titres de section sont francisés.","sev":"mineur","th":"Terminologie"},{"t":"Sans le guide, dix tiroirs d'un coup l'auraient laissée regarder sans agir : le point d'entrée est décisif pour elle.","sev":"mineur","th":"Prise en main"}],"aime":["Le guide d'accueil qui donne un premier geste sûr","« ⟲ Tout réinitialiser » qui préserve langue, thème et compte"]},{"id":22,"nom":"Bernard","age":58,"role":"Batteur jazz amateur","it":2,"dev":"tablette","devLbl":"iPad","note":9,"duree":"22 min","quote":"Triolets, swing 62 %, ride jazz : le fond est impeccable. Sur la tablette, les petites puces du sommaire et les curseurs fins demandent de viser.","scenario":"Régler son ride jazz : subdivision triolets, swing 62 %, accent, sur tablette posée sur le pupitre.","constats":[{"t":"Les puces du sommaire et les onglets de langue restent sous 44 px en tactile (seuls .btn-sm et curseurs sont relevés) : viser demande de l'attention.","sev":"mineur","th":"Mobile & tactile"},{"t":"Un preset « feel jazz » (swing + placement + son) prêt à charger lui ferait gagner du réglage.","sev":"mineur","th":"Fonctions expertes"}],"aime":["Le swing libre au pourcent (62 % ternaire parfait)","Le choix du caractère de clic (tonal / sec)"]},{"id":23,"nom":"Rosa","age":61,"role":"Prof de formation musicale retraitée","it":2,"dev":"ordinateur","devLbl":"laptop, Chrome","note":8.8,"duree":"26 min","quote":"Comme outil pédagogique, c'est riche et bien pensé : je le montrerai à mes anciens collègues. Le guide d'accueil aide, et l'assistant appel-réponse est un vrai support de cours.","scenario":"Évaluer la page en enseignante : gap clicks, progression guidée, appel-réponse, ce qu'elle recommanderait à des collègues.","constats":[{"t":"Les textes d'aide « En savoir plus » sont denses : excellents pour elle, mais longs pour un collègue pressé qui découvre.","sev":"mineur","th":"Visuel & lisibilité"},{"t":"Le contenu reste centré percussions/rythme : peu de matière pour une classe de formation musicale « voix et solfège ».","sev":"mineur","th":"Fonctions expertes"}],"aime":["La progression guidée qui explique la main à chaque étape","Le guide d'accueil pour lancer une démo devant la classe"]},{"id":24,"nom":"Michel","age":63,"role":"Accordéoniste de bal musette","it":1,"dev":"mobile","devLbl":"smartphone hérité de sa fille","note":7.6,"duree":"12 min","quote":"Le bouton « Premier accompagnement » m'a fait jouer un rythme sans rien comprendre d'autre — ça, j'ai réussi. Mais « Team Spirit », « Script » dans la liste, ça reste du chinois.","scenario":"Entrer « pour voir », cliquer « ▶ Premier accompagnement », obtenir un rythme qui joue, ne pas s'aventurer plus loin.","constats":[{"t":"Les intitulés anglais du sommaire (« Team Spirit », « Groove », « Script ») le bloquent net : il ne saura jamais ce qu'il y a dedans.","sev":"majeur","th":"Terminologie"},{"t":"Une fois le rythme lancé, rien ne lui dit en une phrase À QUOI SERT la page pour un accordéoniste comme lui.","sev":"mineur","th":"Prise en main"}],"aime":["« ▶ Premier accompagnement » : sa seule tâche, et elle marche"]},{"id":25,"nom":"Denise","age":66,"role":"Choriste paroissiale","it":1,"dev":"tablette","devLbl":"Android entrée de gamme","note":7.6,"duree":"14 min (avec aide)","quote":"Avec de l'aide, le bouton d'accueil a lancé un petit rythme doux, et « Tout réinitialiser » m'a rassurée. Mais quand ça a ouvert un autre onglet, je me suis perdue.","scenario":"Avec aide : cliquer le guide, écouter une couche percussive douce sous une pulsation lente, ne rien casser.","constats":[{"t":"« ▶ Jouer en équipe » ouvre un nouvel onglet : le changement d'écran la déstabilise et elle n'ose plus revenir.","sev":"mineur","th":"Navigation"},{"t":"Le ✕ du bandeau et les petites puces sont difficiles à viser au doigt sur sa tablette (cibles < 44 px).","sev":"mineur","th":"Mobile & tactile"}],"aime":["Le guide d'accueil : un premier geste réussi avec l'aidant","« ⟲ Tout réinitialiser » qui la rassure après une fausse manœuvre"]},{"id":26,"nom":"Georges","age":68,"role":"Violoniste amateur (50 ans de pratique)","it":2,"dev":"ordinateur","devLbl":"PC Windows, écran 24 pouces","note":8.1,"duree":"24 min","quote":"J'ai découvert le plein écran de la percussion et le mode Atelier par hasard. Comme violoniste, je regrette que l'archet soit parti sur la page d'accueil.","scenario":"Lire la page entière, comprendre chaque section, tester le micro-timing et découvrir les modes plein écran.","constats":[{"t":"Les modes plein écran (percussion, Atelier) sont peu découvrables : il les a trouvés « par hasard » en explorant.","sev":"mineur","th":"Navigation"},{"t":"L'archet ayant migré sur index.html, le vocabulaire et les outils de son instrument ne sont plus sur cette page.","sev":"mineur","th":"Fonctions expertes"}],"aime":["Le micro-timing pour visualiser le swing d'une frappe","Le mode Atelier en BPM géant"]},{"id":27,"nom":"Malika","age":71,"role":"Pianiste retraitée, ex-professeure","it":2,"dev":"tablette","devLbl":"iPad","note":8.3,"duree":"20 min","quote":"Le sommaire en haut m'aide à sauter entre Son, Groove et Répertoire sans me perdre. Il manque juste qu'il me dise où je suis, et les petites puces sont fines au doigt.","scenario":"Naviguer au sommaire entre Son, Groove et Répertoire, régler un clic clair, sans perdre sa position sur la longue page.","constats":[{"t":"Le sommaire n'indique pas la section courante : sur une page longue, elle perd sa position après un défilement.","sev":"mineur","th":"Navigation"},{"t":"Les puces du sommaire (padding réduit) et les icônes sans texte sont fines à viser au doigt sur iPad.","sev":"mineur","th":"Mobile & tactile"}],"aime":["Le sommaire sticky pour sauter de section en section","« Son du clic » clairement libellé et réglable"]},{"id":28,"nom":"Jean-Paul","age":74,"role":"Clarinettiste d'harmonie municipale","it":1,"dev":"ordinateur","devLbl":"PC, Chrome installé par son fils","note":7.8,"duree":"15 min","quote":"Le bouton d'accueil m'a donné un rythme sans que je comprenne le reste, et c'est déjà bien. Mais dès que je vois « Team Spirit » ou « Script », je m'arrête.","scenario":"Visiter la page sur les conseils de son fils, cliquer le guide, chercher « quelque chose de simple », s'arrêter aux mots anglais.","constats":[{"t":"Les anglicismes du sommaire (« Team Spirit », « Script », « Groove ») l'arrêtent : il s'interdit d'ouvrir ce qu'il ne comprend pas.","sev":"majeur","th":"Terminologie"},{"t":"Les cibles fines (puces, onglets de langue) sont difficiles pour des mains qui tremblent un peu.","sev":"mineur","th":"Mobile & tactile"}],"aime":["Le guide « Premier accompagnement » : un rythme sans jargon"]},{"id":29,"nom":"Suzanne","age":77,"role":"Organiste liturgique","it":1,"dev":"tablette","devLbl":"Android","note":7.5,"duree":"13 min (avec aide)","quote":"Avant, toucher un titre ouvrait ou fermait un tiroir sans que je veuille — maintenant appuyer sur un « ? » ne bouge plus la page. Ça m'a beaucoup calmée.","scenario":"Avec aide : lancer le guide, écouter un accompagnement doux, apprivoiser les sections sans déclencher d'ouvertures involontaires.","constats":[{"t":"Il reste beaucoup de tiroirs dépliables : ouvrir une section décale la page, et le mode « une à la fois » est décoché par défaut.","sev":"mineur","th":"Accessibilité"},{"t":"Le ✕ du bandeau et les puces du sommaire sont petits à viser : un toucher imprécis peut ouvrir autre chose.","sev":"mineur","th":"Mobile & tactile"}],"aime":["Le clic sur un « ? » qui n'ouvre plus la section par erreur","Le guide d'accueil pour un premier son rassurant"]},{"id":30,"nom":"Henri","age":80,"role":"Ancien chef d'harmonie","it":1,"dev":"ordinateur","devLbl":"PC ancien, écran 1366×768","note":7.9,"duree":"18 min","quote":"Le visuel est superbe et le zoom à 150 % tient bien. Le bouton d'accueil m'a donné un premier son. Il me manque un vrai manuel imprimable pour tout comprendre au calme.","scenario":"Étudier la page en ancien chef, zoomer le navigateur à 150 %, lancer le guide, chercher un support imprimable global.","constats":[{"t":"Pas de manuel/fiche imprimable global de la page : pour lire au calme, il n'a que l'impression de Team Spirit.","sev":"mineur","th":"Visuel & lisibilité"},{"t":"Certains textes gris et petits (sous-titres, hints) restent difficiles même au zoom pour ses yeux.","sev":"mineur","th":"Visuel & lisibilité"}],"aime":["Le rendu visuel et la roue du métronome","Le guide d'accueil et le zoom navigateur bien supporté"]}];
+
+/* ================= CONSTATS CONSOLIDÉS ================= */
+const ISSUES = [{"id":"C1","sev":"majeur","effort":"faible","titre":"Le sommaire garde « Team Spirit », « Groove », « Script » en anglais et bloque les 63 ans et +","desc":"Les titres de section ont été francisés (« Routine programmée » au lieu de « Script »), mais les puces du sommaire sticky affichent toujours les intitulés anglais. Pour les novices âgés (IT 1), ces mots ferment l'entrée des tiroirs : ils ne sauront jamais ce qu'il y a dedans.","reco":"Franciser les libellés des puces du sommaire (ou doubler d'un libellé FR), en cohérence avec les titres de section déjà francisés. « Team Spirit » peut rester comme nom propre s'il est glosé.","who":[24,28,21,29,30]},{"id":"C2","sev":"majeur","effort":"moyen","titre":"Malgré le guide, pas de parcours « simple / classe » : la densité reste intimidante","desc":"Le bandeau « Par où commencer ? » donne un premier geste, mais la page reste dense (une dizaine de tiroirs). Il n'existe ni chemin « enfant » pour la plus jeune, ni « mode simple » qui replie tout sauf l'essentiel pour un usage de classe rapide.","reco":"Offrir un parcours minimal explicite : soit un mode « simple » qui masque les sections expertes, soit activer « Une section à la fois » par défaut pour les nouveaux venus détectés.","who":[1,13,17,24,25,29]},{"id":"C3","sev":"mineur","effort":"faible","titre":"Cibles tactiles résiduelles sous 44 px (puces, drapeaux de langue, ✕ du guide)","desc":"Le @media (pointer: coarse) relève .btn-sm, les boutons de tempo et les curseurs à 44 px, mais laisse les puces du sommaire (padding 3px 10px), les onglets de langue et le ✕ du bandeau en dessous du seuil.","reco":"Étendre la règle de cible tactile 44 px aux .toc-chip, .lang-btn et .guide-close en pointeur grossier.","who":[2,22,25,27,28,29]},{"id":"C4","sev":"mineur","effort":"moyen","titre":"Premier chargement lourd sur mobile modeste (HTML ~304 Ko + grooves + polices CDN)","desc":"Le fichier fait ~304 Ko, auxquels s'ajoutent les corpus de grooves et deux familles de polices Google chargées depuis un CDN. Sur téléphone d'entrée de gamme ou en 3G, le premier rendu se sent ; ensuite l'usage hors-ligne est impeccable.","reco":"Auto-héberger les polices (supprimer la dépendance fonts.gstatic), différer le chargement des corpus de grooves non affichés d'emblée.","who":[6,13,19,10]},{"id":"C5","sev":"mineur","effort":"faible","titre":"Le sommaire ne marque pas la section courante et n'offre pas « tout replier »","desc":"Le sommaire sticky ouvre bien la section visée, mais n'a aucun état actif au défilement : sur une page aussi longue, on perd le repère de position. Il manque aussi un « tout replier » pour revenir à une vue d'ensemble.","reco":"Ajouter un état actif de puce synchronisé au scroll (IntersectionObserver) et un bouton « tout replier ».","who":[7,10,16,27,26]},{"id":"C6","sev":"mineur","effort":"moyen","titre":"Répertoire sans recherche ni favoris ; pas de preset de séance global","desc":"La liste des grooves s'allonge sans recherche, filtre ni favoris. Par ailleurs on sauve une séquence de percussion, mais pas une « séance » complète (couches + basse + claves + routine) rappelable comme un preset.","reco":"Ajouter une recherche/favoris au répertoire et un enregistrement nommé de la configuration globale.","who":[3,4,8,12,16,20]},{"id":"C7","sev":"mineur","effort":"moyen","titre":"« ▶ Jouer en équipe » ouvre un nouvel onglet, ce qui désoriente les moins à l'aise","desc":"La passerelle R-6 (window.open vers equipe.html) est un vrai progrès, mais l'ouverture en nouvel onglet peut être bloquée par un pop-up et désoriente les utilisateurs âgés qui perdent l'écran de départ.","reco":"Prévenir l'utilisateur (« la vue équipe s'ouvre dans un nouvel onglet »), et prévoir un repli en navigation directe si le pop-up est bloqué.","who":[15,19,25]},{"id":"C8","sev":"mineur","effort":"faible","titre":"Le bandeau « Par où commencer ? » s'affiche pour tout le monde, pas seulement les arrivants de la porte","desc":"Le guide d'accueil est utile aux novices, mais il apparaît par défaut pour chaque visiteur (y compris experts et récurrents) tant qu'il n'est pas masqué. Le libellé « un accompagnement en un clic » sonne superflu pour un habitué.","reco":"Cibler l'affichage aux visites venant de la porte « En équipe » (ou première visite détectée), et le laisser masquable/persisté comme aujourd'hui.","who":[8,10,16]},{"id":"C9","sev":"mineur","effort":"faible","titre":"Anglicismes résiduels glosés mais présents (« backing track », « swing », « gap clicks », « feel »)","desc":"Plusieurs termes techniques restent en anglais, glosés par infobulle bilingue. Corrects pour les initiés, ils restent des portes fermées pour les non-anglophones et les élèves qui cherchent le mot du solfège.","reco":"Doubler systématiquement d'un équivalent français en clair (« accompagnement joué par l'app » pour backing track, etc.).","who":[3,5,9,21]},{"id":"C10","sev":"mineur","effort":"faible","titre":"Nombreux tiroirs dépliables : ouvrir une section décale la page (mode « une à la fois » décoché par défaut)","desc":"La page repose sur une dizaine de <details> ; ouvrir l'un décale la page, ce qui déstabilise les plus âgés. Le clic sur un « ? » n'ouvre plus la section par erreur (bonne correction), mais le mode « Une section à la fois » reste décoché par défaut.","reco":"Activer « Une section à la fois » par défaut pour les profils novices, ou stabiliser le scroll à l'ouverture.","who":[17,25,29]},{"id":"C11","sev":"mineur","effort":"moyen","titre":"Contenu centré percussions/rythme : peu pour la voix, les cordes et l'harmonie","desc":"L'archet a migré vers index.html ; la voix (chant) et l'harmonie n'ont pas d'outil dédié ici. Chanteuse, violoniste et prof de FM trouvent moins de matière sur cette page qu'un percussionniste.","reco":"Prévoir a minima une note de référence pour la voix et signaler explicitement où trouver l'archet (lien contextuel vers index.html).","who":[5,11,23,26]},{"id":"C12","sev":"mineur","effort":"moyen","titre":"Pas de support imprimable global de la page (au-delà de l'impression Team Spirit)","desc":"L'impression/PDF n'existe que pour la grille Team Spirit. Les profils qui veulent lire au calme ou distribuer un support papier n'ont pas de fiche/manuel imprimable de l'ensemble des réglages.","reco":"Ajouter une vue imprimable récapitulative (réglages courants + légende) réutilisable comme aide-mémoire.","who":[18,30,23]}];
+
+/* ================= RENDU ================= */
+const $ = id => document.getElementById(id);
+const AGEBUCKET = a => a<18?"0-17":a<36?"18-35":a<56?"36-55":"56-99";
+const AGELBL = {"0-17":"< 18 ans","18-35":"18–35","36-55":"36–55","56-99":"56 et +"};
+const DEVLBL = {mobile:"📱 Smartphone",tablette:"💻 Tablette",ordinateur:"🖥 Ordinateur"};
+const SEVW = {critique:3,majeur:2,mineur:1};
+
+function kpis(){
+  const avg = (P.reduce((s,p)=>s+p.note,0)/P.length).toFixed(1);
+  const nC = P.reduce((s,p)=>s+p.constats.filter(c=>c.sev==="critique").length,0);
+  const nM = P.reduce((s,p)=>s+p.constats.filter(c=>c.sev==="majeur").length,0);
+  const nTot = P.reduce((s,p)=>s+p.constats.length,0);
+  const reco = P.filter(p=>p.note>=8).length;
+  $("kpis").innerHTML =
+   `<div class="kpi acc"><div class="v">${avg} / 10</div><div class="l">Satisfaction moyenne</div></div>
+    <div class="kpi"><div class="v">30</div><div class="l">Testeurs · 9 à 80 ans</div></div>
+    <div class="kpi crit"><div class="v">${nC}</div><div class="l">Constats critiques</div></div>
+    <div class="kpi maj"><div class="v">${nM}</div><div class="l">Constats majeurs</div></div>
+    <div class="kpi"><div class="v">${nTot}</div><div class="l">Constats au total</div></div>
+    <div class="kpi pos"><div class="v">${reco}/30</div><div class="l">Promoteurs (note ≥ 8)</div></div>`;
+}
+
+function card(p){
+  const init = p.nom.slice(0,2).toUpperCase();
+  const cs = p.constats.map(c=>`<div class="fitem"><span class="sev ${c.sev}">${c.sev}</span><span>${c.t}</span></div>`).join("");
+  const ai = p.aime.map(a=>`<div class="fitem"><span class="sev positif">＋</span><span>${a}</span></div>`).join("");
+  return `<div class="pcard">
+    <div class="top"><div class="avatar">${init}</div>
+      <div><h3>${p.nom}, ${p.age} ans</h3><div class="meta">${p.role}</div></div>
+      <div class="score"><div class="n">${p.note}</div><div class="d">/ 10</div></div></div>
+    <div class="chips"><span class="chip it${p.it}">${ITLBL[p.it]}</span><span class="chip">${DEVLBL[p.dev]} · ${p.devLbl}</span><span class="chip">⏱ ${p.duree}</span></div>
+    <div class="quote">« ${p.quote} »</div>
+    <div class="flist">${cs}${ai}</div>
+    <details class="more"><summary>Scénario de test</summary><div class="box">${p.scenario}</div></details>
+  </div>`;
+}
+
+function renderPanel(){
+  const fa=$("fAge").value, fi=$("fIT").value, fd=$("fDev").value, fs=$("fSev").value, ft=$("fTxt").value.trim().toLowerCase();
+  const out = P.filter(p=>{
+    if(fa && AGEBUCKET(p.age)!==fa) return false;
+    if(fi && String(p.it)!==fi) return false;
+    if(fd && p.dev!==fd) return false;
+    if(fs && !p.constats.some(c=>c.sev===fs)) return false;
+    if(ft){
+      const blob=(p.nom+" "+p.role+" "+p.quote+" "+p.devLbl+" "+p.scenario+" "+p.constats.map(c=>c.t).join(" ")+" "+p.aime.join(" ")).toLowerCase();
+      if(!blob.includes(ft)) return false;
+    }
+    return true;
+  });
+  $("countLine").textContent = out.length===P.length? "30 testeurs affichés" : `${out.length} testeur${out.length>1?"s":""} sur 30 (filtres actifs)`;
+  $("grid").innerHTML = out.map(card).join("") || "<p style='color:var(--sub)'>Aucun testeur ne correspond à ces filtres.</p>";
+}
+
+function renderIssues(){
+  const scored = ISSUES.map(i=>({...i,score:SEVW[i.sev]*i.who.length})).sort((a,b)=>b.score-a.score);
+  $("issueList").innerHTML = scored.map(i=>{
+    const pct = Math.round(i.who.length/30*100);
+    const names = i.who.map(id=>{const p=P.find(x=>x.id===id);return `${p.nom} (${p.age})`;}).join(", ");
+    return `<div class="issue ${i.sev}">
+      <div class="ihead"><span class="sev ${i.sev}">${i.sev}</span><h3>${i.id} — ${i.titre}</h3>
+      <span class="effort ${i.effort}">effort ${i.effort==="eleve"?"élevé":i.effort}</span>
+      <span class="freq">${i.who.length}/30 testeurs · ${pct} %</span></div>
+      <div class="bar-out"><div class="bar-in" style="width:${pct}%;background:${i.sev==="critique"?"var(--crit)":i.sev==="majeur"?"var(--maj)":"var(--min)"}"></div></div>
+      <div class="desc">${i.desc}</div>
+      <div class="reco">💡 <b>Recommandation :</b> ${i.reco}</div>
+      <div class="who">Rapporté par : ${names}</div>
+    </div>`;
+  }).join("");
+}
+
+function hbars(el,rows,max,color){
+  $(el).innerHTML = rows.map(r=>{
+    const w = Math.round(r.v/max*100);
+    return `<div class="hbar"><div class="lab">${r.l}</div><div class="track"><div class="fill" style="width:${w}%;background:${color}">${r.txt}</div></div></div>`;
+  }).join("");
+}
+
+function renderSyn(){
+  const byIT={}, byAge={}, byDev={};
+  P.forEach(p=>{
+    (byIT[p.it]=byIT[p.it]||[]).push(p.note);
+    const b=AGEBUCKET(p.age); (byAge[b]=byAge[b]||[]).push(p.note);
+    (byDev[p.dev]=byDev[p.dev]||[]).push(p.note);
+  });
+  const avg=a=>a.reduce((s,x)=>s+x,0)/a.length;
+  hbars("chIT",[1,2,3,4,5].map(k=>({l:ITLBL[k],v:avg(byIT[k]),txt:avg(byIT[k]).toFixed(1)})),10,"var(--acc)");
+  hbars("chAge",["0-17","18-35","36-55","56-99"].map(k=>({l:AGELBL[k],v:avg(byAge[k]),txt:avg(byAge[k]).toFixed(1)})),10,"#7a5cd6");
+  hbars("chDev",["mobile","tablette","ordinateur"].map(k=>({l:DEVLBL[k],v:avg(byDev[k]),txt:avg(byDev[k]).toFixed(1)})),10,"#2c9a5b");
+  const th={};
+  P.forEach(p=>p.constats.forEach(c=>th[c.th]=(th[c.th]||0)+1));
+  const rows=Object.entries(th).sort((a,b)=>b[1]-a[1]).map(([l,v])=>({l,v,txt:v}));
+  hbars("chTheme",rows,Math.max(...rows.map(r=>r.v)),"var(--maj)");
+}
+
+/* Tabs & filtres */
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("sel",x===t));
+  document.querySelectorAll(".view").forEach(v=>v.classList.toggle("sel",v.id==="v-"+t.dataset.v));
+}));
+["fAge","fIT","fDev","fSev"].forEach(id=>$(id).addEventListener("change",renderPanel));
+$("fTxt").addEventListener("input",renderPanel);
+$("fReset").addEventListener("click",()=>{["fAge","fIT","fDev","fSev"].forEach(id=>$(id).value="");$("fTxt").value="";renderPanel();});
+
+kpis(); renderPanel(); renderIssues(); renderSyn();
+</script>
+</body>
+</html>

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panel UX — Métronome — En équipe</title>
+<style>
+  :root{
+    --bg:#f4f5f7; --card:#ffffff; --ink:#1c2430; --sub:#5b6675; --line:#e3e7ee;
+    --acc:#2f6df6; --acc-soft:#e8effe;
+    --crit:#d63b3b; --crit-bg:#fdeaea;
+    --maj:#e08a00; --maj-bg:#fdf3e2;
+    --min:#3c78c2; --min-bg:#e9f1fb;
+    --pos:#2c9a5b; --pos-bg:#e6f6ec;
+    --radius:12px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);line-height:1.45}
+  .wrap{max-width:1180px;margin:0 auto;padding:20px 16px 60px}
+  header.hd{margin-bottom:18px}
+  header.hd h1{margin:0;font-size:1.5rem}
+  header.hd .sub{color:var(--sub);font-size:.92rem;margin-top:4px}
+  .badge-v{display:inline-block;background:var(--acc-soft);color:var(--acc);border-radius:20px;padding:2px 10px;font-size:.78rem;font-weight:600;margin-left:8px;vertical-align:middle}
+  .note-methodo{background:#fff8e6;border:1px solid #f0dfae;border-radius:var(--radius);padding:10px 14px;font-size:.85rem;color:#6b5a1e;margin:12px 0 18px}
+
+  /* KPI */
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px}
+  .kpi .v{font-size:1.7rem;font-weight:700;font-variant-numeric:tabular-nums}
+  .kpi .l{font-size:.78rem;color:var(--sub);text-transform:uppercase;letter-spacing:.04em}
+  .kpi.crit .v{color:var(--crit)} .kpi.maj .v{color:var(--maj)} .kpi.pos .v{color:var(--pos)} .kpi.acc .v{color:var(--acc)}
+
+  /* Tabs */
+  .tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+  .tab{border:1px solid var(--line);background:var(--card);border-radius:22px;padding:8px 18px;cursor:pointer;font-size:.92rem;font-weight:600;color:var(--sub)}
+  .tab.sel{background:var(--acc);border-color:var(--acc);color:#fff}
+  .view{display:none} .view.sel{display:block}
+
+  /* Filtres */
+  .filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;margin-bottom:16px}
+  .filters label{font-size:.8rem;color:var(--sub);display:flex;flex-direction:column;gap:3px;font-weight:600}
+  .filters select,.filters input[type=search]{border:1px solid var(--line);border-radius:8px;padding:6px 8px;font-size:.88rem;background:#fff;color:var(--ink);min-width:130px}
+  .filters .reset{align-self:flex-end;border:none;background:none;color:var(--acc);cursor:pointer;font-size:.85rem;text-decoration:underline;padding:6px}
+  .count-line{font-size:.85rem;color:var(--sub);margin-bottom:10px}
+
+  /* Cartes personas */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px}
+  .pcard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;gap:10px}
+  .pcard .top{display:flex;gap:12px;align-items:center}
+  .avatar{width:46px;height:46px;border-radius:50%;background:var(--acc-soft);color:var(--acc);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.05rem;flex-shrink:0}
+  .pcard h3{margin:0;font-size:1.02rem}
+  .pcard .meta{font-size:.8rem;color:var(--sub)}
+  .chips{display:flex;gap:6px;flex-wrap:wrap}
+  .chip{font-size:.72rem;border-radius:14px;padding:2px 9px;background:var(--bg);border:1px solid var(--line);color:var(--sub);font-weight:600}
+  .chip.it1{background:#fdeaea;color:#a33;border-color:#f3caca}
+  .chip.it2{background:#fdf3e2;color:#96650a;border-color:#efd9a8}
+  .chip.it3{background:#eef3fb;color:#39599c;border-color:#ccd9f0}
+  .chip.it4{background:#e9f6ee;color:#256e43;border-color:#bfe3cc}
+  .chip.it5{background:#e6f0ea;color:#1b5e35;border-color:#a9d4b8}
+  .score{margin-left:auto;text-align:center}
+  .score .n{font-size:1.25rem;font-weight:700;font-variant-numeric:tabular-nums}
+  .score .d{font-size:.65rem;color:var(--sub)}
+  .quote{font-style:italic;font-size:.88rem;color:#38424f;border-left:3px solid var(--acc);padding:2px 0 2px 10px;background:var(--acc-soft);border-radius:0 8px 8px 0;padding:8px 10px}
+  .flist{display:flex;flex-direction:column;gap:6px;font-size:.85rem}
+  .fitem{display:flex;gap:8px;align-items:flex-start}
+  .sev{flex-shrink:0;font-size:.66rem;font-weight:700;border-radius:4px;padding:2px 6px;margin-top:2px;text-transform:uppercase;letter-spacing:.03em}
+  .sev.critique{background:var(--crit-bg);color:var(--crit)}
+  .sev.majeur{background:var(--maj-bg);color:var(--maj)}
+  .sev.mineur{background:var(--min-bg);color:var(--min)}
+  .sev.positif{background:var(--pos-bg);color:var(--pos)}
+  details.more{font-size:.83rem;color:var(--sub)}
+  details.more summary{cursor:pointer;color:var(--acc);font-weight:600}
+  details.more .box{margin-top:6px;background:var(--bg);border-radius:8px;padding:8px 10px}
+
+  /* Constats consolidés */
+  .issue{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:12px;border-left:5px solid var(--min)}
+  .issue.critique{border-left-color:var(--crit)} .issue.majeur{border-left-color:var(--maj)}
+  .issue .ihead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .issue h3{margin:0;font-size:1rem;flex:1}
+  .issue .freq{font-size:.8rem;color:var(--sub);white-space:nowrap}
+  .issue .desc{font-size:.88rem;color:#38424f;margin:8px 0}
+  .issue .reco{font-size:.86rem;background:var(--pos-bg);border-radius:8px;padding:8px 10px;color:#1d5c38}
+  .issue .who{font-size:.78rem;color:var(--sub);margin-top:8px}
+  .bar-out{height:7px;background:var(--bg);border-radius:4px;overflow:hidden;margin-top:6px}
+  .bar-in{height:100%;border-radius:4px;background:var(--acc)}
+  .effort{font-size:.72rem;font-weight:700;border-radius:4px;padding:2px 8px}
+  .effort.faible{background:var(--pos-bg);color:var(--pos)}
+  .effort.moyen{background:var(--maj-bg);color:var(--maj)}
+  .effort.eleve{background:var(--crit-bg);color:var(--crit)}
+
+  /* Synthèse */
+  .syn-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:820px){.syn-grid{grid-template-columns:1fr}}
+  .syn-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+  .syn-card h3{margin:0 0 12px;font-size:1rem}
+  .hbar{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:.82rem}
+  .hbar .lab{width:150px;flex-shrink:0;color:var(--sub);text-align:right}
+  .hbar .track{flex:1;background:var(--bg);border-radius:4px;height:16px;overflow:hidden}
+  .hbar .fill{height:100%;border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;color:#fff;font-size:.68rem;font-weight:700;min-width:22px}
+  .strengths li,.roadmap li{margin-bottom:7px;font-size:.88rem}
+  .roadmap{padding-left:18px} .strengths{padding-left:18px}
+  .prio-tag{font-weight:700}
+  .p1{color:var(--crit)} .p2{color:var(--maj)} .p3{color:var(--min)}
+  footer{margin-top:30px;font-size:.78rem;color:var(--sub);text-align:center}
+  @media(max-width:600px){
+    .grid{grid-template-columns:1fr}
+    .hbar .lab{width:105px;font-size:.72rem}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hd">
+    <h1>Panel de tests UI — Métronome — En équipe<span class="badge-v">0.21.0</span></h1>
+    <div class="sub">30 testeurs simulés · 9 à 80 ans · compétences numériques niveau 1 (novice) à 5 (expert) · mobile, tablette et ordinateur — tests menés sur <code>equipe.html</code></div>
+  </header>
+
+  <div class="note-methodo">⚠ <b>Méthodologie :</b> panel de personas simulés par IA à partir de l'analyse réelle du code et de l'interface de l'application. Les constats pointent des éléments vérifiables de l'UI (densité, tailles de police, breakpoints, libellés…), mais ne remplacent pas des tests avec de vrais utilisateurs — ils servent à préparer et prioriser ces tests.</div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="tabs">
+    <button class="tab sel" data-v="panel">👥 Le panel (30)</button>
+    <button class="tab" data-v="issues">🔍 Constats consolidés</button>
+    <button class="tab" data-v="syn">📊 Synthèse &amp; plan d'action</button>
+  </div>
+
+  <!-- ===== VUE PANEL ===== -->
+  <div class="view sel" id="v-panel">
+    <div class="filters">
+      <label>Tranche d'âge
+        <select id="fAge"><option value="">Toutes</option><option value="0-17">Moins de 18 ans</option><option value="18-35">18 – 35 ans</option><option value="36-55">36 – 55 ans</option><option value="56-99">56 ans et +</option></select>
+      </label>
+      <label>Compétence numérique
+        <select id="fIT"><option value="">Toutes</option><option value="1">1 · Novice</option><option value="2">2 · Basique</option><option value="3">3 · À l'aise</option><option value="4">4 · Avancé</option><option value="5">5 · Expert</option></select>
+      </label>
+      <label>Appareil
+        <select id="fDev"><option value="">Tous</option><option value="mobile">Smartphone</option><option value="tablette">Tablette</option><option value="ordinateur">Ordinateur</option></select>
+      </label>
+      <label>Sévérité rencontrée
+        <select id="fSev"><option value="">Toutes</option><option value="critique">Critique</option><option value="majeur">Majeur</option><option value="mineur">Mineur</option></select>
+      </label>
+      <label>Recherche
+        <input type="search" id="fTxt" placeholder="mot-clé, instrument…">
+      </label>
+      <button class="reset" id="fReset">Réinitialiser</button>
+    </div>
+    <div class="count-line" id="countLine"></div>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <!-- ===== VUE CONSTATS ===== -->
+  <div class="view" id="v-issues">
+    <div class="count-line">Constats consolidés à partir des 30 sessions, classés par score de priorité (sévérité × nombre de testeurs touchés). La barre indique la part du panel concernée.</div>
+    <div id="issueList"></div>
+  </div>
+
+  <!-- ===== VUE SYNTHÈSE ===== -->
+  <div class="view" id="v-syn">
+    <div class="syn-grid">
+      <div class="syn-card"><h3>Satisfaction moyenne par compétence numérique</h3><div id="chIT"></div></div>
+      <div class="syn-card"><h3>Satisfaction moyenne par tranche d'âge</h3><div id="chAge"></div></div>
+      <div class="syn-card"><h3>Problèmes par thème (occurrences)</h3><div id="chTheme"></div></div>
+      <div class="syn-card"><h3>Satisfaction moyenne par appareil</h3><div id="chDev"></div></div>
+    </div>
+    <div class="syn-grid" style="margin-top:14px">
+      <div class="syn-card">
+        <h3>✅ Points forts unanimes</h3>
+        <ul class="strengths">
+<li><b>Entrée « à froid » sauvée</b> : intro en clair, 3 étapes, et surtout « Essayer avec un exemple » (répartition démo embarquée, sans backend) rendent la page vide explorable en un clic.</li>
+<li><b>Dé-jargon v1.1 payant</b> : « les autres » (ex-backing), « fichier .json » (ex-JSON), « Rythme : » (ex-Groove) et la glose de « le chef » lèvent des blocages de vocabulaire.</li>
+<li><b>Transport masqué à froid</b> : tempo, démarrer et volume n'apparaissent qu'une fois une équipe chargée — fini le « ▶ Démarrer » qui ne jouait qu'un clic nu.</li>
+<li><b>Pupitre vivant</b> : une ligne par voix, cases frappe/accent colorées et curseur qui suit la lecture — lisible et agréable.</li>
+<li><b>Pensé pour le collectif</b> : décompte plein écran du chef, écran maintenu allumé (wake lock), fiche imprimable par pupitre et lien de partage autoporté.</li>
+<li><b>Trilingue soigné</b> : FR / EN / PT-BR complet (« maestro », pupitre → « part »), y compris placeholders, titres et aria-labels.</li>
+</ul>
+      </div>
+      <div class="syn-card">
+        <h3>🗺 Plan d'action recommandé</h3>
+        <ol class="roadmap">
+<li><span class="prio-tag p1">P1 · Guider la mise en place à plusieurs</span> — assistant « inviter mon groupe » (générer/partager le code, rôles explicites, état des joueurs connectés) et un mode démo de salle pour le mode en ligne. <i>Débloque le vrai usage de groupe pour les novices ; effort élevé.</i></li>
+<li><span class="prio-tag p1">P1 · Désangliciser et gloser le vocabulaire résiduel</span> — « Team Spirit », « chef », « pupitre », « salle », « En ligne (salle) » : micro-gloses au survol ou en sous-titre. <i>Touche grands débutants et non-anglophones ; effort faible.</i></li>
+<li><span class="prio-tag p2">P2 · Éditer ou créer une répartition sur place</span> — sans repartir vers Team Spirit ; au minimum, dupliquer/ajuster l'exemple ou choisir un preset par style / instrument. <i>Évite un aller-retour de page ; effort élevé.</i></li>
+<li><span class="prio-tag p2">P2 · Ajouter « Recommencer / revenir à l'accueil »</span> depuis l'état chargé — porte de sortie qui rassure les prudents. <i>Confiance des novices ; effort faible.</i></li>
+<li><span class="prio-tag p2">P2 · Alléger le pupitre sur petit écran</span> — cellules plus grandes/adaptatives, curseur plus visible, et surveiller la charge audio multi-lignes sur téléphone modeste. <i>Mobile & performance ; effort moyen.</i></li>
+<li><span class="prio-tag p3">P3 · Adoucir le décompte plein écran</span> — courte transition, libellé « ça va démarrer », respect de prefers-reduced-motion. <i>Publics sensibles aux mouvements ; effort faible.</i></li>
+<li><span class="prio-tag p3">P3 · Accessibilité fine</span> — exposer la grille du pupitre à l'assistive tech, raccourcis clavier du transport, contraste des petits textes gris. <i>Experts a11y et seniors ; effort moyen.</i></li>
+</ol>
+      </div>
+    </div>
+  </div>
+
+  <footer>Dashboard généré le 17/07/2026 · Panel simulé (30 personas) sur equipe.html · Métronome — En équipe</footer>
+</div>
+
+<script>
+/* ================= DONNÉES ================= */
+const ITLBL = {1:"IT 1 · Novice",2:"IT 2 · Basique",3:"IT 3 · À l'aise",4:"IT 4 · Avancé",5:"IT 5 · Expert"};
+const P = [{"id":1,"nom":"Léa","age":9,"role":"Élève en éveil musical (percussions)","it":1,"dev":"tablette","devLbl":"iPad école","note":7.4,"duree":"8 min (avec la maîtresse)","quote":"J'ai appuyé sur « Essayer avec un exemple » et ça a fait des petites cases qui s'allument avec le son du tambour, j'adore ! Mais « pupitre » et « le chef », je sais pas ce que c'est.","scenario":"Arrive sur la page vide, clique « Essayer avec un exemple », regarde les cases colorées bouger et écoute le djembé, puis essaie de choisir « Joueur 2 ».","constats":[{"t":"Mots d'adulte : « pupitre », « salle de concert », « le chef » incompris","sev":"majeur","th":"Terminologie"},{"t":"Les lignes s'appellent basse/tone/slap, sans image ni explication","sev":"mineur","th":"Terminologie"},{"t":"Une fois l'exemple chargé, elle ne saurait pas revenir en arrière","sev":"mineur","th":"Navigation"}],"aime":["L'exemple qui démarre tout seul, les cases qui s'allument et le son du tambour","Les couleurs différentes pour chaque ligne"]},{"id":2,"nom":"Tom","age":12,"role":"Collégien, batterie 1re année","it":3,"dev":"mobile","devLbl":"Android Samsung A25","note":8,"duree":"10 min","quote":"En deux clics je vois le rythme défiler, on dirait un petit jeu de batterie. Sur le tel, les cases sont vraiment fines par contre.","scenario":"Charge l'exemple, monte le tempo à fond, choisit sa ligne (slap) et suit le curseur en tapant sur la table.","constats":[{"t":"16 cases très serrées au pouce sur mobile, dur de viser une case","sev":"majeur","th":"Mobile & tactile"},{"t":"Envie d'un score / d'un « bien joué », rien ne récompense","sev":"mineur","th":"Fonctions expertes"},{"t":"Le curseur va vite, peu lisible à tempo élevé","sev":"mineur","th":"Visuel & lisibilité"}],"aime":["Ça démarre tout de suite avec l'exemple, effet petit jeu","Le décompte plein écran juste avant le départ"]},{"id":3,"nom":"Inès","age":14,"role":"Flûtiste, conservatoire 2e cycle","it":3,"dev":"mobile","devLbl":"iPhone 13","note":8.2,"duree":"14 min","quote":"« Mon pupitre — ma ligne à jouer », ça parle tout de suite quand on vient de l'orchestre. « Écouter tout (chef) », par contre, je ne savais pas si c'était un rôle ou un bouton.","scenario":"Ouvre l'exemple, lit chaque libellé, teste « Je suis… Joueur 1 » puis « Écouter tout » et compare les grilles.","constats":[{"t":"« Écouter tout (chef) » mélange un rôle et une option d'écoute","sev":"mineur","th":"Terminologie"},{"t":"Un seul exemple (funk/djembé), pas d'autres styles à explorer","sev":"mineur","th":"Fonctions expertes"},{"t":"Passer à sa propre répartition renvoie vers une autre page","sev":"mineur","th":"Navigation"}],"aime":["Le vocabulaire pupitre/ligne, fidèle à l'orchestre","La grille qui distingue nettement frappes et accents"]},{"id":4,"nom":"Hugo","age":16,"role":"Bassiste autodidacte (YouTube)","it":4,"dev":"ordinateur","devLbl":"PC portable Windows","note":8.6,"duree":"18 min","quote":"J'ouvre l'exemple, je coche « Entendre les autres lignes », je repique ma ligne au curseur — exactement ce que je veux. Manque juste un moyen d'éditer la répartition ici même.","scenario":"Charge l'exemple, isole sa ligne en jouant sur « Entendre les autres », remonte le tempo, copie le lien de partage.","constats":[{"t":"Impossible d'éditer/créer une répartition sur la page, il faut aller dans Team Spirit","sev":"majeur","th":"Fonctions expertes"},{"t":"Pas d'export audio ni de tap-tempo pour repiquer plus vite","sev":"mineur","th":"Fonctions expertes"}],"aime":["« Entendre les autres lignes » pour isoler et mixer sa partie","Le lien de partage qui embarque toute la config"]},{"id":5,"nom":"Emma","age":17,"role":"Chanteuse de chorale lycéenne","it":2,"dev":"mobile","devLbl":"Android Xiaomi","note":7.9,"duree":"11 min","quote":"« Chef », « pupitre » : je connais, je chante en chorale. Mais « Team Spirit » et « salle », là je décroche.","scenario":"Charge l'exemple, cherche les mots de la chorale, choisit sa ligne, tente de comprendre le mode « En ligne (salle) ».","constats":[{"t":"« Team Spirit » (anglais) coupe la lecture pour préparer une répartition","sev":"majeur","th":"Terminologie"},{"t":"Retour visuel de la ligne active peu marqué quand on change de joueur","sev":"mineur","th":"Visuel & lisibilité"},{"t":"« En ligne (salle) » : pas sûre de ce qui se passe si je clique","sev":"mineur","th":"Prise en main"}],"aime":["Le vocabulaire chef/pupitre, familier depuis la chorale"]},{"id":6,"nom":"Nathan","age":19,"role":"Étudiant STAPS, djembé en association","it":3,"dev":"mobile","devLbl":"Android milieu de gamme","note":8.7,"duree":"20 min","quote":"Djembé, trois lignes, départ commun : c'est exactement mon asso. Sur mon tel moyen, quand tout joue en même temps, ça tousse un peu.","scenario":"Charge l'exemple djembé, prend la ligne slap, monte le tempo et joue par-dessus le backing pour simuler le groupe.","constats":[{"t":"Charge audio : plusieurs lignes simultanées décrochent sur téléphone modeste","sev":"majeur","th":"Performance"},{"t":"Cases du pupitre serrées, gestes fins difficiles à tempo rapide","sev":"majeur","th":"Mobile & tactile"},{"t":"Rien sur le doigté main gauche / main droite du djembé","sev":"mineur","th":"Audio & son"}],"aime":["L'exemple djembé, pile dans mon usage réel","Le curseur qui suit ma ligne pendant que je joue"]},{"id":7,"nom":"Chloé","age":22,"role":"Étudiante en musicologie","it":3,"dev":"ordinateur","devLbl":"MacBook Air","note":8,"duree":"16 min","quote":"L'intro et les trois étapes sont pédagogiquement propres. J'aurais aimé une source sur le pattern « funk » proposé en exemple.","scenario":"Lit toute la page vide, suit les 3 étapes, charge l'exemple, examine la hiérarchie de l'information et le nommage.","constats":[{"t":"L'exemple « funk » sur djembé n'est pas situé ni sourcé musicologiquement","sev":"mineur","th":"Audio & son"},{"t":"« Écouter tout (chef) » ambigu dans la liste des joueurs","sev":"mineur","th":"Terminologie"}],"aime":["L'intro en clair + les 3 étapes, vraie logique pédagogique","Le dé-jargon (« les autres », « fichier .json »)"]},{"id":8,"nom":"Yanis","age":24,"role":"DJ amateur, production MAO","it":5,"dev":"ordinateur","devLbl":"PC gamer, Chrome","note":8.3,"duree":"17 min","quote":"Import .json, lien qui encode la config, salle Supabase pour la sync : le workflow est là. Mais je ne peux pas vérifier la sync live hors prod, et pas d'export audio.","scenario":"Importe un .json, décode un lien collé, ouvre le mode « En ligne (salle) » et tente de créer une salle.","constats":[{"t":"Synchro live (salle) invérifiable hors production, aucun mode démo","sev":"majeur","th":"Fonctions expertes"},{"t":"Pas d'export audio/MIDI ni d'intégration vers un DAW","sev":"mineur","th":"Fonctions expertes"},{"t":"Créer sa répartition oblige à quitter vers Team Spirit","sev":"mineur","th":"Navigation"}],"aime":["Le lien qui embarque toute la config (partage sans compte)","L'import de fichier .json bien balisé"]},{"id":9,"nom":"Maria","age":26,"role":"Prof de capoeira, brésilienne","it":2,"dev":"mobile","devLbl":"Android Motorola","note":8.3,"duree":"13 min (en PT-BR)","quote":"Passei para o português e tudo se traduziu, até « maestro » e « minha parte ». Muito bom. Só « Team Spirit » ficou em inglês.","scenario":"Bascule en PT-BR dès l'arrivée, charge l'exemple, vérifie la complétude des traductions y compris placeholders et titres.","constats":[{"t":"« Team Spirit » reste en anglais dans une interface traduite","sev":"mineur","th":"Terminologie"},{"t":"« salle de concert » / « pupitre » : gloses utiles mais métaphore de musicien","sev":"mineur","th":"Terminologie"}],"aime":["Traduction PT-BR complète (maestro, minha parte), y compris les libellés cachés","L'exemple qui marche sans rien installer"]},{"id":10,"nom":"Julien","age":28,"role":"Développeur web, guitariste","it":5,"dev":"ordinateur","devLbl":"laptop Linux, Firefox","note":8.4,"duree":"22 min","quote":"Pas de canvas, la grille est en DOM, les statuts sont en aria-live, le focus est visible — du sérieux. Mais les cellules du pupitre ne sont pas exposées au lecteur d'écran et le transport n'a pas de raccourcis clavier.","scenario":"Navigue au clavier, inspecte le DOM et les rôles ARIA, teste l'exemple, ouvre l'API window.fmEquipeApp en console.","constats":[{"t":"Cellules de la grille (div/span) sans rôle ni label pour l'assistive tech","sev":"mineur","th":"Accessibilité"},{"t":"Aucun raccourci clavier pour démarrer / tempo / volume","sev":"mineur","th":"Fonctions expertes"},{"t":"Salle en ligne non testable sans backend accessible","sev":"mineur","th":"Performance"}],"aime":["Statuts en aria-live et focus-visible partout","Grille en DOM (pas de canvas opaque) + API de diagnostic exposée"]},{"id":11,"nom":"Sofia","age":31,"role":"Violoniste semi-professionnelle","it":3,"dev":"tablette","devLbl":"iPad 10e gén.","note":7.6,"duree":"12 min","quote":"Le concept de jouer chacun sa ligne est superbe, mais tout est percussion — rien pour l'archet. En portrait, la grille reste petite.","scenario":"Charge l'exemple sur iPad en portrait, teste le pupitre, cherche un contenu cordes, imprime la fiche.","constats":[{"t":"Aucun contenu pour son instrument (cordes) — djembé/percussions seulement","sev":"majeur","th":"Fonctions expertes"},{"t":"Grille du pupitre exiguë en portrait sur tablette","sev":"mineur","th":"Visuel & lisibilité"},{"t":"« Écouter tout (chef) » ambigu","sev":"mineur","th":"Terminologie"}],"aime":["L'idée « chacun sa ligne, départ commun », rare et bien vue"]},{"id":12,"nom":"Marc","age":33,"role":"Batteur de groupe rock","it":4,"dev":"mobile","devLbl":"Android Pixel","note":7.9,"duree":"15 min","quote":"Comme app de groupe, c'est original. Mais moi je vis dans les stats et les setlists ; ici, une fois l'exemple joué, il ne reste rien à suivre.","scenario":"Charge l'exemple, prend une ligne, joue plusieurs passages, cherche progression / enchaînement de morceaux.","constats":[{"t":"Pas de suivi (stats, historique) ni d'enchaînement type setlist","sev":"mineur","th":"Fonctions expertes"},{"t":"Un seul exemple/preset, pas de variantes de style prêtes","sev":"mineur","th":"Audio & son"},{"t":"Retour au choix depuis l'état chargé peu évident","sev":"mineur","th":"Navigation"}],"aime":["Le départ synchronisé au décompte, sympa à plusieurs"]},{"id":13,"nom":"Aïcha","age":35,"role":"Professeure des écoles (chorale de classe)","it":2,"dev":"ordinateur","devLbl":"PC école ancien, Firefox","note":8.3,"duree":"10 min","quote":"Pour la classe, cliquer « Essayer avec un exemple » et tout tourne, c'est parfait pour montrer vite. Mais faire jouer 25 élèves en ligne, chacun le bon code… je n'ose pas.","scenario":"Teste vite pour un usage en classe : charge l'exemple, projette, imagine la mise en place avec les élèves.","constats":[{"t":"Mode « En ligne » ingérable pour une classe (code à saisir par chacun, coordination)","sev":"majeur","th":"Prise en main"},{"t":"Créer une répartition adaptée à la classe oblige à passer par Team Spirit","sev":"majeur","th":"Navigation"},{"t":"« salle de concert » / « pupitre » à traduire pour de jeunes élèves","sev":"mineur","th":"Terminologie"}],"aime":["L'exemple immédiat, idéal pour démontrer en classe","Les 3 étapes claires en tête de page"]},{"id":14,"nom":"Diego","age":38,"role":"Percussionniste cubain (son, timba)","it":3,"dev":"mobile","devLbl":"iPhone SE, petit écran","note":7.7,"duree":"12 min","quote":"Le djembé, c'est bien, mais où sont mes claves, ma tumbao ? Et sur mon petit écran, les 16 cases sont minuscules.","scenario":"Charge l'exemple sur iPhone SE, cherche des patterns cubains, tente de viser une case précise du pupitre.","constats":[{"t":"16 cellules illisibles/injouables sur petit écran (iPhone SE)","sev":"majeur","th":"Mobile & tactile"},{"t":"Contenu percussion afro/funk mais rien de la tradition cubaine","sev":"mineur","th":"Audio & son"},{"t":"Étiquettes basse/tone/slap sans glose","sev":"mineur","th":"Terminologie"}],"aime":["La précision frappe/accent de la notation"]},{"id":15,"nom":"Camille","age":40,"role":"Cheffe de chœur et d'ensemble percus","it":3,"dev":"ordinateur","devLbl":"laptop Windows","note":8.6,"duree":"19 min","quote":"Je pense « atelier de 10 » en permanence : là, l'exemple à 3 djembés est exactement l'esprit. Reste à monter une vraie répartition à dix et à les faire partir ensemble sans galère.","scenario":"Charge l'exemple, imagine sa transposition à un atelier de 10, teste le mode chef et le lien de partage.","constats":[{"t":"Passer de l'exemple (3) à une vraie répartition de groupe (10) n'est pas outillé ici","sev":"majeur","th":"Fonctions expertes"},{"t":"Coordination en ligne (codes, rôle chef) sans assistant d'invitation","sev":"majeur","th":"Prise en main"},{"t":"Format d'export lisible par des élèves à confirmer (la fiche imprimable aide)","sev":"mineur","th":"Fonctions expertes"}],"aime":["Le décompte plein écran du chef pour lancer tout le monde","La fiche imprimable, une par pupitre"]},{"id":16,"nom":"Olivier","age":42,"role":"Ingénieur, trompettiste d'harmonie","it":5,"dev":"ordinateur","devLbl":"PC Windows, Edge","note":8.1,"duree":"18 min","quote":"Le lien encode tout, l'API de diagnostic est propre. Manque la persistance de ma dernière config et des raccourcis clavier — je fais tout à la souris.","scenario":"Charge l'exemple, décortique le lien encodé, cherche persistance/localStorage de la config, teste les raccourcis.","constats":[{"t":"La config chargée n'est pas persistée (rechargement = page vide)","sev":"mineur","th":"Fonctions expertes"},{"t":"Aucun raccourci clavier (démarrer, tempo, volume)","sev":"mineur","th":"Fonctions expertes"},{"t":"Salle en ligne non vérifiable ni scriptable hors prod","sev":"mineur","th":"Performance"}],"aime":["Le codec de lien qui embarque toute la config","L'API window.fmEquipeApp pour tester et automatiser"]},{"id":17,"nom":"Nadia","age":45,"role":"Pianiste amatrice (reprise après 15 ans)","it":2,"dev":"tablette","devLbl":"iPad ancien","note":8.2,"duree":"12 min","quote":"D'habitude ce genre de page me tétanise. Là, les trois étapes et « Essayer avec un exemple » m'ont prise par la main — j'ai osé.","scenario":"Intimidée au départ, lit les 3 étapes, clique l'exemple, suit le pupitre, n'ose pas le mode en ligne.","constats":[{"t":"Petits textes gris (indications) durs à lire sur tablette ancienne","sev":"mineur","th":"Visuel & lisibilité"},{"t":"Le décompte plein écran surgit sans prévenir, effet de surprise","sev":"mineur","th":"Accessibilité"},{"t":"Mode « En ligne » pas tenté, trop d'inconnues","sev":"mineur","th":"Prise en main"}],"aime":["Les 3 étapes + l'exemple qui donnent confiance pas à pas","Rien à installer, on explore sans risque"]},{"id":18,"nom":"Pierre","age":47,"role":"Luthier, violoncelliste amateur","it":2,"dev":"ordinateur","devLbl":"PC Windows 10 ancien","note":8,"duree":"13 min","quote":"J'ai peur de tout casser d'habitude. Ici l'exemple ne casse rien, et je peux imprimer ma fiche. Mais je ne trouve pas comment revenir à zéro.","scenario":"Charge l'exemple prudemment, explore sans rien changer d'important, imprime la fiche de pupitre.","constats":[{"t":"Pas de bouton « recommencer / revenir à l'accueil » depuis l'état chargé","sev":"majeur","th":"Navigation"},{"t":"Créer sa propre répartition suppose une autre page (Team Spirit)","sev":"mineur","th":"Navigation"}],"aime":["L'exemple sans risque, on explore sans peur de casser","La fiche imprimable, du concret sur papier"]},{"id":19,"nom":"Fatou","age":50,"role":"Animatrice d'ateliers djembé","it":2,"dev":"mobile","devLbl":"Android entrée de gamme","note":8.5,"duree":"16 min","quote":"Je pose le téléphone au sol au milieu du cercle : le décompte géant se voit de loin et l'écran ne s'éteint pas. Sur mon petit téléphone, à trois djembés qui sonnent, ça sature parfois.","scenario":"Pose l'appareil au sol, charge l'exemple djembé, lance le décompte du chef pour l'atelier, vérifie que l'écran reste allumé.","constats":[{"t":"Charge audio multi-lignes qui sature sur téléphone entrée de gamme","sev":"majeur","th":"Performance"},{"t":"Coordonner un vrai groupe (au-delà de l'exemple) demande une mise en place non guidée","sev":"majeur","th":"Prise en main"},{"t":"Étiquettes basse/tone/slap techniques pour des débutants d'atelier","sev":"mineur","th":"Terminologie"}],"aime":["Le décompte plein écran visible de loin, appareil posé au sol","L'écran qui reste allumé pendant l'atelier (wake lock)"]},{"id":20,"nom":"Laurent","age":52,"role":"Bassiste funk semi-pro","it":3,"dev":"ordinateur","devLbl":"laptop + interface audio","note":8.8,"duree":"21 min","quote":"« Exemple funk », chacun sa ligne, départ carré : sur le fond, ça respire le groove. J'aimerais juste que le « funk » aille au-delà de trois lignes de djembé, avec une vraie basse.","scenario":"Branche son interface, charge l'exemple funk, écoute chaque ligne isolément, juge l'authenticité du groove, lit la grille en jouant.","constats":[{"t":"L'exemple « funk » se limite à 3 lignes de djembé, sans basse ni instrumentation funk","sev":"mineur","th":"Audio & son"},{"t":"Pas de réglage fin (swing, feel) accessible depuis cette page","sev":"mineur","th":"Fonctions expertes"}],"aime":["La lisibilité de la grille pendant qu'on joue (curseur qui suit)","L'esprit « chacun sa ligne » fidèle au jeu en section"]},{"id":21,"nom":"Anne","age":55,"role":"Documentaliste, choriste","it":1,"dev":"ordinateur","devLbl":"PC familial, Chrome","note":7.6,"duree":"10 min (avec aide)","quote":"« Essayer avec un exemple » m'a rassurée, je n'ai rien eu à donner. Mais « Se connecter » par e-mail et « En ligne (salle) », ça me met sur la défensive.","scenario":"Explore prudemment via l'exemple, refuse d'ouvrir « Se connecter », n'ose pas le mode en ligne, cherche une porte de sortie.","constats":[{"t":"Monter une vraie session à plusieurs (en ligne) : elle n'y arrive pas seule","sev":"critique","th":"Prise en main"},{"t":"Pas de « revenir en arrière » visible une fois l'exemple chargé","sev":"majeur","th":"Navigation"},{"t":"« Se connecter » / lien par e-mail : méfiance, refus de donner l'adresse","sev":"mineur","th":"Compte & connexion"}],"aime":["L'exemple sans inscription, qui rassure dès l'arrivée"]},{"id":22,"nom":"Bernard","age":58,"role":"Batteur jazz amateur","it":2,"dev":"tablette","devLbl":"iPad","note":7.6,"duree":"13 min","quote":"Sur le fond je suis exigeant : pas de preset jazz, un seul exemple funk. Et au doigt sur l'iPad, viser une case ou le curseur du tempo, je rate.","scenario":"Charge l'exemple, cherche un preset jazz, tente de régler finement le tempo au doigt sur iPad.","constats":[{"t":"Un seul exemple (funk/djembé), aucun preset pour son style (jazz)","sev":"majeur","th":"Fonctions expertes"},{"t":"Réglage fin du tempo / curseurs peu précis au doigt","sev":"mineur","th":"Mobile & tactile"},{"t":"Étiquettes de voix (basse/tone/slap) sans explication","sev":"mineur","th":"Terminologie"}],"aime":["La notation frappe/accent, précise et lisible"]},{"id":23,"nom":"Rosa","age":61,"role":"Prof de formation musicale retraitée","it":2,"dev":"ordinateur","devLbl":"laptop, Chrome","note":8.5,"duree":"17 min","quote":"Pédagogiquement, l'entrée est exemplaire : on dit ce que c'est, trois étapes, un exemple qui tourne. Je le recommanderais — en prévenant que le « en ligne » demande de l'organisation.","scenario":"Évalue en vue de recommander à des collègues : lit l'intro, teste l'exemple, jauge le parcours de découverte enseignant.","constats":[{"t":"Le mode en ligne demande une organisation que des collègues peu à l'aise redouteront","sev":"majeur","th":"Prise en main"},{"t":"Métaphores de musicien (chef, pupitre, salle) à expliciter pour des débutants","sev":"mineur","th":"Terminologie"}],"aime":["L'intro claire + les 3 étapes, très pédagogique","L'exemple embarqué, parfait pour une première démo"]},{"id":24,"nom":"Michel","age":63,"role":"Accordéoniste de bal musette","it":1,"dev":"mobile","devLbl":"smartphone hérité de sa fille","note":7.3,"duree":"11 min (avec aide)","quote":"Le bouton exemple, ça, j'ai réussi, j'ai entendu le tambour. Mais mes amis voulaient jouer « en ligne » ensemble : « Team Spirit », « salle », le code… j'ai abandonné.","scenario":"Tâche unique : rejoindre ses amis pour jouer ensemble en ligne ; réussit l'exemple seul mais échoue à monter la salle.","constats":[{"t":"Échoue à rejoindre une vraie session de groupe en ligne (code, chef, jargon)","sev":"critique","th":"Prise en main"},{"t":"« Team Spirit » et « En ligne (salle) » : termes bloquants","sev":"majeur","th":"Terminologie"},{"t":"« Se connecter » par e-mail : ne comprend pas à quoi ça sert","sev":"mineur","th":"Compte & connexion"}],"aime":["« Essayer avec un exemple » : il a réussi seul et entendu le son"]},{"id":25,"nom":"Denise","age":66,"role":"Choriste paroissiale","it":1,"dev":"tablette","devLbl":"Android entrée de gamme","note":7.4,"duree":"9 min (avec aide)","quote":"On m'a montré le bouton exemple, c'était joli et ça faisait du son. Mais après, j'avais peur d'avoir tout changé, et je ne trouvais pas comment remettre comme avant.","scenario":"Avec aide, charge l'exemple, touche quelques réglages, cherche en vain un « réinitialiser », n'ose plus toucher.","constats":[{"t":"Aucun bouton « réinitialiser / recommencer » : peur d'avoir cassé","sev":"majeur","th":"Navigation"},{"t":"Le décompte plein écran noir la surprend et l'inquiète","sev":"majeur","th":"Accessibilité"},{"t":"Contraste des petits textes gris insuffisant pour elle","sev":"mineur","th":"Visuel & lisibilité"}],"aime":["L'exemple qui fait du son tout de suite, sans rien préparer"]},{"id":26,"nom":"Georges","age":68,"role":"Violoniste amateur (50 ans de pratique)","it":2,"dev":"ordinateur","devLbl":"PC Windows, écran 24 pouces","note":7.7,"duree":"15 min","quote":"J'ai découvert par hasard qu'on pouvait imprimer sa fiche, très bien. Mais ce n'est pas mon instrument, et « basse/tone/slap » ne me disent rien.","scenario":"Explore tranquillement, charge l'exemple, découvre l'impression et le partage, cherche du contenu violon.","constats":[{"t":"Étiquettes de voix (basse/tone/slap) opaques hors percussion","sev":"mineur","th":"Terminologie"},{"t":"Petits libellés gris peu lisibles même sur grand écran","sev":"mineur","th":"Visuel & lisibilité"},{"t":"Aucun contenu pour son instrument (cordes)","sev":"mineur","th":"Fonctions expertes"}],"aime":["La fiche imprimable, découverte par hasard","L'exemple qui se lance sans configuration"]},{"id":27,"nom":"Malika","age":71,"role":"Pianiste retraitée, ex-professeure","it":2,"dev":"tablette","devLbl":"iPad","note":7.9,"duree":"12 min","quote":"Bonne surprise : la page est courte, pas de longue liste où je me perds. Les petites icônes 🖨 ont un texte au survol, tant mieux.","scenario":"Charge l'exemple, apprécie que tout tienne sans défilement, teste impression et partage, ne se perd pas.","constats":[{"t":"Petits textes gris (indications) trop fins à lire","sev":"mineur","th":"Visuel & lisibilité"},{"t":"« salle de concert » / « pupitre » : métaphores à deviner","sev":"mineur","th":"Terminologie"}],"aime":["Une page courte, sans long défilement — pas besoin de sommaire","Les boutons icône avec libellé au survol"]},{"id":28,"nom":"Jean-Paul","age":74,"role":"Clarinettiste d'harmonie municipale","it":1,"dev":"ordinateur","devLbl":"PC, Chrome installé par son fils","note":7.7,"duree":"12 min (avec aide)","quote":"« Chef », « pupitre », « départ » : ça, l'harmonie me l'a appris, je suis chez moi. Ce sont les mots anglais — « Team Spirit », « online » — qui me sortent du chemin.","scenario":"Charge l'exemple, se repère grâce au vocabulaire d'harmonie, bute sur les anglicismes, vise les boutons d'une main tremblante.","constats":[{"t":"Anglicismes bloquants (« Team Spirit », « online / salle »)","sev":"majeur","th":"Terminologie"},{"t":"Cibles justes pour des mains qui tremblent (chips, cases serrées)","sev":"mineur","th":"Mobile & tactile"},{"t":"« Se connecter » par e-mail : usage pas clair","sev":"mineur","th":"Compte & connexion"}],"aime":["Le vocabulaire chef/pupitre/départ, familier de l'harmonie","L'exemple qui se lance et sonne juste"]},{"id":29,"nom":"Suzanne","age":77,"role":"Organiste liturgique","it":1,"dev":"tablette","devLbl":"Android","note":7.2,"duree":"8 min (avec aide)","quote":"Tout bouge : je touche et une case s'ouvre, un grand écran noir apparaît d'un coup avec un chiffre… je ne sais plus où j'en suis.","scenario":"Avec aide, charge l'exemple, déclenche par mégarde le décompte plein écran, se sent perdue par les changements d'état.","constats":[{"t":"Monter une vraie session à plusieurs : hors de portée sans aide","sev":"critique","th":"Prise en main"},{"t":"Décompte plein écran surgissant : mouvement imprévu déstabilisant","sev":"majeur","th":"Accessibilité"},{"t":"État du système peu lisible (qu'est-ce qui est chargé / actif ?)","sev":"mineur","th":"Visuel & lisibilité"}],"aime":["Avec de l'aide, l'exemple montre concrètement l'idée"]},{"id":30,"nom":"Henri","age":80,"role":"Ancien chef d'harmonie","it":1,"dev":"ordinateur","devLbl":"PC ancien, écran 1366×768","note":8.1,"duree":"14 min","quote":"Un métronome qui fait le chef et donne le départ à tout le monde… moi qui ai dirigé l'harmonie quarante ans, ça m'émeut. Je regrette juste que les textes soient si petits à l'écran.","scenario":"Charge l'exemple, contemple le décompte du « chef », zoome le navigateur à 150 % pour lire, cherche un manuel imprimable.","constats":[{"t":"Petits textes gris illisibles sans zoom navigateur (150 %+)","sev":"majeur","th":"Visuel & lisibilité"},{"t":"Pas de manuel/aide imprimable d'ensemble (seule la fiche de pupitre s'imprime)","sev":"mineur","th":"Accessibilité"},{"t":"Étiquettes de voix (basse/tone/slap) non expliquées","sev":"mineur","th":"Terminologie"}],"aime":["Le « chef automatique » qui donne le départ — émouvant pour un ancien chef d'harmonie","Le décompte plein écran, beau et lisible de loin"]}];
+
+/* ================= CONSTATS CONSOLIDÉS ================= */
+const ISSUES = [{"id":"C1","sev":"critique","effort":"eleve","titre":"Monter une vraie session à plusieurs (mode En ligne) n'est pas guidé","desc":"L'exemple embarqué sauve l'exploration en solo, mais dès qu'il faut jouer réellement à plusieurs en ligne — même code de salle saisi par chacun, désignation d'un chef, dépendance à Supabase en production — aucun pas-à-pas n'accompagne. Les novices testés n'y parviennent pas seuls, et la synchro live n'est pas vérifiable hors prod.","reco":"Ajouter un assistant « inviter mon groupe » : générer et partager le code, rôles explicites (chef / joueur), état de connexion des joueurs, et un mode démo de salle pour montrer le comportement sans backend.","who":[13,15,19,21,23,24,29]},{"id":"C2","sev":"majeur","effort":"faible","titre":"Vocabulaire de musicien résiduel, même glosé (chef, pupitre, salle de concert)","desc":"Le dé-jargon v1.1 aide beaucoup, mais « chef », « pupitre », « salle de concert » et « En ligne (salle) » restent des métaphores d'orchestre. Familières aux choristes/harmonistes, elles restent opaques pour les grands débutants et les enfants.","reco":"Ajouter une micro-glose au survol / en sous-titre sur ces mots (ex. « pupitre = ta ligne à jouer », « salle = l'espace partagé du groupe »).","who":[1,9,13,23,27]},{"id":"C3","sev":"majeur","effort":"faible","titre":"Anglicismes bloquants (« Team Spirit ») dans un parcours francophone","desc":"Le lien « → La préparer dans Team Spirit » renvoie à une page tierce au nom anglais ; couplé à « online / salle », il coupe le fil des non-anglophones et des grands débutants au moment précis où ils voudraient préparer ou rejoindre un groupe.","reco":"Franciser ou sous-titrer « Team Spirit » (« l'atelier de préparation »), et remplacer les traces d'« online » par « en direct / en ligne » déjà partout ailleurs.","who":[5,9,24,28]},{"id":"C4","sev":"majeur","effort":"eleve","titre":"Impossible de créer/éditer une répartition sur la page","desc":"L'état vide propose d'importer un .json, de coller un lien ou de charger l'exemple, mais fabriquer sa propre répartition renvoie vers pratiquer.html#secTeam (Team Spirit). Pas d'édition sur place : un aller-retour de page pour la tâche la plus créative.","reco":"Permettre au moins de dupliquer/ajuster l'exemple sur place (nombre de joueurs, lignes) ou proposer une petite banque d'exemples par style/instrument avant de renvoyer vers Team Spirit.","who":[3,4,8,13,15,18]},{"id":"C5","sev":"majeur","effort":"moyen","titre":"Cellules du pupitre serrées sur mobile / petit écran","desc":"La grille compte 16 cellules (min-width 6px) ; sur smartphone et surtout sur iPhone SE, viser une case est difficile et le curseur de lecture devient peu lisible à tempo rapide — au moment où l'on joue.","reco":"Agrandir/adapter les cellules selon la largeur (regrouper par temps, mode « gros doigts »), épaissir le curseur et augmenter son contraste.","who":[2,6,11,14,22]},{"id":"C6","sev":"majeur","effort":"moyen","titre":"Charge audio multi-lignes qui sature sur téléphone modeste","desc":"Jouer plusieurs lignes de backing simultanément (l'exemple en compte trois) peut faire décrocher le son sur des téléphones d'entrée/milieu de gamme — précisément le matériel des ateliers où l'app est posée au sol au milieu du groupe.","reco":"Optimiser le mixage (voix pré-mixées, limitation du nombre de nœuds), et proposer un réglage « alléger le son » pour les appareils modestes.","who":[6,19]},{"id":"C7","sev":"majeur","effort":"faible","titre":"Pas de retour / réinitialisation depuis l'état chargé","desc":"Une fois l'exemple (ou une config) chargé, aucun bouton visible ne ramène à l'accueil vide. Les publics prudents craignent d'avoir « tout changé » et n'osent plus toucher — l'exemple leur a donné confiance, l'absence de porte de sortie la reprend.","reco":"Ajouter un bouton « Recommencer / revenir à l'accueil » qui restaure l'état vide sans recharger la page.","who":[1,12,18,21,25]},{"id":"C8","sev":"majeur","effort":"faible","titre":"Décompte plein écran surgissant, déstabilisant","desc":"Le départ affiche un overlay noir plein écran avec un grand chiffre, sans transition ni avertissement. Pour les publics sensibles aux mouvements imprévus, c'est une surprise qui fait perdre le fil ; il peut même se déclencher par mégarde.","reco":"Annoncer le décompte (libellé « ça va démarrer »), une courte transition, et respecter prefers-reduced-motion ; laisser une échappatoire visible (annuler).","who":[17,25,29]},{"id":"C9","sev":"mineur","effort":"faible","titre":"« Écouter tout (chef) » ambigu dans la liste « Je suis… »","desc":"Dans le choix de ma ligne, l'option « Écouter tout (chef) » mêle un rôle (le chef) et une option d'écoute, ce qui trouble ceux qui lisent attentivement les libellés.","reco":"Dissocier le rôle de l'écoute : ex. « Tout écouter (sans jouer de ligne) », et traiter le rôle « chef » ailleurs.","who":[3,7,11]},{"id":"C10","sev":"mineur","effort":"faible","titre":"Étiquettes de voix techniques (basse/tone/slap) sans glose","desc":"Le pupitre nomme les lignes avec le vocabulaire du djembé (basse, tone, slap). Hors percussion, ces libellés sont opaques et ne renseignent pas sur ce qu'il faut jouer.","reco":"Accompagner chaque étiquette d'un mot simple ou d'une icône (grave / medium / claqué), ou d'une info-bulle.","who":[1,14,19,22,26,30]},{"id":"C11","sev":"mineur","effort":"moyen","titre":"Accessibilité de la grille et absence de raccourcis clavier","desc":"Les cellules du pupitre (div/span) ne sont pas exposées à l'assistive tech (ni rôle ni label), et le transport (démarrer, tempo, volume) n'offre aucun raccourci clavier — deux manques relevés par les profils techniques.","reco":"Donner un rôle/aria-label lisible à la grille (ou une alternative textuelle), et mapper Espace/flèches sur démarrer et le tempo.","who":[10,16]},{"id":"C12","sev":"mineur","effort":"faible","titre":"Petits textes gris peu lisibles (hints, --fm-sub)","desc":"Les indications en .8125rem et couleur atténuée (--fm-sub) sont difficiles à lire pour les seniors, sur tablette ancienne comme sur grand écran, et se dégradent au zoom.","reco":"Relever la taille minimale et le contraste des textes secondaires, et vérifier la lisibilité au zoom 150 %+.","who":[17,25,26,27,30]},{"id":"C13","sev":"mineur","effort":"faible","titre":"« Se connecter » par e-mail inquiète les plus prudents","desc":"Le libellé de connexion par lien magique (« Recevoir un lien de connexion par e-mail ») met certains novices sur la défensive : ils ne comprennent pas à quoi il sert et refusent de donner leur adresse — alors même que l'app fonctionne sans compte.","reco":"Préciser que le compte est optionnel et rappeler, à côté du bouton, que jouer et partager ne l'exigent pas.","who":[21,24,28]},{"id":"C14","sev":"mineur","effort":"moyen","titre":"Un seul exemple (funk/djembé), pas de presets par style ou instrument","desc":"L'unique exemple embarqué est un pattern funk à trois djembés. Les experts d'autres styles (jazz, cubain, cordes) et instruments restent sur leur faim, et il n'y a pas de banque de départs prêts à l'emploi.","reco":"Proposer quelques exemples déterministes couvrant plusieurs styles et instruments, réutilisables comme presets de démarrage.","who":[3,7,12,20,22]}];
+
+/* ================= RENDU ================= */
+const $ = id => document.getElementById(id);
+const AGEBUCKET = a => a<18?"0-17":a<36?"18-35":a<56?"36-55":"56-99";
+const AGELBL = {"0-17":"< 18 ans","18-35":"18–35","36-55":"36–55","56-99":"56 et +"};
+const DEVLBL = {mobile:"📱 Smartphone",tablette:"💻 Tablette",ordinateur:"🖥 Ordinateur"};
+const SEVW = {critique:3,majeur:2,mineur:1};
+
+function kpis(){
+  const avg = (P.reduce((s,p)=>s+p.note,0)/P.length).toFixed(1);
+  const nC = P.reduce((s,p)=>s+p.constats.filter(c=>c.sev==="critique").length,0);
+  const nM = P.reduce((s,p)=>s+p.constats.filter(c=>c.sev==="majeur").length,0);
+  const nTot = P.reduce((s,p)=>s+p.constats.length,0);
+  const reco = P.filter(p=>p.note>=8).length;
+  $("kpis").innerHTML =
+   `<div class="kpi acc"><div class="v">${avg} / 10</div><div class="l">Satisfaction moyenne</div></div>
+    <div class="kpi"><div class="v">30</div><div class="l">Testeurs · 9 à 80 ans</div></div>
+    <div class="kpi crit"><div class="v">${nC}</div><div class="l">Constats critiques</div></div>
+    <div class="kpi maj"><div class="v">${nM}</div><div class="l">Constats majeurs</div></div>
+    <div class="kpi"><div class="v">${nTot}</div><div class="l">Constats au total</div></div>
+    <div class="kpi pos"><div class="v">${reco}/30</div><div class="l">Promoteurs (note ≥ 8)</div></div>`;
+}
+
+function card(p){
+  const init = p.nom.slice(0,2).toUpperCase();
+  const cs = p.constats.map(c=>`<div class="fitem"><span class="sev ${c.sev}">${c.sev}</span><span>${c.t}</span></div>`).join("");
+  const ai = p.aime.map(a=>`<div class="fitem"><span class="sev positif">＋</span><span>${a}</span></div>`).join("");
+  return `<div class="pcard">
+    <div class="top"><div class="avatar">${init}</div>
+      <div><h3>${p.nom}, ${p.age} ans</h3><div class="meta">${p.role}</div></div>
+      <div class="score"><div class="n">${p.note}</div><div class="d">/ 10</div></div></div>
+    <div class="chips"><span class="chip it${p.it}">${ITLBL[p.it]}</span><span class="chip">${DEVLBL[p.dev]} · ${p.devLbl}</span><span class="chip">⏱ ${p.duree}</span></div>
+    <div class="quote">« ${p.quote} »</div>
+    <div class="flist">${cs}${ai}</div>
+    <details class="more"><summary>Scénario de test</summary><div class="box">${p.scenario}</div></details>
+  </div>`;
+}
+
+function renderPanel(){
+  const fa=$("fAge").value, fi=$("fIT").value, fd=$("fDev").value, fs=$("fSev").value, ft=$("fTxt").value.trim().toLowerCase();
+  const out = P.filter(p=>{
+    if(fa && AGEBUCKET(p.age)!==fa) return false;
+    if(fi && String(p.it)!==fi) return false;
+    if(fd && p.dev!==fd) return false;
+    if(fs && !p.constats.some(c=>c.sev===fs)) return false;
+    if(ft){
+      const blob=(p.nom+" "+p.role+" "+p.quote+" "+p.devLbl+" "+p.scenario+" "+p.constats.map(c=>c.t).join(" ")+" "+p.aime.join(" ")).toLowerCase();
+      if(!blob.includes(ft)) return false;
+    }
+    return true;
+  });
+  $("countLine").textContent = out.length===P.length? "30 testeurs affichés" : `${out.length} testeur${out.length>1?"s":""} sur 30 (filtres actifs)`;
+  $("grid").innerHTML = out.map(card).join("") || "<p style='color:var(--sub)'>Aucun testeur ne correspond à ces filtres.</p>";
+}
+
+function renderIssues(){
+  const scored = ISSUES.map(i=>({...i,score:SEVW[i.sev]*i.who.length})).sort((a,b)=>b.score-a.score);
+  $("issueList").innerHTML = scored.map(i=>{
+    const pct = Math.round(i.who.length/30*100);
+    const names = i.who.map(id=>{const p=P.find(x=>x.id===id);return `${p.nom} (${p.age})`;}).join(", ");
+    return `<div class="issue ${i.sev}">
+      <div class="ihead"><span class="sev ${i.sev}">${i.sev}</span><h3>${i.id} — ${i.titre}</h3>
+      <span class="effort ${i.effort}">effort ${i.effort==="eleve"?"élevé":i.effort}</span>
+      <span class="freq">${i.who.length}/30 testeurs · ${pct} %</span></div>
+      <div class="bar-out"><div class="bar-in" style="width:${pct}%;background:${i.sev==="critique"?"var(--crit)":i.sev==="majeur"?"var(--maj)":"var(--min)"}"></div></div>
+      <div class="desc">${i.desc}</div>
+      <div class="reco">💡 <b>Recommandation :</b> ${i.reco}</div>
+      <div class="who">Rapporté par : ${names}</div>
+    </div>`;
+  }).join("");
+}
+
+function hbars(el,rows,max,color){
+  $(el).innerHTML = rows.map(r=>{
+    const w = Math.round(r.v/max*100);
+    return `<div class="hbar"><div class="lab">${r.l}</div><div class="track"><div class="fill" style="width:${w}%;background:${color}">${r.txt}</div></div></div>`;
+  }).join("");
+}
+
+function renderSyn(){
+  const byIT={}, byAge={}, byDev={};
+  P.forEach(p=>{
+    (byIT[p.it]=byIT[p.it]||[]).push(p.note);
+    const b=AGEBUCKET(p.age); (byAge[b]=byAge[b]||[]).push(p.note);
+    (byDev[p.dev]=byDev[p.dev]||[]).push(p.note);
+  });
+  const avg=a=>a.reduce((s,x)=>s+x,0)/a.length;
+  hbars("chIT",[1,2,3,4,5].map(k=>({l:ITLBL[k],v:avg(byIT[k]),txt:avg(byIT[k]).toFixed(1)})),10,"var(--acc)");
+  hbars("chAge",["0-17","18-35","36-55","56-99"].map(k=>({l:AGELBL[k],v:avg(byAge[k]),txt:avg(byAge[k]).toFixed(1)})),10,"#7a5cd6");
+  hbars("chDev",["mobile","tablette","ordinateur"].map(k=>({l:DEVLBL[k],v:avg(byDev[k]),txt:avg(byDev[k]).toFixed(1)})),10,"#2c9a5b");
+  const th={};
+  P.forEach(p=>p.constats.forEach(c=>th[c.th]=(th[c.th]||0)+1));
+  const rows=Object.entries(th).sort((a,b)=>b[1]-a[1]).map(([l,v])=>({l,v,txt:v}));
+  hbars("chTheme",rows,Math.max(...rows.map(r=>r.v)),"var(--maj)");
+}
+
+/* Tabs & filtres */
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("sel",x===t));
+  document.querySelectorAll(".view").forEach(v=>v.classList.toggle("sel",v.id==="v-"+t.dataset.v));
+}));
+["fAge","fIT","fDev","fSev"].forEach(id=>$(id).addEventListener("change",renderPanel));
+$("fTxt").addEventListener("input",renderPanel);
+$("fReset").addEventListener("click",()=>{["fAge","fIT","fDev","fSev"].forEach(id=>$(id).value="");$("fTxt").value="";renderPanel();});
+
+kpis(); renderPanel(); renderIssues(); renderSyn();
+</script>
+</body>
+</html>
