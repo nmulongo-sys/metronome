@@ -105,6 +105,10 @@
   .eq-chip.on { background: var(--fm-accent); border-color: var(--fm-accent); color: var(--fm-accent-ink); font-weight: 600; }
   .eq-chip:focus-visible { outline: 2px solid var(--fm-accent); outline-offset: 1px; }
   .eq-mode-sub { font-size: .78rem; color: var(--fm-sub); margin-top: 2px; }
+  /* entrée « à froid » (v1.1) : dire ce que c'est + 3 étapes + exemple */
+  .eq-steps { margin: 8px 0 10px 1.15em; padding: 0; color: var(--fm-sub); font-size: .85rem; line-height: 1.6; }
+  .eq-steps li { margin: 2px 0; }
+  .eq-sep { margin: 16px 0 8px; font-size: .74rem; letter-spacing: .1em; text-transform: uppercase; color: var(--fm-sub); border-top: 1px solid var(--fm-line); padding-top: 12px; }
   /* pupitre : une ligne par voix, cases frappe/accent, curseur (patron R-4d) */
   .eq-grille { margin: 10px 0 2px; display: flex; flex-direction: column; gap: 4px; }
   .pfg-row { display: flex; align-items: center; gap: 6px; }
@@ -177,8 +181,10 @@
     </div>
   </header>
 
-  <!-- Transport (patron R-4a) : démarrer/arrêter, tempo, volume. -->
-  <div class="card" id="transport">
+  <!-- Transport (patron R-4a) : démarrer/arrêter, tempo, volume. Masqué tant qu'aucune
+       équipe n'est chargée (v1.1) : un « ▶ Démarrer » qui ne joue qu'un clic nu déroute
+       à froid ; eqApplyConfig le révèle dès qu'une répartition est en place. -->
+  <div class="card hide" id="transport">
     <div class="tempo-value" id="tempoValue">92</div>
     <div class="tempo-label">BPM · <em id="tempoName">Moderato</em></div>
     <div class="slider-row" role="group" aria-label="Réglage du tempo">
@@ -206,13 +212,26 @@
       <span class="sec-sub">chacun sa ligne · le chef donne le départ</span>
     </div>
 
-    <!-- État vide : aucune config chargée -->
+    <!-- État vide : aucune config chargée — entrée « à froid » guidée (v1.1). Dire ce
+         que c'est en clair, montrer les 3 temps, offrir un exemple à explorer sans rien
+         préparer ; l'entrée aux vraies configs (lien / .json / passerelle) vient ensuite. -->
     <div id="eqEmpty">
-      <p class="hint">Fabrique la répartition dans <b>Pratiquer › Team Spirit</b> (qui joue quoi), puis ouvre-la ici : chacun choisit sa ligne sur son appareil, et le chef donne le départ commun.</p>
+      <p class="hint" id="eqColdIntro">Jouer à plusieurs, chacun sur son téléphone : une personne prépare qui joue quoi, partage un lien, puis lance tout le monde en même temps.</p>
+      <ol class="eq-steps">
+        <li>Une personne prépare la répartition — qui joue quelle ligne.</li>
+        <li>Elle partage le lien avec le groupe.</li>
+        <li>Chacun ouvre le lien, choisit sa ligne, et part au signal commun.</li>
+      </ol>
+      <div class="row" style="margin-top:2px;">
+        <button class="btn-sm primary" id="eqTryExample">Essayer avec un exemple</button>
+        <span class="hint" style="margin:0;">voir à quoi ça ressemble, sans rien préparer.</span>
+      </div>
+
+      <div class="eq-sep">J'ai déjà une répartition</div>
       <div class="row">
-        <button class="btn-sm primary" id="eqImportBtn">Importer un fichier d'équipe (JSON)</button>
+        <button class="btn-sm" id="eqImportBtn">Importer un fichier d'équipe (fichier .json)</button>
         <input type="file" id="eqImportFile" accept="application/json,.json" class="hide" aria-hidden="true">
-        <a class="btn-sm" href="pratiquer.html#secTeam" id="eqGoTeam">→ Aller à Team Spirit</a>
+        <a class="btn-sm" href="pratiquer.html#secTeam" id="eqGoTeam">→ La préparer dans Team Spirit</a>
       </div>
       <div class="row">
         <label for="eqLinkInput" style="flex:none;">Coller un lien d'équipe</label>
@@ -253,6 +272,7 @@
 
       <div id="eqPupitre" style="margin-top:12px;">
         <span class="sec-title" style="font-size:1.05rem;">Mon pupitre</span>
+        <span class="hint" style="margin-left:6px;">ma ligne à jouer</span>
         <div class="eq-grille" id="eqGrid"></div>
         <label class="check" style="margin-top:8px;"><input type="checkbox" id="eqBacking" checked> Entendre les autres lignes (l'app les joue)</label>
       </div>
@@ -260,7 +280,7 @@
       <div class="main-buttons" id="eqChefRow" style="margin-top:14px;">
         <button class="eq-chef-btn" id="eqChef">▶ Départ (le chef)</button>
       </div>
-      <div class="hint">Un décompte de préparation, puis tout le monde part ensemble. En salle en ligne, seul le chef déclenche le départ.</div>
+      <div class="hint">Un décompte de préparation, puis tout le monde part ensemble. Le chef, c'est la personne qui lance le groupe ; en salle en ligne, seul lui donne le départ.</div>
 
       <div class="row" id="eqShareRow" style="margin-top:10px;">
         <button class="btn-sm" id="eqCopyLink" title="Copier le lien à partager avec les autres joueurs">Copier le lien de partage</button>
@@ -336,10 +356,15 @@ window.__I18N = { "en": {
   "Sourdine générale (coupe tout le son en un clic)": "Master mute (cuts all sound in one click)",
   "La salle de concert": "The concert hall",
   "chacun sa ligne · le chef donne le départ": "each their own line · the conductor starts it",
-  "Fabrique la répartition dans": "Build the distribution in",
-  "(qui joue quoi), puis ouvre-la ici : chacun choisit sa ligne sur son appareil, et le chef donne le départ commun.": "(who plays what), then open it here: everyone picks their line on their own device, and the conductor gives the shared start.",
-  "Importer un fichier d'équipe (JSON)": "Import a team file (JSON)",
-  "→ Aller à Team Spirit": "→ Go to Team Spirit",
+  "Jouer à plusieurs, chacun sur son téléphone : une personne prépare qui joue quoi, partage un lien, puis lance tout le monde en même temps.": "Play together, each on their own phone: one person sets up who plays what, shares a link, then starts everyone at once.",
+  "Une personne prépare la répartition — qui joue quelle ligne.": "One person sets up the distribution — who plays which line.",
+  "Elle partage le lien avec le groupe.": "They share the link with the group.",
+  "Chacun ouvre le lien, choisit sa ligne, et part au signal commun.": "Everyone opens the link, picks their line, and starts on the shared signal.",
+  "Essayer avec un exemple": "Try it with an example",
+  "voir à quoi ça ressemble, sans rien préparer.": "see what it looks like, without setting anything up.",
+  "J'ai déjà une répartition": "I already have a distribution",
+  "Importer un fichier d'équipe (fichier .json)": "Import a team file (.json file)",
+  "→ La préparer dans Team Spirit": "→ Set it up in Team Spirit",
   "Coller un lien d'équipe": "Paste a team link",
   "Ouvrir": "Open",
   "Comment jouer ?": "How to play?",
@@ -357,11 +382,12 @@ window.__I18N = { "en": {
   "Écouter tout (chef)": "Hear everything (conductor)",
   "Joueur": "Player",
   "Mon pupitre": "My part",
+  "ma ligne à jouer": "my line to play",
   "Entendre les autres lignes (l'app les joue)": "Hear the other lines (the app plays them)",
-  "Aucune ligne ne t'est attribuée — tu accompagnes (backing).": "No line is assigned to you — you accompany (backing).",
+  "Aucune ligne ne t'est attribuée — tu accompagnes les autres.": "No line is assigned to you — you accompany the others.",
   "Ta partie : cases sourdes = frappes, cases vives = accents — le curseur suit la lecture.": "Your part: dim cells = hits, bright cells = accents — the cursor follows playback.",
   "▶ Départ (le chef)": "▶ Start (conductor)",
-  "Un décompte de préparation, puis tout le monde part ensemble. En salle en ligne, seul le chef déclenche le départ.": "A preparation count-in, then everyone starts together. In an online room, only the conductor triggers the start.",
+  "Un décompte de préparation, puis tout le monde part ensemble. Le chef, c'est la personne qui lance le groupe ; en salle en ligne, seul lui donne le départ.": "A preparation count-in, then everyone starts together. The conductor is the person who starts the group; in an online room, only they give the start.",
   "Copier le lien à partager avec les autres joueurs": "Copy the link to share with the other players",
   "Copier le lien de partage": "Copy the share link",
   "Vue imprimable de ma fiche de pupitre": "Printable view of my part sheet",
@@ -374,7 +400,7 @@ window.__I18N = { "en": {
   "Salle quittée.": "Room left.",
   "En attente du chef…": "Waiting for the conductor…",
   "joueurs": "players",
-  "Groove :": "Groove:"
+  "Rythme :": "Rhythm:"
 }, "pt": {
   "Métronome — En équipe": "Metrônomo — Em equipe",
   "Jouer ensemble · chacun sa ligne": "Tocar juntos · cada um sua linha",
@@ -400,10 +426,15 @@ window.__I18N = { "en": {
   "Sourdine générale (coupe tout le son en un clic)": "Mudo geral (corta todo o som em um clique)",
   "La salle de concert": "A sala de concerto",
   "chacun sa ligne · le chef donne le départ": "cada um sua linha · o maestro dá a largada",
-  "Fabrique la répartition dans": "Monte a distribuição em",
-  "(qui joue quoi), puis ouvre-la ici : chacun choisit sa ligne sur son appareil, et le chef donne le départ commun.": "(quem toca o quê), depois abra aqui: cada um escolhe sua linha no seu aparelho, e o maestro dá a largada comum.",
-  "Importer un fichier d'équipe (JSON)": "Importar um arquivo de equipe (JSON)",
-  "→ Aller à Team Spirit": "→ Ir para o Team Spirit",
+  "Jouer à plusieurs, chacun sur son téléphone : une personne prépare qui joue quoi, partage un lien, puis lance tout le monde en même temps.": "Tocar juntos, cada um no seu telefone: uma pessoa monta quem toca o quê, compartilha um link, depois dá a largada para todos ao mesmo tempo.",
+  "Une personne prépare la répartition — qui joue quelle ligne.": "Uma pessoa monta a distribuição — quem toca qual linha.",
+  "Elle partage le lien avec le groupe.": "Ela compartilha o link com o grupo.",
+  "Chacun ouvre le lien, choisit sa ligne, et part au signal commun.": "Cada um abre o link, escolhe sua linha e parte no sinal comum.",
+  "Essayer avec un exemple": "Experimentar com um exemplo",
+  "voir à quoi ça ressemble, sans rien préparer.": "veja como funciona, sem preparar nada.",
+  "J'ai déjà une répartition": "Já tenho uma distribuição",
+  "Importer un fichier d'équipe (fichier .json)": "Importar um arquivo de equipe (arquivo .json)",
+  "→ La préparer dans Team Spirit": "→ Montá-la no Team Spirit",
   "Coller un lien d'équipe": "Colar um link de equipe",
   "Ouvrir": "Abrir",
   "Comment jouer ?": "Como tocar?",
@@ -421,11 +452,12 @@ window.__I18N = { "en": {
   "Écouter tout (chef)": "Ouvir tudo (maestro)",
   "Joueur": "Jogador",
   "Mon pupitre": "Minha parte",
+  "ma ligne à jouer": "minha linha para tocar",
   "Entendre les autres lignes (l'app les joue)": "Ouvir as outras linhas (o app as toca)",
-  "Aucune ligne ne t'est attribuée — tu accompagnes (backing).": "Nenhuma linha foi atribuída a você — você acompanha (backing).",
+  "Aucune ligne ne t'est attribuée — tu accompagnes les autres.": "Nenhuma linha foi atribuída a você — você acompanha os outros.",
   "Ta partie : cases sourdes = frappes, cases vives = accents — le curseur suit la lecture.": "Sua parte: células foscas = toques, células vivas = acentos — o cursor segue a leitura.",
   "▶ Départ (le chef)": "▶ Largada (o maestro)",
-  "Un décompte de préparation, puis tout le monde part ensemble. En salle en ligne, seul le chef déclenche le départ.": "Uma contagem de preparação, depois todos partem juntos. Em sala online, só o maestro dispara a largada.",
+  "Un décompte de préparation, puis tout le monde part ensemble. Le chef, c'est la personne qui lance le groupe ; en salle en ligne, seul lui donne le départ.": "Uma contagem de preparação, depois todos partem juntos. O maestro é a pessoa que dá a largada ao grupo; em sala online, só ele dá a largada.",
   "Copier le lien à partager avec les autres joueurs": "Copiar o link para compartilhar com os outros jogadores",
   "Copier le lien de partage": "Copiar o link de compartilhamento",
   "Vue imprimable de ma fiche de pupitre": "Visualização para impressão da minha ficha de parte",
@@ -438,7 +470,7 @@ window.__I18N = { "en": {
   "Salle quittée.": "Sala deixada.",
   "En attente du chef…": "Aguardando o maestro…",
   "joueurs": "jogadores",
-  "Groove :": "Groove:"
+  "Rythme :": "Ritmo:"
 } };
 window.fmTr = (function(){
   function norm(t){ return (t||'').replace(/\s+/g,' ').trim(); }
@@ -595,6 +627,7 @@ window.fmTr = (function(){
     EQ.player = cfg.joueurs >= 1 ? 1 : 0;
     $('eqEmpty').classList.add('hide');
     $('eqLoaded').classList.remove('hide');
+    $('transport').classList.remove('hide');   // v1.1 : le transport n'a de sens qu'une équipe chargée
     eqRenderSummary(); eqRenderPlayers(); eqRenderGrid();
     return true;
   }
@@ -602,7 +635,7 @@ window.fmTr = (function(){
   function eqRenderSummary() {
     const c = EQ.config; if (!c) return;
     const titre = c.titre ? c.titre : '';
-    $('eqSummary').innerHTML = (titre ? fmTr('Groove :') + ' <b>' + esc(titre) + '</b> · ' : '')
+    $('eqSummary').innerHTML = (titre ? fmTr('Rythme :') + ' <b>' + esc(titre) + '</b> · ' : '')
       + (c.joueurs || 1) + ' ' + fmTr('joueurs') + ' · ' + (c.tempo || 92) + ' BPM';
   }
   function esc(s) { const d = document.createElement('div'); d.textContent = (s == null ? '' : String(s)); return d.innerHTML; }
@@ -636,7 +669,7 @@ window.fmTr = (function(){
     const mine = EQ.player === 0 ? c.voix : window.fmEquipe.voicesOfPlayer(c, EQ.player);
     if (!mine.length) {
       const p = document.createElement('div'); p.className = 'hint';
-      p.textContent = fmTr('Aucune ligne ne t\'est attribuée — tu accompagnes (backing).');
+      p.textContent = fmTr('Aucune ligne ne t\'est attribuée — tu accompagnes les autres.');
       host.appendChild(p); return;
     }
     const el = document.createElement('div'); el.className = 'eq-grille';
@@ -761,6 +794,19 @@ window.fmTr = (function(){
     const cfg = window.fmEquipe.decode(raw);
     if (cfg && eqApplyConfig(cfg)) eqStatus('');
     else fmToast(fmTr('Lien d\'équipe illisible.'));
+  });
+
+  // ---- exemple embarqué (v1.1) : rendre la page « à froid » explorable sans rien
+  // préparer. Répartition déterministe, aucun backend — 3 joueurs sur un djembé. ----
+  const EQ_EXAMPLE = { v: 1, titre: 'Exemple funk', tempo: 96, steps: 16, swing: 50, joueurs: 3, backing: true,
+    voix: [
+      { k: 'basse', instr: 'djembe', g: [2,0,0,0,0,0,1,0,0,0,2,0,0,0,0,0], j: 1 },
+      { k: 'tone',  instr: 'djembe', g: [0,0,1,0,1,0,0,0,1,0,0,0,1,0,1,0], j: 2 },
+      { k: 'slap',  instr: 'djembe', g: [0,0,0,0,2,0,0,0,0,0,0,0,2,0,0,1], j: 3 }
+    ] };
+  $('eqTryExample').addEventListener('click', () => {
+    // copie profonde : eqApplyConfig prend possession de l'objet (backing muté, etc.)
+    if (eqApplyConfig(JSON.parse(JSON.stringify(EQ_EXAMPLE)))) eqStatus('');
   });
 
   // ---- mode hors-ligne / en ligne ----

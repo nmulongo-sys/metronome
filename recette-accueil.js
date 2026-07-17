@@ -85,8 +85,8 @@ function runTests() {
   /* ---------- A. chargement + premier niveau FERMÉ (§9.8) ---------- */
   const realErrors = jsdomErrors.filter(m => !/resources?|Could not load|external script|net::|ERR_|Not implemented/i.test(m));
   ok('A1.1 chargement sans erreur jsdom (' + realErrors.length + ')', realErrors.length === 0);
-  ok('A1.2 BUILD 0.20.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.20.0');
-  ok('A1.3 tampon de build affiché', /metronomefunk-0\.20\.0/.test(txt($('buildStamp'))));
+  ok('A1.2 BUILD 0.21.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.21.0');
+  ok('A1.3 tampon de build affiché', /metronomefunk-0\.21\.0/.test(txt($('buildStamp'))));
   ok('A2.1 la liste fermée est là : tempo (gros, ±), tap, démarrer, battue, subdivision, son du clic, thème',
     ['tempoValue', 'tempoSlider', 'minusBtn', 'plusBtn', 'tapBtn', 'startBtn',
      'beatsSel', 'subdivSel', 'pulseFreq', 'pulseFreqVal', 'clickType', 'themeBtn'].every(id => !!$(id)));
@@ -271,7 +271,7 @@ function runTests() {
       ['Apprendre', 'Pratiquer', 'En équipe', 'le parcours cajón · djembé — mode écoute, mode pratique',
        'la pratique libre — ce que je joue, ce qui m\'accompagne, le clic',
        'jouer ensemble — chacun sa ligne, le chef donne le départ',
-       'La salle de concert : le pupitre de chacun et le départ commun.'].every(k => EN[k] && PT[k]));
+       'La salle de concert : chacun sa ligne, une personne lance tout le monde.'].every(k => EN[k] && PT[k]));
     ok('H1.3bis R-6 : clés volume/sourdine traduites, ancienne annonce « bientôt » PURGÉE des deux dicts',
       ['Volume', 'muet', 'Sourdine générale (coupe tout le son en un clic)'].every(k => EN[k] && PT[k]) &&
       !('bientôt — en attendant, la répartition des voix vit dans' in EN) &&
