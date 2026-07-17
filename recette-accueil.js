@@ -85,8 +85,8 @@ function runTests() {
   /* ---------- A. chargement + premier niveau FERMÉ (§9.8) ---------- */
   const realErrors = jsdomErrors.filter(m => !/resources?|Could not load|external script|net::|ERR_|Not implemented/i.test(m));
   ok('A1.1 chargement sans erreur jsdom (' + realErrors.length + ')', realErrors.length === 0);
-  ok('A1.2 BUILD 0.17.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.17.0');
-  ok('A1.3 tampon de build affiché', /metronomefunk-0\.17\.0/.test(txt($('buildStamp'))));
+  ok('A1.2 BUILD 0.18.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.18.0');
+  ok('A1.3 tampon de build affiché', /metronomefunk-0\.18\.0/.test(txt($('buildStamp'))));
   ok('A2.1 la liste fermée est là : tempo (gros, ±), tap, démarrer, battue, subdivision, son du clic, thème',
     ['tempoValue', 'tempoSlider', 'minusBtn', 'plusBtn', 'tapBtn', 'startBtn',
      'beatsSel', 'subdivSel', 'pulseFreq', 'pulseFreqVal', 'clickType', 'themeBtn'].every(id => !!$(id)));

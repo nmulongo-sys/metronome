@@ -201,6 +201,19 @@
   body.ctx-archet details.section[data-strate="couche"] { display: none; }
   /* mode simple prime : tout replié (règle ci-dessus) */
 
+  /* ---- P1-a (M2) : bandeau « par où commencer ? » ---- */
+  .guide-accueil {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    background: var(--fm-accent-soft, var(--fm-panel)); border: 1px solid var(--fm-accent);
+    border-radius: 12px; padding: 11px 14px; margin-bottom: 14px;
+  }
+  .guide-accueil .guide-txt { flex: 1; min-width: 180px; font-size: .9rem; color: var(--fm-ink); }
+  .guide-accueil .guide-close {
+    background: none; border: none; color: var(--fm-sub); cursor: pointer;
+    font-size: 1rem; line-height: 1; padding: 4px 6px; border-radius: 6px;
+  }
+  .guide-accueil .guide-close:hover { color: var(--fm-ink); background: var(--fm-panel); }
+
   /* ---- sélecteur de famille (bin/tern) en tête de la strate couches ---- */
   .family-bar {
     display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
@@ -897,6 +910,34 @@ window.__I18N = { "en": {
   "L'application fonctionne aussi sans compte : la connexion sert seulement à partager tes routines et suivre ta progression.": "The app also works without an account: signing in is only for sharing your routines and tracking your progress.",
   "Pas reçu au bout d'une minute ? Vérifie tes indésirables (spams), ou renvoie le lien.": "Nothing after a minute? Check your spam folder, or resend the link.",
   "Renvoyer le lien": "Resend the link",
+  /* P1-b (M3, salve R-5 P1) : modale de compte — jeu de clés COMPLET repris d'apprendre
+     (identiques). La modale vient de fm-compte.js verbatim, traduite par le marcheur. */
+  "ton@email.fr": "you@email.com",
+  "Annuler": "Cancel",
+  "Envoyer le lien": "Send the link",
+  "Entre une adresse e-mail valide.": "Enter a valid e-mail address.",
+  "Connexion au serveur impossible (réseau ?).": "Can't reach the server (network issue?).",
+  "Envoi…": "Sending…",
+  "Vérifie tes e-mails": "Check your e-mail",
+  "Un lien de connexion a été envoyé à": "A sign-in link has been sent to",
+  ". Ouvre-le sur cet appareil pour te connecter.": ". Open it on this device to sign in.",
+  "Fermer": "Close",
+  "Ton pseudo": "Your nickname",
+  "Le nom affiché à côté des routines que tu partageras.": "The name shown next to the routines you share.",
+  "ex. Naomi": "e.g. Naomi",
+  "Enregistrer": "Save",
+  "Enregistrement…": "Saving…",
+  "Choisis un pseudo (ou « Plus tard »).": "Pick a nickname (or \"Later\").",
+  "Connecté": "Signed in",
+  "Connecté comme": "Signed in as",
+  "Changer de pseudo": "Change nickname",
+  "Choisir un pseudo": "Pick a nickname",
+  /* P1-a (M2) : bandeau « par où commencer ? » */
+  "Par où commencer ?": "Where to start?",
+  "Un accompagnement en un clic, puis appuie sur ▶.": "One-click accompaniment, then press ▶.",
+  "▶ Premier accompagnement": "▶ First accompaniment",
+  "Masquer ce message": "Hide this message",
+  "Accompagnement de base chargé — à toi de jouer par-dessus.": "Base accompaniment loaded — now play over it.",
   "En savoir plus": "Learn more",
   "Débutant ? Laisse-toi guider": "Beginner? Let us guide you",
   "— l'assistant règle le métronome pour toi en trois questions.": "— the assistant sets up the metronome for you in three questions.",
@@ -1486,6 +1527,33 @@ window.__I18N = { "en": {
   "L'application fonctionne aussi sans compte : la connexion sert seulement à partager tes routines et suivre ta progression.": "O app também funciona sem conta: entrar serve apenas para compartilhar suas rotinas e acompanhar seu progresso.",
   "Pas reçu au bout d'une minute ? Vérifie tes indésirables (spams), ou renvoie le lien.": "Nada depois de um minuto? Verifique sua caixa de spam, ou reenvie o link.",
   "Renvoyer le lien": "Reenviar o link",
+  /* P1-b (M3, salve R-5 P1) : modale de compte — jeu de clés COMPLET repris d'apprendre (identiques). */
+  "ton@email.fr": "voce@email.com",
+  "Annuler": "Cancelar",
+  "Envoyer le lien": "Enviar o link",
+  "Entre une adresse e-mail valide.": "Digite um endereço de e-mail válido.",
+  "Connexion au serveur impossible (réseau ?).": "Não foi possível conectar ao servidor (rede?).",
+  "Envoi…": "Enviando…",
+  "Vérifie tes e-mails": "Verifique seus e-mails",
+  "Un lien de connexion a été envoyé à": "Um link de acesso foi enviado para",
+  ". Ouvre-le sur cet appareil pour te connecter.": ". Abra-o neste dispositivo para entrar.",
+  "Fermer": "Fechar",
+  "Ton pseudo": "Seu apelido",
+  "Le nom affiché à côté des routines que tu partageras.": "O nome exibido ao lado das rotinas que você compartilhar.",
+  "ex. Naomi": "ex. Naomi",
+  "Enregistrer": "Salvar",
+  "Enregistrement…": "Salvando…",
+  "Choisis un pseudo (ou « Plus tard »).": "Escolha um apelido (ou « Mais tarde »).",
+  "Connecté": "Conectado",
+  "Connecté comme": "Conectado como",
+  "Changer de pseudo": "Mudar de apelido",
+  "Choisir un pseudo": "Escolher um apelido",
+  /* P1-a (M2) : bandeau « par où commencer ? » */
+  "Par où commencer ?": "Por onde começar?",
+  "Un accompagnement en un clic, puis appuie sur ▶.": "Um acompanhamento em um clique, depois aperte ▶.",
+  "▶ Premier accompagnement": "▶ Primeiro acompanhamento",
+  "Masquer ce message": "Ocultar esta mensagem",
+  "Accompagnement de base chargé — à toi de jouer par-dessus.": "Acompanhamento base carregado — agora toque por cima.",
   "En savoir plus": "Saiba mais",
   "Débutant ? Laisse-toi guider": "Iniciante? Deixe-se guiar",
   "— l'assistant règle le métronome pour toi en trois questions.": "— o assistente ajusta o metrônomo para você em três perguntas.",
@@ -1695,6 +1763,16 @@ window.fmTr = (function(){
       </span>
     </div>
   </header>
+
+  <!-- P1-a (M2, salve R-5 P1) : « par où commencer ? » — bandeau d'accueil additif
+       pour les novices que le lien de la porte « En équipe » envoie ici. Un clic pose
+       un accompagnement de base (djembé) et démarre ; masquable (persisté). Aucune
+       section touchée : purement additif au-dessus du transport. -->
+  <div class="guide-accueil" id="guideAccueil" hidden>
+    <span class="guide-txt"><b>Par où commencer ?</b> Un accompagnement en un clic, puis appuie sur ▶.</span>
+    <button class="btn-sm primary" id="btnGuidePreset">▶ Premier accompagnement</button>
+    <button class="guide-close" id="btnGuideClose" title="Masquer ce message" aria-label="Masquer ce message">✕</button>
+  </div>
 
   <div class="top">
     <!-- Transport -->
@@ -5095,6 +5173,26 @@ swing 62
     const el = $(id); if (!el) return;
     if (el.tagName === 'DETAILS') el.open = true;
     el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  })();
+  // P1-a (M2, salve R-5 P1) : « par où commencer ? » — bandeau d'accueil pour les
+  // novices. Le bouton pose un accompagnement de base par les ancrages EXISTANTS de
+  // l'UI (setFamily + percSetInstr, la fonction du sélecteur d'instrument) puis démarre.
+  (function () {
+    const g = $('guideAccueil'); if (!g) return;
+    if (store.get('fm-metro-pratiquer-guide') !== 'off') g.hidden = false;
+    $('btnGuideClose').addEventListener('click', () => {
+      g.hidden = true; store.set('fm-metro-pratiquer-guide', 'off');
+    });
+    $('btnGuidePreset').addEventListener('click', () => {
+      setFamily('bin');                       // grille binaire 16 (défaut débutant)
+      $('percInstr').value = 'djembe';
+      percSetInstr('djembe');                 // remplit le groove de base authentique
+      S.perc.on = true; $('percOn').checked = true;
+      const sec = $('secPerc');
+      if (sec) { sec.open = true; sec.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+      if (!isPlaying) toggle();               // « puis appuie sur ▶ » — on le fait pour lui
+      percStatusSet(fmTr('Accompagnement de base chargé — à toi de jouer par-dessus.'));
+    });
   })();
   // C8 : tout remettre par défaut — n'efface que les réglages de l'appli (fm-metro-*) ;
   // la langue, le thème, la file de votes et la session de compte sont conservés.

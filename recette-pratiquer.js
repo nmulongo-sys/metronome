@@ -72,13 +72,15 @@ const W = dom.window, D = W.document;
 const $ = id => D.getElementById(id);
 const ev = (el, type) => el.dispatchEvent(new W.Event(type, { bubbles: true }));
 const g = expr => W.eval(expr);   // accès aux bindings lexicaux (const/let) de la portée globale partagée
+const norm = s => (s || '').replace(/\s+/g, ' ').trim();
+const txt = el => norm(el ? el.textContent : '');
 
 setTimeout(runTests, 80);
 
 function runTests() {
   /* ---------- A. chargement + hiérarchie J1 ---------- */
   ok('chargement sans erreur jsdom (' + jsdomErrors.length + ')', jsdomErrors.length === 0);
-  ok('BUILD 0.17.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.17.0');   // la ligne vivante suit le build
+  ok('BUILD 0.18.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.18.0');   // la ligne vivante suit le build
   ok('GROOVES assemblés depuis FM_GROOVES (31)', g('GROOVES.length') === 31 && Object.keys(W.FM_GROOVES || {}).length === 6);
   const b1 = $('blocJoue'), b2 = $('blocAccomp'), b3 = $('blocClic');
   ok('les trois blocs J1 présents', !!(b1 && b2 && b3));
@@ -246,26 +248,66 @@ function runTests() {
   ok('R-4b : « Publier la routine » câblé (title dynamique posé par le bloc biblio)',
     ($('btnBiblioPublish').getAttribute('title') || '').length > 10);
 
-  /* ---------- H. R-5 (C2) : lien profond — hash-open des sections ---------- */
-  // La porte « En équipe » d'index pointe pratiquer.html#secTeam : à l'arrivée avec
-  // un hash, la section ciblée doit s'OUVRIR (même geste que le sommaire C6 0.6.6) —
-  // second DOM chargé avec l'ancre, mêmes stubs.
+  /* ---------- I. Salve R-5 P1 (M2 + M3) ---------- */
+  // P1-a (M2) : bandeau « par où commencer ? » — présent, visible au premier chargement,
+  // masquable (persisté). Le bouton pose un accompagnement de base + démarre.
+  const guide = $('guideAccueil');
+  ok('P1-a (M2) : bandeau « par où commencer ? » présent, visible au 1er chargement',
+    !!guide && guide.hidden === false && !!$('btnGuidePreset') && !!$('btnGuideClose') &&
+    /Par où commencer/.test(txt(guide)));
+  $('btnGuidePreset').click();
+  ok('P1-a : le preset pose djembé + groove de base (percOn coché, une voix a des frappes)',
+    g('S.perc.on') === true && $('percOn').checked === true && g('S.perc.instr') === 'djembe' &&
+    Object.keys(g('percGrids')).some(k => (g('percGrids')[k] || []).some(x => x > 0)));
+  ok('P1-a : le preset ouvre la section Percussion et lance la lecture',
+    $('secPerc').open === true && g('isPlaying') === true);
+  g('stop()');
+  $('btnGuideClose').click();
+  ok('P1-a : le × masque le bandeau et persiste (fm-metro-pratiquer-guide=off)',
+    guide.hidden === true && W.localStorage.getItem('fm-metro-pratiquer-guide') === 'off');
+  // P1-b (M3) : la modale de compte gagne le jeu de clés COMPLET (identique à apprendre)
   {
-    const vc2 = new VirtualConsole();
-    vc2.on('jsdomError', () => {});
-    const dom2 = new JSDOM(html, {
-      runScripts: 'dangerously', pretendToBeVisual: true,
-      url: 'http://localhost/pratiquer.html#secTeam', virtualConsole: vc2,
-      beforeParse: stubs
-    });
+    const EN = W.__I18N.en, PT = W.__I18N.pt;
+    const COMPTE = ['ton@email.fr', 'Annuler', 'Envoyer le lien', 'Entre une adresse e-mail valide.',
+      'Connexion au serveur impossible (réseau ?).', 'Envoi…', 'Vérifie tes e-mails',
+      'Un lien de connexion a été envoyé à', '. Ouvre-le sur cet appareil pour te connecter.',
+      'Fermer', 'Ton pseudo', 'Le nom affiché à côté des routines que tu partageras.', 'ex. Naomi',
+      'Enregistrer', 'Enregistrement…', 'Choisis un pseudo (ou « Plus tard »).', 'Connecté',
+      'Connecté comme', 'Changer de pseudo', 'Choisir un pseudo'];
+    ok('P1-b (M3) : les 20 clés de la modale de compte présentes EN et PT (symétrie)',
+      COMPTE.every(k => EN[k] && PT[k]));
+    ok('P1-b : symétrie globale conservée (0 clé orpheline après ajout)',
+      Object.keys(EN).every(k => k in PT) && Object.keys(PT).every(k => k in EN));
+  }
+
+  /* ---------- H. R-5 (C2) hash-open + P1-b rendu réel de la modale en PT ---------- */
+  // Deux seconds DOM : (1) #secTeam pour le lien profond ; (2) ?lang=pt pour vérifier
+  // que la modale de compte s'AFFICHE traduite (rendu réel, pas seulement le dico).
+  {
+    const vc2 = new VirtualConsole(); vc2.on('jsdomError', () => {});
+    const dom2 = new JSDOM(html, { runScripts: 'dangerously', pretendToBeVisual: true,
+      url: 'http://localhost/pratiquer.html#secTeam', virtualConsole: vc2, beforeParse: stubs });
+    const vc3 = new VirtualConsole(); vc3.on('jsdomError', () => {});
+    const dom3 = new JSDOM(html, { runScripts: 'dangerously', pretendToBeVisual: true,
+      url: 'http://localhost/pratiquer.html?lang=pt', virtualConsole: vc3, beforeParse: stubs });
     setTimeout(() => {
       const D2 = dom2.window.document;
       ok('R-5 (C2) : arrivée avec #secTeam → la section Team Spirit est OUVERTE (lien profond de la porte)',
         D2.getElementById('secTeam').open === true);
       ok('R-5 (C2) : seule la cible s\'ouvre — les autres sections restent fermées',
         D2.getElementById('secPerc').open === false && D2.getElementById('secBass').open === false);
-      console.log(`\n--- pratiquer (R-3b→R-4b) : ${PASS} vertes, ${FAIL} rouges (total ${PASS + FAIL}) ---`);
-      process.exit(FAIL ? 1 : 0);
+      // P1-b : rendu réel — ouvrir la modale en PT, le marcheur traduit les nœuds insérés
+      const W3 = dom3.window, D3 = W3.document;
+      D3.getElementById('btnAccount').dispatchEvent(new W3.MouseEvent('click', { bubbles: true }));
+      setTimeout(() => {
+        const body = norm(D3.getElementById('acctBody').textContent);
+        const btns = [...D3.querySelectorAll('#acctBody button')].map(b => norm(b.textContent));
+        ok('P1-b (M3) : modale ouverte en PT → « Enviar o link » et « Cancelar » (plus de FR)',
+          btns.some(b => /Enviar o link/.test(b)) && btns.some(b => /Cancelar/.test(b)) &&
+          !/Envoyer le lien|Annuler/.test(body));
+        console.log(`\n--- pratiquer (R-3b→R-4b, +R-5 P1) : ${PASS} vertes, ${FAIL} rouges (total ${PASS + FAIL}) ---`);
+        process.exit(FAIL ? 1 : 0);
+      }, 200);
     }, 300);
   }
 }
