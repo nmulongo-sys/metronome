@@ -113,8 +113,8 @@ for (const page of Object.keys(ORDRES)) {
   ok(new RegExp('</script>\\s*<script>\\s*\'use strict\';').test(html),
     page + ' : le script principal ouvre sur \'use strict\' sans IIFE (portée globale partagée)');
 }
-ok(/const BUILD = 'metronomefunk-0\.18\.0'/.test(etat),
-  'BUILD = 0.18.0 dans fm-etat.js (unique ligne vivante, tolérance déclarée)');
+ok(/const BUILD = 'metronomefunk-0\.19\.0'/.test(etat),
+  'BUILD = 0.19.0 dans fm-etat.js (unique ligne vivante, tolérance déclarée)');
 
 // ---- C. coquille partagée : fm-compte.js == bloc COMPTE du 0.12.0 (déplacement) ----
 const REFC = JSON.parse(fs.readFileSync(path.join(__dirname, 'reference-compte-0.12.0.json'), 'utf-8'));

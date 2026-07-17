@@ -80,7 +80,7 @@ setTimeout(runTests, 80);
 function runTests() {
   /* ---------- A. chargement + hiérarchie J1 ---------- */
   ok('chargement sans erreur jsdom (' + jsdomErrors.length + ')', jsdomErrors.length === 0);
-  ok('BUILD 0.18.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.18.0');   // la ligne vivante suit le build
+  ok('BUILD 0.19.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.19.0');   // la ligne vivante suit le build
   ok('GROOVES assemblés depuis FM_GROOVES (31)', g('GROOVES.length') === 31 && Object.keys(W.FM_GROOVES || {}).length === 6);
   const b1 = $('blocJoue'), b2 = $('blocAccomp'), b3 = $('blocClic');
   ok('les trois blocs J1 présents', !!(b1 && b2 && b3));
@@ -305,6 +305,13 @@ function runTests() {
         ok('P1-b (M3) : modale ouverte en PT → « Enviar o link » et « Cancelar » (plus de FR)',
           btns.some(b => /Enviar o link/.test(b)) && btns.some(b => /Cancelar/.test(b)) &&
           !/Envoyer le lien|Annuler/.test(body));
+        // R-5 salve P2 : M4 — sous-titres des tiroirs francisés (« groove » compris)
+        const p2subs = Array.from(D.querySelectorAll('.sec-sub')).map(e => norm(e.textContent)).join(' || ');
+        ok('P2-M4.1 anglicismes retirés des sous-titres (script / Supabase / export / groove)',
+          !/\bscript\b/i.test(p2subs) && !/Supabase/.test(p2subs) && !/·\s*export\b/.test(p2subs) && !/\bgroove\b/i.test(p2subs));
+        ok('P2-M4.2 sous-titres FR posés (routine / en ligne / à exporter / rythme)',
+          /écrire la routine pas à pas/.test(p2subs) && /routines · en ligne/.test(p2subs) &&
+          /solo\/muet · à exporter/.test(p2subs) && /rythme · variations/.test(p2subs));
         console.log(`\n--- pratiquer (R-3b→R-4b, +R-5 P1) : ${PASS} vertes, ${FAIL} rouges (total ${PASS + FAIL}) ---`);
         process.exit(FAIL ? 1 : 0);
       }, 200);

@@ -188,6 +188,7 @@
   .pf-perso-body label { display:flex; align-items:center; gap:4px; }
   .pf-vote { display:flex; align-items:center; gap:6px; margin-top:8px; font-size: .8125rem; color:var(--fm-sub); flex-wrap:wrap; }
   .pf-vote .pf-v { font-size: .8125rem; padding:2px 8px; }
+  .pf-vote-note { margin-top:4px; font-size: .75rem; color:var(--fm-sub); opacity:.85; }
   #pfStatus { font-size: .8125rem; color:var(--fm-accent-2); margin-top:8px; min-height:1em; }
   .pf-mod { border:1px solid var(--fm-line); border-radius:10px; margin:8px 0; overflow:hidden; background:var(--fm-panel); }
   .pf-mod-head { width:100%; display:flex; align-items:center; gap:8px; padding:9px 10px; background:transparent; border:none; cursor:pointer; color:var(--fm-ink); font:inherit; text-align:left; }
@@ -279,6 +280,15 @@
     <div class="main-buttons">
       <button class="btn-start" id="startBtn">▶ Démarrer</button>
     </div>
+    <!-- R-5 P2 : volume + sourdine (patron R5-1, IDs identiques à index/pratiquer) —
+         apprendre était la seule page sans depuis R5-1. -->
+    <div style="margin-top:10px">
+      <label for="volSlider" class="small">Volume <span id="volVal" style="font-variant-numeric:tabular-nums">· 80 %</span></label>
+      <div style="display:flex;align-items:center;gap:6px">
+        <input type="range" id="volSlider" min="0" max="100" value="80" style="flex:1;min-width:0">
+        <button class="btn-sm" id="volMuteBtn" title="Sourdine générale (coupe tout le son en un clic)" aria-pressed="false">🔊</button>
+      </div>
+    </div>
     <div class="status-line" id="statusLine" role="status" aria-live="polite">Prêt</div>
   </div>
 
@@ -344,6 +354,10 @@
    corpus », non planifié). Les clés partagées avec index/pratiquer sont reprises
    TELLES QUELLES (cohérence de vocabulaire inter-pages). ===== */
 window.__I18N = { "en": {
+  "Volume": "Volume",
+  "muet": "mute",
+  "Sourdine générale (coupe tout le son en un clic)": "Master mute (cuts all sound in one click)",
+  "Ton vote recalibre le niveau pour tout le monde.": "Your vote recalibrates the level for everyone.",
   /* — en-tête — */
   "Métronome — Apprendre": "Metronome — Learn",
   "Le parcours · mode écoute — mode pratique": "The path · listen mode — practice mode",
@@ -386,7 +400,7 @@ window.__I18N = { "en": {
   "Densite": "Density",
   "Tonalite": "Key",
   "Drop-outs": "Drop-outs",
-  "Difficulte :": "Difficulty:",
+  "Difficulté :": "Difficulty:",
   "facile": "easy",
   "difficile": "hard",
   "deja rencontre": "already seen",
@@ -432,6 +446,10 @@ window.__I18N = { "en": {
   "Choisir un pseudo": "Pick a nickname",
   "Se déconnecter": "Log out"
 }, "pt": {
+  "Volume": "Volume",
+  "muet": "mudo",
+  "Sourdine générale (coupe tout le son en un clic)": "Mudo geral (corta todo o som em um clique)",
+  "Ton vote recalibre le niveau pour tout le monde.": "Seu voto recalibra o nível para todo mundo.",
   /* — en-tête — */
   "Métronome — Apprendre": "Metrônomo — Aprender",
   "Le parcours · mode écoute — mode pratique": "O percurso · modo escuta — modo prática",
@@ -474,7 +492,7 @@ window.__I18N = { "en": {
   "Densite": "Densidade",
   "Tonalite": "Tonalidade",
   "Drop-outs": "Drop-outs",
-  "Difficulte :": "Dificuldade:",
+  "Difficulté :": "Dificuldade:",
   "facile": "fácil",
   "difficile": "difícil",
   "deja rencontre": "já visto",
@@ -644,6 +662,7 @@ window.fmTr = (function(){
     $('tempoValue').textContent = S.tempo;
     $('tempoName').textContent = nameOf(S.tempo);
     $('tempoSlider').value = S.tempo;
+    store.set('fm-tempo', S.tempo); // R-5 P2 : continuité du tempo entre pages
   }
   function setSwing(v) {
     S.swing = Math.min(85, Math.max(50, v));
@@ -660,6 +679,16 @@ window.fmTr = (function(){
   $('minusBtn').addEventListener('click', () => setTempo(S.tempo - 1));
   $('plusBtn').addEventListener('click', () => setTempo(S.tempo + 1));
   $('startBtn').addEventListener('click', () => { toggle(); statusRender(); });
+  // R-5 P2 : volume + sourdine — S.volume/volMuted/masterGain sont des globals moteur ;
+  // 1 clic pour couper, le curseur lève la sourdine ; session seule (non persisté), aligné index/pratiquer.
+  function volRender() {
+    const v = $('volVal'); if (v) v.textContent = '· ' + Math.round(S.volume * 100) + ' %' + (volMuted ? ' · muet' : '');
+    const b = $('volMuteBtn');
+    if (b) { b.textContent = volMuted ? '🔇' : '🔊'; b.setAttribute('aria-pressed', volMuted ? 'true' : 'false'); }
+  }
+  function volApply() { if (masterGain) masterGain.gain.value = volMuted ? 0 : S.volume; }
+  $('volSlider').addEventListener('input', e => { S.volume = e.target.value / 100; volMuted = false; volApply(); volRender(); });
+  $('volMuteBtn').addEventListener('click', () => { volMuted = !volMuted; volApply(); volRender(); });
 
   // ============ FAMILLE & GRILLES (R-4a — versions de page) ============
   // Pas de clave ni de séquenceur ici : setFamily tient S.family (et le miroir
@@ -978,10 +1007,11 @@ window.fmTr = (function(){
           html += '<label class="check"><input type="checkbox" class="pf-drop"' + (E.preset.drop && E.preset.drop.on ? ' checked' : '') + '> Drop-outs</label>';
           html += '<label>Tonalite <select class="pf-key">' + PF_KEYS.map(k => '<option' + (k === 'E' ? ' selected' : '') + '>' + k + '</option>').join('') + '</select></label>';
           html += '</div></details>';
-          html += '<div class="pf-vote"><span>Difficulte :</span>';
+          html += '<div class="pf-vote"><span>Difficulté :</span>';
           html += '<button class="btn-sm pf-v" data-v="facile">facile</button>';
           html += '<button class="btn-sm pf-v" data-v="ok">ok</button>';
           html += '<button class="btn-sm pf-v" data-v="difficile">difficile</button></div>';
+          html += '<div class="pf-vote-note">Ton vote recalibre le niveau pour tout le monde.</div>';
           html += '</div>';
         });
         html += '</div></div>';
@@ -1078,7 +1108,7 @@ window.fmTr = (function(){
 
   // ============ INIT ============
   $('themeBtn').textContent = currentTheme() === 'sombre' ? '◐ Mode clair' : '◐ Mode sombre';
-  setTempo(92);
+  setTempo(+store.get('fm-tempo') || 92); // R-5 P2 : reprend le tempo de la page précédente
   setSwing(50);
   { const _bs = $('buildStamp'); if (_bs) _bs.textContent = 'build ' + BUILD + ' · ' + BUILD_DATE; }
 
