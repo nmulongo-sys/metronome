@@ -71,6 +71,17 @@
     color: var(--fm-accent-text); font-weight: 600; margin-top: 4px;
   }
   .header-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  /* R-5 (C3) : sélecteur de langue — styles repris d'index.html (patron commun) */
+  .lang-switch { display: inline-flex; gap: 4px; align-items: center; }
+  .lang-btn {
+    display: inline-flex; align-items: center; gap: 5px; cursor: pointer;
+    background: var(--fm-panel); border: 1px solid var(--fm-line); color: var(--fm-sub);
+    padding: 5px 8px; border-radius: 7px; font-family: var(--fm-font-ui); font-size: .8125rem;
+    font-weight: 600; letter-spacing: .04em; transition: border-color .12s, color .12s, background .12s;
+  }
+  .lang-btn:hover { color: var(--fm-ink); border-color: var(--fm-accent); }
+  .lang-btn.on { border-color: var(--fm-accent); background: var(--fm-accent); color: var(--fm-accent-ink); }
+  .lang-btn .flag { width: 18px; height: 12px; border-radius: 2px; box-shadow: 0 0 0 1px rgba(0,0,0,.15); display: block; }
   .btn-ghost {
     background: var(--fm-panel); border: 1px solid var(--fm-line); color: var(--fm-ink);
     padding: 8px 14px; border-radius: 7px; cursor: pointer;
@@ -247,6 +258,12 @@
     <div class="header-actions">
       <button class="btn-ghost" id="themeBtn" title="Basculer entre thème clair et thème sombre">◐ Mode sombre</button>
       <button class="btn-ghost" id="btnAccount" title="Recevoir un lien de connexion par e-mail">Se connecter</button>
+      <!-- R-5 (C3) : la dernière marche du trilingue — patron d'index.html, langue partagée fm-lang -->
+      <span id="langSwitch" class="lang-switch" role="group" aria-label="Langue / Language / Idioma">
+        <button type="button" class="lang-btn" data-lang="fr" title="Français" aria-label="Français"><svg class="flag" viewBox="0 0 3 2" aria-hidden="true"><rect width="3" height="2" fill="#fff"/><rect width="1" height="2" fill="#0055A4"/><rect x="2" width="1" height="2" fill="#EF4135"/></svg>FR</button>
+        <button type="button" class="lang-btn" data-lang="en" title="English" aria-label="English"><svg class="flag" viewBox="0 0 60 30" aria-hidden="true"><clipPath id="ukc"><path d="M0,0 v30 h60 v-30 z"/></clipPath><g clip-path="url(#ukc)"><path d="M0,0 v30 h60 v-30 z" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M30,0 v30 M0,15 h60" stroke="#fff" stroke-width="10"/><path d="M30,0 v30 M0,15 h60" stroke="#C8102E" stroke-width="6"/></g></svg>EN</button>
+        <button type="button" class="lang-btn" data-lang="pt" title="Português (Brasil)" aria-label="Português (Brasil)"><svg class="flag" viewBox="0 0 20 14" aria-hidden="true"><rect width="20" height="14" fill="#009B3A"/><path d="M10,1.2 L18.8,7 L10,12.8 L1.2,7 Z" fill="#FEDD00"/><circle cx="10" cy="7" r="2.7" fill="#002776"/></svg>BR</button>
+      </span>
     </div>
   </header>
 
@@ -313,6 +330,196 @@
   <div id="acctBody"></div>
 </div>
 
+<script>
+/* ===== R-5 (C3) : dictionnaires FR→EN / FR→PT-BR — la dernière marche du trilingue.
+   Même mécanisme qu'index.html et pratiquer.html : clé = texte FRANÇAIS normalisé
+   (espaces repliés) ; le marcheur + MutationObserver (bloc en fin de page) traduisent
+   les nœuds texte et les attributs placeholder/title/aria-label. PÉRIMÈTRE (spec R-5
+   §4.2) : les libellés PROPRES de la page — le contenu pédagogique du corpus (objet,
+   consigne, critère, noms de modules) reste en français (transverse « principes en
+   corpus », non planifié). Les clés partagées avec index/pratiquer sont reprises
+   TELLES QUELLES (cohérence de vocabulaire inter-pages). ===== */
+window.__I18N = { "en": {
+  /* — en-tête — */
+  "Métronome — Apprendre": "Metronome — Learn",
+  "Le parcours · mode écoute — mode pratique": "The path · listen mode — practice mode",
+  "← Accueil du métronome": "← Metronome home",
+  "Revenir à la page d'accueil du métronome": "Back to the metronome home page",
+  "Pratique libre": "Free practice",
+  "La pratique libre : instruments, styles, réglages complets": "Free practice: instruments, styles, full settings",
+  "Basculer entre thème clair et thème sombre": "Switch between light and dark theme",
+  "◐ Mode sombre": "◐ Dark mode",
+  "◐ Mode clair": "◐ Light mode",
+  "Se connecter": "Log in",
+  "Recevoir un lien de connexion par e-mail": "Get a sign-in link by e-mail",
+  /* — transport — */
+  "Réglage du tempo": "Tempo control",
+  "Tempo -1": "Tempo -1",
+  "Tempo +1": "Tempo +1",
+  "BPM ·": "BPM ·",
+  "▶ Démarrer": "▶ Start",
+  "■ Arrêter": "■ Stop",
+  "Prêt": "Ready",
+  "Arrêté": "Stopped",
+  "Écoute — le modèle joue par-dessus l'accompagnement": "Listening — the model plays over the accompaniment",
+  "Lecture — à toi de jouer": "Playing — your turn to play",
+  /* — carte parcours — */
+  "Le parcours": "The path",
+  "cajón · djembé — leçons par niveaux": "cajón · djembé — lessons by level",
+  "Choisis un exercice. « ▶ Écouter » fait entendre le modèle par-dessus l'accompagnement — imprègne-toi, puis « Charger » installe l'accompagnement seul : à toi de jouer. Coche « acquis » quand le critère est atteint ; le vote de difficulté aide à recalibrer le niveau pour tout le monde.": "Pick an exercise. \"▶ Listen\" plays the model over the accompaniment — soak it up, then \"Load\" sets up the accompaniment alone: your turn to play. Tick \"mastered\" when the criterion is met; the difficulty vote helps recalibrate the level for everyone.",
+  /* — rendu du parcours (libellés générés par pfRender) — */
+  "Niveau du parcours": "Path level",
+  "Débutant": "Beginner",
+  "Intermédiaire": "Intermediate",
+  "Avancé": "Advanced",
+  "Artiste": "Artist",
+  "▶ Écouter": "▶ Listen",
+  "démo à venir": "demo coming soon",
+  "Charger": "Load",
+  "acquis": "mastered",
+  "Personnaliser": "Customize",
+  "Densite": "Density",
+  "Tonalite": "Key",
+  "Drop-outs": "Drop-outs",
+  "Difficulte :": "Difficulty:",
+  "facile": "easy",
+  "difficile": "hard",
+  "deja rencontre": "already seen",
+  "Deja rencontre dans l'autre parcours": "Already seen in the other path",
+  "↑ niveau": "↑ level",
+  "Monte d'un niveau par les votes": "Moved up one level by the votes",
+  /* — statuts composés (segments fixes via fmTr — la part corpus reste en FR) — */
+  "Chargé :": "Loaded:",
+  "— lance le métronome.": "— start the metronome.",
+  "Écoute :": "Listening:",
+  "— le modèle joue par-dessus l’accompagnement.": "— the model plays over the accompaniment.",
+  "Vote enregistre :": "Vote saved:",
+  /* — grille vivante (R-4d) — */
+  "Ta partie : cases sourdes = frappes, cases vives = accents — le curseur suit la lecture.": "Your part: muted cells = strokes, bright cells = accents — the cursor follows playback.",
+  /* — toast moteur (fm-etat, verbatim — clé reprise de pratiquer) — */
+  "✓ Réglages enregistrés automatiquement": "✓ Settings saved automatically",
+  /* — compte (fm-compte.js verbatim : traduit par l'observateur, jeu complet) — */
+  "Reçois un lien de connexion par e-mail — aucun mot de passe à retenir.": "Get a sign-in link by e-mail — no password to remember.",
+  "L'application fonctionne aussi sans compte : la connexion sert seulement à partager tes routines et suivre ta progression.": "The app also works without an account: signing in is only for sharing your routines and tracking your progress.",
+  "ton@email.fr": "you@email.com",
+  "Annuler": "Cancel",
+  "Envoyer le lien": "Send the link",
+  "Entre une adresse e-mail valide.": "Enter a valid e-mail address.",
+  "Connexion au serveur impossible (réseau ?).": "Can't reach the server (network issue?).",
+  "Envoi…": "Sending…",
+  "Vérifie tes e-mails": "Check your e-mail",
+  "Un lien de connexion a été envoyé à": "A sign-in link has been sent to",
+  ". Ouvre-le sur cet appareil pour te connecter.": ". Open it on this device to sign in.",
+  "Pas reçu au bout d'une minute ? Vérifie tes indésirables (spams), ou renvoie le lien.": "Nothing after a minute? Check your spam folder, or resend the link.",
+  "Renvoyer le lien": "Resend the link",
+  "Fermer": "Close",
+  "Ton pseudo": "Your nickname",
+  "Le nom affiché à côté des routines que tu partageras.": "The name shown next to the routines you share.",
+  "ex. Naomi": "e.g. Naomi",
+  "Plus tard": "Later",
+  "Enregistrer": "Save",
+  "Enregistrement…": "Saving…",
+  "Choisis un pseudo (ou « Plus tard »).": "Pick a nickname (or \"Later\").",
+  "Ton compte": "Your account",
+  "Connecté": "Signed in",
+  "Connecté comme": "Signed in as",
+  "Changer de pseudo": "Change nickname",
+  "Choisir un pseudo": "Pick a nickname",
+  "Se déconnecter": "Log out"
+}, "pt": {
+  /* — en-tête — */
+  "Métronome — Apprendre": "Metrônomo — Aprender",
+  "Le parcours · mode écoute — mode pratique": "O percurso · modo escuta — modo prática",
+  "← Accueil du métronome": "← Início do metrônomo",
+  "Revenir à la page d'accueil du métronome": "Voltar à página inicial do metrônomo",
+  "Pratique libre": "Prática livre",
+  "La pratique libre : instruments, styles, réglages complets": "A prática livre: instrumentos, estilos, ajustes completos",
+  "Basculer entre thème clair et thème sombre": "Alternar entre tema claro e tema escuro",
+  "◐ Mode sombre": "◐ Modo escuro",
+  "◐ Mode clair": "◐ Modo claro",
+  "Se connecter": "Entrar",
+  "Recevoir un lien de connexion par e-mail": "Receber um link de acesso por e-mail",
+  /* — transport — */
+  "Réglage du tempo": "Ajuste do tempo",
+  "Tempo -1": "Tempo -1",
+  "Tempo +1": "Tempo +1",
+  "BPM ·": "BPM ·",
+  "▶ Démarrer": "▶ Iniciar",
+  "■ Arrêter": "■ Parar",
+  "Prêt": "Pronto",
+  "Arrêté": "Parado",
+  "Écoute — le modèle joue par-dessus l'accompagnement": "Escuta — o modelo toca por cima do acompanhamento",
+  "Lecture — à toi de jouer": "Tocando — sua vez de tocar",
+  /* — carte parcours — */
+  "Le parcours": "O percurso",
+  "cajón · djembé — leçons par niveaux": "cajón · djembê — lições por nível",
+  "Choisis un exercice. « ▶ Écouter » fait entendre le modèle par-dessus l'accompagnement — imprègne-toi, puis « Charger » installe l'accompagnement seul : à toi de jouer. Coche « acquis » quand le critère est atteint ; le vote de difficulté aide à recalibrer le niveau pour tout le monde.": "Escolha um exercício. « ▶ Ouvir » faz soar o modelo por cima do acompanhamento — absorva, depois « Carregar » instala apenas o acompanhamento: sua vez de tocar. Marque « adquirido » quando o critério for atingido; o voto de dificuldade ajuda a recalibrar o nível para todos.",
+  /* — rendu du parcours (libellés générés par pfRender) — */
+  "Niveau du parcours": "Nível do percurso",
+  "Débutant": "Iniciante",
+  "Intermédiaire": "Intermediário",
+  "Avancé": "Avançado",
+  "Artiste": "Artista",
+  "▶ Écouter": "▶ Ouvir",
+  "démo à venir": "demo em breve",
+  "Charger": "Carregar",
+  "acquis": "adquirido",
+  "Personnaliser": "Personalizar",
+  "Densite": "Densidade",
+  "Tonalite": "Tonalidade",
+  "Drop-outs": "Drop-outs",
+  "Difficulte :": "Dificuldade:",
+  "facile": "fácil",
+  "difficile": "difícil",
+  "deja rencontre": "já visto",
+  "Deja rencontre dans l'autre parcours": "Já visto no outro percurso",
+  "↑ niveau": "↑ nível",
+  "Monte d'un niveau par les votes": "Subiu um nível pelos votos",
+  /* — statuts composés (segments fixes via fmTr — la part corpus reste en FR) — */
+  "Chargé :": "Carregado:",
+  "— lance le métronome.": "— inicie o metrônomo.",
+  "Écoute :": "Escuta:",
+  "— le modèle joue par-dessus l’accompagnement.": "— o modelo toca por cima do acompanhamento.",
+  "Vote enregistre :": "Voto registrado:",
+  /* — grille vivante (R-4d) — */
+  "Ta partie : cases sourdes = frappes, cases vives = accents — le curseur suit la lecture.": "Sua parte: células apagadas = batidas, células vivas = acentos — o cursor segue a leitura.",
+  /* — toast moteur (fm-etat, verbatim — clé reprise de pratiquer) — */
+  "✓ Réglages enregistrés automatiquement": "✓ Configurações salvas automaticamente",
+  /* — compte (fm-compte.js verbatim : traduit par l'observateur, jeu complet) — */
+  "Reçois un lien de connexion par e-mail — aucun mot de passe à retenir.": "Receba um link de acesso por e-mail — nenhuma senha para lembrar.",
+  "L'application fonctionne aussi sans compte : la connexion sert seulement à partager tes routines et suivre ta progression.": "O app também funciona sem conta: entrar serve apenas para compartilhar suas rotinas e acompanhar seu progresso.",
+  "ton@email.fr": "voce@email.com",
+  "Annuler": "Cancelar",
+  "Envoyer le lien": "Enviar o link",
+  "Entre une adresse e-mail valide.": "Digite um endereço de e-mail válido.",
+  "Connexion au serveur impossible (réseau ?).": "Não foi possível conectar ao servidor (rede?).",
+  "Envoi…": "Enviando…",
+  "Vérifie tes e-mails": "Verifique seus e-mails",
+  "Un lien de connexion a été envoyé à": "Um link de acesso foi enviado para",
+  ". Ouvre-le sur cet appareil pour te connecter.": ". Abra-o neste dispositivo para entrar.",
+  "Pas reçu au bout d'une minute ? Vérifie tes indésirables (spams), ou renvoie le lien.": "Nada depois de um minuto? Verifique sua caixa de spam, ou reenvie o link.",
+  "Renvoyer le lien": "Reenviar o link",
+  "Fermer": "Fechar",
+  "Ton pseudo": "Seu apelido",
+  "Le nom affiché à côté des routines que tu partageras.": "O nome exibido ao lado das rotinas que você compartilhar.",
+  "ex. Naomi": "ex. Naomi",
+  "Plus tard": "Mais tarde",
+  "Enregistrer": "Salvar",
+  "Enregistrement…": "Salvando…",
+  "Choisis un pseudo (ou « Plus tard »).": "Escolha um apelido (ou « Mais tarde »).",
+  "Ton compte": "Sua conta",
+  "Connecté": "Conectado",
+  "Connecté comme": "Conectado como",
+  "Changer de pseudo": "Mudar de apelido",
+  "Choisir un pseudo": "Escolher um apelido",
+  "Se déconnecter": "Sair"
+} };
+window.fmTr = (function(){
+  function norm(t){ return (t||'').replace(/\s+/g,' ').trim(); }
+  function lang(){ try{ var q=new URLSearchParams(location.search).get('lang'); var l=q||localStorage.getItem('fm-lang')||'fr'; return ['fr','en','pt'].indexOf(l)>=0?l:'fr'; }catch(e){ return 'fr'; } }
+  return function(fr){ var l=lang(); if(l==='fr') return fr; var D=(window.__I18N||{})[l]; return (D && D[norm(fr)]) || fr; };
+})();
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="corpus/socle-technique.js"></script>
 <script src="corpus/funk.js"></script>
@@ -703,7 +910,8 @@
     try { if (typeof bassPersist === 'function') bassPersist(); } catch(e){}
     pfSyncBassUI();
     if (P.metro) pfSyncMetroUI();
-    pfStatus('Chargé : ' + E.objet + ' — lance le métronome.');
+    // R-5 (apprendre) : segments fixes via fmTr — E.objet (corpus) reste en français (§4.2)
+    pfStatus(fmTr('Chargé :') + ' ' + E.objet + ' ' + fmTr('— lance le métronome.'));
   }
   function pfStatus(msg){ const el = $('pfStatus'); if (el) el.textContent = msg || ''; }
   // ---- rendu ----
@@ -800,7 +1008,8 @@
           pfLoadPreset(ex);
           if (demoApply(ex, pk)) {
             grillePose(ex, pk);   // R-4d : la grille vivante dans la carte
-            pfStatus('\u00C9coute : ' + E.objet + ' \u2014 le mod\u00E8le joue par-dessus l\u2019accompagnement.');
+            // R-5 (apprendre) : segments fixes via fmTr \u2014 E.objet (corpus) reste en fran\u00E7ais (\u00A74.2)
+            pfStatus(fmTr('\u00C9coute :') + ' ' + E.objet + ' ' + fmTr('\u2014 le mod\u00E8le joue par-dessus l\u2019accompagnement.'));
             if (!isPlaying) toggle();
             statusRender();
           }
@@ -816,7 +1025,8 @@
       card.querySelector('.pf-dens').addEventListener('change', e => { S.bass.density = +e.target.value; try { bassResetCycle(); } catch(_){} });
       card.querySelector('.pf-drop').addEventListener('change', e => { S.bass.drop = S.bass.drop || { on:false, everyN:4, lenBeats:2 }; S.bass.drop.on = e.target.checked; try { bassResetCycle(); } catch(_){} });
       card.querySelector('.pf-key').addEventListener('change', e => { S.bass.key = e.target.value; try { bassResetCycle(); bassUpdateChordLabel(); } catch(_){} });
-      card.querySelectorAll('.pf-v').forEach(b => b.addEventListener('click', () => { pfVote(pk, ex, E.kind, b.getAttribute('data-v')); pfStatus('Vote enregistre : ' + b.getAttribute('data-v') + '.'); }));
+      // R-5 (apprendre) : verdict affiché via fmTr (facile/ok/difficile) — data-v reste la valeur FR envoyée au vote
+      card.querySelectorAll('.pf-v').forEach(b => b.addEventListener('click', () => { pfVote(pk, ex, E.kind, b.getAttribute('data-v')); pfStatus(fmTr('Vote enregistre :') + ' ' + fmTr(b.getAttribute('data-v')) + '.'); }));
     });
   }
 
@@ -870,5 +1080,44 @@
   // utilisateur, le toast « réglages enregistrés » peut se montrer (une fois par session).
   window.__fmReady = true;
 </script>
+<script>
+/* ===== R-5 (C3) : bascule FR/EN/PT — bloc REPRIS d'index.html (patron commun).
+   Traduit par correspondance du texte source français normalisé ; le MutationObserver
+   retraduit ce que pfRender/fm-compte re-rendent. Langue partagée : localStorage
+   « fm-lang » — une bascule faite sur l'accueil suit ici sans geste. ===== */
+(function(){
+  var DICTS = window.__I18N || {};
+  var LANGS = ['fr','en','pt'];
+  function norm(s){ return (s||'').replace(/\s+/g,' ').trim(); }
+  function lang(){ try{ var q=new URLSearchParams(location.search).get('lang'); var l=q||localStorage.getItem('fm-lang')||'fr'; return LANGS.indexOf(l)>=0?l:'fr'; }catch(e){ return 'fr'; } }
+  function curDict(){ var l=lang(); return (l!=='fr' && DICTS[l]) ? DICTS[l] : null; }
+  var D=null;
+  /* I5 0.6.9 : ?i18ndebug=1 — marque les nœuds restés en français après bascule
+     (VALS = valeurs déjà traduites, pour ne pas marquer les nœuds convertis) */
+  var DEBUG=false; try{ DEBUG=new URLSearchParams(location.search).get('i18ndebug')==='1'; }catch(e){}
+  var VALS=null;
+  function trText(node){ if(!D)return; var raw=node.nodeValue; if(!raw)return; var key=norm(raw); if(!key)return; var t=D[key]; if(t){ var lead=(raw.match(/^\s*/)||[''])[0], trail=(raw.match(/\s*$/)||[''])[0]; if(node.nodeValue!==lead+t+trail) node.nodeValue=lead+t+trail; }
+    else if(DEBUG && /[A-Za-zÀ-ÿ]{2}/.test(key) && !(VALS && VALS[key])){ var p=node.parentElement; if(p && p.classList) p.classList.add('i18n-miss'); } }
+  function trEl(el){ if(!D||!el||!el.getAttribute)return; ['placeholder','title','aria-label'].forEach(function(a){ if(el.hasAttribute&&el.hasAttribute(a)){ var t=D[norm(el.getAttribute(a))]; if(t) el.setAttribute(a,t); } }); }
+  function walk(root){ try{ var w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,null),n,ns=[]; while(n=w.nextNode())ns.push(n); ns.forEach(trText); if(root.querySelectorAll) root.querySelectorAll('[placeholder],[title],[aria-label]').forEach(trEl); if(root.nodeType===1) trEl(root); }catch(e){} }
+  function enable(){ D=curDict(); if(!D) return; if(DEBUG){ VALS={}; Object.keys(D).forEach(function(k){ VALS[D[k]]=1; }); } walk(document.body); try{ var obs=new MutationObserver(function(muts){ muts.forEach(function(m){ if(m.type==='characterData'){ trText(m.target); return; } m.addedNodes&&m.addedNodes.forEach(function(nd){ if(nd.nodeType===3)trText(nd); else if(nd.nodeType===1)walk(nd); }); }); }); obs.observe(document.body,{childList:true,subtree:true,characterData:true}); }catch(e){} }
+  function setLang(code){
+    if(LANGS.indexOf(code)<0 || code===lang()) return;
+    try{ localStorage.setItem('fm-lang',code); }catch(e){}
+    try{ var u=new URL(location.href); u.searchParams.delete('lang'); history.replaceState(null,'',u.toString()); }catch(e){}
+    location.reload();
+  }
+  function highlight(){ var cur=lang(); document.querySelectorAll('.lang-btn').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-lang')===cur); }); }
+  function init(){
+    highlight();
+    document.querySelectorAll('.lang-btn').forEach(function(b){
+      if(b._wired) return; b._wired=true;
+      b.addEventListener('click', function(){ setLang(b.getAttribute('data-lang')); });
+    });
+    enable();
+  }
+  if(document.readyState!=='loading') init(); else document.addEventListener('DOMContentLoaded', init);
+})();</script>
+<!-- =================== FIN i18n FR/EN/PT (R-5) =================== -->
 </body>
 </html>

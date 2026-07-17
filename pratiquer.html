@@ -5087,6 +5087,15 @@ swing 62
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
   });
+  // R-5 (C2) : lien profond — à l'arrivée avec un hash (ex. pratiquer.html#secTeam,
+  // posé par la porte « En équipe » d'index), ouvrir la section ciblée comme le fait
+  // le sommaire ; sans quoi le lien atterrirait sur un <details> fermé.
+  (function () {
+    const id = (location.hash || '').slice(1); if (!id) return;
+    const el = $(id); if (!el) return;
+    if (el.tagName === 'DETAILS') el.open = true;
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  })();
   // C8 : tout remettre par défaut — n'efface que les réglages de l'appli (fm-metro-*) ;
   // la langue, le thème, la file de votes et la session de compte sont conservés.
   $('btnResetAll').addEventListener('click', () => {

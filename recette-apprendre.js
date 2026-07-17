@@ -37,9 +37,8 @@ const vc = new VirtualConsole();
 const jsdomErrors = [];
 vc.on('jsdomError', (e) => jsdomErrors.push(String(e && e.message || e)));
 
-const dom = new JSDOM(html, {
-  runScripts: 'dangerously', pretendToBeVisual: true, url: 'http://localhost/', virtualConsole: vc,
-  beforeParse(w) {
+// R-5 : stubs factorisés — réutilisés par le second DOM du test i18n (section F)
+function jsdomStubs(w) {
     w.AudioContext = w.webkitAudioContext = function () {
       return new Proxy({}, { get: (t, k) => {
         if (k === 'destination') return {};
@@ -61,7 +60,11 @@ const dom = new JSDOM(html, {
     w.requestAnimationFrame = w.requestAnimationFrame || ((cb) => setTimeout(() => cb(Date.now()), 0));
     w.cancelAnimationFrame = w.cancelAnimationFrame || ((id) => clearTimeout(id));
     w.ResizeObserver = w.ResizeObserver || function () { return { observe(){}, unobserve(){}, disconnect(){} }; };
-  }
+}
+
+const dom = new JSDOM(html, {
+  runScripts: 'dangerously', pretendToBeVisual: true, url: 'http://localhost/', virtualConsole: vc,
+  beforeParse: jsdomStubs
 });
 
 const W = dom.window, D = W.document;
@@ -74,7 +77,7 @@ setTimeout(runTests, 120);
 function runTests() {
   /* ---------- A. chargement + page minimale ---------- */
   ok('chargement sans erreur jsdom (' + jsdomErrors.length + ')', jsdomErrors.length === 0);
-  ok('BUILD 0.16.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.16.0');
+  ok('BUILD 0.17.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.17.0');
   ok('2 corpus chargés (socle-technique + funk), 152 exercices assemblés',
     Object.keys(W.FM_CORPUS || {}).length === 2 && Object.keys(g('FM_ASM.exercices')).length === 152);
   ok('pas de répertoire ici : FM_GROOVES absent (la page ne charge pas les grooves)',
@@ -263,6 +266,106 @@ function runTests() {
   ok('la surcouche P-4 réutilise ce client (pfSb → null hors ligne, file locale)',
     g('typeof pfSb') === 'function' && g('pfSb()') === null);
 
-  console.log(`\n--- apprendre (R-4a) : ${PASS} vertes, ${FAIL} rouges (total ${PASS + FAIL}) ---`);
-  process.exit(FAIL ? 1 : 0);
+  /* ---------- F. R-5 (C3) : EN/PT-BR — la dernière marche du trilingue ---------- */
+  // Périmètre spec R-5 §4.2 : libellés PROPRES de la page traduits ; le contenu
+  // pédagogique du corpus (objet/consigne/critère, noms de modules) RESTE en FR.
+  const norm = s => (s || '').replace(/\s+/g, ' ').trim();
+  const txt = el => norm(el ? el.textContent : '');
+  ok('F1.1 sélecteur de langue présent (drapeaux FR/EN/BR) + fmTr exposé',
+    D.querySelectorAll('#langSwitch .lang-btn').length === 3 && typeof W.fmTr === 'function');
+  const EN = W.__I18N.en, PT = W.__I18N.pt;
+  const enKeys = Object.keys(EN), ptKeys = Object.keys(PT);
+  ok('F1.2 dictionnaires en/pt non vides (' + enKeys.length + ' clés) et symétriques : 0 clé orpheline',
+    enKeys.length >= 60 && enKeys.every(k => k in PT) && ptKeys.every(k => k in EN));
+  ok('F1.3 clés critiques couvertes : chrome, écoute/pratique, légende de grille (R-4d), compte',
+    ['Métronome — Apprendre', '▶ Écouter', 'Charger', 'acquis', 'démo à venir',
+     'Débutant', 'Avancé', 'Artiste', 'Chargé :', '— lance le métronome.',
+     'Ta partie : cases sourdes = frappes, cases vives = accents — le curseur suit la lecture.',
+     'Reçois un lien de connexion par e-mail — aucun mot de passe à retenir.',
+     'Annuler', 'Envoyer le lien'].every(k => EN[k] && PT[k]));
+  // audit d'extraction (patron recette-accueil H1.4/H1.5) : chaque libellé PROPRE
+  // couvert — les zones CORPUS sont exclues (elles restent en FR par périmètre).
+  const IDENT = new Set(['FR', 'EN', 'BR', 'Langue / Language / Idioma', 'Français', 'English',
+    'Português (Brasil)', 'Tempo (BPM)', 'Tempo', 'ok', 'Grave', 'Largo', 'Larghetto', 'Adagio',
+    'Moderato', 'Allegretto', 'Allegro', 'Vivace', 'Presto', 'Prestissimo']);
+  const CORPUS_ZONES = '.pf-objet, .pf-consigne, .pf-critere, .pf-mod-objet, .pf-col-head, .pfg-voix';
+  const EXCL = (t, el) => IDENT.has(t) || /^build metronomefunk-/.test(t) || /^\d+([.,]\d+)?$/.test(t) ||
+    !!(el && el.closest && el.closest(CORPUS_ZONES + ', #pfStatus, #statusLine, #fmStubs, #buildStamp'));
+  const misses = new Set();
+  { const walker = D.createTreeWalker(D.body, 4); let n;
+    while ((n = walker.nextNode())) {
+      const p = n.parentElement;
+      if (p && (p.tagName === 'SCRIPT' || p.tagName === 'STYLE')) continue;
+      const t = norm(n.nodeValue);
+      if (!t || !/[A-Za-zÀ-ÿ]{2}/.test(t) || EXCL(t, p)) continue;
+      if (!EN[t]) misses.add(t);
+    } }
+  ok('F1.4 extraction des nœuds texte : 0 libellé propre hors dictionnaire (corpus exclu par périmètre)',
+    misses.size === 0);
+  if (misses.size) Array.from(misses).slice(0, 8).forEach(t => console.log('     ! ' + JSON.stringify(t.slice(0, 70))));
+  const attrMisses = new Set();
+  D.querySelectorAll('[placeholder],[title],[aria-label]').forEach(el => {
+    ['placeholder', 'title', 'aria-label'].forEach(a => {
+      if (!el.hasAttribute(a)) return;
+      const t = norm(el.getAttribute(a));
+      if (!t || !/[A-Za-zÀ-ÿ]{2}/.test(t) || EXCL(t, el)) return;
+      if (!EN[t]) attrMisses.add(t);
+    });
+  });
+  ok('F1.5 extraction des attributs : 0 manque', attrMisses.size === 0);
+  if (attrMisses.size) Array.from(attrMisses).slice(0, 8).forEach(t => console.log('     ! ' + JSON.stringify(t.slice(0, 70))));
+  // bascule : le clic écrit la langue partagée (le reload est du ressort du navigateur)
+  clic(D.querySelector('.lang-btn[data-lang="pt"]'));
+  ok('F1.6 clic BR → langue partagée écrite (localStorage fm-lang = pt)',
+    W.localStorage.getItem('fm-lang') === 'pt');
+
+  /* ---- F2. second DOM en ?lang=pt : la page vit en portugais, le corpus reste FR ---- */
+  const vc2 = new VirtualConsole();
+  vc2.on('jsdomError', () => {});
+  const dom2 = new JSDOM(html, {
+    runScripts: 'dangerously', pretendToBeVisual: true,
+    url: 'http://localhost/apprendre.html?lang=pt', virtualConsole: vc2,
+    beforeParse: jsdomStubs
+  });
+  setTimeout(() => {
+    const W2 = dom2.window, D2 = W2.document;
+    const txt2 = el => norm(el ? el.textContent : '');
+    const clic2 = el => el.dispatchEvent(new W2.MouseEvent('click', { bubbles: true }));
+    ok('F2.1 ?lang=pt : en-tête traduit (h1, kicker), bouton BR actif',
+      txt2(D2.querySelector('h1')) === 'Metrônomo — Aprender' &&
+      /modo escuta/.test(txt2(D2.querySelector('.kicker'))) &&
+      (D2.querySelector('.lang-btn.on') || {}).getAttribute && D2.querySelector('.lang-btn.on').getAttribute('data-lang') === 'pt');
+    ok('F2.2 transport traduit : ▶ Iniciar, Pronto',
+      /Iniciar/.test(txt2(D2.getElementById('startBtn'))) && txt2(D2.getElementById('statusLine')) === 'Pronto');
+    ok('F2.3 hint + libellés du parcours traduits : Escolha um exercício…, ▶ Ouvir, Carregar, adquirido, Iniciante',
+      /^Escolha um exerc/.test(txt2(D2.querySelector('.hint'))) &&
+      /Ouvir/.test(txt2(D2.querySelector('.pf-ecouter'))) &&
+      txt2(D2.querySelector('.pf-load')) === 'Carregar' &&
+      /adquirido/.test(txt2(D2.querySelector('.pf-acq-lbl'))) &&
+      ['Iniciante', 'Intermediário', 'Avançado', 'Artista'].indexOf(txt2(D2.querySelector('.pf-niv-tab'))) >= 0);
+    // témoin robuste : la carte affiche EXACTEMENT l'objet du corpus (FR), non traduit
+    const carte1 = D2.querySelector('.pf-card');
+    const objetCorpus = W2.eval('PF_EX[' + JSON.stringify(carte1.getAttribute('data-ex')) + '].objet');
+    ok('F2.4 le contenu CORPUS reste en FRANÇAIS (périmètre §4.2) — l\'objet affiché == corpus',
+      txt2(carte1.querySelector('.pf-objet')) === norm(objetCorpus));
+    // écoute : statut composé (segments fixes via fmTr) + légende de grille traduits
+    clic2(D2.querySelector('.pf-ecouter'));
+    setTimeout(() => {
+      ok('F2.5 statut écoute : segments fixes traduits, objet corpus FR au milieu',
+        /^Escuta:/.test(txt2(D2.getElementById('pfStatus'))) &&
+        /o modelo toca por cima do acompanhamento\.$/.test(txt2(D2.getElementById('pfStatus'))));
+      ok('F2.6 légende de la grille vivante traduite (Sua parte…)',
+        /^Sua parte/.test(txt2(D2.querySelector('.pfg-legende'))));
+      // vote : pfVote → pfRender re-rend TOUT — l'observateur retraduit (nœuds FRAIS)
+      clic2(D2.querySelector('.pf-v[data-v="facile"]'));
+      setTimeout(() => {
+        ok('F2.7 statut de vote traduit (verdict compris) : Voto registrado: fácil.',
+          txt2(D2.getElementById('pfStatus')) === 'Voto registrado: fácil.');
+        ok('F2.8 re-rendu après vote TOUJOURS traduit (MutationObserver vivant, cartes fraîches)',
+          /Ouvir/.test(txt2(D2.querySelector('.pf-ecouter'))));
+        console.log(`\n--- apprendre (R-4a) : ${PASS} vertes, ${FAIL} rouges (total ${PASS + FAIL}) ---`);
+        process.exit(FAIL ? 1 : 0);
+      }, 150);
+    }, 150);
+  }, 300);
 }
