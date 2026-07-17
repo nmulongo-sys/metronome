@@ -77,7 +77,7 @@ setTimeout(runTests, 120);
 function runTests() {
   /* ---------- A. chargement + page minimale ---------- */
   ok('chargement sans erreur jsdom (' + jsdomErrors.length + ')', jsdomErrors.length === 0);
-  ok('BUILD 0.18.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.18.0');
+  ok('BUILD 0.19.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.19.0');
   ok('2 corpus chargés (socle-technique + funk), 152 exercices assemblés',
     Object.keys(W.FM_CORPUS || {}).length === 2 && Object.keys(g('FM_ASM.exercices')).length === 152);
   ok('pas de répertoire ici : FM_GROOVES absent (la page ne charge pas les grooves)',
@@ -374,6 +374,17 @@ function runTests() {
         ok('F2.9 P1-c (M1) : avis « leçons en FR » RÉVÉLÉ et traduit en PT (As lições…)',
           D2.getElementById('pfLangNote').hidden === false &&
           /^As lições/.test(txt2(D2.getElementById('pfLangNote'))));
+        // R-5 salve P2 : volume sur apprendre + phrase située sous les votes
+        ok('P2.1 volume + sourdine sur le transport (IDs R5-1, dans #transport)',
+          !!$('volSlider') && !!$('volVal') && !!$('volMuteBtn') && !!($('volMuteBtn').closest && $('volMuteBtn').closest('#transport')));
+        $('volMuteBtn').click();
+        ok('P2.2 sourdine 1-clic : aria-pressed=true + pictogramme muet',
+          $('volMuteBtn').getAttribute('aria-pressed') === 'true' && /🔇/.test(txt($('volMuteBtn'))));
+        $('volMuteBtn').click();
+        ok('P2.3 phrase située sous les votes (rendue par pfRender)',
+          !!D.querySelector('.pf-vote-note') && /recalibre le niveau/.test(txt(D.querySelector('.pf-vote-note'))));
+        ok('P2.4 « Difficulté » accentué',
+          Array.from(D.querySelectorAll('.pf-vote span')).some(s => /Difficulté/.test(txt(s))));
         console.log(`\n--- apprendre (R-4a, +R-5 P1) : ${PASS} vertes, ${FAIL} rouges (total ${PASS + FAIL}) ---`);
         process.exit(FAIL ? 1 : 0);
       }, 150);

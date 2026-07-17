@@ -85,8 +85,8 @@ function runTests() {
   /* ---------- A. chargement + premier niveau FERMÉ (§9.8) ---------- */
   const realErrors = jsdomErrors.filter(m => !/resources?|Could not load|external script|net::|ERR_|Not implemented/i.test(m));
   ok('A1.1 chargement sans erreur jsdom (' + realErrors.length + ')', realErrors.length === 0);
-  ok('A1.2 BUILD 0.18.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.18.0');
-  ok('A1.3 tampon de build affiché', /metronomefunk-0\.18\.0/.test(txt($('buildStamp'))));
+  ok('A1.2 BUILD 0.19.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.19.0');
+  ok('A1.3 tampon de build affiché', /metronomefunk-0\.19\.0/.test(txt($('buildStamp'))));
   ok('A2.1 la liste fermée est là : tempo (gros, ±), tap, démarrer, battue, subdivision, son du clic, thème',
     ['tempoValue', 'tempoSlider', 'minusBtn', 'plusBtn', 'tapBtn', 'startBtn',
      'beatsSel', 'subdivSel', 'pulseFreq', 'pulseFreqVal', 'clickType', 'themeBtn'].every(id => !!$(id)));
@@ -310,6 +310,24 @@ function runTests() {
     if (attrMisses.size) Array.from(attrMisses).slice(0, 8).forEach(t => console.log('     ! ' + JSON.stringify(t.slice(0, 70))));
     ok('H1.6 sélecteur de langue présent (drapeaux FR/EN/BR) + fmTr exposé',
       D.querySelectorAll('#langSwitch .lang-btn').length === 3 && typeof W.fmTr === 'function');
+
+    /* ---------- P2 (R-5 salve P2) : saisie BPM · continuité tempo · infobulles · annonces ---------- */
+    $('tempoSlider').value = '133'; fire('tempoSlider', 'input');
+    ok('P2.1 continuité : le tempo se persiste (fm-tempo, clé silencieuse ≠ fm-metro-)',
+      W.localStorage.getItem('fm-tempo') === '133' && !W.localStorage.getItem('fm-metro-tempo') && txt($('tempoValue')) === '133');
+    ok('P2.2 saisie BPM : #tempoValue éditable (contenteditable + role textbox)',
+      $('tempoValue').getAttribute('contenteditable') === 'true' && $('tempoValue').getAttribute('role') === 'textbox');
+    $('tempoValue').textContent = '400'; fire('tempoValue', 'blur');
+    const p2ClampHaut = txt($('tempoValue')) === '260';
+    $('tempoValue').textContent = '5'; fire('tempoValue', 'blur');
+    ok('P2.3 saisie clavier clampée à [30,260] (blur)', p2ClampHaut && txt($('tempoValue')) === '30');
+    const p2Freq = D.querySelector('label[for="pulseFreq"] .term'), p2Carac = D.querySelector('label[for="clickType"] .term');
+    ok('P2.4 infobulles Fréquence + Caractère (titres FR)',
+      !!p2Freq && /Hauteur du clic/.test(p2Freq.getAttribute('title') || '') &&
+      !!p2Carac && /Timbre du clic/.test(p2Carac.getAttribute('title') || ''));
+    ok('P2.5 annonces situées : 2 notes sous les portes (compte/bibliothèque/Team Spirit)',
+      D.querySelectorAll('.porte-note').length === 2 &&
+      /bibliothèque partagée et Team Spirit/.test(txt(D.querySelector('#portePratiquer .porte-note'))));
 
     console.log('\n--- accueil (R-4b) : ' + PASS + ' vertes, ' + FAIL + ' rouges (total ' + (PASS + FAIL) + ') ---\n');
     process.exit(FAIL ? 1 : 0);

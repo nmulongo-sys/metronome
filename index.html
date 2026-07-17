@@ -282,6 +282,7 @@
   .porte-titre { display: block; font-family: var(--fm-font-display); font-weight: 600; font-size: 1.15rem; }
   .porte-titre::after { content: ' →'; color: var(--fm-accent-text); }
   .porte-sub { display: block; color: var(--fm-sub); font-size: .8125rem; margin-top: 2px; }
+  .porte-note { display: block; color: var(--fm-sub); font-size: .75rem; margin-top: 3px; opacity: .85; }
   .porte.inactive { opacity: .55; cursor: default; }
   .porte.inactive:hover { border-color: var(--fm-line); }
   .porte.inactive .porte-titre::after { content: ''; }
@@ -334,6 +335,12 @@
    composées en JS (statuts dynamiques, confirm, aria-labels construits). Le walker de
    bas de page traduit le reste par correspondance du texte source français. ===== */
 window.__I18N = { "en": {
+  "Ton parcours et ta progression sont sauvegardés ici.": "Your course and progress are saved here.",
+  "Ton compte, la bibliothèque partagée et Team Spirit vivent ici.": "Your account, the shared library and Team Spirit live here.",
+  "Cliquez pour saisir le tempo (30 à 260 BPM)": "Click to type the tempo (30 to 260 BPM)",
+  "Tempo en BPM, modifiable au clavier": "Tempo in BPM, editable from the keyboard",
+  "Hauteur du clic : plus haut, plus aigu": "Click pitch: higher means brighter",
+  "Timbre du clic : tonal (ping) ou sec (bruit bref)": "Click timbre: tonal (ping) or dry (short noise)",
   "Métronome": "Metronome",
   "Formation musicale · Groove & horloge interne": "Music training · Groove & internal clock",
   "◐ Mode sombre": "◐ Dark mode",
@@ -460,6 +467,12 @@ window.__I18N = { "en": {
   "battue binaire (croches) ou ternaire (triolets)": "binary feel (eighth notes) or ternary (triplets)",
   "Fréquence de la pulsation (Hz)": "Pulse frequency (Hz)"
 }, "pt": {
+  "Ton parcours et ta progression sont sauvegardés ici.": "Seu percurso e seu progresso ficam salvos aqui.",
+  "Ton compte, la bibliothèque partagée et Team Spirit vivent ici.": "Sua conta, a biblioteca compartilhada e o Team Spirit ficam aqui.",
+  "Cliquez pour saisir le tempo (30 à 260 BPM)": "Clique para digitar o andamento (30 a 260 BPM)",
+  "Tempo en BPM, modifiable au clavier": "Andamento em BPM, editável pelo teclado",
+  "Hauteur du clic : plus haut, plus aigu": "Altura do clique: mais alto, mais agudo",
+  "Timbre du clic : tonal (ping) ou sec (bruit bref)": "Timbre do clique: tonal (ping) ou seco (ruído curto)",
   "Métronome": "Metrônomo",
   "Formation musicale · Groove & horloge interne": "Treinamento musical · Groove & relógio interno",
   "◐ Mode sombre": "◐ Modo escuro",
@@ -617,7 +630,7 @@ window.fmTr = (function(){
   <div class="top">
     <!-- Transport -->
     <div class="card">
-      <div class="tempo-value" id="tempoValue">92</div>
+      <div class="tempo-value" id="tempoValue" contenteditable="true" role="textbox" inputmode="numeric" tabindex="0" aria-label="Tempo en BPM, modifiable au clavier" title="Cliquez pour saisir le tempo (30 à 260 BPM)">92</div>
       <div class="tempo-label">BPM · <em id="tempoName">Moderato</em></div>
       <div class="slider-row" role="group" aria-label="Réglage du tempo">
         <button id="minusBtn" aria-label="Tempo -1">−</button>
@@ -649,11 +662,11 @@ window.fmTr = (function(){
           <span class="term-sub">battue binaire (croches) ou ternaire (triolets)</span>
         </div>
         <div>
-          <label class="small" for="pulseFreq">Fréquence pulsation <span style="font-variant-numeric:tabular-nums" id="pulseFreqVal">1000 Hz</span></label>
+          <label class="small" for="pulseFreq"><span class="term" tabindex="0" title="Hauteur du clic : plus haut, plus aigu">Fréquence pulsation</span> <span style="font-variant-numeric:tabular-nums" id="pulseFreqVal">1000 Hz</span></label>
           <input type="range" id="pulseFreq" min="100" max="3000" value="1000" aria-label="Fréquence de la pulsation (Hz)">
         </div>
         <div>
-          <label class="small" for="clickType">Caractère</label>
+          <label class="small" for="clickType"><span class="term" tabindex="0" title="Timbre du clic : tonal (ping) ou sec (bruit bref)">Caractère</span></label>
           <select id="clickType">
             <option value="ton" selected>Tonal (ping)</option>
             <option value="sec">Sec (bruit, type rimshot)</option>
@@ -684,10 +697,12 @@ window.fmTr = (function(){
     <a class="porte" id="porteApprendre" href="apprendre.html">
       <span class="porte-titre">Apprendre</span>
       <span class="porte-sub">le parcours cajón · djembé — mode écoute, mode pratique</span>
+      <span class="porte-note">Ton parcours et ta progression sont sauvegardés ici.</span>
     </a>
     <a class="porte" id="portePratiquer" href="pratiquer.html">
       <span class="porte-titre">Pratiquer</span>
       <span class="porte-sub">la pratique libre — ce que je joue, ce qui m'accompagne, le clic</span>
+      <span class="porte-note">Ton compte, la bibliothèque partagée et Team Spirit vivent ici.</span>
     </a>
     <!-- R-5 (C2) : la porte reste inactive (equipe.html = R-6) mais le sous-titre dit
          où Team Spirit vit DÉJÀ, avec le seul élément cliquable : le lien profond.
@@ -1058,6 +1073,7 @@ window.fmTr = (function(){
     $('tempoValue').textContent = S.tempo;
     $('tempoName').textContent = nameOf(S.tempo);
     $('tempoSlider').value = S.tempo;
+    store.set('fm-tempo', S.tempo); // R-5 P2 : continuité du tempo entre pages
   }
 
   function setSwing(v) {
@@ -1081,6 +1097,16 @@ window.fmTr = (function(){
   $('plusBtn').addEventListener('click', () => setTempo(S.tempo + 1));
   $('startBtn').addEventListener('click', toggle);
   $('tapBtn').addEventListener('click', tap);
+  // R-5 P2 : le grand nombre de tempo est saisissable au clavier (clampé 30–260 par setTempo).
+  (function () {
+    const tv = $('tempoValue'); if (!tv) return;
+    const commit = () => { const n = parseInt((tv.textContent || '').replace(/[^\d]/g, ''), 10); setTempo(Number.isFinite(n) ? n : S.tempo); };
+    tv.addEventListener('keydown', ev => {
+      if (ev.key === 'Enter') { ev.preventDefault(); commit(); tv.blur(); }
+      else if (ev.key === 'Escape') { ev.preventDefault(); tv.textContent = S.tempo; tv.blur(); }
+    });
+    tv.addEventListener('blur', commit);
+  })();
   // R-5 (C1) : volume + sourdine 1-clic — bloc repris verbatim de pratiquer.html
   // (S.volume/volMuted/masterGain vivent dans le moteur, portée globale partagée).
   // Bouger le curseur lève la sourdine ; non persisté (session seule, aligné pratiquer).
@@ -1108,7 +1134,7 @@ window.fmTr = (function(){
 
   document.addEventListener('keydown', e => {
     const tag = e.target.tagName;
-    if (tag === 'TEXTAREA' || tag === 'INPUT' || tag === 'SELECT') return;
+    if (tag === 'TEXTAREA' || tag === 'INPUT' || tag === 'SELECT' || e.target.isContentEditable) return;
     if (e.key === 'Escape' && fsOpen) { closeBowFs(); return; }
     if (e.code === 'Space') { e.preventDefault(); toggle(); }
     else if (e.key === 'ArrowUp') { e.preventDefault(); setTempo(S.tempo + 1); }
@@ -1729,7 +1755,7 @@ window.fmTr = (function(){
   // ============ INIT ============
   refreshPalette();
   $('themeBtn').textContent = currentTheme() === 'sombre' ? '◐ Mode clair' : '◐ Mode sombre';
-  setTempo(92);
+  setTempo(+store.get('fm-tempo') || 92); // R-5 P2 : reprend le tempo de la page précédente
   setSwing(50);
   bowCompile(false);
   { const _bs = $('buildStamp'); if (_bs) _bs.textContent = 'build ' + BUILD + ' · ' + BUILD_DATE; }
