@@ -248,7 +248,7 @@
       <div class="row">
         <button class="btn-sm" id="eqImportBtn">Importer un fichier d'équipe (fichier .json)</button>
         <input type="file" id="eqImportFile" accept="application/json,.json" class="hide" aria-hidden="true">
-        <a class="btn-sm" href="pratiquer.html#secTeam" id="eqGoTeam" title="Ouvre la section « Répartition » de la pratique libre">→ La préparer en pratique libre</a>
+        <a class="btn-sm" href="pratiquer.html#secTeam" id="eqGoTeam" title="Ouvre la section « Rythme à plusieurs » de la pratique libre">→ La préparer en pratique libre</a>
       </div>
       <div class="row">
         <label for="eqLinkInput" style="flex:none;">Coller un lien d'équipe</label>
@@ -404,7 +404,7 @@ window.__I18N = { "en": {
   "J'ai déjà une répartition": "I already have a distribution",
   "Importer un fichier d'équipe (fichier .json)": "Import a team file (.json file)",
   "→ La préparer en pratique libre": "→ Set it up in free practice",
-  "Ouvre la section « Répartition » de la pratique libre": "Opens the “Distribution” section of free practice",
+  "Ouvre la section « Rythme à plusieurs » de la pratique libre": "Opens the “Group rhythm” section of free practice",
   "Coller un lien d'équipe": "Paste a team link",
   "Ouvrir": "Open",
   "Comment jouer ?": "How to play?",
@@ -493,7 +493,7 @@ window.__I18N = { "en": {
   "J'ai déjà une répartition": "Já tenho uma distribuição",
   "Importer un fichier d'équipe (fichier .json)": "Importar um arquivo de equipe (arquivo .json)",
   "→ La préparer en pratique libre": "→ Montá-la na prática livre",
-  "Ouvre la section « Répartition » de la pratique libre": "Abre a seção “Distribuição” da prática livre",
+  "Ouvre la section « Rythme à plusieurs » de la pratique libre": "Abre a seção “Ritmo em grupo” da prática livre",
   "Coller un lien d'équipe": "Colar um link de equipe",
   "Ouvrir": "Abrir",
   "Comment jouer ?": "Como tocar?",
@@ -877,7 +877,7 @@ window.fmTr = (function(){
   // ---- charger une config (import JSON / lien collé) ----
   function eqFromExport(obj) {
     // accepte le format natif fm-equipe (déjà {voix:[{k,instr,g,j}]}) OU l'export
-    // « Répartition » / pratique libre (type 'fm-metro-groove' : { groove, participants, voix:[…] }).
+    // « Rythme à plusieurs » / pratique libre (type 'fm-metro-groove' : { groove, participants, voix:[…] }).
     if (obj && Array.isArray(obj.voix) && obj.voix[0] && ('g' in obj.voix[0] || 'k' in obj.voix[0])) return obj;
     if (obj && obj.type === 'fm-metro-groove' && Array.isArray(obj.voix)) {
       const labels = obj.participants || [];

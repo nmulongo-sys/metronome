@@ -85,8 +85,8 @@ function runTests() {
   /* ---------- A. chargement + premier niveau FERMÉ (§9.8) ---------- */
   const realErrors = jsdomErrors.filter(m => !/resources?|Could not load|external script|net::|ERR_|Not implemented/i.test(m));
   ok('A1.1 chargement sans erreur jsdom (' + realErrors.length + ')', realErrors.length === 0);
-  ok('A1.2 BUILD 0.22.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.22.0');
-  ok('A1.3 tampon de build affiché', /metronomefunk-0\.22\.0/.test(txt($('buildStamp'))));
+  ok('A1.2 BUILD 0.23.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.23.0');
+  ok('A1.3 tampon de build affiché', /metronomefunk-0\.23\.0/.test(txt($('buildStamp'))));
   ok('A2.1 la liste fermée est là : tempo (gros, ±), tap, démarrer, battue, subdivision, son du clic, thème',
     ['tempoValue', 'tempoSlider', 'minusBtn', 'plusBtn', 'tapBtn', 'startBtn',
      'beatsSel', 'subdivSel', 'pulseFreq', 'pulseFreqVal', 'clickType', 'themeBtn'].every(id => !!$(id)));
@@ -325,9 +325,9 @@ function runTests() {
     ok('P2.4 infobulles Fréquence + Caractère (titres FR)',
       !!p2Freq && /Hauteur du clic/.test(p2Freq.getAttribute('title') || '') &&
       !!p2Carac && /Timbre du clic/.test(p2Carac.getAttribute('title') || ''));
-    ok('P2.5 annonces situées : 3 notes sous les portes (parcours / compte+répartition / salle de concert)',
+    ok('P2.5 annonces situées : 3 notes sous les portes (parcours / compte+Rythme à plusieurs / salle de concert)',
       D.querySelectorAll('.porte-note').length === 3 &&
-      /bibliothèque partagée et la répartition d'équipe/.test(txt(D.querySelector('#portePratiquer .porte-note'))) &&
+      /bibliothèque partagée et Rythme à plusieurs/.test(txt(D.querySelector('#portePratiquer .porte-note'))) &&
       /salle de concert/i.test(txt(D.querySelector('#porteEquipe .porte-note'))));
 
     console.log('\n--- accueil (R-4b) : ' + PASS + ' vertes, ' + FAIL + ' rouges (total ' + (PASS + FAIL) + ') ---\n');

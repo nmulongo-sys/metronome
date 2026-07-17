@@ -177,7 +177,7 @@ async function runTests() {
   // spot-checks de non-perte sur les 5 autres
   ok('3.14 claves : résolution sur le 1 conservée', /cycle suivant\./.test(txt(hintOf('#secClave .hint-more'))));
   ok('3.15 horloge : mode progressif conservé', /aucun filet de sécurité\./.test(txt(hintOf('#secGap .hint-more'))));
-  ok('3.16 répertoire : renvoi « Répartition » conservé', /Répartition/.test(txt(hintOf('#secRepertoire .hint-more'))));
+  ok('3.16 répertoire : renvoi « Rythme à plusieurs » conservé', /Rythme à plusieurs/.test(txt(hintOf('#secRepertoire .hint-more'))));
   const teamMores = Array.from(D.querySelectorAll('#secTeam .hint-more'));
   eq('3.17 Team Spirit : deux aides repliées (priorité + assignation)', teamMores.length, 2);
   ok('3.18 Team Spirit : fins des deux pavés conservées', /en sourdine sinon\./.test(txt(teamMores[0])) && /physiquement impossible\)\./.test(txt(teamMores[1])));

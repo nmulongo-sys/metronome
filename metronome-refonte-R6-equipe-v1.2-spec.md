@@ -38,17 +38,17 @@
 - par voix, un `<select>` **Joueur 1..N / personne (accompagnement)** → `cfg.voix[i].j` ;
 - re-render live (résumé + « Je suis… » + pupitre) ; **le lien de partage et le broadcast
   reflètent l'édition**.
-- **Hors périmètre** (reste dans « Répartition » côté pratiquer) : créer un groove de zéro
+- **Hors périmètre** (reste dans « Rythme à plusieurs » côté pratiquer) : créer un groove de zéro
   (choix d'instruments, dessin des grilles). Ici on **répartit** un groove existant ;
   l'exemple embarqué fournit un groove prêt à répartir. Le renvoi vers pratiquer demeure.
 
 ### Volet 3 — Franciser « Team Spirit » *(anglicisme transverse)*
-Renommer le **libellé visible** « Team Spirit » → **« Répartition »** (défaut proposé —
-seul choix de nommage ; Jean peut trancher un autre mot au merge). Portée :
+Renommer le **libellé visible** « Team Spirit » → **« Rythme à plusieurs »** (nom **retenu par
+Jean**, remplace le défaut initial « Répartition »). Portée :
 - `pratiquer.html` : titre de section + chip du sommaire + renvois texte ;
 - `index.html` : la phrase « … et Team Spirit vivent ici » ;
 - `equipe.html` : bouton « → La préparer dans … » + clé de dico « Pratiquer › … » ;
-- dicos i18n FR/EN/PT des 3 pages (EN « Line-up » / PT « Distribuição »).
+- dicos i18n FR/EN/PT des 3 pages (EN « Group rhythm » / PT « Ritmo em grupo »).
 - **Ne PAS toucher** l'`id="secTeam"` ni les ancres `pratiquer.html#secTeam` (liens
   profonds R-5 + `eqGoTeam`) : on change le **texte**, pas les identifiants.
 
