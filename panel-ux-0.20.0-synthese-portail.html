@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panel UX 0.20.0 — synthèse portail (4 pages)</title>
+<style>
+  :root{--bg:#f4f5f7;--card:#fff;--ink:#1c2430;--sub:#5b6675;--line:#e3e7ee;--acc:#2f6df6;--acc-soft:#e8effe;
+    --crit:#d63b3b;--crit-bg:#fdeaea;--maj:#e08a00;--maj-bg:#fdf3e2;--min:#3c78c2;--min-bg:#e9f1fb;
+    --pos:#2c9a5b;--pos-bg:#e6f6ec;--radius:12px}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+  .wrap{max-width:1080px;margin:0 auto;padding:20px 16px 60px}
+  h1{margin:0;font-size:1.45rem}
+  .sub{color:var(--sub);font-size:.92rem;margin-top:4px}
+  .badge{display:inline-block;background:var(--acc-soft);color:var(--acc);border-radius:20px;padding:2px 10px;font-size:.78rem;font-weight:600;margin-left:8px;vertical-align:middle}
+  .methodo{background:#fff8e6;border:1px solid #f0dfae;border-radius:var(--radius);padding:10px 14px;font-size:.85rem;color:#6b5a1e;margin:14px 0 20px}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-bottom:22px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px}
+  .kpi .v{font-size:1.7rem;font-weight:700;font-variant-numeric:tabular-nums}
+  .kpi .l{font-size:.78rem;color:var(--sub);text-transform:uppercase;letter-spacing:.04em}
+  .kpi .d{font-size:.8rem;color:var(--sub);margin-top:3px}
+  .kpi a{color:var(--acc);text-decoration:none;font-size:.8rem}
+  .kpi .up{color:var(--pos);font-weight:700}
+  .kpi .new{color:var(--acc);font-weight:700}
+  h2{font-size:1.08rem;margin:26px 0 10px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+  .card.majeur{border-left:5px solid var(--maj)}
+  .card.crit{border-left:5px solid var(--crit)}
+  .card.pos{border-left:5px solid var(--pos)}
+  .card h3{margin:0 0 6px;font-size:.98rem}
+  .card p{margin:6px 0;font-size:.88rem;color:#38424f}
+  .pages{font-size:.76rem;color:var(--sub)}
+  .pages b{color:var(--ink)}
+  .reco{font-size:.86rem;background:var(--pos-bg);border-radius:8px;padding:8px 10px;color:#1d5c38;margin-top:8px}
+  table{width:100%;border-collapse:collapse;font-size:.88rem;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+  th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line)}
+  th{background:var(--acc-soft);color:var(--ink);font-size:.8rem;text-transform:uppercase;letter-spacing:.03em}
+  td.num{font-variant-numeric:tabular-nums;text-align:center}
+  .tag{font-size:.7rem;font-weight:700;border-radius:4px;padding:2px 7px;text-transform:uppercase}
+  .tag.p1{background:var(--crit-bg);color:var(--crit)}
+  .tag.p2{background:var(--maj-bg);color:var(--maj)}
+  .tag.p3{background:var(--min-bg);color:var(--min)}
+  .tag.r7{background:var(--pos-bg);color:var(--pos)}
+  ul.plan{list-style:none;padding:0;margin:0}
+  ul.plan li{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:11px 14px;margin-bottom:8px;font-size:.88rem}
+  footer{margin-top:30px;color:var(--sub);font-size:.78rem;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Panel UX — synthèse portail<span class="badge">0.20.0 (R-6)</span></h1>
+    <div class="sub">Le panel FIXE de 30 testeurs (mêmes identités que v0.6.5, 0.14.0 et 0.17.0) rejoué sur <b>les quatre pages</b> — index, pratiquer, apprendre (rejeu longitudinal) + <b>equipe.html (premier run)</b> — quatre dashboards détaillés + cette synthèse.</div>
+  </header>
+
+  <div class="methodo">⚠ Personas simulés : constats ancrés dans le code réel des pages, utiles pour PRIORISER —
+  à confirmer avec de vrais utilisateurs. Rejeu longitudinal : accueil / pratiquer / apprendre se comparent à leur run 0.17.0
+  (avant P1+P2) ; <b>equipe.html passe son PREMIER run</b> (page neuve R-6, sans ligne de base).</div>
+
+  <div class="kpis">
+    <div class="kpi"><div class="l">Accueil (index.html)</div><div class="v">9,02<span class="up"> ▲ +0,41</span></div>
+      <div class="d">vs 8,61 au 0.17.0 · <b>0 majeur, 0 P1</b> · 30/30 promoteurs</div>
+      <a href="panel-tests-ui-metronomefunk-accueil-0.20.0.html">→ dashboard accueil</a></div>
+    <div class="kpi"><div class="l">Pratiquer</div><div class="v">8,55<span class="up"> ▲ +0,45</span></div>
+      <div class="d">vs 8,10 · plus forte hausse · les 3 majeurs d'entrée RÉSOLUS · 26/30</div>
+      <a href="panel-tests-ui-metronomefunk-pratiquer-0.20.0.html">→ dashboard pratiquer</a></div>
+    <div class="kpi"><div class="l">Apprendre</div><div class="v">8,63<span class="up"> ▲ +0,26</span></div>
+      <div class="d">vs 8,37 · 1 majeur restant (M1, contenu FR) · 26/30</div>
+      <a href="panel-tests-ui-metronomefunk-apprendre-0.20.0.html">→ dashboard apprendre</a></div>
+    <div class="kpi"><div class="l">En équipe (neuf)</div><div class="v">7,84<span class="new"> ◆ 1er run</span></div>
+      <div class="d">page neuve R-6 · 1 critique (arrivée à froid) · 14/30 promoteurs</div>
+      <a href="panel-tests-ui-metronomefunk-equipe-0.20.0.html">→ dashboard equipe</a></div>
+  </div>
+
+  <p class="sub" style="margin-bottom:18px">Moyenne des 3 pages comparables : <b>8,73</b> (+0,37 vs les 8,36 de 0.17.0). Moyenne des 4 pages : <b>8,51</b> — la page neuve equipe tire vers le bas, à raison : c'est là que se trouve le travail suivant.</p>
+
+  <h2>Ce que R-5 → R-6 a réglé — constaté par le panel</h2>
+  <div class="card pos">
+    <p><b>Les 4 majeurs croisés du run 0.17.0 sont éteints, et le panel le constate :</b>
+    M1-court (avis « leçons en FR » sur apprendre), M2 (bandeau « par où commencer ? » + preset sur pratiquer, qui fait ENTRER les novices — Michel 6,8→7,9, Anne 7,3→8,1, Henri 7,4→8,3), M3 (modale de compte traduite — Maria, Chloé), M4 (sous-titres de pratiquer francisés — Jean-Paul, Bernard). S'y ajoutent les 6 gestes P2 : <b>saisie du BPM au clavier</b> et <b>infobulles</b> sur l'accueil (Hugo, Yanis, Marc, Olivier, Michel), <b>volume + sourdine sur apprendre</b> (seule page qui en manquait), <b>continuité du tempo</b> entre pages (3/3), <b>annonces situées</b> sous les portes, <b>phrase des votes</b>. Enfin R-6 : la <b>porte « En équipe » devient active</b> (le dernier « lien grisé » de 0.17.0 disparaît) et <b>equipe.html existe</b>.</p>
+  </div>
+
+  <h2>Les constats majeurs restants du portail</h2>
+  <div class="card crit">
+    <h3>equipe · Arrivée « à froid » = écran vide <span class="pages">— equipe (CRITIQUE, 4 novices en échec)</span></h3>
+    <p>Le seul critique du portail. Cliquer la porte « En équipe » sans config mène à l'état vide (importer un JSON / coller un lien / Team Spirit) : Anne, Michel, Denise, Suzanne s'y arrêtent. La page est un CONSOMMATEUR — elle ne sert qu'avec une répartition reçue ou fabriquée sur Pratiquer.</p>
+    <div class="reco">« ▶ Essayer avec un exemple » (config de démo intégrée) + un mini-onboarding « fabrique → partage → chacun sa ligne ». C'est le geste qui ferait basculer les novices.</div>
+  </div>
+  <div class="card majeur">
+    <h3>equipe · Jargon d'entrée + mode en ligne sans présence + accessibilité des chips <span class="pages">— equipe (4 majeurs de page neuve)</span></h3>
+    <p>« backing », « config d'équipe », « importer un JSON » bloquent les 66+ (C2). La salle en ligne n'affiche ni qui a rejoint ni d'accusé de départ (C3) ; le départ commun n'est pas horodaté, le décompte masque la dérive (C4). Les chips mode/joueur signalent la sélection par la couleur seule, sans aria (C5). Enfin, pas de passerelle depuis une fiche d'apprendre vers le pupitre (C6, demande de Camille/Aïcha/Rosa).</p>
+    <div class="reco">Franciser/expliquer le jargon (faible) ; présence + départ horodaté en salle (moyen) ; role=radio/aria-live (faible) ; bouton « en pupitre » sur apprendre (v1.1).</div>
+  </div>
+  <div class="card majeur">
+    <h3>M1 · Le contenu pédagogique du corpus reste en français <span class="pages">— apprendre (seul majeur, plafond de la page)</span></h3>
+    <p>L'avis « leçons en français » (R-5 P1) rend la limite honnête, mais ne la résout pas : en EN/PT, objectif/consigne/critère des leçons restent FR. Maria (lusophone) et Diego (hispanophone) gardent seuls le majeur. C'est le grand chantier i18n transverse, non ouvert.</p>
+    <div class="reco">Ouvrir la traduction du corpus des leçons (EN/PT) — le chantier de fond, à planifier (potentiellement en parallèle de l'expansion des styles, C6, dont l'appétit est documenté).</div>
+  </div>
+
+  <h2>Constats transverses (vus sur 2 ou 3 pages)</h2>
+  <table>
+    <tr><th>Constat</th><th>Pages</th><th>Reco</th></tr>
+    <tr><td>Lisibilité des 66 ans et + : légendes, sous-titres et statuts &lt; 0,85 rem, état muet discret</td><td class="num">3/4</td><td>+1 cran de police ciblé, indicateurs plus francs (pratiquer C2, equipe C8, accueil C1 volume)</td></tr>
+    <tr><td>Accessibilité : états de sélection par couleur seule, focus/aria à compléter</td><td class="num">2/4</td><td>role=radio/aria-pressed + aria-live (equipe C5, écho accueil/apprendre)</td></tr>
+    <tr><td>Polices CDN : premier rendu dépendant du réseau</td><td class="num">2/4</td><td>auto-héberger (woff2 + font-display:swap) — cohérent avec le « 100 % hors-ligne »</td></tr>
+    <tr><td>Persistance des réglages personnels (volume) non sauvegardée entre visites</td><td class="num">2/4</td><td>persister S.volume/volMuted comme le tempo (fm-tempo) et le thème</td></tr>
+    <tr><td>Impressions/exports inégaux (PNG pupitre absent d'equipe ; fiches d'apprendre sur pratiquer)</td><td class="num">2/4</td><td>reprendre le PNG (equipe C11), vue imprimable par fiche côté apprendre</td></tr>
+  </table>
+
+  <h2>R-6 validé par le terrain — le verdict du premier run</h2>
+  <div class="card pos">
+    <p>Les trois qui portaient le cahier des charges sont satisfaits : <b>Camille (8,9)</b> tient le flux « fabrique → joue → départ dirigé » ; <b>Fatou (8,6)</b> anime « chacun sa ligne sur son tel » ; <b>Henri (7,8, 80 ans)</b> s'émeut du « chef automatique » — le décompte 4·3·2·1 est le point fort dominant de la page. <b>R-6 tient sa promesse.</b> Mais la page neuve désigne aussi, sans ambiguïté, son prochain lot : l'entrée « à froid » et le jargon, qui la plombent pour les novices (7,84 de moyenne, sous le portail). Corriger ces deux points — effort faible à moyen — remonterait equipe au niveau des autres pages.</p>
+  </div>
+
+  <h2>Plan d'action re-priorisé (portail entier)</h2>
+  <ul class="plan">
+    <li><span class="tag p1">P1</span> <b>equipe : entrée « à froid » + jargon</b> — le seul critique du portail (C1 : exemple de démo + onboarding fabrique→joue) et le jargon d'entrée (C2 : backing→accompagnement, « fichier d'équipe »). Deux gestes à effort faible/moyen qui débloquent les novices sur la page neuve.</li>
+    <li><span class="tag p2">P2</span> <b>Cohérence & robustesse</b> : présence + départ horodaté en salle en ligne (equipe C3/C4) · accessibilité des chips et du décompte (equipe C5) · passerelle apprendre → pupitre (equipe C6, v1.1) · finitions du volume + persistance (accueil) · lisibilité des 66+ (transverse) · export PNG du pupitre (equipe C11).</li>
+    <li><span class="tag p3">P3</span> <b>Finitions</b> : polices auto-hébergées · QR / raccourci de partage du lien d'équipe (C9) · impressions côté apprendre · « ma session » locale + stats/export de progression sur pratiquer · tiroirs qui « sautent » · filtre-favoris du répertoire · grille en grand (classe).</li>
+    <li><span class="tag r7">FOND</span> <b>M1 — traduction du corpus des leçons (EN/PT)</b> : le grand chantier i18n restant, seul majeur d'apprendre — à planifier en parallèle de l'expansion des styles/instruments (C6 : voix, jazz, son cubain, vents… l'appétit est documenté au fil des runs).</li>
+  </ul>
+
+  <footer>Synthèse générée le 17/07/2026 · Rejeu du panel simulé FIXE (30 personas, mêmes identités que v0.6.5 / 0.14.0 / 0.17.0)
+  sur index.html, pratiquer.html, apprendre.html et equipe.html 0.20.0 · Métronome — Formation Musicale</footer>
+</div>
+</body>
+</html>

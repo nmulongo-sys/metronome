@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panel UX — Métronome — Formation Musicale (Apprendre)</title>
+<style>
+  :root{
+    --bg:#f4f5f7; --card:#ffffff; --ink:#1c2430; --sub:#5b6675; --line:#e3e7ee;
+    --acc:#2f6df6; --acc-soft:#e8effe;
+    --crit:#d63b3b; --crit-bg:#fdeaea;
+    --maj:#e08a00; --maj-bg:#fdf3e2;
+    --min:#3c78c2; --min-bg:#e9f1fb;
+    --pos:#2c9a5b; --pos-bg:#e6f6ec;
+    --radius:12px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);line-height:1.45}
+  .wrap{max-width:1180px;margin:0 auto;padding:20px 16px 60px}
+  header.hd{margin-bottom:18px}
+  header.hd h1{margin:0;font-size:1.5rem}
+  header.hd .sub{color:var(--sub);font-size:.92rem;margin-top:4px}
+  .badge-v{display:inline-block;background:var(--acc-soft);color:var(--acc);border-radius:20px;padding:2px 10px;font-size:.78rem;font-weight:600;margin-left:8px;vertical-align:middle}
+  .note-methodo{background:#fff8e6;border:1px solid #f0dfae;border-radius:var(--radius);padding:10px 14px;font-size:.85rem;color:#6b5a1e;margin:12px 0 18px}
+
+  /* KPI */
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px}
+  .kpi .v{font-size:1.7rem;font-weight:700;font-variant-numeric:tabular-nums}
+  .kpi .l{font-size:.78rem;color:var(--sub);text-transform:uppercase;letter-spacing:.04em}
+  .kpi.crit .v{color:var(--crit)} .kpi.maj .v{color:var(--maj)} .kpi.pos .v{color:var(--pos)} .kpi.acc .v{color:var(--acc)}
+
+  /* Tabs */
+  .tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+  .tab{border:1px solid var(--line);background:var(--card);border-radius:22px;padding:8px 18px;cursor:pointer;font-size:.92rem;font-weight:600;color:var(--sub)}
+  .tab.sel{background:var(--acc);border-color:var(--acc);color:#fff}
+  .view{display:none} .view.sel{display:block}
+
+  /* Filtres */
+  .filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;margin-bottom:16px}
+  .filters label{font-size:.8rem;color:var(--sub);display:flex;flex-direction:column;gap:3px;font-weight:600}
+  .filters select,.filters input[type=search]{border:1px solid var(--line);border-radius:8px;padding:6px 8px;font-size:.88rem;background:#fff;color:var(--ink);min-width:130px}
+  .filters .reset{align-self:flex-end;border:none;background:none;color:var(--acc);cursor:pointer;font-size:.85rem;text-decoration:underline;padding:6px}
+  .count-line{font-size:.85rem;color:var(--sub);margin-bottom:10px}
+
+  /* Cartes personas */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px}
+  .pcard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;gap:10px}
+  .pcard .top{display:flex;gap:12px;align-items:center}
+  .avatar{width:46px;height:46px;border-radius:50%;background:var(--acc-soft);color:var(--acc);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.05rem;flex-shrink:0}
+  .pcard h3{margin:0;font-size:1.02rem}
+  .pcard .meta{font-size:.8rem;color:var(--sub)}
+  .chips{display:flex;gap:6px;flex-wrap:wrap}
+  .chip{font-size:.72rem;border-radius:14px;padding:2px 9px;background:var(--bg);border:1px solid var(--line);color:var(--sub);font-weight:600}
+  .chip.it1{background:#fdeaea;color:#a33;border-color:#f3caca}
+  .chip.it2{background:#fdf3e2;color:#96650a;border-color:#efd9a8}
+  .chip.it3{background:#eef3fb;color:#39599c;border-color:#ccd9f0}
+  .chip.it4{background:#e9f6ee;color:#256e43;border-color:#bfe3cc}
+  .chip.it5{background:#e6f0ea;color:#1b5e35;border-color:#a9d4b8}
+  .score{margin-left:auto;text-align:center}
+  .score .n{font-size:1.25rem;font-weight:700;font-variant-numeric:tabular-nums}
+  .score .d{font-size:.65rem;color:var(--sub)}
+  .quote{font-style:italic;font-size:.88rem;color:#38424f;border-left:3px solid var(--acc);padding:2px 0 2px 10px;background:var(--acc-soft);border-radius:0 8px 8px 0;padding:8px 10px}
+  .flist{display:flex;flex-direction:column;gap:6px;font-size:.85rem}
+  .fitem{display:flex;gap:8px;align-items:flex-start}
+  .sev{flex-shrink:0;font-size:.66rem;font-weight:700;border-radius:4px;padding:2px 6px;margin-top:2px;text-transform:uppercase;letter-spacing:.03em}
+  .sev.critique{background:var(--crit-bg);color:var(--crit)}
+  .sev.majeur{background:var(--maj-bg);color:var(--maj)}
+  .sev.mineur{background:var(--min-bg);color:var(--min)}
+  .sev.positif{background:var(--pos-bg);color:var(--pos)}
+  details.more{font-size:.83rem;color:var(--sub)}
+  details.more summary{cursor:pointer;color:var(--acc);font-weight:600}
+  details.more .box{margin-top:6px;background:var(--bg);border-radius:8px;padding:8px 10px}
+
+  /* Constats consolidés */
+  .issue{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:12px;border-left:5px solid var(--min)}
+  .issue.critique{border-left-color:var(--crit)} .issue.majeur{border-left-color:var(--maj)}
+  .issue .ihead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .issue h3{margin:0;font-size:1rem;flex:1}
+  .issue .freq{font-size:.8rem;color:var(--sub);white-space:nowrap}
+  .issue .desc{font-size:.88rem;color:#38424f;margin:8px 0}
+  .issue .reco{font-size:.86rem;background:var(--pos-bg);border-radius:8px;padding:8px 10px;color:#1d5c38}
+  .issue .who{font-size:.78rem;color:var(--sub);margin-top:8px}
+  .bar-out{height:7px;background:var(--bg);border-radius:4px;overflow:hidden;margin-top:6px}
+  .bar-in{height:100%;border-radius:4px;background:var(--acc)}
+  .effort{font-size:.72rem;font-weight:700;border-radius:4px;padding:2px 8px}
+  .effort.faible{background:var(--pos-bg);color:var(--pos)}
+  .effort.moyen{background:var(--maj-bg);color:var(--maj)}
+  .effort.eleve{background:var(--crit-bg);color:var(--crit)}
+
+  /* Synthèse */
+  .syn-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:820px){.syn-grid{grid-template-columns:1fr}}
+  .syn-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+  .syn-card h3{margin:0 0 12px;font-size:1rem}
+  .hbar{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:.82rem}
+  .hbar .lab{width:150px;flex-shrink:0;color:var(--sub);text-align:right}
+  .hbar .track{flex:1;background:var(--bg);border-radius:4px;height:16px;overflow:hidden}
+  .hbar .fill{height:100%;border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;color:#fff;font-size:.68rem;font-weight:700;min-width:22px}
+  .strengths li,.roadmap li{margin-bottom:7px;font-size:.88rem}
+  .roadmap{padding-left:18px} .strengths{padding-left:18px}
+  .prio-tag{font-weight:700}
+  .p1{color:var(--crit)} .p2{color:var(--maj)} .p3{color:var(--min)}
+  footer{margin-top:30px;font-size:.78rem;color:var(--sub);text-align:center}
+  @media(max-width:600px){
+    .grid{grid-template-columns:1fr}
+    .hbar .lab{width:105px;font-size:.72rem}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hd">
+    <h1>Panel de tests UI — Métronome — Formation Musicale (Apprendre)<span class="badge-v">0.20.0 (R-6)</span></h1>
+    <div class="sub">30 testeurs simulés · 9 à 80 ans · compétences numériques niveau 1 (novice) à 5 (expert) · mobile, tablette et ordinateur — <b>rejeu longitudinal vs 0.17.0</b> sur <code>apprendre.html 0.20.0 (prod GitHub Pages)</code></div>
+  </header>
+
+  <div class="note-methodo">⚠ <b>Méthodologie :</b> panel de personas simulés par IA à partir de l'analyse réelle du code et de l'interface de la page. Les constats pointent des éléments vérifiables de l'UI (densité, tailles de police, libellés, i18n du contenu, présence/absence du volume, continuité du tempo…), mais ne remplacent pas des tests avec de vrais utilisateurs — ils servent à préparer et prioriser ces tests. <b>Rejeu longitudinal :</b> mêmes 30 personas et mêmes scénarios qu'en 0.17.0 (moyenne 8,37), re-scorés sur la prod 0.20.0 après l'atterrissage des salves R-5 (volume, continuité tempo, phrase des votes, avis « leçons en français »).</div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="tabs">
+    <button class="tab sel" data-v="panel">👥 Le panel (30)</button>
+    <button class="tab" data-v="issues">🔍 Constats consolidés</button>
+    <button class="tab" data-v="syn">📊 Synthèse &amp; plan d'action</button>
+  </div>
+
+  <!-- ===== VUE PANEL ===== -->
+  <div class="view sel" id="v-panel">
+    <div class="filters">
+      <label>Tranche d'âge
+        <select id="fAge"><option value="">Toutes</option><option value="0-17">Moins de 18 ans</option><option value="18-35">18 – 35 ans</option><option value="36-55">36 – 55 ans</option><option value="56-99">56 ans et +</option></select>
+      </label>
+      <label>Compétence numérique
+        <select id="fIT"><option value="">Toutes</option><option value="1">1 · Novice</option><option value="2">2 · Basique</option><option value="3">3 · À l'aise</option><option value="4">4 · Avancé</option><option value="5">5 · Expert</option></select>
+      </label>
+      <label>Appareil
+        <select id="fDev"><option value="">Tous</option><option value="mobile">Smartphone</option><option value="tablette">Tablette</option><option value="ordinateur">Ordinateur</option></select>
+      </label>
+      <label>Sévérité rencontrée
+        <select id="fSev"><option value="">Toutes</option><option value="critique">Critique</option><option value="majeur">Majeur</option><option value="mineur">Mineur</option></select>
+      </label>
+      <label>Recherche
+        <input type="search" id="fTxt" placeholder="mot-clé, instrument…">
+      </label>
+      <button class="reset" id="fReset">Réinitialiser</button>
+    </div>
+    <div class="count-line" id="countLine"></div>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <!-- ===== VUE CONSTATS ===== -->
+  <div class="view" id="v-issues">
+    <div class="count-line">Constats consolidés à partir des 30 sessions, classés par score de priorité (sévérité × nombre de testeurs touchés). La barre indique la part du panel concernée.</div>
+    <div id="issueList"></div>
+  </div>
+
+  <!-- ===== VUE SYNTHÈSE ===== -->
+  <div class="view" id="v-syn">
+    <div class="syn-grid">
+      <div class="syn-card"><h3>Satisfaction moyenne par compétence numérique</h3><div id="chIT"></div></div>
+      <div class="syn-card"><h3>Satisfaction moyenne par tranche d'âge</h3><div id="chAge"></div></div>
+      <div class="syn-card"><h3>Problèmes par thème (occurrences)</h3><div id="chTheme"></div></div>
+      <div class="syn-card"><h3>Satisfaction moyenne par appareil</h3><div id="chDev"></div></div>
+    </div>
+    <div class="syn-grid" style="margin-top:14px">
+      <div class="syn-card">
+        <h3>✅ Points forts unanimes</h3>
+        <ul class="strengths">
+          <li><b>Volume + sourdine ont ATTERRI (R-5 P2)</b> — apprendre était la SEULE page sans : Nathan, Fatou, Emma, Nadia et Aïcha règlent enfin le clic sous la démo ICI, fini le détour par l'accueil.</li>
+          <li><b>La continuité du tempo est là (fm-tempo)</b> — le tempo suit depuis l'accueil et pratiquer ; Nathan et Laurent ne retombent plus sur 92 après une session à 104/108.</li>
+          <li><b>La phrase sous les votes clarifie tout</b> — « ton vote recalibre le niveau pour tout le monde » + « Difficulté » accentué : Anne, Nadia, Denise et Suzanne votent enfin en comprenant, le vote n'est plus opaque.</li>
+          <li><b>L'avis « les leçons sont en français pour l'instant » rend la limite HONNÊTE</b> — dès que la langue ≠ FR (P1 0.18.0) : Maria et Chloé savent que c'est un choix assumé, pas un bug — la limite est dite.</li>
+          <li><b>L'ingénierie pédagogique fait toujours l'unanimité des enseignants</b> — Rosa (9,6), Aïcha et Camille valident la chaîne critère → modèle → essai → validation → recalibrage ; « la meilleure ingénierie que j'aie vue ».</li>
+          <li><b>Le contenu percussif et la grille vivante résistent aux experts</b> — Diego valide le 3-contre-2 ternaire, Laurent le placement laid-back/pushed ; la grille se fige à l'arrêt (Suzanne rassurée).</li>
+</ul>
+      </div>
+      <div class="syn-card">
+        <h3>🗺 Plan d'action recommandé</h3>
+        <ol class="roadmap">
+          <li><span class="prio-tag p1">P1 · Ouvrir le chantier i18n du corpus (les leçons)</span> — C1, le seul majeur restant : l'avis « leçons en FR » (livré) rend la limite VISIBLE, mais le contenu (objectif, consigne, critère, noms de modules) reste français en EN/PT. Traduire le corpus est LE grand chantier pour les non-francophones (Maria lusophone, Diego hispanophone — l'espagnol n'est même pas au sélecteur). <i>Impact fort, effort élevé.</i></li>
+          <li><span class="prio-tag p2">P2 · Impressions (fiche, livret du maître)</span> — C4 : quatre profils (Pierre l'établi, Georges le fauteuil, Rosa le livret, Henri le manuel) ; reprendre le patron d'export de Pratiquer. <i>Impact moyen, effort moyen.</i></li>
+          <li><span class="prio-tag p2">P2 · Grille vivante en « grand » pour le collectif</span> — C7 : Fatou (cercle d'atelier), Aïcha (projection au tableau), Nathan (asso) — un mode plein écran façon Atelier. <i>Impact moyen, effort moyen.</i></li>
+          <li><span class="prio-tag p2">P2 · Lisibilité des fiches (police critères, mot d'usage de la grille, intro raccourcie)</span> — C2 : les extrêmes du panel (9 ans, 66+) lisent mal ou pas. <i>Impact moyen, effort faible.</i></li>
+          <li><span class="prio-tag p3">P3 · Progression : vue globale + export local</span> — C5 : stats/séries (Tom, Marc), export JSON (Olivier, Pierre), vue « ce qui me reste » (Inès) — sans gamification lourde. <i>Impact faible à moyen, effort moyen.</i></li>
+          <li><span class="prio-tag p3">P3 · Finitions & feuilles de route</span> — passerelle « leçon → pupitre » vers equipe R-6 (C8), seuils de vote documentés pour les pédagogues (C9), « démo à venir » explicité (C3), feel/pattern réglables (C11), multi-styles/instruments (C6, chantier corpus). <i>Efforts variables.</i></li>
+</ol>
+      </div>
+    </div>
+  </div>
+
+  <footer>Dashboard généré le 17/07/2026 · Panel simulé (30 personas) — rejeu longitudinal vs 0.17.0 sur apprendre.html 0.20.0 (R-6) · Métronome — Formation Musicale (Apprendre)</footer>
+</div>
+
+<script>
+/* ================= DONNÉES ================= */
+const ITLBL = {1:"IT 1 · Novice",2:"IT 2 · Basique",3:"IT 3 · À l'aise",4:"IT 4 · Avancé",5:"IT 5 · Expert"};
+const P = [
+{id:1,nom:"Léa",age:9,role:"Élève en éveil musical (percussions)",it:1,dev:"tablette",devLbl:"iPad (école)",note:7.7,duree:"18 min (avec adulte)",
+ quote:"On appuie sur Écouter et les tambours montrent comment faire, avec les petites cases qui s'allument. Après c'est mon tour !",
+ scenario:"Avec un adulte : écouter une démo de cajón Débutant, regarder la grille, refaire « à son tour ».",
+ constats:[{t:"Les consignes des fiches restent longues pour 9 ans — l'adulte lit, elle joue.",sev:"mineur",th:"Prise en main"},
+ {t:"Après « acquis », rien ne fait « bravo » : elle attend une petite récompense visuelle.",sev:"mineur",th:"Prise en main"}],
+ aime:["Écouter puis refaire, « comme la maîtresse mais en tablette »","La grille qui s'allume en rythme"]},
+{id:2,nom:"Tom",age:12,role:"Collégien, batterie 1re année",it:3,dev:"mobile",devLbl:"Android (Samsung A25)",note:8.8,duree:"30 min",
+ quote:"Écouter, jouer, cocher « acquis » : on dirait des niveaux de jeu. Il manque juste les points et le classement.",
+ scenario:"Enchaîner trois fiches cajón Débutant, cocher ses acquis, voter la difficulté.",
+ constats:[{t:"Pas de points, badges ni « série » : le compteur x/y par module reste le seul retour de progression.",sev:"mineur",th:"Fonctions expertes"},
+ {t:"Il voudrait « jouer contre le modèle » : la démo montre, mais rien ne note sa précision.",sev:"mineur",th:"Fonctions expertes"}],
+ aime:["Le trio Écouter / Charger / acquis : clair comme un jeu","La grille vivante pour voir où frapper"]},
+{id:3,nom:"Inès",age:14,role:"Flûtiste, conservatoire 2e cycle",it:3,dev:"mobile",devLbl:"iPhone 13",note:8.7,duree:"35 min",
+ quote:"Chaque fiche a un critère de réussite écrit noir sur blanc — comme mes examens. Je sais toujours QUOI travailler, c'est rare.",
+ scenario:"Suivre méthodiquement le module 1 djembé Débutant, revenir le lendemain vérifier ses acquis.",
+ constats:[{t:"Au-delà du compteur x/y, pas de vue « ce qui me reste » globale par niveau — elle compte à la main.",sev:"mineur",th:"Fonctions expertes"},
+ {t:"Le badge « déjà rencontré » gagnerait à une infobulle plus explicite sur le partage cajón/djembé.",sev:"mineur",th:"Terminologie"}],
+ aime:["Les critères d'acquisition explicites, dignes du conservatoire","Ses acquis retrouvés d'une visite à l'autre"]},
+{id:4,nom:"Hugo",age:16,role:"Bassiste autodidacte (YouTube)",it:4,dev:"ordinateur",devLbl:"PC portable Windows",note:9.0,duree:"50 min",
+ quote:"Le mode Écouter, c'est exactement comme je repique sur YouTube — sauf qu'ici le modèle est propre et la grille montre tout.",
+ scenario:"Écouter les démos Avancé cajón, repiquer à l'oreille, personnaliser la tonalité de la basse.",
+ constats:[{t:"Trente exercices affichent « démo à venir » — pile sur les structures longues qu'il voulait entendre.",sev:"mineur",th:"Fonctions expertes"},
+ {t:"« Personnaliser » reste sobre (tempo, densité, drop, tonalité) : il aurait pris le choix du pattern de basse aussi.",sev:"mineur",th:"Fonctions expertes"}],
+ aime:["Écouter = repiquage propre, son mode d'apprentissage","La grille vivante : il VOIT le slap qu'il entend"]},
+{id:5,nom:"Emma",age:17,role:"Chanteuse de chorale lycéenne",it:2,dev:"mobile",devLbl:"Android (Xiaomi)",note:8.3,duree:"25 min",
+ quote:"Tout est clair, et le volume est enfin là comme sur l'accueil. Il n'y a toujours QUE du tambour — j'aimerais la même chose pour la voix.",
+ scenario:"Curiosité : suivre une fiche cajón Débutant « pour voir », imaginer l'équivalent chant.",
+ constats:[{t:"Le parcours ne couvre que cajón et djembé : rien pour la voix ou d'autres instruments (elle sait que c'est le début).",sev:"mineur",th:"Fonctions expertes"},
+ {t:"Le texte d'introduction reste long d'un bloc : sur mobile, elle l'a sauté (et failli rater « coche acquis »).",sev:"mineur",th:"Prise en main"}],
+ aime:["Le volume et la sourdine enfin là, comme sur l'accueil","La pédagogie « on te montre, tu refais », rassurante"]},
+{id:6,nom:"Nathan",age:19,role:"Étudiant STAPS, djembé en association",it:3,dev:"mobile",devLbl:"Android milieu de gamme",note:9.6,duree:"55 min",
+ quote:"Le volume a suivi, et le tempo aussi : plus besoin de repasser par l'accueil pour doser le clic ou garder mon 104. Là, c'est vraiment MA page.",
+ scenario:"Travailler le module djembé Intermédiaire complet en mode écoute puis pratique.",
+ constats:[{t:"Le djembé Intermédiaire est complet ; pour l'asso, il voudrait la grille en « grand » (téléphone posé au centre du cercle).",sev:"mineur",th:"Visuel & lisibilité"}],
+ aime:["Le volume et la sourdine enfin sous la démo — fini le détour par l'accueil","Le tempo qui suit d'une page à l'autre : plus de retour à 92"]},
+{id:7,nom:"Chloé",age:22,role:"Étudiante en musicologie",it:3,dev:"ordinateur",devLbl:"MacBook Air",note:9.2,duree:"60 min",
+ quote:"En anglais, le cadre est traduit et, nouveauté, un avis prévient que les leçons restent en français : la limite est enfin dite. Reste à traduire le corpus lui-même.",
+ scenario:"Analyser la structure pédagogique complète, tester la bascule EN sur tout le parcours.",
+ constats:[{t:"En EN/PT, les fiches (objectif, consigne, critère) restent en français — désormais SIGNALÉ par un avis, mais le corpus reste à traduire.",sev:"mineur",th:"Terminologie"},
+ {t:"Le recalibrage par votes : la phrase dit « pour tout le monde », mais les seuils de promotion (à partir de combien de votes ?) restent non documentés.",sev:"mineur",th:"Fonctions expertes"}],
+ aime:["L'avis « leçons en français » : la limite est enfin dite","La structure modules → exercices → critères, publiable"]},
+{id:8,nom:"Yanis",age:24,role:"DJ amateur, production MAO",it:5,dev:"ordinateur",devLbl:"PC gamer, Chrome",note:8.3,duree:"25 min",
+ quote:"Pas mon univers, mais je reconnais le travail : les démos « laid-back » et « pushed » des modules Artiste sont VRAIMENT décalées — ça s'entend au casque.",
+ scenario:"Écouter les démos Artiste P1/P2 au casque, vérifier le rendu du feel, jauger la qualité audio.",
+ constats:[{t:"Le feel des démos (±18 ms) s'entend au casque mais ne se VOIT pas sur la grille (quantifiée) — un indicateur « posé/poussé » l'annoncerait.",sev:"mineur",th:"Fonctions expertes"},
+ {t:"Pas d'export audio des démos pour les réécouter ailleurs (il sait que l'export vit sur Pratiquer).",sev:"mineur",th:"Fonctions expertes"}],
+ aime:["Le feel réellement audible dans les démos Artiste","Le moteur ne décroche pas, même démos + accompagnement"]},
+{id:9,nom:"Maria",age:26,role:"Prof de capoeira, brésilienne",it:2,dev:"mobile",devLbl:"Android (Motorola)",note:8.6,duree:"40 min",
+ quote:"O aviso « as lições estão em francês » agora aparece — pelo menos é honesto. Mas o conteúdo mesmo continua em francês, e meus alunos lusófonos ainda vão travar aí.",
+ scenario:"En PT-BR : suivre deux fiches cajón Débutant, créer un compte pour garder ses acquis, tout en portugais.",
+ constats:[{t:"Le contenu des leçons (objectif, consigne, critère) reste en français : l'avis prévient, mais ses élèves lusophones bloqueront quand même là.",sev:"majeur",th:"Terminologie"},
+ {t:"Elle aimerait la capoeira/samba dans le parcours un jour — le cajón s'en approche sans y être.",sev:"mineur",th:"Fonctions expertes"}],
+ aime:["La modale de compte ENTIÈREMENT en portugais (contrairement à Pratiquer)","L'avis « lições em francês » : au moins la limite est honnête"]},
+{id:10,nom:"Julien",age:28,role:"Développeur web, guitariste",it:5,dev:"ordinateur",devLbl:"Laptop Linux, Firefox",note:9.2,duree:"55 min",
+ quote:"La dette de contenu FR était documentée au dépôt ; elle est maintenant VISIBLE côté produit, avec un avis quand la langue n'est pas le français. Honnête. Le corpus, lui, reste à faire.",
+ scenario:"Audit : bascule de langue à chaud, re-rendu après vote, comportement de la grille rAF, file de votes hors-ligne.",
+ constats:[{t:"Le corpus reste FR en EN/PT — la dette, documentée au dépôt, est maintenant signalée côté produit (avis), mais non résolue.",sev:"mineur",th:"Terminologie"},
+ {t:"La file de votes hors-ligne reste silencieuse : aucun indicateur « x votes en attente d'envoi ».",sev:"mineur",th:"Compte & connexion"}],
+ aime:["L'avis i18n : la dette de contenu est enfin visible côté produit","La grille figée à l'arrêt : aucun rAF fantôme"]},
+{id:11,nom:"Sofia",age:31,role:"Violoniste semi-professionnelle",it:3,dev:"tablette",devLbl:"iPad 10e gén.",note:7.8,duree:"25 min",
+ quote:"La méthode est belle — écouter, refaire, valider — mais elle parle percussions. Mon archet attend toujours sa leçon.",
+ scenario:"Chercher ce qu'une violoniste peut tirer du parcours, imaginer des fiches « archet ».",
+ constats:[{t:"Le parcours ne couvre que cajón/djembé : l'Archet de l'accueil n'a aucune fiche pédagogique ici.",sev:"mineur",th:"Fonctions expertes"},
+ {t:"Rien ne relie l'outil Archet de l'accueil au parcours (« la leçon d'archet » n'existe pas encore, même en annonce).",sev:"mineur",th:"Navigation"}],
+ aime:["La mécanique écouter/refaire, transposable à tous les instruments","Les critères de réussite explicites"]},
+{id:12,nom:"Marc",age:33,role:"Batteur de groupe rock",it:4,dev:"mobile",devLbl:"Android (Pixel)",note:8.9,duree:"35 min",
+ quote:"Les compteurs x/y et la promotion par votes, c'est un bon début de gamification sérieuse. J'en veux plus : stats, séries, historique.",
+ scenario:"Travailler l'indépendance cajón Avancé, suivre sa progression sur la semaine.",
+ constats:[{t:"Pas de statistiques de progression (historique, séries, temps passé) au-delà des compteurs par module.",sev:"mineur",th:"Fonctions expertes"},
+ {t:"Après « acquis », la fiche suivante ne s'ouvre pas : le flux s'interrompt à chaque validation.",sev:"mineur",th:"Navigation"}],
+ aime:["La promotion par votes : le niveau « vit » avec la communauté","Les démos Avancé exigeantes — enfin du contenu qui résiste"]},
+{id:13,nom:"Aïcha",age:35,role:"Professeure des écoles (chorale de classe)",it:2,dev:"ordinateur",devLbl:"PC école ancien, Firefox",note:8.7,duree:"35 min",
+ quote:"Pour la classe, deux bonnes nouvelles : je règle le son ici pour projeter, et la phrase sous les votes explique enfin à mes élèves ce qu'ils font. Il me manque la grille en grand.",
+ scenario:"Préparer une séquence de classe sur le module 1 cajón Débutant, projeter la démo.",
+ constats:[{t:"Les acquis sont « pour moi » : pas de multi-profils pour suivre 28 élèves (elle note sur papier).",sev:"mineur",th:"Fonctions expertes"},
+ {t:"Projetée au tableau, la grille vivante reste petite — un mode « grand » façon Atelier lui servirait en classe.",sev:"mineur",th:"Visuel & lisibilité"}],
+ aime:["Le volume enfin sur apprendre : réglable pour projeter en classe","La phrase sous les votes qui explique aux élèves ce qu'ils font"]},
+{id:14,nom:"Diego",age:38,role:"Percussionniste cubain (son, timba)",it:3,dev:"mobile",devLbl:"iPhone SE (petit écran)",note:8.9,duree:"40 min",
+ quote:"Las démos ternaires en 12 pasos: EXACTAS, es la ficha que hago repetir hace veinte años. Pero el contenido sigue en francés y el español ni está en el selector — para mis alumnos hispanohablantes, ahí está el freno.",
+ scenario:"Vérifier les fiches ternaires et le 3-contre-2 Avancé, jauger la justesse du contenu percussif.",
+ constats:[{t:"Le contenu des leçons reste en français, et l'espagnol n'est pas dans le sélecteur FR/EN/PT : un frein pour ses élèves hispanophones.",sev:"majeur",th:"Terminologie"},
+ {t:"Sur iPhone SE, les cases de la grille sont serrées en 16 pas — lisible, mais ses gros doigts ne « suivent » pas en jouant.",sev:"mineur",th:"Mobile & tactile"}],
+ aime:["Le 3-contre-2 en 12 pas : exact, enseigné dans le bon ordre","Le geste main par main dans les consignes djembé"]},
+{id:15,nom:"Camille",age:40,role:"Cheffe de chœur et d'ensemble percus",it:3,dev:"ordinateur",devLbl:"Laptop Windows",note:8.7,duree:"40 min",
+ quote:"Je forme mes percussionnistes fiche par fiche — solide. Et le monde « en équipe » que j'attendais est arrivé (R-6) ; reste à pouvoir passer une leçon d'ici directement « en pupitre ».",
+ scenario:"Sélectionner des fiches pour former son ensemble, imaginer le travail par pupitre.",
+ constats:[{t:"Le monde « en pupitre » est arrivé (equipe.html R-6) ; reste à ouvrir une passerelle « leçon → pupitre » depuis apprendre.",sev:"mineur",th:"Navigation"},
+ {t:"Elle voudrait marquer des fiches « pour le prochain cours » (une liste de travail), au-delà de l'acquis binaire.",sev:"mineur",th:"Fonctions expertes"}],
+ aime:["Le monde « en équipe » (R-6) est arrivé, comme promis","La progression par critères, directement réutilisable en cours"]},
+{id:16,nom:"Olivier",age:42,role:"Ingénieur, trompettiste d'harmonie",it:5,dev:"ordinateur",devLbl:"PC Windows, Edge",note:8.7,duree:"40 min",
+ quote:"La file de votes hors-ligne qui se vide au retour du réseau : voilà de l'ingénierie discrète. J'exporterais bien mes acquis en JSON, par principe.",
+ scenario:"Éprouver la mécanique : votes hors-ligne, acquis persistants, comportement au rechargement.",
+ constats:[{t:"Pas d'export de sa progression (acquis/votes) — tout vit en localStorage sans porte de sortie.",sev:"mineur",th:"Fonctions expertes"},
+ {t:"Les raccourcis clavier de l'accueil (Espace, ↑↓) ne sont pas rappelés ici — ils marchent pourtant.",sev:"mineur",th:"Prise en main"}],
+ aime:["La file de votes offline-first, silencieuse et fiable","Les acquis qui survivent sans compte"]},
+{id:17,nom:"Nadia",age:45,role:"Pianiste amatrice (reprise après 15 ans)",it:2,dev:"tablette",devLbl:"iPad ancien",note:9.1,duree:"30 min",
+ quote:"« On me montre, je refais », et maintenant quand je vote, une phrase me dit à quoi ça sert. Le volume que je connais de l'accueil est là aussi.",
+ scenario:"Suivre trois fiches cajón Débutant en autonomie complète, à son rythme.",
+ constats:[{t:"Elle n'a pas compris au premier passage que « Charger » = « à toi de jouer » — le mot reste technique pour elle.",sev:"mineur",th:"Terminologie"}],
+ aime:["La phrase des votes qui dit enfin où va sa réponse","Le rythme choisi par elle, l'acquis coché par elle","Le volume déjà familier de l'accueil"]},
+{id:18,nom:"Pierre",age:47,role:"Luthier, violoncelliste amateur",it:2,dev:"ordinateur",devLbl:"PC Windows 10 ancien",note:8.4,duree:"30 min",
+ quote:"Écouter d'abord, faire ensuite : ma méthode d'atelier depuis toujours. J'imprimerais bien la fiche pour la poser sur l'établi.",
+ scenario:"Suivre une fiche en écoutant deux fois avant de jouer, chercher à l'imprimer.",
+ constats:[{t:"Pas d'impression d'une fiche (consigne + critère + grille) — les impressions vivent sur Pratiquer.",sev:"mineur",th:"Fonctions expertes"},
+ {t:"Il craint de « perdre » ses acquis cochés (pas de compte) : une sauvegarde exportable le rassurerait.",sev:"mineur",th:"Fonctions expertes"}],
+ aime:["Écouter avant de faire : la méthode de l'atelier","Rien ne pousse à se connecter — le compte est une option"]},
+{id:19,nom:"Fatou",age:50,role:"Animatrice d'ateliers djembé",it:2,dev:"mobile",devLbl:"Android entrée de gamme",note:9.2,duree:"45 min",
+ quote:"Enfin je règle le son ICI, l'atelier n'a plus à faire l'aller-retour par l'accueil. Il me reste à obtenir la grille en GRAND pour le cercle.",
+ scenario:"Animer un atelier avec les fiches djembé Débutant, téléphone au sol au milieu du cercle.",
+ constats:[{t:"La grille vivante reste petite pour un cercle d'atelier — un mode « très grand » (façon Atelier de Pratiquer) manque ici.",sev:"mineur",th:"Visuel & lisibilité"}],
+ aime:["Le volume enfin réglable ICI, fini le détour par l'accueil","Les fiches Débutant qui « font cours » à sa place"]},
+{id:20,nom:"Laurent",age:52,role:"Bassiste funk semi-pro",it:3,dev:"ordinateur",devLbl:"Laptop + interface audio",note:9.4,duree:"60 min",
+ quote:"Le placement enseigné, toujours au top — et cette fois mon tempo me suit d'une page à l'autre, je ne retombe plus sur 92.",
+ scenario:"Éprouver les modules Artiste P1/P2 (laid-back/pushed) au casque, comparer au placement de ses relevés.",
+ constats:[{t:"Le feel des démos ne se règle pas dans « Personnaliser » : l'élève l'écoute mais ne peut pas s'exercer à ±10 ou ±25 ms.",sev:"mineur",th:"Fonctions expertes"}],
+ aime:["Le tempo qui suit maintenant d'une page à l'autre","Le placement enseigné (laid-back/pushed) : unique dans une app grand public"]},
+{id:21,nom:"Anne",age:55,role:"Documentaliste, choriste",it:1,dev:"ordinateur",devLbl:"PC familial, Chrome",note:8.5,duree:"25 min",
+ quote:"J'ai voté la difficulté, et cette fois c'était écrit où ça allait : « recalibre le niveau pour tout le monde ». Ce petit mot m'a rassurée.",
+ scenario:"Suivre une fiche cajón Débutant en autonomie, voter la difficulté, comprendre où va le vote.",
+ constats:[{t:"« Se connecter » l'intrigue encore : le texte de la fenêtre rassure, mais elle veut savoir ce que devient son e-mail.",sev:"mineur",th:"Compte & connexion"}],
+ aime:["Une leçon finie SEULE, de bout en bout","La phrase sous les votes qui dit enfin où va sa réponse"]},
+{id:22,nom:"Bernard",age:58,role:"Batteur jazz amateur",it:2,dev:"tablette",devLbl:"iPad",note:8.3,duree:"30 min",
+ quote:"Le ternaire est enseigné en 12 cases, honnêtement — j'ai VU mes triolets dans la grille. Maintenant j'attends le parcours jazz.",
+ scenario:"Chercher le ternaire dans le parcours, suivre une fiche 12 pas, rêver d'un module chabada.",
+ constats:[{t:"Pas de parcours jazz : le funk ouvre le bal, sa musique attend (il le comprend, il le note).",sev:"mineur",th:"Fonctions expertes"},
+ {t:"Le swing des démos ne se règle pas — c'est le modèle qui décide (voulu, mais il aurait aimé « pousser » à 66 %).",sev:"mineur",th:"Fonctions expertes"}],
+ aime:["Le ternaire VISIBLE en 12 cases dans la grille","La pédagogie par critères, sans blabla"]},
+{id:23,nom:"Rosa",age:61,role:"Prof de formation musicale retraitée",it:2,dev:"ordinateur",devLbl:"Laptop, Chrome",note:9.6,duree:"50 min",
+ quote:"La chaîne pédagogique reste la meilleure que j'aie vue, et la phrase « ton vote recalibre le niveau pour tout le monde » dit enfin l'intention. Il me manque un livret du maître et les seuils de promotion.",
+ scenario:"Évaluer la page comme un outil de formation : structure, critères, votes, recalibrage des niveaux.",
+ constats:[{t:"Un « livret du maître » imprimable (tous les critères d'un module) lui manque pour préparer un cours.",sev:"mineur",th:"Fonctions expertes"},
+ {t:"Le recalibrage : la phrase « pour tout le monde » aide, mais « comment les niveaux bougent » (seuils) reste à documenter pour un enseignant.",sev:"mineur",th:"Fonctions expertes"}],
+ aime:["La chaîne pédagogique complète : la meilleure note qu'elle ait donnée","La phrase « recalibre pour tout le monde » enfin affichée sous les votes"]},
+{id:24,nom:"Michel",age:63,role:"Accordéoniste de bal musette",it:1,dev:"mobile",devLbl:"Smartphone hérité de sa fille",note:7.7,duree:"20 min",
+ quote:"On m'a montré : écouter, puis à moi. Ça, je comprends. Les explications écrites, par contre, c'est encore trop de mots pour moi.",
+ scenario:"Suivre une fiche cajón Débutant avec l'aide de sa fille, refaire seul le lendemain.",
+ constats:[{t:"Les consignes des fiches restent longues et savantes pour lui — il fait « à l'oreille » sans les lire.",sev:"mineur",th:"Prise en main"},
+ {t:"Une fiche qu'il voulait entendre affichait « démo à venir » : pour lui, sans modèle, pas de leçon.",sev:"mineur",th:"Fonctions expertes"}],
+ aime:["« Écouter puis refaire » : il n'a pas eu besoin de lire","Les gros boutons, même sur son vieux téléphone"]},
+{id:25,nom:"Denise",age:66,role:"Choriste paroissiale",it:1,dev:"tablette",devLbl:"Tablette Android (Lidl)",note:8.1,duree:"25 min (aidée)",
+ quote:"La musique montre l'exemple, les petites cases suivent, et quand j'ai voté, on m'a dit à quoi ça servait. J'ai coché « acquis » toute seule.",
+ scenario:"Avec aide : suivre une fiche très simple, regarder la grille, cocher son premier acquis.",
+ constats:[{t:"Le texte des critères est petit pour elle — elle demande à sa petite-fille de lire.",sev:"mineur",th:"Visuel & lisibilité"}],
+ aime:["La grille qui « montre où ça tape »","La phrase qui dit enfin à quoi sert le vote"]},
+{id:26,nom:"Georges",age:68,role:"Violoniste amateur (50 ans de pratique)",it:2,dev:"ordinateur",devLbl:"PC Windows, écran 24\"",note:8.2,duree:"40 min",
+ quote:"J'ai tout lu, fiche après fiche — du travail d'orfèvre pédagogique, même si les percussions ne sont pas mon rayon. J'imprimerais volontiers pour lire au fauteuil.",
+ scenario:"Lire le parcours en entier « pour la culture », tester une fiche Débutant au clavier.",
+ constats:[{t:"Pas de version imprimable des fiches — il lit à l'écran, il préférerait son fauteuil.",sev:"mineur",th:"Fonctions expertes"},
+ {t:"« Charger » l'a fait douter : charger quoi, où ? Le statut sous la fiche l'a rattrapé.",sev:"mineur",th:"Terminologie"}],
+ aime:["La qualité d'écriture des fiches (il a TOUT lu)","Le statut qui dit toujours ce qui vient de se passer"]},
+{id:27,nom:"Malika",age:71,role:"Pianiste retraitée, ex-professeure",it:2,dev:"tablette",devLbl:"iPad",note:8.6,duree:"30 min",
+ quote:"Une seule colonne, des onglets de niveau clairs, pas de labyrinthe : cette page-là ne me perd jamais. Et les leçons sont dignes d'un vrai professeur.",
+ scenario:"Parcourir les niveaux aux onglets, suivre une fiche Débutant, thème sombre le soir.",
+ constats:[{t:"Les critères en petit gris demanderaient une police plus grande (même remarque que ses consœurs).",sev:"mineur",th:"Visuel & lisibilité"},
+ {t:"Le bouton « Se connecter » en haut l'intrigue sans la concerner — un mot (« optionnel ») la tranquilliserait.",sev:"mineur",th:"Compte & connexion"}],
+ aime:["La page en une colonne : jamais perdue","Les onglets Débutant → Artiste, clairs comme un manuel"]},
+{id:28,nom:"Jean-Paul",age:74,role:"Clarinettiste d'harmonie municipale",it:1,dev:"ordinateur",devLbl:"PC (Chrome installé par son fils)",note:7.9,duree:"25 min",
+ quote:"Ici tout est en français, même les boutons : je suis chez moi. Dommage que ma clarinette n'ait pas encore ses leçons.",
+ scenario:"Suivre une fiche cajón « pour le rythme », chercher un parcours pour instruments à vent.",
+ constats:[{t:"« Démo à venir » sur plusieurs fiches : il n'ose pas les travailler sans modèle.",sev:"mineur",th:"Fonctions expertes"},
+ {t:"Pas de parcours pour les vents/harmonie — le rythme au cajón l'amuse mais sa clarinette attend.",sev:"mineur",th:"Fonctions expertes"}],
+ aime:["Tout en français, boutons compris — sa page préférée","« Écouter » : le professeur montre, comme à l'harmonie"]},
+{id:29,nom:"Suzanne",age:77,role:"Organiste liturgique",it:1,dev:"tablette",devLbl:"Tablette Android",note:8.2,duree:"25 min (aidée)",
+ quote:"Les cases s'arrêtent quand j'arrête — rien ne bouge dans mon dos. Et cette fois, une phrase m'a expliqué le vote. J'ai regardé trois leçons comme un spectacle.",
+ scenario:"Avec aide : écouter des démos, observer la grille vivante, comprendre « à quoi on joue ».",
+ constats:[{t:"Elle a d'abord cru qu'il fallait « suivre le curseur du doigt » sur la grille — l'usage (regarder, pas toucher) n'est dit nulle part.",sev:"mineur",th:"Prise en main"}],
+ aime:["La grille qui se FIGE à l'arrêt : rien d'imprévu","La phrase qui éclaire enfin le vote de difficulté"]},
+{id:30,nom:"Henri",age:80,role:"Ancien chef d'harmonie",it:1,dev:"ordinateur",devLbl:"PC ancien, écran 1366×768",note:8.5,duree:"40 min",
+ quote:"Un manuel de percussion vivant, où le maître joue l'exemple à la demande. Soixante ans plus tôt, j'aurais donné cher pour ça. Imprimez-le-moi, et je meurs comblé.",
+ scenario:"Lire le parcours entier à zoom 150 %, écouter des démos de chaque niveau, réclamer un manuel.",
+ constats:[{t:"Pas de « manuel imprimable » du parcours (fiches + critères) — sa demande récurrente, ici plus légitime que jamais.",sev:"mineur",th:"Fonctions expertes"},
+ {t:"À zoom 150 %, les cases de la grille deviennent grosses mais les étiquettes de voix (grave/aigu) restent petites.",sev:"mineur",th:"Visuel & lisibilité"}],
+ aime:["« Le maître joue l'exemple à la demande » — il en redemande","Les quatre niveaux : une vraie méthode, pas un gadget"]}
+];
+
+const ISSUES = [
+{id:"C1",sev:"majeur",titre:"Le contenu des leçons (corpus) reste en français même en EN/PT — désormais SIGNALÉ, mais non traduit",
+ desc:"R-5 a traduit tout le cadre (boutons, légende, statuts, modale de compte) et 0.18.0 a ajouté l'avis « les leçons sont en français pour l'instant » dès que la langue ≠ FR : la limite est enfin VISIBLE et honnête (Chloé, Julien saluent le pas). Mais le contenu lui-même — objectif, consigne, critère, noms de modules — reste français. Maria est formelle : ses élèves lusophones bloqueront quand même ; Diego pointe que l'espagnol n'est même pas au sélecteur FR/EN/PT. C'est LE majeur restant du portail, le plafond de la page pour les non-francophones.",
+ reco:"L'avis (livré) tient le court terme. Moyen/long terme : ouvrir le transverse « contenu principes en données de corpus » (traduction du corpus EN puis PT, idéalement ES à terme) — le grand chantier i18n non traité.",
+ effort:"eleve",who:[7,9,10,14]},
+{id:"C2",sev:"mineur",titre:"Fiches denses pour les extrêmes du panel (9 ans, 66+) : consignes longues, critères en petit",
+ desc:"Léa et Michel font « à l'oreille » sans lire ; Denise fait lire sa petite-fille ; Malika demande une police plus grande ; Emma saute le bloc d'intro sur mobile ; Suzanne ne sait pas si la grille se touche ou se regarde.",
+ reco:"Une taille de police + un cran sur consigne/critère ; un mot d'usage sur la grille (« regarde : les cases montrent où frapper ») ; l'intro raccourcie d'un tiers.",
+ effort:"faible",who:[1,5,24,25,27,29]},
+{id:"C3",sev:"mineur",titre:"« Démo à venir » sur 30 exercices : la déception est ciblée mais réelle",
+ desc:"La liste fermée R-4c (structures multi-mesures, flams, cimbalette…) est documentée au dépôt, pas dans la page. Michel et Jean-Paul ne travaillent PAS une fiche sans modèle ; Hugo tombe dessus pile sur les structures longues qu'il voulait.",
+ reco:"Remplacer « démo à venir » par la raison courte quand c'est structurel (« exercice long — pas de démo : suis la consigne ») pour distinguer « pas encore » de « pas prévu ».",
+ effort:"faible",who:[4,24,28]},
+{id:"C4",sev:"mineur",titre:"Aucune impression : ni fiche, ni « livret » (la demande vient de 4 profils différents)",
+ desc:"Pierre veut la fiche sur l'établi, Georges au fauteuil, Rosa un livret du maître par module, Henri le manuel entier. Les impressions du portail vivent toutes sur Pratiquer.",
+ reco:"Une vue imprimable par fiche (consigne + critère + grille statique) sur le patron des exports existants ; le « livret de module » en option (concat des fiches).",
+ effort:"moyen",who:[18,23,26,30]},
+{id:"C5",sev:"mineur",titre:"La progression reste locale et muette : pas de stats, pas d'export, pas de vue « ce qui me reste »",
+ desc:"Tom veut des points, Marc des séries et un historique, Inès une vue « reste à faire », Olivier un export JSON de ses acquis, Pierre craint de tout perdre sans compte.",
+ reco:"Un petit bloc « ma progression » (compteurs par niveau + export/import JSON local) — sans gamification lourde, fidèle au ton de l'app.",
+ effort:"moyen",who:[2,3,12,16,18]},
+{id:"C6",sev:"mineur",titre:"Un seul style (funk) et deux instruments (cajón/djembé) : chaque spécialiste attend le sien",
+ desc:"Emma la voix, Sofia l'archet, Maria la capoeira, Bernard le jazz, Jean-Paul les vents. Tous SAVENT que c'est le début (la refonte multi-styles est l'architecture même) — le panel confirme l'appétit et l'ordre de priorité.",
+ reco:"Aucune action de page : c'est la feuille de route corpus (chantier B+ multi-styles). À citer dans l'arbitrage — l'ordre des styles suivants peut s'appuyer sur ces demandes.",
+ effort:"eleve",who:[5,9,11,22,28]},
+{id:"C7",sev:"mineur",titre:"La grille vivante en « grand » manque pour l'usage collectif (classe, atelier, asso)",
+ desc:"Fatou (cercle de djembé, téléphone au sol), Aïcha (projection au tableau) et Nathan (asso) utilisent la grille comme support de groupe : elle est dimensionnée pour un seul lecteur.",
+ reco:"Un mode « grille en grand » (plein écran, cases XL, façon Atelier de Pratiquer) déclenché depuis la carte de l'exercice.",
+ effort:"moyen",who:[6,13,19]},
+{id:"C8",sev:"mineur",titre:"Travail « à plusieurs » : suivi multi-profils et passerelle « leçon → pupitre » (equipe R-6 arrivé)",
+ desc:"Le monde « en équipe » réclamé (equipe.html R-6) existe désormais. Reste, côté apprendre, la passerelle : Camille veut envoyer une fiche « en pupitre » depuis ici, Aïcha suivre 28 élèves (multi-profils).",
+ reco:"Un bouton « mettre en pupitre » sur les fiches (génère une config d'équipe vers equipe.html) ; à plus long terme, des profils multiples pour le suivi de classe.",
+ effort:"eleve",who:[13,15]},
+{id:"C9",sev:"mineur",titre:"Vote de difficulté : la phrase clarifie « pour qui », les seuils de promotion restent à documenter",
+ desc:"La phrase « ton vote recalibre le niveau pour tout le monde » (livrée R-5 P2) lève l'opacité pour les novices (Anne, Nadia, Denise, Suzanne : résolu). Mais les deux pédagogues (Chloé, Rosa) veulent la méthode : à partir de combien de votes un exercice change de niveau, anonymat, périmètre.",
+ reco:"Une note méthodo dépliable pour les enseignants (seuils de promotion, anonymat) sous la phrase existante — sans alourdir l'interface novice.",
+ effort:"faible",who:[7,23]},
+{id:"C10",sev:"mineur",titre:"Pas de retour après « acquis » : ni « bravo », ni ouverture de la fiche suivante",
+ desc:"Léa attend une petite récompense visuelle après avoir coché ; Marc constate que la fiche suivante ne s'ouvre pas — le flux s'interrompt à chaque validation.",
+ reco:"Un micro-retour à la validation (coche animée, message court) et l'ouverture optionnelle de la fiche suivante pour garder l'élan — sans gamification lourde.",
+ effort:"faible",who:[1,12]},
+{id:"C11",sev:"mineur",titre:"Personnalisation limitée : le feel, le swing et le pattern des démos ne se règlent pas",
+ desc:"Hugo aurait pris le choix du pattern de basse ; Yanis voit le feel s'entendre sans se dessiner ; Laurent voudrait s'exercer à ±10/±25 ms ; Bernard « pousser » le swing à 66 %. La démo reste le modèle qui décide (voulu), mais l'appétit d'un bac à sable est là.",
+ reco:"Étendre « Personnaliser » avec des réglages optionnels (feel ±ms, swing, pattern) réservés aux niveaux avancés — sans casser la simplicité des fiches Débutant.",
+ effort:"moyen",who:[4,8,20,22]}
+];
+
+/* ================= RENDU ================= */
+const $ = id => document.getElementById(id);
+const AGEBUCKET = a => a<18?"0-17":a<36?"18-35":a<56?"36-55":"56-99";
+const AGELBL = {"0-17":"< 18 ans","18-35":"18–35","36-55":"36–55","56-99":"56 et +"};
+const DEVLBL = {mobile:"📱 Smartphone",tablette:"💻 Tablette",ordinateur:"🖥 Ordinateur"};
+const SEVW = {critique:3,majeur:2,mineur:1};
+
+function kpis(){
+  const avg = (P.reduce((s,p)=>s+p.note,0)/P.length).toFixed(1);
+  const nC = P.reduce((s,p)=>s+p.constats.filter(c=>c.sev==="critique").length,0);
+  const nM = P.reduce((s,p)=>s+p.constats.filter(c=>c.sev==="majeur").length,0);
+  const nTot = P.reduce((s,p)=>s+p.constats.length,0);
+  const reco = P.filter(p=>p.note>=8).length;
+  $("kpis").innerHTML =
+   `<div class="kpi acc"><div class="v">${avg} / 10</div><div class="l">Satisfaction moyenne</div></div>
+    <div class="kpi"><div class="v">30</div><div class="l">Testeurs · 9 à 80 ans</div></div>
+    <div class="kpi crit"><div class="v">${nC}</div><div class="l">Constats critiques</div></div>
+    <div class="kpi maj"><div class="v">${nM}</div><div class="l">Constats majeurs</div></div>
+    <div class="kpi"><div class="v">${nTot}</div><div class="l">Constats au total</div></div>
+    <div class="kpi pos"><div class="v">${reco}/30</div><div class="l">Promoteurs (note ≥ 8)</div></div>`;
+}
+
+function card(p){
+  const init = p.nom.slice(0,2).toUpperCase();
+  const cs = p.constats.map(c=>`<div class="fitem"><span class="sev ${c.sev}">${c.sev}</span><span>${c.t}</span></div>`).join("");
+  const ai = p.aime.map(a=>`<div class="fitem"><span class="sev positif">＋</span><span>${a}</span></div>`).join("");
+  return `<div class="pcard">
+    <div class="top"><div class="avatar">${init}</div>
+      <div><h3>${p.nom}, ${p.age} ans</h3><div class="meta">${p.role}</div></div>
+      <div class="score"><div class="n">${p.note}</div><div class="d">/ 10</div></div></div>
+    <div class="chips"><span class="chip it${p.it}">${ITLBL[p.it]}</span><span class="chip">${DEVLBL[p.dev]} · ${p.devLbl}</span><span class="chip">⏱ ${p.duree}</span></div>
+    <div class="quote">« ${p.quote} »</div>
+    <div class="flist">${cs}${ai}</div>
+    <details class="more"><summary>Scénario de test</summary><div class="box">${p.scenario}</div></details>
+  </div>`;
+}
+
+function renderPanel(){
+  const fa=$("fAge").value, fi=$("fIT").value, fd=$("fDev").value, fs=$("fSev").value, ft=$("fTxt").value.trim().toLowerCase();
+  const out = P.filter(p=>{
+    if(fa && AGEBUCKET(p.age)!==fa) return false;
+    if(fi && String(p.it)!==fi) return false;
+    if(fd && p.dev!==fd) return false;
+    if(fs && !p.constats.some(c=>c.sev===fs)) return false;
+    if(ft){
+      const blob=(p.nom+" "+p.role+" "+p.quote+" "+p.devLbl+" "+p.scenario+" "+p.constats.map(c=>c.t).join(" ")+" "+p.aime.join(" ")).toLowerCase();
+      if(!blob.includes(ft)) return false;
+    }
+    return true;
+  });
+  $("countLine").textContent = out.length===P.length? "30 testeurs affichés" : `${out.length} testeur${out.length>1?"s":""} sur 30 (filtres actifs)`;
+  $("grid").innerHTML = out.map(card).join("") || "<p style='color:var(--sub)'>Aucun testeur ne correspond à ces filtres.</p>";
+}
+
+function renderIssues(){
+  const scored = ISSUES.map(i=>({...i,score:SEVW[i.sev]*i.who.length})).sort((a,b)=>b.score-a.score);
+  $("issueList").innerHTML = scored.map(i=>{
+    const pct = Math.round(i.who.length/30*100);
+    const names = i.who.map(id=>{const p=P.find(x=>x.id===id);return `${p.nom} (${p.age})`;}).join(", ");
+    return `<div class="issue ${i.sev}">
+      <div class="ihead"><span class="sev ${i.sev}">${i.sev}</span><h3>${i.id} — ${i.titre}</h3>
+      <span class="effort ${i.effort}">effort ${i.effort==="eleve"?"élevé":i.effort}</span>
+      <span class="freq">${i.who.length}/30 testeurs · ${pct} %</span></div>
+      <div class="bar-out"><div class="bar-in" style="width:${pct}%;background:${i.sev==="critique"?"var(--crit)":i.sev==="majeur"?"var(--maj)":"var(--min)"}"></div></div>
+      <div class="desc">${i.desc}</div>
+      <div class="reco">💡 <b>Recommandation :</b> ${i.reco}</div>
+      <div class="who">Rapporté par : ${names}</div>
+    </div>`;
+  }).join("");
+}
+
+function hbars(el,rows,max,color){
+  $(el).innerHTML = rows.map(r=>{
+    const w = Math.round(r.v/max*100);
+    return `<div class="hbar"><div class="lab">${r.l}</div><div class="track"><div class="fill" style="width:${w}%;background:${color}">${r.txt}</div></div></div>`;
+  }).join("");
+}
+
+function renderSyn(){
+  const byIT={}, byAge={}, byDev={};
+  P.forEach(p=>{
+    (byIT[p.it]=byIT[p.it]||[]).push(p.note);
+    const b=AGEBUCKET(p.age); (byAge[b]=byAge[b]||[]).push(p.note);
+    (byDev[p.dev]=byDev[p.dev]||[]).push(p.note);
+  });
+  const avg=a=>a.reduce((s,x)=>s+x,0)/a.length;
+  hbars("chIT",[1,2,3,4,5].map(k=>({l:ITLBL[k],v:avg(byIT[k]),txt:avg(byIT[k]).toFixed(1)})),10,"var(--acc)");
+  hbars("chAge",["0-17","18-35","36-55","56-99"].map(k=>({l:AGELBL[k],v:avg(byAge[k]),txt:avg(byAge[k]).toFixed(1)})),10,"#7a5cd6");
+  hbars("chDev",["mobile","tablette","ordinateur"].map(k=>({l:DEVLBL[k],v:avg(byDev[k]),txt:avg(byDev[k]).toFixed(1)})),10,"#2c9a5b");
+  const th={};
+  P.forEach(p=>p.constats.forEach(c=>th[c.th]=(th[c.th]||0)+1));
+  const rows=Object.entries(th).sort((a,b)=>b[1]-a[1]).map(([l,v])=>({l,v,txt:v}));
+  hbars("chTheme",rows,Math.max(...rows.map(r=>r.v)),"var(--maj)");
+}
+
+/* Tabs & filtres */
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("sel",x===t));
+  document.querySelectorAll(".view").forEach(v=>v.classList.toggle("sel",v.id==="v-"+t.dataset.v));
+}));
+["fAge","fIT","fDev","fSev"].forEach(id=>$(id).addEventListener("change",renderPanel));
+$("fTxt").addEventListener("input",renderPanel);
+$("fReset").addEventListener("click",()=>{["fAge","fIT","fDev","fSev"].forEach(id=>$(id).value="");$("fTxt").value="";renderPanel();});
+
+kpis(); renderPanel(); renderIssues(); renderSyn();
+</script>
+</body>
+</html>
