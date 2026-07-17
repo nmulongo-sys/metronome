@@ -10,12 +10,12 @@ préparer une répartition **sans quitter la page** + **franciser « Team Spirit
 | Fichier | Changement |
 |---|---|
 | `equipe.html` | **Salle en ligne guidée** : copy « à froid » (ce qu'est un code + 2 pas), champ « Mon nom », bouton « Rejoindre la salle ». **Présence** (Realtime Presence) : à la connexion `track({nom,chef,joueur})`, écoute `presence: sync/join/leave` → **roster vivant** « N dans la salle », ★ chef, ligne de chacun ; garde-fous doux (aucun chef / plusieurs chefs). **« Le chef lance »** : hors salle inchangé ; en salle, bouton réservé au chef (« ▶ Lancer la salle »), sinon **désactivé** + « En attente du chef… (Nom) ». **Éditeur de répartition en page** (`#eqEditCard`) : ± nombre de joueurs (1..6) + un `<select>` par voix (Joueur 1..N / accompagnement) → édite `cfg.joueurs`/`cfg.voix[i].j`, re-render live, **partage + broadcast reflètent l'édition**. Franc. bouton « → La préparer en pratique libre ». i18n EN+PT (clés neuves + francisation, symétrie tenue). |
-| `pratiquer.html` | Franc. « Team Spirit » → **« Répartition »** : titre de section, chip du sommaire, renvoi texte du répertoire, dicos EN (`Distribution`) / PT (`Distribuição`). **`id="secTeam"` et l'ancre `#secTeam` inchangés** (liens profonds R-5 + `eqGoTeam` intacts). |
+| `pratiquer.html` | Franc. « Team Spirit » → **« Rythme à plusieurs »** (nom retenu par Jean) : titre de section, chip du sommaire, renvoi texte du répertoire, dicos EN (`Group rhythm`) / PT (`Ritmo em grupo`). **`id="secTeam"` et l'ancre `#secTeam` inchangés** (liens profonds R-5 + `eqGoTeam` intacts). |
 | `index.html` | Note de la porte « Pratiquer » francisée (« … et la répartition d'équipe vivent ici. ») + 2 clés i18n (EN+PT). |
 | `moteur/fm-etat.js` | `BUILD` → `metronomefunk-0.22.0` (**seule** ligne moteur ; md5 == 0.10.0, dans la tolérance). |
 | `recette-equipe.js` | Mock Realtime étendu (**Presence** : `track`/`untrack`/`presenceState` + events `presence`, aide `_inject`). +14 assertions : **M1–M7** (guidage salle, présence chef ★, arrivée d'un 2ᵉ membre, départ réservé au chef, clic non-chef neutre, avertissement sans chef) ; **N1–N7** (éditeur : selects par voix, ±joueurs, options, réaffectation en place, partage reflété, clamp hors-bornes, 0 « Team Spirit » visible). BUILD 0.22.0. |
 | `recette-accueil.js` | `P2.5` note de porte francisée (`… et la répartition d'équipe`) ; BUILD 0.22.0. |
-| `recette-onboarding-0.6.7.js` | `3.16` renvoi répertoire → « Répartition ». |
+| `recette-onboarding-0.6.7.js` | `3.16` renvoi répertoire → « Rythme à plusieurs ». |
 | `recette-apprendre.js`, `recette-pratiquer.js`, `recette-extraction.js` | BUILD 0.21.0 → 0.22.0 (seul changement). |
 
 **Aucune retouche moteur** hors BUILD : `moteur/*.js` reste identique à 0.10.0 à l'octet près
@@ -50,14 +50,14 @@ libellés neufs (salle, présence, éditeur) sont couverts EN+PT.
 - **Salle en ligne** : bascule « En ligne (salle) » → carte révélée, **2 pas de guidage**, roster
   **caché tant qu'on n'a pas rejoint**, sous-titre « En direct : le chef fait partir et arrêter ».
 - **Francisation** : **0 « Team Spirit » visible** sur `equipe.html`, `pratiquer.html`,
-  `index.html` ; `pratiquer` chip + titre = « Répartition » ; porte accueil « … répartition
-  d'équipe » ; **`pratiquer.html#secTeam` ouvre toujours la section** (`open`, titre « Répartition »).
+  `index.html` ; `pratiquer` chip + titre = « Rythme à plusieurs » ; porte accueil « … et Rythme à
+  plusieurs vivent ici » ; **`pratiquer.html#secTeam` ouvre toujours la section** (`open`, titre « Rythme à plusieurs »).
 
 ## 4. Hors périmètre (déclaré)
 
 - **Mode online à 2 appareils** : présence + départ **mock-vérifiés** (roster, chef, garde-fous,
   broadcast). La synchro **live** demande la prod (egress Supabase 403 en env) — **vérif de Jean**.
-- **Nom de section « Répartition »** : défaut proposé pour franciser « Team Spirit » ; Jean peut
-  trancher un autre mot au merge (le renommage est purement libellé, `id`/ancres intacts).
+- **Nom de section « Rythme à plusieurs »** : nom **retenu par Jean** pour franciser « Team Spirit »
+  (remplace le défaut initial « Répartition ») ; renommage purement libellé, `id`/ancres intacts.
 - Après merge : Pages doit servir **0.22.0** ; salle en ligne guidée + éditeur de répartition à
-  l'œil sur `equipe.html`, francisation « Répartition » sur pratiquer/accueil.
+  l'œil sur `equipe.html`, francisation « Rythme à plusieurs » sur pratiquer/accueil.

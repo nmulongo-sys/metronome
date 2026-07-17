@@ -325,9 +325,9 @@ function runTests() {
     ok('P2.4 infobulles Fréquence + Caractère (titres FR)',
       !!p2Freq && /Hauteur du clic/.test(p2Freq.getAttribute('title') || '') &&
       !!p2Carac && /Timbre du clic/.test(p2Carac.getAttribute('title') || ''));
-    ok('P2.5 annonces situées : 3 notes sous les portes (parcours / compte+répartition / salle de concert)',
+    ok('P2.5 annonces situées : 3 notes sous les portes (parcours / compte+Rythme à plusieurs / salle de concert)',
       D.querySelectorAll('.porte-note').length === 3 &&
-      /bibliothèque partagée et la répartition d'équipe/.test(txt(D.querySelector('#portePratiquer .porte-note'))) &&
+      /bibliothèque partagée et Rythme à plusieurs/.test(txt(D.querySelector('#portePratiquer .porte-note'))) &&
       /salle de concert/i.test(txt(D.querySelector('#porteEquipe .porte-note'))));
 
     console.log('\n--- accueil (R-4b) : ' + PASS + ' vertes, ' + FAIL + ' rouges (total ' + (PASS + FAIL) + ') ---\n');
