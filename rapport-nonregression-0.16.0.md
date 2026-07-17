@@ -62,8 +62,9 @@ section D2 requête la carte FRAÎCHE (les nœuds capturés avant sont périmés
 build 0.16.0 affiché ; « ▶ Écouter » (T1-01) → grille posée (1 voix, 16 cases,
 l'accent du 1) et **curseur qui AVANCE réellement** (deux lectures espacées : pas
 0 → 3) ; « Charger » → grille MAINTENUE, démo retirée, **curseur toujours en
-mouvement** (4 → 7) ; 0 erreur console applicative. Capture d'écran de la grille en
-lecture (CALL-02, 3 voix) jointe à la PR.
+mouvement** (4 → 7) ; 0 erreur console applicative. Une capture d'écran de la grille
+en lecture (CALL-02, 3 voix : basse/tone/slap, accents, curseur) a été prise pendant
+la vérification et montrée à Jean en séance.
 
 ## 5. Reste à faire (hors R-4d)
 
