@@ -32,16 +32,38 @@ function canvasCtx() {
   }});
 }
 
-// ---- mock Supabase : auth minimal (pour fm-compte) + Realtime broadcast (pour le online) ----
+// ---- mock Supabase : auth minimal (pour fm-compte) + Realtime broadcast + présence (online) ----
 const SB = { sent: [], chans: [] };
 function makeChannel(name) {
   const handlers = [];
+  const presence = {};   // presenceState : { clé -> [payload] }
+  let selfKey = null;
   const ch = {
     name,
     on(type, filter, cb) { handlers.push({ type, filter, cb }); return ch; },
     subscribe(cb) { if (cb) cb('SUBSCRIBED'); return ch; },
     send(msg) { SB.sent.push(msg); return Promise.resolve('ok'); },
-    _emit(payload) { handlers.forEach(h => h.cb(payload)); }   // aide de test : simule une réception
+    // --- présence (Realtime Presence) ---
+    track(payload) {
+      selfKey = (payload && payload.key) || selfKey || 'self';
+      presence[selfKey] = [payload];
+      ch._emitPresence('join', { key: selfKey, newPresences: [payload] });
+      ch._emitPresence('sync');
+      return Promise.resolve('ok');
+    },
+    untrack() {
+      if (selfKey && presence[selfKey]) { const left = presence[selfKey]; delete presence[selfKey]; ch._emitPresence('leave', { key: selfKey, leftPresences: left }); }
+      ch._emitPresence('sync');
+      return Promise.resolve('ok');
+    },
+    presenceState() { return presence; },
+    _emit(payload) { handlers.filter(h => h.type === 'broadcast').forEach(h => h.cb(payload)); },   // réception broadcast
+    _emitPresence(event, arg) { handlers.filter(h => h.type === 'presence' && (!h.filter || h.filter.event === event)).forEach(h => h.cb(arg || {})); },
+    _inject(key, payload) {   // aide de test : simule l'arrivée d'un AUTRE membre
+      presence[key] = [payload];
+      ch._emitPresence('join', { key, newPresences: [payload] });
+      ch._emitPresence('sync');
+    }
   };
   SB.chans.push(ch);
   return ch;
@@ -112,8 +134,8 @@ setTimeout(runTests, 140);
 function runTests() {
   /* ---------- A. chargement + page ---------- */
   ok('A1 chargement sans erreur jsdom (' + jsdomErrors.length + ')', jsdomErrors.length === 0);
-  ok('A2 BUILD 0.21.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.21.0');
-  ok('A3 tampon de build affiché', /metronomefunk-0\.21\.0/.test(txt($('buildStamp'))));
+  ok('A2 BUILD 0.22.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.22.0');
+  ok('A3 tampon de build affiché', /metronomefunk-0\.22\.0/.test(txt($('buildStamp'))));
   ok('A4 stubs au strict contrat moteur (percFsPlay + gapTarget seuls)',
     !!$('percFsPlay') && !!$('gapTarget') && $('fmStubs').children.length === 2);
   ok('A5 transport présent (tempo, démarrer, volume, statut)',
@@ -221,6 +243,65 @@ function runTests() {
   ok('H7 réception « stop » : arrêt (idempotent hors lecture)', g('isPlaying') === false);
   g('window.fmEquipeApp.leave()');
 
+  /* ---------- M. salle en ligne : présence « qui est là / qui est chef » (v1.2) ---------- */
+  g('window.fmEquipeApp.apply(' + JSON.stringify(CFG) + ')');
+  g('window.fmEquipeApp.setMode("online")');
+  ok('M1 salle en ligne : guidage (code + 2 pas) présent, roster caché avant de rejoindre',
+    D.querySelectorAll('#eqSalleCard .eq-steps li').length === 2 && $('eqSalleRoster').classList.contains('hide'));
+  $('eqSalleName').value = 'Naomi'; $('eqSalleCode').value = 'funk-7'; $('eqSalleChef').checked = true;
+  SB.chans.length = 0; clic($('eqSalleJoin'));
+  const chM = SB.chans[0];
+  ok('M2 rejoindre en chef : je figure au roster (★ + mon nom), compteur « 1 dans la salle »',
+    !$('eqSalleRoster').classList.contains('hide') && /Naomi/.test(txt($('eqSalleRoster')))
+    && /★/.test($('eqSalleRoster').innerHTML) && /1 dans la salle/.test(txt($('eqSalleRoster'))));
+  ok('M3 chef : bouton de départ actif et libellé « Lancer la salle »',
+    $('eqChef').disabled === false && /Lancer la salle/.test(txt($('eqChef'))));
+  chM._inject('bob', { key: 'bob', nom: 'Bob', chef: false, joueur: 2 });
+  ok('M4 arrivée d\'un 2e membre : compteur « 2 dans la salle », Bob visible',
+    /2 dans la salle/.test(txt($('eqSalleRoster'))) && /Bob/.test(txt($('eqSalleRoster'))));
+  // rejoindre en NON-chef, un autre membre est chef → départ réservé au chef
+  g('window.fmEquipeApp.leave()'); $('eqSalleChef').checked = false;
+  SB.chans.length = 0; clic($('eqSalleJoin'));
+  const chN = SB.chans[0];
+  chN._inject('cheffe', { key: 'cheffe', nom: 'Alex', chef: true, joueur: 1 });
+  ok('M5 non-chef : bouton de départ désactivé + « En attente du chef… Alex »',
+    $('eqChef').disabled === true && /En attente du chef/.test(txt($('eqChef'))) && /Alex/.test(txt($('eqChef'))));
+  $('eqCount').classList.remove('show');   // repartir d'un overlay propre (F/H l'ont laissé « show », tick async)
+  SB.sent.length = 0; clic($('eqChef'));
+  ok('M6 non-chef : le clic « Départ » ne relance rien (aucun décompte, aucune diffusion)',
+    !$('eqCount').classList.contains('show') && SB.sent.length === 0);
+  // seul et sans chef → avertissement doux
+  g('window.fmEquipeApp.leave()'); $('eqSalleChef').checked = false;
+  SB.chans.length = 0; clic($('eqSalleJoin'));
+  ok('M7 seul sans chef : avertissement « Personne n\'est encore chef »',
+    /Personne n'est encore chef/.test(txt($('eqSalleRoster'))));
+  g('window.fmEquipeApp.leave()'); g('window.fmEquipeApp.setMode("off")');
+
+  /* ---------- N. éditeur de répartition en page (v1.2) ---------- */
+  g('window.fmEquipeApp.apply(' + JSON.stringify(CFG) + ')');   // 2 joueurs, 2 voix (grave J1, aigu J2)
+  ok('N1 éditeur : une ligne d\'affectation par voix (2), compteur = 2',
+    $('eqAssign').querySelectorAll('select').length === 2 && txt($('eqEditPlayersVal')) === '2');
+  clic($('eqEditPlus'));
+  ok('N2 « +1 joueur » : config à 3 joueurs, « Je suis… » = 3 chips + « écouter tout »',
+    g('window.fmEquipeApp.state().joueurs') === 3 && $('eqPlayers').querySelectorAll('[data-player]').length === 4);
+  ok('N3 selects d\'affectation : J1..J3 + accompagnement (4 options)',
+    $('eqAssign').querySelector('select').querySelectorAll('option').length === 4);
+  (function () { const s = $('eqAssign').querySelectorAll('select')[0]; s.value = '3'; s.dispatchEvent(new W.Event('change')); })();
+  ok('N4 réaffecter une voix : cfg.voix[0].j = 3 (édition en place)', g('EQ.config.voix[0].j') === 3);
+  ok('N5 le lien de partage reflète l\'édition (3 joueurs, voix 0 → J3)', (function () {
+    const u = g('window.fmEquipeApp.shareUrl()');
+    const b = g('window.fmEquipe.decode(' + JSON.stringify(u) + ')');
+    return b && b.joueurs === 3 && b.voix[0].j === 3;
+  })());
+  clic($('eqEditMinus')); clic($('eqEditMinus'));   // 3 → 1
+  ok('N6 réduire à 1 joueur : affectations hors bornes ramenées à l\'accompagnement (j=0)',
+    g('window.fmEquipeApp.state().joueurs') === 1 && g('EQ.config.voix[0].j') === 0 && g('EQ.config.voix[1].j') === 0);
+  ok('N7 francisation : aucun libellé visible « Team Spirit » (equipe.html)', (function () {
+    const w = D.createTreeWalker(D.body, 4); let n;
+    while ((n = w.nextNode())) { const p = n.parentElement; if (p && (p.tagName === 'SCRIPT' || p.tagName === 'STYLE')) continue; if (/Team Spirit/.test(n.nodeValue || '')) return false; }
+    return true;
+  })());
+
   /* ---------- I. i18n strict ---------- */
   ok('I1 sélecteur de langue (FR/EN/BR) + fmTr exposé',
     D.querySelectorAll('#langSwitch .lang-btn').length === 3 && typeof W.fmTr === 'function');
@@ -238,7 +319,7 @@ function runTests() {
   // zones exclues : labels de voix (corpus), résumé/statuts composés, chips de joueur
   // composées (« Joueur N »), placeholders d'exemple (URL/code de salle), stubs, tampon.
   const EXCL_ZONE = '.pfg-voix, #eqSummary, #statusLine, #eqStatus, #eqSalleStatus, #eqPlayers, ' +
-    '#eqLinkInput, #eqSalleCode, #fmStubs, #buildStamp, #eqCountNum';
+    '#eqLinkInput, #eqSalleCode, #fmStubs, #buildStamp, #eqCountNum, #eqAssign, #eqSalleRoster, #eqChef';
   const EXCL = (t, el) => IDENT.has(t) || /^build metronomefunk-/.test(t) || /^\d+([.,]\d+)?$/.test(t) ||
     !!(el && el.closest && el.closest(EXCL_ZONE));
   const misses = new Set();

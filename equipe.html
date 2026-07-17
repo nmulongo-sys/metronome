@@ -128,7 +128,24 @@
   #eqCountNum { font-family: var(--fm-font-display); font-weight: 700; color: #fff; font-size: 30vw; line-height: 1; font-variant-numeric: tabular-nums; }
   .eq-chef-btn { flex: 1; background: var(--fm-accent-2); border: none; color: var(--fm-accent-ink); padding: 14px; border-radius: 7px; font-family: var(--fm-font-ui); font-size: .95rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; }
   .eq-chef-btn:hover { filter: brightness(1.08); }
+  .eq-chef-btn:disabled { opacity: .5; cursor: not-allowed; filter: none; }
   .eq-status { font-size: .8125rem; color: var(--fm-accent-2); margin-top: 6px; min-height: 1em; }
+  /* salle en ligne (v1.2) : roster de présence « qui est là / qui est chef » */
+  .eq-roster { margin-top: 10px; border-top: 1px solid var(--fm-line); padding-top: 8px; }
+  .eq-roster-head { font-size: .74rem; letter-spacing: .1em; text-transform: uppercase; color: var(--fm-sub); }
+  .eq-roster-list { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+  .eq-roster-list li { background: var(--fm-panel-2); border: 1px solid var(--fm-line); border-radius: 16px; padding: 4px 12px; font-size: .85rem; }
+  .eq-roster-list li.me { border-color: var(--fm-accent); }
+  .eq-star { color: var(--fm-accent-text); font-weight: 700; }
+  .eq-roster-warn { margin-top: 6px; font-size: .8rem; color: var(--fm-danger-text); }
+  /* éditeur de répartition en page (v1.2) */
+  #eqEditCard summary { list-style: none; }
+  #eqEditCard summary::-webkit-details-marker { display: none; }
+  #eqEditCard summary::before { content: '▸'; color: var(--fm-sub); margin-right: 6px; }
+  #eqEditCard[open] summary::before { content: '▾'; }
+  .eq-assign { display: flex; flex-direction: column; gap: 6px; margin: 10px 0 4px; }
+  .eq-assign .pfg-voix { width: 80px; }
+  .eq-assign select { flex: 1; min-width: 0; max-width: 260px; }
 
   .fm-toast { position:fixed; left:50%; transform:translateX(-50%); bottom:18px; z-index:200; background:var(--fm-panel); color:var(--fm-ink); border:1px solid var(--fm-line); border-radius:10px; padding:8px 14px; font-size:.85rem; box-shadow:0 4px 14px rgba(0,0,0,.18); opacity:0; transition:opacity .3s; pointer-events:none; }
   .fm-toast.show { opacity:1; }
@@ -231,7 +248,7 @@
       <div class="row">
         <button class="btn-sm" id="eqImportBtn">Importer un fichier d'équipe (fichier .json)</button>
         <input type="file" id="eqImportFile" accept="application/json,.json" class="hide" aria-hidden="true">
-        <a class="btn-sm" href="pratiquer.html#secTeam" id="eqGoTeam">→ La préparer dans Team Spirit</a>
+        <a class="btn-sm" href="pratiquer.html#secTeam" id="eqGoTeam" title="Ouvre la section « Répartition » de la pratique libre">→ La préparer en pratique libre</a>
       </div>
       <div class="row">
         <label for="eqLinkInput" style="flex:none;">Coller un lien d'équipe</label>
@@ -253,17 +270,40 @@
         <div class="eq-mode-sub" id="eqModeSub">Chacun sur son appareil, départ au décompte du chef.</div>
       </div>
 
-      <!-- Salle en ligne (mode online) -->
+      <!-- Salle en ligne (mode online) : guidage « à froid » + présence (v1.2) -->
       <div id="eqSalleCard" class="hide" style="margin-top:12px;">
+        <p class="hint" id="eqSalleIntro">Une salle en ligne fait jouer tout le monde en direct : le chef lance le groupe, chacun voit qui est là. Pas besoin d'être au même endroit.</p>
+        <ol class="eq-steps">
+          <li>Invente un mot simple comme code (par exemple « funk-42 ») et dis-le au groupe.</li>
+          <li>Chacun tape exactement le même mot, puis « Rejoindre la salle » : vous voilà tous ensemble.</li>
+        </ol>
+        <div class="row">
+          <label for="eqSalleName" style="flex:none;">Mon nom</label>
+          <input type="text" id="eqSalleName" placeholder="ton prénom" maxlength="24" style="flex:1;min-width:0;max-width:180px;">
+        </div>
         <div class="row">
           <label for="eqSalleCode" style="flex:none;">Code de la salle</label>
           <input type="text" id="eqSalleCode" placeholder="ex. funk-42" style="flex:1;min-width:0;max-width:200px;">
-          <button class="btn-sm primary" id="eqSalleJoin">Créer / Rejoindre</button>
-          <button class="btn-sm" id="eqSalleLeave">Quitter</button>
+          <button class="btn-sm primary" id="eqSalleJoin">Rejoindre la salle</button>
+          <button class="btn-sm hide" id="eqSalleLeave">Quitter</button>
         </div>
         <label class="check" style="margin-top:4px;"><input type="checkbox" id="eqSalleChef"> Je suis le chef (je donne le départ à tout le monde)</label>
         <div class="eq-status" id="eqSalleStatus" role="status" aria-live="polite"></div>
+        <div class="eq-roster hide" id="eqSalleRoster" aria-live="polite"></div>
       </div>
+
+      <!-- Éditeur de répartition en page (v1.2) : ajuster qui joue quoi sans quitter -->
+      <details id="eqEditCard" style="margin-top:14px;">
+        <summary><span class="sec-title" style="font-size:1.05rem;">Ajuster la répartition</span> <span class="hint" style="margin-left:2px;">qui joue quelle ligne</span></summary>
+        <div class="row" style="margin-top:8px;">
+          <label style="flex:none;">Nombre de joueurs</label>
+          <button class="btn-sm" id="eqEditMinus" type="button" aria-label="Un joueur de moins">−</button>
+          <span id="eqEditPlayersVal" style="font-variant-numeric:tabular-nums;min-width:1.5em;text-align:center;">1</span>
+          <button class="btn-sm" id="eqEditPlus" type="button" aria-label="Un joueur de plus">+</button>
+        </div>
+        <div class="eq-assign" id="eqAssign"></div>
+        <div class="hint">Chaque ligne va à un joueur, ou reste en accompagnement (personne ne la tient).</div>
+      </details>
 
       <div style="margin-top:14px;">
         <div class="sec-sub">Je suis…</div>
@@ -350,7 +390,6 @@ window.__I18N = { "en": {
   "■ Arrêter": "■ Stop",
   "Prêt": "Ready",
   "BPM ·": "BPM ·",
-  "Pratiquer › Team Spirit": "Practice › Team Spirit",
   "Volume": "Volume",
   "muet": "mute",
   "Sourdine générale (coupe tout le son en un clic)": "Master mute (cuts all sound in one click)",
@@ -364,7 +403,8 @@ window.__I18N = { "en": {
   "voir à quoi ça ressemble, sans rien préparer.": "see what it looks like, without setting anything up.",
   "J'ai déjà une répartition": "I already have a distribution",
   "Importer un fichier d'équipe (fichier .json)": "Import a team file (.json file)",
-  "→ La préparer dans Team Spirit": "→ Set it up in Team Spirit",
+  "→ La préparer en pratique libre": "→ Set it up in free practice",
+  "Ouvre la section « Répartition » de la pratique libre": "Opens the “Distribution” section of free practice",
   "Coller un lien d'équipe": "Paste a team link",
   "Ouvrir": "Open",
   "Comment jouer ?": "How to play?",
@@ -374,7 +414,7 @@ window.__I18N = { "en": {
   "Chacun sur son appareil, départ au décompte du chef.": "Everyone on their own device, start on the conductor's count-in.",
   "En direct : le chef fait partir et arrêter toute la salle.": "Live: the conductor starts and stops the whole room.",
   "Code de la salle": "Room code",
-  "Créer / Rejoindre": "Create / Join",
+  "Rejoindre la salle": "Join the room",
   "Quitter": "Leave",
   "Choix de ma ligne": "My line choice",
   "Je suis le chef (je donne le départ à tout le monde)": "I am the conductor (I start everyone)",
@@ -400,6 +440,25 @@ window.__I18N = { "en": {
   "Salle quittée.": "Room left.",
   "En attente du chef…": "Waiting for the conductor…",
   "joueurs": "players",
+  "Une salle en ligne fait jouer tout le monde en direct : le chef lance le groupe, chacun voit qui est là. Pas besoin d'être au même endroit.": "An online room plays everyone live: the conductor starts the group, everyone sees who's there. No need to be in the same place.",
+  "Invente un mot simple comme code (par exemple « funk-42 ») et dis-le au groupe.": "Make up a simple word as a code (for example “funk-42”) and tell it to the group.",
+  "Chacun tape exactement le même mot, puis « Rejoindre la salle » : vous voilà tous ensemble.": "Everyone types exactly the same word, then “Join the room”: you're all together.",
+  "Mon nom": "My name",
+  "ton prénom": "your first name",
+  "dans la salle": "in the room",
+  "écoute tout": "listens to all",
+  "Invité": "Guest",
+  "Personne n'est encore chef — quelqu'un doit cocher « Je suis le chef ».": "No one is the conductor yet — someone needs to check “I am the conductor”.",
+  "Plusieurs chefs — un seul devrait donner le départ.": "Several conductors — only one should give the start.",
+  "▶ Lancer la salle": "▶ Start the room",
+  "Ajuster la répartition": "Adjust the distribution",
+  "qui joue quelle ligne": "who plays which line",
+  "Nombre de joueurs": "Number of players",
+  "Un joueur de moins": "One player fewer",
+  "Un joueur de plus": "One player more",
+  "Chaque ligne va à un joueur, ou reste en accompagnement (personne ne la tient).": "Each line goes to a player, or stays as accompaniment (no one holds it).",
+  "personne (accompagnement)": "no one (accompaniment)",
+  "Qui joue": "Who plays",
   "Rythme :": "Rhythm:"
 }, "pt": {
   "Métronome — En équipe": "Metrônomo — Em equipe",
@@ -420,7 +479,6 @@ window.__I18N = { "en": {
   "■ Arrêter": "■ Parar",
   "Prêt": "Pronto",
   "BPM ·": "BPM ·",
-  "Pratiquer › Team Spirit": "Praticar › Team Spirit",
   "Volume": "Volume",
   "muet": "mudo",
   "Sourdine générale (coupe tout le son en un clic)": "Mudo geral (corta todo o som em um clique)",
@@ -434,7 +492,8 @@ window.__I18N = { "en": {
   "voir à quoi ça ressemble, sans rien préparer.": "veja como funciona, sem preparar nada.",
   "J'ai déjà une répartition": "Já tenho uma distribuição",
   "Importer un fichier d'équipe (fichier .json)": "Importar um arquivo de equipe (arquivo .json)",
-  "→ La préparer dans Team Spirit": "→ Montá-la no Team Spirit",
+  "→ La préparer en pratique libre": "→ Montá-la na prática livre",
+  "Ouvre la section « Répartition » de la pratique libre": "Abre a seção “Distribuição” da prática livre",
   "Coller un lien d'équipe": "Colar um link de equipe",
   "Ouvrir": "Abrir",
   "Comment jouer ?": "Como tocar?",
@@ -444,7 +503,7 @@ window.__I18N = { "en": {
   "Chacun sur son appareil, départ au décompte du chef.": "Cada um no seu aparelho, largada na contagem do maestro.",
   "En direct : le chef fait partir et arrêter toute la salle.": "Ao vivo: o maestro faz partir e parar a sala inteira.",
   "Code de la salle": "Código da sala",
-  "Créer / Rejoindre": "Criar / Entrar",
+  "Rejoindre la salle": "Entrar na sala",
   "Quitter": "Sair",
   "Choix de ma ligne": "Escolha da minha linha",
   "Je suis le chef (je donne le départ à tout le monde)": "Eu sou o maestro (eu dou a largada para todos)",
@@ -470,6 +529,25 @@ window.__I18N = { "en": {
   "Salle quittée.": "Sala deixada.",
   "En attente du chef…": "Aguardando o maestro…",
   "joueurs": "jogadores",
+  "Une salle en ligne fait jouer tout le monde en direct : le chef lance le groupe, chacun voit qui est là. Pas besoin d'être au même endroit.": "Uma sala online faz todos tocarem ao vivo: o maestro dá a largada ao grupo, cada um vê quem está lá. Não precisa estar no mesmo lugar.",
+  "Invente un mot simple comme code (par exemple « funk-42 ») et dis-le au groupe.": "Invente uma palavra simples como código (por exemplo “funk-42”) e diga-a ao grupo.",
+  "Chacun tape exactement le même mot, puis « Rejoindre la salle » : vous voilà tous ensemble.": "Cada um digita exatamente a mesma palavra, depois “Entrar na sala”: vocês estão todos juntos.",
+  "Mon nom": "Meu nome",
+  "ton prénom": "seu nome",
+  "dans la salle": "na sala",
+  "écoute tout": "ouve tudo",
+  "Invité": "Convidado",
+  "Personne n'est encore chef — quelqu'un doit cocher « Je suis le chef ».": "Ninguém é maestro ainda — alguém precisa marcar “Eu sou o maestro”.",
+  "Plusieurs chefs — un seul devrait donner le départ.": "Vários maestros — apenas um deveria dar a largada.",
+  "▶ Lancer la salle": "▶ Iniciar a sala",
+  "Ajuster la répartition": "Ajustar a distribuição",
+  "qui joue quelle ligne": "quem toca qual linha",
+  "Nombre de joueurs": "Número de jogadores",
+  "Un joueur de moins": "Um jogador a menos",
+  "Un joueur de plus": "Um jogador a mais",
+  "Chaque ligne va à un joueur, ou reste en accompagnement (personne ne la tient).": "Cada linha vai para um jogador, ou fica como acompanhamento (ninguém a segura).",
+  "personne (accompagnement)": "ninguém (acompanhamento)",
+  "Qui joue": "Quem toca",
   "Rythme :": "Ritmo:"
 } };
 window.fmTr = (function(){
@@ -628,7 +706,8 @@ window.fmTr = (function(){
     $('eqEmpty').classList.add('hide');
     $('eqLoaded').classList.remove('hide');
     $('transport').classList.remove('hide');   // v1.1 : le transport n'a de sens qu'une équipe chargée
-    eqRenderSummary(); eqRenderPlayers(); eqRenderGrid();
+    eqRenderSummary(); eqRenderPlayers(); eqRenderAssign(); eqRenderGrid();
+    eqRefreshChefControls();
     return true;
   }
 
@@ -658,7 +737,48 @@ window.fmTr = (function(){
     all.addEventListener('click', () => eqSetPlayer(0));
     box.appendChild(all);
   }
-  function eqSetPlayer(p) { EQ.player = p; eqRenderPlayers(); eqRenderGrid(); }
+  function eqSetPlayer(p) {
+    EQ.player = p; eqRenderPlayers(); eqRenderGrid();
+    if (EQ.mode === 'online' && EQ.channel) eqTrackPresence();
+  }
+
+  // ---- éditeur de répartition en page (v1.2) : régler joueurs + affectations ----
+  function eqRenderAssign() {
+    const box = $('eqAssign'); if (!box) return;
+    box.innerHTML = '';
+    const c = EQ.config; if (!c || !Array.isArray(c.voix)) return;
+    const n = Math.max(1, c.joueurs || 1);
+    $('eqEditPlayersVal').textContent = String(n);
+    c.voix.forEach((v) => {
+      const row = document.createElement('div'); row.className = 'pfg-row';
+      const lab = document.createElement('span'); lab.className = 'pfg-voix'; lab.textContent = v.k;
+      const sel = document.createElement('select');
+      sel.setAttribute('aria-label', fmTr('Qui joue') + ' ' + v.k);
+      for (let p = 0; p <= n; p++) {
+        const o = document.createElement('option'); o.value = String(p);
+        o.textContent = p === 0 ? fmTr('personne (accompagnement)') : (fmTr('Joueur') + ' ' + p);
+        if ((v.j || 0) === p) o.selected = true;
+        sel.appendChild(o);
+      }
+      sel.addEventListener('change', () => { v.j = +sel.value || 0; eqAfterEdit(); });
+      row.appendChild(lab); row.appendChild(sel); box.appendChild(row);
+    });
+  }
+  function eqSetPlayers(n) {
+    const c = EQ.config; if (!c) return;
+    n = Math.min(6, Math.max(1, n | 0));
+    c.joueurs = n;
+    c.voix.forEach(v => { if ((v.j || 0) > n) v.j = 0; });   // affectations hors bornes → accompagnement
+    if (EQ.player > n) EQ.player = 0;                        // « je suis » hors bornes → écouter tout
+    eqAfterEdit();
+  }
+  function eqAfterEdit() {
+    eqRenderSummary(); eqRenderPlayers(); eqRenderAssign(); eqRenderGrid();
+    if (EQ.mode === 'online' && EQ.channel && EQ.chef) eqBroadcast({ action: 'config', config: EQ.config });
+    if (EQ.mode === 'online' && EQ.channel) eqTrackPresence();
+  }
+  $('eqEditMinus').addEventListener('click', () => eqSetPlayers((EQ.config ? (EQ.config.joueurs || 1) : 1) - 1));
+  $('eqEditPlus').addEventListener('click', () => eqSetPlayers((EQ.config ? (EQ.config.joueurs || 1) : 1) + 1));
 
   // ---- pupitre : rendu de la grille de MES voix (patron R-4d) ----
   let gridRows = null, gridSteps = 0, gridCur = null, gridEl = null;
@@ -732,7 +852,8 @@ window.fmTr = (function(){
   }
   function eqStartHere() { if (!isPlaying) toggle(); }
   function eqChefStart() {
-    // en salle en ligne : le chef diffuse le départ à tout le monde
+    // en salle en ligne : seul le chef lance ; il diffuse le départ à tout le monde
+    if (EQ.mode === 'online' && EQ.channel && !EQ.chef) return;
     if (EQ.mode === 'online' && EQ.channel && EQ.chef) eqBroadcast({ action: 'start', tempo: S.tempo });
     eqCountdown(4, eqStartHere);
   }
@@ -756,7 +877,7 @@ window.fmTr = (function(){
   // ---- charger une config (import JSON / lien collé) ----
   function eqFromExport(obj) {
     // accepte le format natif fm-equipe (déjà {voix:[{k,instr,g,j}]}) OU l'export
-    // Team Spirit (type 'fm-metro-groove' : { groove, participants, voix:[…] }).
+    // « Répartition » / pratique libre (type 'fm-metro-groove' : { groove, participants, voix:[…] }).
     if (obj && Array.isArray(obj.voix) && obj.voix[0] && ('g' in obj.voix[0] || 'k' in obj.voix[0])) return obj;
     if (obj && obj.type === 'fm-metro-groove' && Array.isArray(obj.voix)) {
       const labels = obj.participants || [];
@@ -818,11 +939,14 @@ window.fmTr = (function(){
     $('eqModeSub').textContent = fmTr(m === 'online'
       ? 'En direct : le chef fait partir et arrêter toute la salle.'
       : 'Chacun sur son appareil, départ au décompte du chef.');
+    if (m === 'online') eqRenderRoster();
+    else { const box = $('eqSalleRoster'); if (box) { box.classList.add('hide'); box.innerHTML = ''; } }
+    eqRefreshChefControls();
   }
   $('eqModeOff').addEventListener('click', () => eqSetMode('off'));
   $('eqModeOnline').addEventListener('click', () => eqSetMode('online'));
 
-  // ---- salle en ligne : broadcast Supabase (réutilise window.fmSupabase) ----
+  // ---- salle en ligne : présence + broadcast Supabase (réutilise window.fmSupabase) ----
   function eqSalleStatus(msg) { const el = $('eqSalleStatus'); if (el) el.textContent = msg; }
   function eqBroadcast(obj) {
     if (EQ.channel && EQ.channel.send) {
@@ -836,6 +960,61 @@ window.fmTr = (function(){
     else if (msg.action === 'start') eqCountdown(4, eqStartHere);
     else if (msg.action === 'stop') { if (isPlaying) toggle(); }
   }
+
+  // ---- présence « qui est là / qui est chef » (Realtime Presence) ----
+  function eqSelfName() {
+    const typed = ($('eqSalleName').value || '').trim();
+    if (typed) return typed.slice(0, 24);
+    const p = window.fmCurrentProfil && window.fmCurrentProfil.pseudo;
+    return (p && String(p).trim()) || fmTr('Invité');
+  }
+  function eqSelfKey() { if (!EQ.selfKey) EQ.selfKey = 'u' + Math.random().toString(36).slice(2, 9); return EQ.selfKey; }
+  function eqPresencePayload() { return { key: eqSelfKey(), nom: eqSelfName(), chef: !!EQ.chef, joueur: EQ.player }; }
+  function eqTrackPresence() {
+    if (EQ.channel && EQ.channel.track) { try { EQ.channel.track(eqPresencePayload()); } catch (e) {} }
+  }
+  function eqMembers() {
+    if (!EQ.channel || !EQ.channel.presenceState) return [];
+    let state = {};
+    try { state = EQ.channel.presenceState() || {}; } catch (e) { state = {}; }
+    const out = [];
+    Object.keys(state).forEach(k => { const arr = state[k]; if (arr && arr.length) out.push(arr[arr.length - 1]); });
+    return out;
+  }
+  function eqRefreshChefControls() {
+    const btn = $('eqChef'); if (!btn) return;
+    const online = EQ.mode === 'online' && !!EQ.channel;
+    if (!online) { btn.disabled = false; btn.textContent = fmTr('▶ Départ (le chef)'); return; }
+    if (EQ.chef) { btn.disabled = false; btn.textContent = fmTr('▶ Lancer la salle'); return; }
+    const chef = eqMembers().filter(m => m && m.chef)[0];
+    btn.disabled = true;
+    btn.textContent = fmTr('En attente du chef…') + (chef && chef.nom ? ' ' + chef.nom : '');
+  }
+  function eqRenderRoster() {
+    const box = $('eqSalleRoster'); if (!box) return;
+    if (!(EQ.mode === 'online' && EQ.channel && EQ.channel.presenceState)) {
+      box.classList.add('hide'); box.innerHTML = ''; eqRefreshChefControls(); return;
+    }
+    const members = eqMembers();
+    const chefs = members.filter(m => m && m.chef);
+    box.classList.remove('hide');
+    let html = '<div class="eq-roster-head">' + members.length + ' ' + fmTr('dans la salle') + '</div><ul class="eq-roster-list">';
+    members.forEach(m => {
+      const mine = m && m.key && m.key === EQ.selfKey;
+      const star = m && m.chef ? '<span class="eq-star">★</span> ' : '';
+      const nom = esc((m && m.nom) || fmTr('Invité'));
+      let line = '';
+      if (m && m.joueur) line = ' · ' + fmTr('Joueur') + ' ' + m.joueur;
+      else if (m && m.joueur === 0) line = ' · ' + fmTr('écoute tout');
+      html += '<li' + (mine ? ' class="me"' : '') + '>' + star + nom + line + '</li>';
+    });
+    html += '</ul>';
+    if (!chefs.length) html += '<div class="eq-roster-warn">' + fmTr('Personne n\'est encore chef — quelqu\'un doit cocher « Je suis le chef ».') + '</div>';
+    else if (chefs.length > 1) html += '<div class="eq-roster-warn">' + fmTr('Plusieurs chefs — un seul devrait donner le départ.') + '</div>';
+    box.innerHTML = html;
+    eqRefreshChefControls();
+  }
+
   function eqJoinSalle() {
     const code = ($('eqSalleCode').value || '').trim().replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 40);
     if (!code) return;
@@ -843,25 +1022,38 @@ window.fmTr = (function(){
     if (!sb || !sb.channel) { eqSalleStatus(fmTr('Connexion à la salle impossible (hors ligne ?).')); return; }
     if (EQ.channel) { try { sb.removeChannel(EQ.channel); } catch (e) {} EQ.channel = null; }
     EQ.chef = $('eqSalleChef').checked;
-    const ch = sb.channel('equipe-' + code, { config: { broadcast: { self: false } } });
+    const ch = sb.channel('equipe-' + code, { config: { broadcast: { self: false }, presence: { key: eqSelfKey() } } });
     ch.on('broadcast', { event: 'transport' }, payload => eqOnBroadcast(payload && payload.payload));
+    if (ch.on) {   // présence : re-render du roster à chaque sync/join/leave
+      ch.on('presence', { event: 'sync' }, () => eqRenderRoster());
+      ch.on('presence', { event: 'join' }, () => eqRenderRoster());
+      ch.on('presence', { event: 'leave' }, () => eqRenderRoster());
+    }
     EQ.channel = ch;   // assigné AVANT subscribe : le callback peut diffuser aussitôt
     ch.subscribe(status => {
       if (status === 'SUBSCRIBED') {
         eqSalleStatus(fmTr('Salle rejointe :') + ' ' + code + (EQ.chef ? '' : ' — ' + fmTr('En attente du chef…')));
+        eqTrackPresence();
         // le chef partage aussitôt la config courante à la salle
         if (EQ.chef && EQ.config) eqBroadcast({ action: 'config', config: EQ.config });
+        $('eqSalleLeave').classList.remove('hide');
+        eqRenderRoster();
       }
     });
   }
   function eqLeaveSalle() {
     const sb = window.fmSupabase && window.fmSupabase();
-    if (sb && EQ.channel) { try { sb.removeChannel(EQ.channel); } catch (e) {} }
-    EQ.channel = null; EQ.chef = false; eqSalleStatus(fmTr('Salle quittée.'));
+    if (EQ.channel) { try { if (EQ.channel.untrack) EQ.channel.untrack(); } catch (e) {} if (sb) { try { sb.removeChannel(EQ.channel); } catch (e) {} } }
+    EQ.channel = null; EQ.chef = false;
+    eqSalleStatus(fmTr('Salle quittée.'));
+    $('eqSalleLeave').classList.add('hide');
+    const box = $('eqSalleRoster'); if (box) { box.classList.add('hide'); box.innerHTML = ''; }
+    eqRefreshChefControls();
   }
   $('eqSalleJoin').addEventListener('click', eqJoinSalle);
   $('eqSalleLeave').addEventListener('click', eqLeaveSalle);
-  $('eqSalleChef').addEventListener('change', e => { EQ.chef = e.target.checked; });
+  $('eqSalleChef').addEventListener('change', e => { EQ.chef = e.target.checked; eqTrackPresence(); eqRenderRoster(); });
+  $('eqSalleName').addEventListener('input', () => { if (EQ.mode === 'online' && EQ.channel) { eqTrackPresence(); eqRenderRoster(); } });
 
   // ---- boot ----
   function eqBoot() {
@@ -874,14 +1066,18 @@ window.fmTr = (function(){
   window.fmEquipeApp = {
     apply: eqApplyConfig,
     setPlayer: eqSetPlayer,
+    setPlayers: eqSetPlayers,
     setMode: eqSetMode,
     join: eqJoinSalle,
     leave: eqLeaveSalle,
     broadcast: eqBroadcast,
     onBroadcast: eqOnBroadcast,
+    trackPresence: eqTrackPresence,
+    renderRoster: eqRenderRoster,
+    members: eqMembers,
     shareUrl: eqShareUrl,
     tsMuted: tsMuted,
-    state: function () { return { player: EQ.player, mode: EQ.mode, chef: EQ.chef, vids: EQ.vids.slice(), hasConfig: !!EQ.config, hasChannel: !!EQ.channel }; }
+    state: function () { return { player: EQ.player, mode: EQ.mode, chef: EQ.chef, vids: EQ.vids.slice(), joueurs: EQ.config ? (EQ.config.joueurs || 1) : 0, hasConfig: !!EQ.config, hasChannel: !!EQ.channel }; }
   };
 
   // ============ INIT ============
