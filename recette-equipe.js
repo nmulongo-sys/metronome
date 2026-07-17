@@ -1,6 +1,6 @@
 /* recette-equipe.js — R-6 : equipe.html (la « salle de concert »). Headless jsdom,
    mêmes stubs que les suites P-* et apprendre. Vérifie (spec R-6) :
-     A. chargement propre + BUILD 0.20.0 + stubs au strict contrat moteur ;
+     A. chargement propre + BUILD 0.21.0 + stubs au strict contrat moteur ;
      B. contrat moteur : hooks + globals neutres, le moteur démarre ;
      C. codec fm-equipe (coquille/fm-equipe.js) : encode/decode symétrique,
         lecture d'un hash, audibilité par joueur ;
@@ -112,12 +112,25 @@ setTimeout(runTests, 140);
 function runTests() {
   /* ---------- A. chargement + page ---------- */
   ok('A1 chargement sans erreur jsdom (' + jsdomErrors.length + ')', jsdomErrors.length === 0);
-  ok('A2 BUILD 0.20.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.20.0');
-  ok('A3 tampon de build affiché', /metronomefunk-0\.20\.0/.test(txt($('buildStamp'))));
+  ok('A2 BUILD 0.21.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.21.0');
+  ok('A3 tampon de build affiché', /metronomefunk-0\.21\.0/.test(txt($('buildStamp'))));
   ok('A4 stubs au strict contrat moteur (percFsPlay + gapTarget seuls)',
     !!$('percFsPlay') && !!$('gapTarget') && $('fmStubs').children.length === 2);
   ok('A5 transport présent (tempo, démarrer, volume, statut)',
     !!($('tempoValue') && $('startBtn') && $('volSlider') && $('volMuteBtn') && $('statusLine')));
+
+  /* ---------- K. entrée « à froid » (v1.1) — lecture seule, AVANT tout chargement ---------- */
+  // au boot sans config : la page vide guide (3 étapes + exemple), le transport est
+  // masqué — un « ▶ Démarrer » qui ne joue qu'un clic nu déroute à froid.
+  ok('K1 à froid : état vide affiché, état chargé masqué',
+    !$('eqEmpty').classList.contains('hide') && $('eqLoaded').classList.contains('hide'));
+  ok('K2 à froid : transport masqué tant qu\'aucune équipe n\'est chargée',
+    $('transport').classList.contains('hide'));
+  ok('K3 à froid : 3 étapes + bouton « Essayer avec un exemple »',
+    D.querySelectorAll('#eqEmpty .eq-steps li').length === 3 && !!$('eqTryExample'));
+  ok('K4 dé-jargon : plus de « (backing) » nu ni « d\'équipe (JSON) » dans les dicos i18n',
+    !/tu accompagnes \(backing\)/.test(g('JSON.stringify(window.__I18N)'))
+    && !/d'équipe \(JSON\)/.test(g('JSON.stringify(window.__I18N)')));
 
   /* ---------- B. contrat moteur ---------- */
   ok('B1 hooks de coquille définis (draw/tsMuted/percBreakEvents…)',
@@ -252,6 +265,21 @@ function runTests() {
   if (attrMisses.size) Array.from(attrMisses).slice(0, 10).forEach(t => console.log('     ! ' + JSON.stringify(t.slice(0, 80))));
   clic(D.querySelector('.lang-btn[data-lang="pt"]'));
   ok('I6 clic BR → langue partagée écrite (localStorage fm-lang = pt)', W.localStorage.getItem('fm-lang') === 'pt');
+
+  /* ---------- L. exemple embarqué (v1.1) — charge une vraie répartition sans backend ---------- */
+  clic($('eqTryExample'));
+  ok('L1 « Essayer avec un exemple » charge une config (état chargé, transport révélé)',
+    !$('eqLoaded').classList.contains('hide') && $('eqEmpty').classList.contains('hide')
+    && !$('transport').classList.contains('hide'));
+  ok('L2 exemple déterministe : 3 joueurs, percGrids peuplé, djembé',
+    g('EQ.config.joueurs') === 3 && Object.keys(g('percGrids')).length === 3 &&
+    g('percMeta["eq.0"].instr') === 'djembe' && g('S.perc.on') === true);
+  ok('L3 exemple : le partage reproduit exactement l\'exemple chargé (aller-retour)',
+    (function () {
+      const u = g('window.fmEquipeApp.shareUrl()');
+      const b = g('window.fmEquipe.decode(' + JSON.stringify(u) + ')');
+      return b && b.joueurs === 3 && b.titre === 'Exemple funk';
+    })());
 
   finish();
 }
