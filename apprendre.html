@@ -190,6 +190,17 @@
 
   /* R-4a (apprendre) : mention « démo à venir » sur les fiches sans champ demo */
   .pf-nodemo { font-size: .8125rem; color: var(--fm-sub); font-style: italic; }
+  /* R-4d : la grille d'exercice vivante — lecture seule, une par exercice actif */
+  .pf-grille { margin:8px 0 2px; display:flex; flex-direction:column; gap:3px; }
+  .pfg-row { display:flex; align-items:center; gap:6px; }
+  .pfg-voix { font-size:.75rem; color:var(--fm-sub); width:46px; text-align:right; flex:none; }
+  .pfg-steps { display:flex; gap:2px; flex:1; min-width:0; }
+  .pfg-cell { flex:1; height:14px; border-radius:3px; background:var(--fm-line); min-width:5px; }
+  .pfg-cell.pfg-beat { margin-left:6px; }
+  .pfg-cell.pfg-hit { background:var(--pf-c, var(--fm-accent-2)); }
+  .pfg-cell.pfg-acc { background:var(--fm-accent); box-shadow:inset 0 0 0 1px var(--fm-accent-2); }
+  .pfg-cell.pfg-cur { outline:2px solid var(--fm-ink); outline-offset:1px; }
+  .pfg-legende { font-size:.71rem; color:var(--fm-sub); margin-top:2px; }
 
   #fmStubs { display: none !important; }
 
@@ -354,7 +365,18 @@
   function bowReset() {}
   function atelierRender() {}
   function tsMuted() { return false; }
-  function draw() {}
+  // R-4d (apprendre) : la grille d'exercice vivante — seule animation de la page.
+  // Phase née correcte (spec R-4d §3.3) : un reste négatif (fin de mesure — le
+  // scheduler a déjà basculé cycleStart sur la mesure suivante, fenêtre AHEAD)
+  // s'affiche comme FIN de mesure (repli +1), jamais comme un saut anticipé au 1.
+  // L'arrêt du transport FIGE le curseur (draw sort sur !isPlaying, drawStatic
+  // n'efface rien) ; index/pratiquer restent inchangés (arbitrage Jean 17/07).
+  function phaseVisuelle(p) { return p < 0 ? p + 1 : p; }
+  function draw() {
+    if (!isPlaying) return;
+    grilleCursor();
+    requestAnimationFrame(draw);
+  }
   function drawStatic() {}
 
   // ---- wake lock (0.7.0, C11 — W2), repris de la coquille : écran maintenu en lecture.
@@ -450,6 +472,7 @@
     for (const vid of demoVoices) { delete percGrids[vid]; delete percMeta[vid]; delete percOffsets[vid]; }
     demoVoices = []; demoActive = false; demoEx = null;
     S.perc.on = false;
+    grilleRetire();   // R-4d : la grille part avec la démo (« Charger » la repose aussitôt)
   }
   function demoApply(ex, pk) {
     demoClear();
@@ -479,6 +502,58 @@
     S.perc.on = true;         // les voix d'instrument exigent S.perc.on (computeCycle)
     demoActive = true; demoEx = ex;
     return true;
+  }
+
+  // ============ GRILLE D'EXERCICE VIVANTE (R-4d) ============
+  // Rend le champ demo de l'exercice actif dans SA carte (une ligne par voix,
+  // cases frappe/accent, curseur de pas) — pendant l'écoute ET en pratique
+  // (spec R-4d §3.1, GO Jean 17/07). Lecture seule ; UNE grille à la fois ;
+  // retirée par demoClear ; figée à l'arrêt du transport. Le feel (±ms) et le
+  // swing s'entendent mais ne se dessinent pas (grille quantifiée, §3.4).
+  let grilleEl = null, grilleRows = null, grilleSteps = 0, grilleCur = null;
+  function grilleRetire() {
+    if (grilleEl && grilleEl.parentNode) grilleEl.parentNode.removeChild(grilleEl);
+    grilleEl = null; grilleRows = null; grilleSteps = 0; grilleCur = null;
+  }
+  function grillePose(ex, pk) {
+    grilleRetire();
+    const E = PF_EX[ex], d = demoFor(E, pk);
+    const card = document.querySelector('.pf-card[data-ex="' + ex + '"][data-parc="' + pk + '"]');
+    if (!d || !card) return false;
+    const perBeat = d.steps / 4;   // 4|8|12|16 pas → 1|2|3|4 cases par temps
+    const el = document.createElement('div');
+    el.className = 'pf-grille';
+    for (const vk of Object.keys(d.voix)) {
+      const row = document.createElement('div'); row.className = 'pfg-row';
+      const lab = document.createElement('span'); lab.className = 'pfg-voix'; lab.textContent = vk;
+      const steps = document.createElement('div'); steps.className = 'pfg-steps';
+      d.voix[vk].forEach((x, i) => {
+        const c = document.createElement('span');
+        c.className = 'pfg-cell' + (i > 0 && i % perBeat === 0 ? ' pfg-beat' : '')
+          + (x === 2 ? ' pfg-acc' : (x === 1 ? ' pfg-hit' : ''));
+        steps.appendChild(c);
+      });
+      row.appendChild(lab); row.appendChild(steps); el.appendChild(row);
+    }
+    const leg = document.createElement('div'); leg.className = 'pfg-legende';
+    leg.textContent = 'Ta partie : cases sourdes = frappes, cases vives = accents — le curseur suit la lecture.';
+    el.appendChild(leg);
+    card.querySelector('.pf-actions').insertAdjacentElement('afterend', el);
+    grilleEl = el; grilleSteps = d.steps;
+    grilleRows = [...el.querySelectorAll('.pfg-steps')].map(r => [...r.children]);
+    return true;
+  }
+  function grilleCursor() {
+    if (!grilleRows) return;
+    if (!grilleEl.isConnected) { grilleRetire(); return; }   // la vue a été re-rendue sous la grille
+    const phase = phaseVisuelle(((audioCtx.currentTime - cycleStart) / cycleDur) % 1);
+    const cur = Math.floor(phase * grilleSteps) % grilleSteps;
+    if (cur === grilleCur) return;
+    grilleRows.forEach(cells => {
+      if (grilleCur != null && cells[grilleCur]) cells[grilleCur].classList.remove('pfg-cur');
+      if (cells[cur]) cells[cur].classList.add('pfg-cur');
+    });
+    grilleCur = cur;
   }
 
   // ============ PARCOURS FUNK (P-4) — surcouche additive, module 6 (Intermédiaire) ============
@@ -717,12 +792,14 @@
     root.querySelectorAll('.pf-card').forEach(card => {
       const ex = card.getAttribute('data-ex'), pk = card.getAttribute('data-parc'), E = PF_EX[ex];
       // R-4a (apprendre) : « Charger » = mode pratique — retire la démo avant d'installer l'accompagnement
-      card.querySelector('.pf-load').addEventListener('click', () => { demoClear(); pfLoadPreset(ex); statusRender(); });
+      // R-4d : la grille reste affichée en pratique (l'élève voit où ses frappes doivent tomber)
+      card.querySelector('.pf-load').addEventListener('click', () => { demoClear(); pfLoadPreset(ex); grillePose(ex, pk); statusRender(); });
       // R-4a (apprendre) : « ▶ Écouter » = mode écoute — accompagnement + modèle joué par l'app
       { const ec = card.querySelector('.pf-ecouter');
         if (ec) ec.addEventListener('click', () => {
           pfLoadPreset(ex);
           if (demoApply(ex, pk)) {
+            grillePose(ex, pk);   // R-4d : la grille vivante dans la carte
             pfStatus('\u00C9coute : ' + E.objet + ' \u2014 le mod\u00E8le joue par-dessus l\u2019accompagnement.');
             if (!isPlaying) toggle();
             statusRender();
