@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panel UX — Métronome — Formation Musicale (accueil)</title>
+<style>
+  :root{
+    --bg:#f4f5f7; --card:#ffffff; --ink:#1c2430; --sub:#5b6675; --line:#e3e7ee;
+    --acc:#2f6df6; --acc-soft:#e8effe;
+    --crit:#d63b3b; --crit-bg:#fdeaea;
+    --maj:#e08a00; --maj-bg:#fdf3e2;
+    --min:#3c78c2; --min-bg:#e9f1fb;
+    --pos:#2c9a5b; --pos-bg:#e6f6ec;
+    --radius:12px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);line-height:1.45}
+  .wrap{max-width:1180px;margin:0 auto;padding:20px 16px 60px}
+  header.hd{margin-bottom:18px}
+  header.hd h1{margin:0;font-size:1.5rem}
+  header.hd .sub{color:var(--sub);font-size:.92rem;margin-top:4px}
+  .badge-v{display:inline-block;background:var(--acc-soft);color:var(--acc);border-radius:20px;padding:2px 10px;font-size:.78rem;font-weight:600;margin-left:8px;vertical-align:middle}
+  .note-methodo{background:#fff8e6;border:1px solid #f0dfae;border-radius:var(--radius);padding:10px 14px;font-size:.85rem;color:#6b5a1e;margin:12px 0 18px}
+
+  /* KPI */
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px}
+  .kpi .v{font-size:1.7rem;font-weight:700;font-variant-numeric:tabular-nums}
+  .kpi .l{font-size:.78rem;color:var(--sub);text-transform:uppercase;letter-spacing:.04em}
+  .kpi.crit .v{color:var(--crit)} .kpi.maj .v{color:var(--maj)} .kpi.pos .v{color:var(--pos)} .kpi.acc .v{color:var(--acc)}
+
+  /* Tabs */
+  .tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+  .tab{border:1px solid var(--line);background:var(--card);border-radius:22px;padding:8px 18px;cursor:pointer;font-size:.92rem;font-weight:600;color:var(--sub)}
+  .tab.sel{background:var(--acc);border-color:var(--acc);color:#fff}
+  .view{display:none} .view.sel{display:block}
+
+  /* Filtres */
+  .filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;margin-bottom:16px}
+  .filters label{font-size:.8rem;color:var(--sub);display:flex;flex-direction:column;gap:3px;font-weight:600}
+  .filters select,.filters input[type=search]{border:1px solid var(--line);border-radius:8px;padding:6px 8px;font-size:.88rem;background:#fff;color:var(--ink);min-width:130px}
+  .filters .reset{align-self:flex-end;border:none;background:none;color:var(--acc);cursor:pointer;font-size:.85rem;text-decoration:underline;padding:6px}
+  .count-line{font-size:.85rem;color:var(--sub);margin-bottom:10px}
+
+  /* Cartes personas */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px}
+  .pcard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;gap:10px}
+  .pcard .top{display:flex;gap:12px;align-items:center}
+  .avatar{width:46px;height:46px;border-radius:50%;background:var(--acc-soft);color:var(--acc);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.05rem;flex-shrink:0}
+  .pcard h3{margin:0;font-size:1.02rem}
+  .pcard .meta{font-size:.8rem;color:var(--sub)}
+  .chips{display:flex;gap:6px;flex-wrap:wrap}
+  .chip{font-size:.72rem;border-radius:14px;padding:2px 9px;background:var(--bg);border:1px solid var(--line);color:var(--sub);font-weight:600}
+  .chip.it1{background:#fdeaea;color:#a33;border-color:#f3caca}
+  .chip.it2{background:#fdf3e2;color:#96650a;border-color:#efd9a8}
+  .chip.it3{background:#eef3fb;color:#39599c;border-color:#ccd9f0}
+  .chip.it4{background:#e9f6ee;color:#256e43;border-color:#bfe3cc}
+  .chip.it5{background:#e6f0ea;color:#1b5e35;border-color:#a9d4b8}
+  .score{margin-left:auto;text-align:center}
+  .score .n{font-size:1.25rem;font-weight:700;font-variant-numeric:tabular-nums}
+  .score .d{font-size:.65rem;color:var(--sub)}
+  .quote{font-style:italic;font-size:.88rem;color:#38424f;border-left:3px solid var(--acc);padding:2px 0 2px 10px;background:var(--acc-soft);border-radius:0 8px 8px 0;padding:8px 10px}
+  .flist{display:flex;flex-direction:column;gap:6px;font-size:.85rem}
+  .fitem{display:flex;gap:8px;align-items:flex-start}
+  .sev{flex-shrink:0;font-size:.66rem;font-weight:700;border-radius:4px;padding:2px 6px;margin-top:2px;text-transform:uppercase;letter-spacing:.03em}
+  .sev.critique{background:var(--crit-bg);color:var(--crit)}
+  .sev.majeur{background:var(--maj-bg);color:var(--maj)}
+  .sev.mineur{background:var(--min-bg);color:var(--min)}
+  .sev.positif{background:var(--pos-bg);color:var(--pos)}
+  details.more{font-size:.83rem;color:var(--sub)}
+  details.more summary{cursor:pointer;color:var(--acc);font-weight:600}
+  details.more .box{margin-top:6px;background:var(--bg);border-radius:8px;padding:8px 10px}
+
+  /* Constats consolidés */
+  .issue{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:12px;border-left:5px solid var(--min)}
+  .issue.critique{border-left-color:var(--crit)} .issue.majeur{border-left-color:var(--maj)}
+  .issue .ihead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .issue h3{margin:0;font-size:1rem;flex:1}
+  .issue .freq{font-size:.8rem;color:var(--sub);white-space:nowrap}
+  .issue .desc{font-size:.88rem;color:#38424f;margin:8px 0}
+  .issue .reco{font-size:.86rem;background:var(--pos-bg);border-radius:8px;padding:8px 10px;color:#1d5c38}
+  .issue .who{font-size:.78rem;color:var(--sub);margin-top:8px}
+  .bar-out{height:7px;background:var(--bg);border-radius:4px;overflow:hidden;margin-top:6px}
+  .bar-in{height:100%;border-radius:4px;background:var(--acc)}
+  .effort{font-size:.72rem;font-weight:700;border-radius:4px;padding:2px 8px}
+  .effort.faible{background:var(--pos-bg);color:var(--pos)}
+  .effort.moyen{background:var(--maj-bg);color:var(--maj)}
+  .effort.eleve{background:var(--crit-bg);color:var(--crit)}
+
+  /* Synthèse */
+  .syn-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:820px){.syn-grid{grid-template-columns:1fr}}
+  .syn-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+  .syn-card h3{margin:0 0 12px;font-size:1rem}
+  .hbar{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:.82rem}
+  .hbar .lab{width:150px;flex-shrink:0;color:var(--sub);text-align:right}
+  .hbar .track{flex:1;background:var(--bg);border-radius:4px;height:16px;overflow:hidden}
+  .hbar .fill{height:100%;border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;color:#fff;font-size:.68rem;font-weight:700;min-width:22px}
+  .strengths li,.roadmap li{margin-bottom:7px;font-size:.88rem}
+  .roadmap{padding-left:18px} .strengths{padding-left:18px}
+  .prio-tag{font-weight:700}
+  .p1{color:var(--crit)} .p2{color:var(--maj)} .p3{color:var(--min)}
+  footer{margin-top:30px;font-size:.78rem;color:var(--sub);text-align:center}
+  @media(max-width:600px){
+    .grid{grid-template-columns:1fr}
+    .hbar .lab{width:105px;font-size:.72rem}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hd">
+    <h1>Panel de tests UI — Métronome — Formation Musicale (accueil)<span class="badge-v">0.17.0 (R-5)</span></h1>
+    <div class="sub">30 testeurs simulés · 9 à 80 ans · compétences numériques niveau 1 (novice) à 5 (expert) · mobile, tablette et ordinateur — tests menés sur <code>index.html 0.17.0 (prod GitHub Pages, rejeu officiel R5-4)</code></div>
+  </header>
+
+  <div class="note-methodo">⚠ <b>Méthodologie :</b> panel de personas simulés par IA à partir de l'analyse réelle du code et de l'interface de l'application. Les constats pointent des éléments vérifiables de l'UI (densité, tailles de police, breakpoints, libellés…), mais ne remplacent pas des tests avec de vrais utilisateurs — ils servent à préparer et prioriser ces tests.</div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="tabs">
+    <button class="tab sel" data-v="panel">👥 Le panel (30)</button>
+    <button class="tab" data-v="issues">🔍 Constats consolidés</button>
+    <button class="tab" data-v="syn">📊 Synthèse &amp; plan d'action</button>
+  </div>
+
+  <!-- ===== VUE PANEL ===== -->
+  <div class="view sel" id="v-panel">
+    <div class="filters">
+      <label>Tranche d'âge
+        <select id="fAge"><option value="">Toutes</option><option value="0-17">Moins de 18 ans</option><option value="18-35">18 – 35 ans</option><option value="36-55">36 – 55 ans</option><option value="56-99">56 ans et +</option></select>
+      </label>
+      <label>Compétence numérique
+        <select id="fIT"><option value="">Toutes</option><option value="1">1 · Novice</option><option value="2">2 · Basique</option><option value="3">3 · À l'aise</option><option value="4">4 · Avancé</option><option value="5">5 · Expert</option></select>
+      </label>
+      <label>Appareil
+        <select id="fDev"><option value="">Tous</option><option value="mobile">Smartphone</option><option value="tablette">Tablette</option><option value="ordinateur">Ordinateur</option></select>
+      </label>
+      <label>Sévérité rencontrée
+        <select id="fSev"><option value="">Toutes</option><option value="critique">Critique</option><option value="majeur">Majeur</option><option value="mineur">Mineur</option></select>
+      </label>
+      <label>Recherche
+        <input type="search" id="fTxt" placeholder="mot-clé, instrument…">
+      </label>
+      <button class="reset" id="fReset">Réinitialiser</button>
+    </div>
+    <div class="count-line" id="countLine"></div>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <!-- ===== VUE CONSTATS ===== -->
+  <div class="view" id="v-issues">
+    <div class="count-line">Constats consolidés à partir des 30 sessions, classés par score de priorité (sévérité × nombre de testeurs touchés). La barre indique la part du panel concernée.</div>
+    <div id="issueList"></div>
+  </div>
+
+  <!-- ===== VUE SYNTHÈSE ===== -->
+  <div class="view" id="v-syn">
+    <div class="syn-grid">
+      <div class="syn-card"><h3>Satisfaction moyenne par compétence numérique</h3><div id="chIT"></div></div>
+      <div class="syn-card"><h3>Satisfaction moyenne par tranche d'âge</h3><div id="chAge"></div></div>
+      <div class="syn-card"><h3>Problèmes par thème (occurrences)</h3><div id="chTheme"></div></div>
+      <div class="syn-card"><h3>Satisfaction moyenne par appareil</h3><div id="chDev"></div></div>
+    </div>
+    <div class="syn-grid" style="margin-top:14px">
+      <div class="syn-card">
+        <h3>✅ Points forts unanimes</h3>
+        <ul class="strengths">
+          <li><b>Les deux majeurs de 0.14.0 sont RÉSOLUS et constatés par ceux qui les portaient</b> — volume + sourdine sur l'accueil (Emma, Yanis, Marc, Aïcha, Fatou, Denise, Suzanne : notes +0,8 à +1,2) et porte « En équipe » clarifiée avec lien direct vers Team Spirit, section ouverte à l'arrivée (Camille, Fatou, Bernard, Henri).</li>
+          <li><b>La promesse trilingue est tenue de bout en bout</b> : FR/EN/PT-BR sur les TROIS pages — Maria et Chloé traversent tout le portail sans retomber en français (le contenu pédagogique du corpus, lui, reste en FR, assumé).</li>
+          <li><b>L'atterrissage immédiat tient toujours à 30/30</b> — les 7 novices IT 1 démarrent, règlent, dosent le volume et arrêtent SEULS ; deux « premières fois » de plus (Denise monte le son elle-même, Jean-Paul réussit sans son fils, 2e fois).</li>
+          <li><b>La roue + le tempo géant</b> restent la signature plébiscitée de 9 à 80 ans.</li>
+          <li><b>Le soin accessibilité se voit</b> : aria-disabled retiré de la porte pour préserver le lien aux lecteurs d'écran (Julien : « quelqu'un a lu la spec ARIA »), sourdine pilotable au clavier avec aria-pressed.</li>
+          <li><b>L'architecture en trois pages est comprise par 30/30</b> — plus aucune porte ne « ment », le lien situé de la porte En équipe montre le patron à suivre pour les autres.</li>
+</ul>
+      </div>
+      <div class="syn-card">
+        <h3>🗺 Plan d'action recommandé</h3>
+        <ol class="roadmap">
+          <li><span class="prio-tag p1">Aucun P1 restant sur l'accueil</span> — zéro constat critique ou majeur : les deux majeurs de 0.14.0 (C1 volume, C2 porte) sont résolus par R-5 et vérifiés par le panel. <i>Fait.</i></li>
+          <li><span class="prio-tag p2">P2 · Saisie directe du BPM + infobulles Fréquence/Caractère</span> — les deux reliquats 0.14.0 les plus cités (C1, C2), déjà pré-arbitrés « option A » de la spec R-5 : c'est le moment. <i>Impact moyen, effort faible.</i></li>
+          <li><span class="prio-tag p2">P2 · Annonces situées sous les portes (patron du lien Team Spirit)</span> — C3, le constat le plus partagé (10 testeurs) : étendre le geste R-5 aux portes Apprendre et Pratiquer. <i>Impact moyen, effort moyen.</i></li>
+          <li><span class="prio-tag p2">P2 · Continuité tempo + persistance volume</span> — C4 + C10 : persister S.tempo et S.volume/volMuted comme le thème et la langue. <i>Impact moyen, effort faible.</i></li>
+          <li><span class="prio-tag p3">P3 · Finitions</span> — porte cliquable en entier (C11, ou attendre R-6), état muet plus voyant, − / + volume, « ⛶ Plein écran » avec mot, replier l'archet, roue mobile (C7), polices auto-hébergées (C8), micro-attentes musicales à arbitrer §9.8 (C9). <i>Impact faible à moyen, efforts faibles.</i></li>
+</ol>
+      </div>
+    </div>
+  </div>
+
+  <footer>Dashboard généré le 17/07/2026 · Panel simulé (30 personas) sur index.html 0.17.0 (prod GitHub Pages, rejeu officiel R5-4) · Métronome — Formation Musicale (accueil)</footer>
+</div>
+
+<script>
+/* ================= DONNÉES ================= */
+const ITLBL = {1:"IT 1 · Novice",2:"IT 2 · Basique",3:"IT 3 · À l'aise",4:"IT 4 · Avancé",5:"IT 5 · Expert"};
+const P = [
+{id:1,nom:"Léa",age:9,role:"Élève en éveil musical (percussions)",it:1,dev:"tablette",devLbl:"iPad (école)",note:7.7,duree:"12 min (avec adulte)",
+ quote:"Le gros bouton est toujours là, et maintenant y a un truc pour baisser le son quand la maîtresse parle !",
+ scenario:"Trouver le bouton pour démarrer, taper le rythme ; puis aller chercher « les tambours » derrière la porte Apprendre.",
+ constats:[{t:"Derrière la porte « Apprendre », les fiches du parcours restent denses pour 9 ans — l'adulte a repris la main (inchangé depuis 0.14.0).",sev:"mineur",th:"Prise en main"},
+ {t:"Elle cherche encore « les sons de tambour » sur l'accueil même : le clic seul la déçoit avant qu'on lui montre la porte.",sev:"mineur",th:"Navigation"}],
+ aime:["Le gros bouton ▶ Démarrer « impossible à rater »","Le petit haut-parleur 🔊 : « comme sur la télé »"]},
+{id:2,nom:"Tom",age:12,role:"Collégien, batterie 1re année",it:3,dev:"mobile",devLbl:"Android (Samsung A25)",note:8.3,duree:"20 min",
+ quote:"Toujours nickel pour régler vite fait. Le volume direct sur la page, c'est ce qui manquait pour jouer sans réveiller ma sœur.",
+ scenario:"Régler 100 BPM au tap, puis retrouver un groove rock (porte Pratiquer → Répertoire).",
+ constats:[{t:"Pour « un rythme de rock », il hésite toujours entre Apprendre et Pratiquer — les sous-titres n'annoncent pas les styles du répertoire.",sev:"mineur",th:"Navigation"},
+ {t:"Il aurait aimé un mini-aperçu (« Pratiquer : grooves rock, funk, samba… ») pour choisir plus vite.",sev:"mineur",th:"Prise en main"}],
+ aime:["Volume + sourdine au pouce, sans quitter la page","Tap tempo direct sur la première page"]},
+{id:3,nom:"Inès",age:14,role:"Flûtiste, conservatoire 2e cycle",it:3,dev:"mobile",devLbl:"iPhone 13",note:8.4,duree:"25 min",
+ quote:"Les mots du conservatoire sont toujours là. Mes triolets se règlent sans menu, et je baisse le clic sous ma flûte maintenant.",
+ scenario:"Travailler des triolets à 72 BPM puis passer en 6 temps pour une barcarolle.",
+ constats:[{t:"Le 6/8 se construit toujours en « 6 temps + noires » : un repère « mesures composées » manque dans l'infobulle Temps/cycle.",sev:"mineur",th:"Terminologie"},
+ {t:"L'accent du 1er temps ne se règle toujours pas sur l'accueil — pour ses exercices « sans accent », direction Pratiquer.",sev:"mineur",th:"Fonctions expertes"}],
+ aime:["La subdivision au premier niveau, avec les bons noms","Le volume discret sous sa flûte (60 % et ça respire)"]},
+{id:4,nom:"Hugo",age:16,role:"Bassiste autodidacte (YouTube)",it:4,dev:"ordinateur",devLbl:"PC portable Windows",note:8.7,duree:"40 min",
+ quote:"Trois pages, trois usages, et le mute une touche a rejoint l'accueil. Il me manque juste de taper « 132 » au clavier.",
+ scenario:"Vérifier qu'il retrouve tout : tempo rapide sur l'accueil, puis basse funk et gap clicks sur Pratiquer.",
+ constats:[{t:"Il tape « 132 » au clavier par réflexe : le BPM ne se saisit toujours qu'au curseur/±/tap — pas de champ nombre.",sev:"mineur",th:"Fonctions expertes"},
+ {t:"Le raccourci ↑↓ va par pas de 1 : un Maj+↑ (±10) lui manque encore pour les grands écarts.",sev:"mineur",th:"Fonctions expertes"}],
+ aime:["Raccourcis clavier conservés (Espace, ↑↓, T)","La sourdine 1-clic pour caler ses boucles YouTube"]},
+{id:5,nom:"Emma",age:17,role:"Chanteuse de chorale lycéenne",it:2,dev:"mobile",devLbl:"Android (Xiaomi)",note:8.6,duree:"18 min",
+ quote:"C'est réglé : je baisse le clic SOUS ma voix, directement sur la page. C'était mon seul vrai reproche, il a disparu.",
+ scenario:"Lancer une pulsation discrète à 60 BPM pour travailler une chanson, ajuster le volume du clic.",
+ constats:[{t:"« Fréquence pulsation » reste un mot d'ingénieur pour elle — toujours pas d'infobulle « ? » sur ce réglage.",sev:"mineur",th:"Terminologie"},
+ {t:"L'état sourdine ne se voit qu'au petit « · muet » à côté du pourcentage : discret sur mobile en plein soleil.",sev:"mineur",th:"Visuel & lisibilité"}],
+ aime:["Le volume enfin sur l'accueil — réglé en 5 secondes","Le caractère « Tonal » plus doux pour chanter"]},
+{id:6,nom:"Nathan",age:19,role:"Étudiant STAPS, djembé en association",it:3,dev:"mobile",devLbl:"Android milieu de gamme",note:8.8,duree:"35 min",
+ quote:"L'accueil pour m'échauffer, Apprendre pour bosser : le trajet est toujours aussi évident, et le clic se dose au doigt.",
+ scenario:"S'échauffer au clic sur l'accueil, puis suivre deux fiches djembé en mode écoute (porte Apprendre).",
+ constats:[{t:"Depuis Apprendre, revenir régler le son du clic = retour à l'accueil : le tempo de sa session ne le suit pas d'une page à l'autre.",sev:"mineur",th:"Navigation"},
+ {t:"Le premier chargement des polices dépend toujours du réseau (CDN) — visible en 3G à la salle.",sev:"mineur",th:"Performance"}],
+ aime:["Rapidité inchangée sur son téléphone","Volume au premier niveau : fini le détour par Pratiquer"]},
+{id:7,nom:"Chloé",age:22,role:"Étudiante en musicologie",it:3,dev:"ordinateur",devLbl:"MacBook Air",note:9.2,duree:"55 min",
+ quote:"La promesse trilingue est enfin TENUE de bout en bout : j'ai basculé en anglais et traversé les trois pages sans retomber en français.",
+ scenario:"Évaluer la cohérence éditoriale des trois pages en partant de l'accueil, tester la bascule EN jusqu'au bout du parcours.",
+ constats:[{t:"Toujours pas de lien discret « à propos / méthode » depuis l'accueil pour citer l'app dans un dossier universitaire.",sev:"mineur",th:"Fonctions expertes"},
+ {t:"La porte « En équipe » reste grisée alors qu'elle contient désormais le seul lien vivant du panneau — hiérarchie visuelle contre-intuitive.",sev:"mineur",th:"Visuel & lisibilité"}],
+ aime:["Le trilingue complet : accueil, Pratiquer ET Apprendre","La porte inactive qui dit la vérité (« la répartition vit dans Pratiquer › Team Spirit »)"]},
+{id:8,nom:"Yanis",age:24,role:"DJ amateur, production MAO",it:5,dev:"ordinateur",devLbl:"PC gamer, Chrome",note:8.7,duree:"30 min",
+ quote:"Le mute une touche est arrivé sur l'accueil : en balance je coupe, je rouvre, sans navigation. C'était MA demande.",
+ scenario:"Caler un tempo au tap, comparer clic tonal/sec, couper/reprendre au mute pendant une balance.",
+ constats:[{t:"Saisie directe du BPM toujours impossible (pas de champ nombre) : au tap ou au curseur seulement.",sev:"mineur",th:"Fonctions expertes"},
+ {t:"L'export WAV/MP3 vit sur Pratiquer sans qu'aucun indice de l'accueil ne le dise.",sev:"mineur",th:"Navigation"}],
+ aime:["Sourdine 1-clic : gain maître à zéro, propre, sans clic parasite","Le tap tempo stable (moyenne glissante propre)"]},
+{id:9,nom:"Maria",age:26,role:"Prof de capoeira, brésilienne",it:2,dev:"mobile",devLbl:"Android (Motorola)",note:9.0,duree:"30 min",
+ quote:"Perfeito ! Je bascule en português na primeira página et TOUT me suit : Praticar, Aprender, até a legenda da grade. Fini le retour au français.",
+ scenario:"Basculer en PT-BR, régler une pulsation binaire pour la roda, puis traverser les trois pages en portugais.",
+ constats:[{t:"Le mot « battue » du sous-titre n'a toujours pas d'équivalent évident pour elle — l'infobulle aide, en portugais aussi.",sev:"mineur",th:"Terminologie"},
+ {t:"La bascule de langue recharge la page : le tempo qu'elle venait de régler revient à 92 — petit effet de bord global.",sev:"mineur",th:"Navigation"}],
+ aime:["Trilingue COMPLET — la promesse est tenue sur les trois pages","Réglage binaire/ternaire par la subdivision, très clair"]},
+{id:10,nom:"Julien",age:28,role:"Développeur web, guitariste",it:5,dev:"ordinateur",devLbl:"Laptop Linux, Firefox",note:9.3,duree:"50 min",
+ quote:"Quelqu'un a lu la spec ARIA : l'aria-disabled de la porte a été RETIRÉ pour ne pas neutraliser le lien chez les lecteurs d'écran. Ce niveau de soin, c'est rare.",
+ scenario:"Audit technique : console, hors-ligne, focus clavier, lecteur d'écran sur la porte « En équipe », thème sombre.",
+ constats:[{t:"Les polices Cormorant/Work Sans viennent toujours d'un CDN : hors ligne, l'accueil s'affiche en police de secours.",sev:"mineur",th:"Performance"},
+ {t:"Le tempo réglé n'est toujours pas persisté entre deux visites (le thème l'est).",sev:"mineur",th:"Fonctions expertes"},
+ {t:"Le volume non plus n'est pas persisté (session seule) — cohérent avec Pratiquer, mais surprenant au rechargement.",sev:"mineur",th:"Fonctions expertes"}],
+ aime:["aria-disabled retiré de la porte : le lien reste annoncé aux lecteurs d'écran","Sourdine testée au clavier : focus visible, aria-pressed propre"]},
+{id:11,nom:"Sofia",age:31,role:"Violoniste semi-professionnelle",it:3,dev:"tablette",devLbl:"iPad 10e gén.",note:9.3,duree:"45 min",
+ quote:"L'Archet est toujours à un geste de l'arrivée. Rien n'a bougé pour moi — et c'est très bien comme ça.",
+ scenario:"Déplier l'option Archet, travailler « Liaisons — 4 croches par archet » en plein écran, imprimer la séquence.",
+ constats:[{t:"La section Archet repliée reste discrète : un mot dans le sous-titre des portes guiderait les cordistes plus vite.",sev:"mineur",th:"Navigation"},
+ {t:"En plein écran archet, le tempo ne se règle qu'en sortant — un ± dans la barre du plein écran lui manque toujours.",sev:"mineur",th:"Fonctions expertes"}],
+ aime:["Exports pupitre (imprimer / PNG) de la séquence","Le volume à côté du transport : elle dose le clic sous son violon"]},
+{id:12,nom:"Marc",age:33,role:"Batteur de groupe rock",it:4,dev:"mobile",devLbl:"Android (Pixel)",note:9.0,duree:"25 min",
+ quote:"Mute une touche depuis le kit : coupé pour écouter le guitariste, rouvert d'un tap. Exactement ce que je réclamais aux balances.",
+ scenario:"Caler 148 BPM au tap entre deux morceaux, couper/reprendre le clic rapidement.",
+ constats:[{t:"Saisie directe du BPM toujours impossible : au tap ou au curseur seulement — sur un setlist serré, il tape ses tempos.",sev:"mineur",th:"Fonctions expertes"},
+ {t:"L'état muet n'est signalé qu'au 🔇 et au petit « · muet » : sur scène, il voudrait l'indicateur plus voyant.",sev:"mineur",th:"Visuel & lisibilité"}],
+ aime:["La sourdine 1-clic SANS perdre la roue qui tourne","Le tempo en très grand, lisible depuis le kit"]},
+{id:13,nom:"Aïcha",age:35,role:"Professeure des écoles (chorale de classe)",it:2,dev:"ordinateur",devLbl:"PC école ancien, Firefox",note:8.5,duree:"30 min",
+ quote:"Le volume sur la page, c'est LA différence en classe : les enceintes ne saturent plus, je dose sans toucher au système.",
+ scenario:"Préparer un exercice de pulsation pour la chorale de classe, doser le clic sur les enceintes de la salle.",
+ constats:[{t:"Le mode Atelier (BPM géant pour le fond de classe) n'est toujours pas suggéré depuis l'accueil — il faut connaître Pratiquer.",sev:"mineur",th:"Navigation"},
+ {t:"Le volume ne se mémorise pas d'une séance à l'autre : chaque matin, elle redose pour sa salle.",sev:"mineur",th:"Fonctions expertes"}],
+ aime:["Le clic dosé pour la classe, sans menu système","Ça tourne toujours bien sur le vieux PC de l'école"]},
+{id:14,nom:"Diego",age:38,role:"Percussionniste cubain (son, timba)",it:3,dev:"mobile",devLbl:"iPhone SE (petit écran)",note:8.8,duree:"30 min",
+ quote:"En el SE tout tient encore, y ahora el volumen está aquí mismo. Mis claves siguen en « Pratiquer », un toque et j'y suis.",
+ scenario:"Régler une pulsation 2 temps « sec » sur petit écran, doser le volume, puis rejoindre ses claves (porte Pratiquer).",
+ constats:[{t:"Sur iPhone SE, le bloc roue passe toujours sous le transport : un scroll pour voir l'aiguille en jouant.",sev:"mineur",th:"Mobile & tactile"},
+ {t:"Il aurait toujours pris l'espagnol dans le sélecteur de langue (FR/EN/PT seulement).",sev:"mineur",th:"Terminologie"}],
+ aime:["Cibles tactiles larges même sur SE, volume compris","Le clic « sec » qui perce dans le local de répète"]},
+{id:15,nom:"Camille",age:40,role:"Cheffe de chœur et d'ensemble percus",it:3,dev:"ordinateur",devLbl:"Laptop Windows",note:8.8,duree:"45 min",
+ quote:"La porte dit enfin la vérité : « la répartition des voix vit dans Pratiquer › Team Spirit ». Un clic, la section s'ouvre déjà dépliée. J'ai failli applaudir.",
+ scenario:"Préparer une répartition de voix pour son ensemble : partir de l'accueil, suivre le lien de la porte « En équipe ».",
+ constats:[{t:"Au retour de Team Spirit (« ← Accueil »), le tempo de sa répétition est reparti à 92 : la continuité entre pages manque encore.",sev:"mineur",th:"Navigation"},
+ {t:"Elle voudrait le même genre de lien situé sous la porte Pratiquer (« le répertoire de grooves vit ici »).",sev:"mineur",th:"Navigation"}],
+ aime:["Le lien direct porte → Team Spirit, section OUVERTE à l'arrivée","L'accueil sobre à projeter en répétition"]},
+{id:16,nom:"Olivier",age:42,role:"Ingénieur, trompettiste d'harmonie",it:5,dev:"ordinateur",devLbl:"PC Windows, Edge",note:8.9,duree:"40 min",
+ quote:"Huit réglages maintenant, tous au clavier, sourdine comprise. Je maintiens ma seule demande : taper « 116 » directement.",
+ scenario:"Préparer ses gammes : 60 → 116 BPM par paliers, subdivision croches, clic sec, sourdine entre les séries.",
+ constats:[{t:"Pas de saisie numérique du tempo : 56 appuis de flèche pour passer de 60 à 116, ou le curseur moins précis.",sev:"mineur",th:"Fonctions expertes"},
+ {t:"Le clic « Tonal/Sec » gagnerait un aperçu sonore au survol sans lancer le métronome.",sev:"mineur",th:"Audio & son"},
+ {t:"Volume et sourdine ne sont pas persistés — il s'attendait à retrouver ses 60 % du matin.",sev:"mineur",th:"Fonctions expertes"}],
+ aime:["Tout pilotable au clavier, focus visible — sourdine comprise","La page tient toujours sans scroll sur son écran"]},
+{id:17,nom:"Nadia",age:45,role:"Pianiste amatrice (reprise après 15 ans)",it:2,dev:"tablette",devLbl:"iPad ancien",note:8.6,duree:"20 min",
+ quote:"Toujours un vrai métronome, pas un cockpit. Le petit haut-parleur m'a rassurée : si c'est trop fort, je sais où appuyer.",
+ scenario:"Reprendre ses gammes : 60 BPM en noires, doser le volume, puis oser la porte Apprendre « pour voir ».",
+ constats:[{t:"Elle hésite encore à cliquer une porte, croyant quitter l'application — le « ← Accueil » n'est visible qu'une fois de l'autre côté.",sev:"mineur",th:"Navigation"},
+ {t:"Le sous-titre « battue binaire ou ternaire » la rassure à moitié : elle aurait aimé un exemple sonore.",sev:"mineur",th:"Terminologie"}],
+ aime:["Elle démarre seule en 10 secondes, volume compris","Rien ne « clignote » : elle ne craint plus de casser un réglage"]},
+{id:18,nom:"Pierre",age:47,role:"Luthier, violoncelliste amateur",it:2,dev:"ordinateur",devLbl:"PC Windows 10 ancien",note:8.6,duree:"35 min",
+ quote:"L'archet n'a pas bougé, tant mieux : jauge talon-pointe, impression pupitre. Mes élèves de l'atelier repartent avec leur feuille.",
+ scenario:"Travailler le détaché au milieu, imprimer la séquence pour un élève de l'atelier.",
+ constats:[{t:"Le bouton « Appliquer » de la séquence d'archet fait toujours doublon avec la validation à la saisie — il clique deux fois « pour être sûr ».",sev:"mineur",th:"Fonctions expertes"},
+ {t:"Il aimerait toujours sauvegarder « sa » séquence d'archet (elle revient au préset au rechargement).",sev:"mineur",th:"Fonctions expertes"}],
+ aime:["La jauge d'archet et ses libellés TALON/MILIEU/POINTE","L'impression pupitre en un clic"]},
+{id:19,nom:"Fatou",age:50,role:"Animatrice d'ateliers djembé",it:2,dev:"mobile",devLbl:"Android entrée de gamme",note:8.6,duree:"30 min",
+ quote:"Mes deux blocages ont sauté d'un coup : le volume est sur la page, et la porte me dit où répartir les voix. Mon téléphone reste au sol, tout le monde entend.",
+ scenario:"Préparer un atelier : pulsation ternaire montée à fond sur l'accueil, puis répartir des voix via le lien Team Spirit.",
+ constats:[{t:"À 100 %, le clic reste juste pour l'extérieur sur son téléphone d'entrée de gamme — elle garde son enceinte Bluetooth.",sev:"mineur",th:"Audio & son"},
+ {t:"Posé au sol au milieu du cercle, le petit « · muet » et le pourcentage sont illisibles — l'état du son devrait se voir de loin.",sev:"mineur",th:"Visuel & lisibilité"}],
+ aime:["Volume à fond en un geste, l'atelier démarre","Le lien de la porte : Team Spirit trouvé en 10 secondes"]},
+{id:20,nom:"Laurent",age:52,role:"Bassiste funk semi-pro",it:3,dev:"ordinateur",devLbl:"Laptop + interface audio",note:9.0,duree:"50 min",
+ quote:"L'accueil répond toujours au quart de tour, et je coupe le clic d'une touche pour écouter mon placement. Le funk sérieux reste dans Pratiquer, à sa place.",
+ scenario:"Échauffement au clic sec 92 BPM avec sourdine intermittente, puis session basse funk + gaps sur Pratiquer.",
+ constats:[{t:"Le swing ne se règle toujours pas au premier niveau : « swinguer le clic » demande de connaître Pratiquer › Micro-timing.",sev:"mineur",th:"Fonctions expertes"},
+ {t:"Après une session sur Pratiquer, revenir à l'accueil ne reprend pas le tempo de la session (chaque page repart à 92).",sev:"mineur",th:"Navigation"}],
+ aime:["Sourdine 1-clic pour vérifier son placement rythmique","Réactivité impeccable (clavier + tap)"]},
+{id:21,nom:"Anne",age:55,role:"Documentaliste, choriste",it:1,dev:"ordinateur",devLbl:"PC familial, Chrome",note:8.2,duree:"18 min",
+ quote:"J'ai encore tout fait seule : démarrer, monter le tempo, et cette fois baisser le son. Le petit lien souligné, ça au moins je reconnais.",
+ scenario:"Lancer le métronome à 80 BPM pour répéter un chant, baisser le volume du clic, arrêter.",
+ constats:[{t:"« Caractère » la fait toujours hésiter (caractère de quoi ?) — pas d'infobulle « ? » sur ce réglage.",sev:"mineur",th:"Terminologie"},
+ {t:"Elle cherche toujours un bouton « tout remettre comme avant » : le filet de sécurité n'existe pas sur cette page.",sev:"mineur",th:"Prise en main"}],
+ aime:["Le lien souligné de la porte : « un vrai lien, je reconnais »","Un écran = tout visible, volume compris"]},
+{id:22,nom:"Bernard",age:58,role:"Batteur jazz amateur",it:2,dev:"tablette",devLbl:"iPad",note:8.2,duree:"30 min",
+ quote:"La porte m'explique enfin où vivent les voix multiples. Pour mon chabada il me faut toujours le swing — lui n'a pas déménagé.",
+ scenario:"Travailler le ride jazz : triolets à 140, doser le volume au doigt, chercher le swing réglable.",
+ constats:[{t:"Swing et accent du 1er temps restent absents du premier niveau : son réglage jazz de base demande le chemin Pratiquer › Micro-timing.",sev:"mineur",th:"Fonctions expertes"},
+ {t:"Le curseur de volume est aussi fin que celui du tempo — les gros « − / + » n'existent pas pour le volume, ses doigts ratent.",sev:"mineur",th:"Mobile & tactile"}],
+ aime:["Triolets à 140 stables, sans décrochage","La porte « En équipe » clarifiée — il a suivi le lien par curiosité"]},
+{id:23,nom:"Rosa",age:61,role:"Prof de formation musicale retraitée",it:2,dev:"ordinateur",devLbl:"Laptop, Chrome",note:9.0,duree:"35 min",
+ quote:"Le vocabulaire est toujours irréprochable, et je peux maintenant régler le volume devant un élève sans chercher. Je la recommande sans réserve.",
+ scenario:"Vérifier le vocabulaire musical de chaque réglage, tester une progression pédagogique simple (60 → 100 BPM).",
+ constats:[{t:"« Battue » reste régional selon elle : « pulsation binaire/ternaire » serait plus universel.",sev:"mineur",th:"Terminologie"},
+ {t:"Elle aimerait toujours que la porte Apprendre annonce les niveaux (Débutant → Artiste) dès l'accueil.",sev:"mineur",th:"Navigation"}],
+ aime:["Vocabulaire solfège irréprochable","La roue : « le temps qu'on voit tourner », outil de cours parfait"]},
+{id:24,nom:"Michel",age:63,role:"Accordéoniste de bal musette",it:1,dev:"mobile",devLbl:"Smartphone hérité de sa fille",note:7.9,duree:"20 min",
+ quote:"Ma valse à 180, trois temps, tout seul comme la dernière fois. Le son se règle sur la page maintenant, ma femme apprécie.",
+ scenario:"Régler une valse : 3 temps / cycle à 180 BPM, baisser un peu le son, démarrer, arrêter.",
+ constats:[{t:"À 180 BPM au curseur, viser précisément reste dur au doigt — il passe par le « + » longuement appuyé.",sev:"mineur",th:"Mobile & tactile"},
+ {t:"« Subdivision » reste un mot savant pour lui : il n'ose toujours pas taper sur les « ? ».",sev:"mineur",th:"Terminologie"}],
+ aime:["Trois temps = trois pastilles sur la roue, il « voit » sa valse","Le volume « comme sur la radio de la cuisine »"]},
+{id:25,nom:"Denise",age:66,role:"Choriste paroissiale",it:1,dev:"tablette",devLbl:"Tablette Android (Lidl)",note:8.7,duree:"22 min",
+ quote:"Cette fois le tic porte dans toute la salle paroissiale : j'ai monté la petite réglette moi-même, et rien n'a cassé.",
+ scenario:"Faire tourner une pulsation à 66 BPM pour la répétition du chœur, monter le volume du clic.",
+ constats:[{t:"Elle a d'abord cru le 🔊 « décoratif » : rien ne dit qu'on peut appuyer dessus (pas de mot à côté).",sev:"mineur",th:"Prise en main"},
+ {t:"« Fréquence pulsation » reste opaque : elle n'a pas compris que le clic pouvait devenir plus perçant — pas d'infobulle.",sev:"mineur",th:"Terminologie"}],
+ aime:["Le volume monté toute seule — « c'est bien la première fois »","Gros chiffres, gros bouton, rien de cassé"]},
+{id:26,nom:"Georges",age:68,role:"Violoniste amateur (50 ans de pratique)",it:2,dev:"ordinateur",devLbl:"PC Windows, écran 24\"",note:8.7,duree:"40 min",
+ quote:"L'archet est toujours sur la première page, replié sagement. À mon rythme, j'ai même découvert la sourdine — par hasard, comme toujours.",
+ scenario:"Déplier l'Archet, refaire ses détachés « moitié d'archet », tester le martelé.",
+ constats:[{t:"Une fois l'Archet déplié, la page devient longue : un bouton « replier » en bas de section lui éviterait de remonter.",sev:"mineur",th:"Navigation"},
+ {t:"Il n'ose toujours pas le plein écran (« ⛶ » sans mot) — icône seule peu explicite pour lui.",sev:"mineur",th:"Visuel & lisibilité"}],
+ aime:["L'Archet enfin trouvable sans aide (confirmé au 2e passage)","La jauge talon-pointe « comme au conservatoire »"]},
+{id:27,nom:"Malika",age:71,role:"Pianiste retraitée, ex-professeure",it:2,dev:"tablette",devLbl:"iPad",note:8.3,duree:"25 min",
+ quote:"Les chiffres géants me font toujours plaisir. Le son se dose sur la page — je pose la tablette sur le piano et tout y est.",
+ scenario:"Travailler Czerny à 84 puis 100 BPM, subdivision croches, thème sombre le soir.",
+ constats:[{t:"Elle voudrait le tempo encore plus grand pour le fond du salon — le mode Atelier existe mais il faut savoir qu'il vit dans Pratiquer.",sev:"mineur",th:"Navigation"},
+ {t:"Le contraste des sous-titres gris des portes reste un peu léger pour elle en thème clair.",sev:"mineur",th:"Accessibilité"}],
+ aime:["Le thème sombre reposant le soir","Les infobulles « ? » : dignes, pas infantilisantes"]},
+{id:28,nom:"Jean-Paul",age:74,role:"Clarinettiste d'harmonie municipale",it:1,dev:"ordinateur",devLbl:"PC (Chrome installé par son fils)",note:8.0,duree:"25 min",
+ quote:"Démarrer, plus, moins, le son, arrêter : tout seul, deuxième fois de suite. Je réclame encore mon bouton « tout remettre d'origine ».",
+ scenario:"Régler 76 BPM en 4 temps pour ses gammes de clarinette, doser le volume, tout remettre par défaut.",
+ constats:[{t:"Toujours pas de « Tout réinitialiser » sur l'accueil : le filet de sécurité vit sur Pratiquer seulement.",sev:"mineur",th:"Prise en main"},
+ {t:"« Fréquence pulsation » et « Caractère » restent sans infobulle : il tourne les curseurs « pour voir », un « ? » le rassurerait.",sev:"mineur",th:"Terminologie"}],
+ aime:["Il réussit sans son fils, volume compris","Les raccourcis clavier notés sous les boutons"]},
+{id:29,nom:"Suzanne",age:77,role:"Organiste liturgique",it:1,dev:"tablette",devLbl:"Tablette Android",note:8.5,duree:"25 min",
+ quote:"À l'orgue, on entend enfin le petit tic : on m'a montré la réglette une fois, et je l'ai retrouvée toute seule le lendemain.",
+ scenario:"Pulsation lente (54 BPM) pour un choral, monter le clic pour qu'il porte dans l'église.",
+ constats:[{t:"Elle a tapoté le corps de la porte « En équipe » : rien ne bouge — seul le petit lien souligné réagit, elle ne l'avait pas vu.",sev:"mineur",th:"Prise en main"},
+ {t:"Le curseur de tempo reste fin pour ses doigts — heureusement les gros « − / + » compensent (pas pour le volume).",sev:"mineur",th:"Mobile & tactile"}],
+ aime:["Le clic qui porte enfin dans l'église","Personne ne lui a « rangé » l'écran : tout reste où elle l'a vu"]},
+{id:30,nom:"Henri",age:80,role:"Ancien chef d'harmonie",it:1,dev:"ordinateur",devLbl:"PC ancien, écran 1366×768",note:8.1,duree:"30 min",
+ quote:"« En équipe, bientôt » me narguait. Maintenant on me dit où ça vit déjà — j'ai suivi le lien, la répartition des voix s'est ouverte devant moi. J'aurai tout vu.",
+ scenario:"Faire battre 92 puis 60 BPM, lire tous les textes de la page, suivre le lien « Pratiquer › Team Spirit » (60 ans de direction).",
+ constats:[{t:"À zoom 150 % sur son 1366×768, le petit lien du sous-titre demande une bonne vue — il l'a trouvé parce qu'il lit TOUT.",sev:"mineur",th:"Visuel & lisibilité"},
+ {t:"La section Archet dépliée pousse toujours les portes hors écran — un léger repère de position manquerait presque.",sev:"mineur",th:"Visuel & lisibilité"}],
+ aime:["On lui dit ENFIN que Team Spirit existe — et le lien l'y mène","Texte à 13 px minimum : il lit tout sans lunettes de rechange"]}
+];
+
+/* ================= CONSTATS CONSOLIDÉS ================= */
+const ISSUES = [
+{id:"C1",sev:"mineur",titre:"Saisie directe du BPM toujours absente (champ nombre)",
+ desc:"Inchangé depuis 0.14.0 (ex-C4) : le tempo se règle au curseur, aux ±, aux flèches ou au tap — jamais en tapant « 132 ». Les testeurs à setlist ou à paliers (Hugo, Yanis, Marc, Olivier) le réclament à chaque run ; Michel vise mal les grands tempos au curseur.",
+ reco:"Rendre le grand chiffre cliquable/éditable (input numérique 30–260 avec validation), sans rien changer au reste du transport ; bonus : Maj+↑↓ = ±10.",
+ effort:"faible",who:[4,8,12,16,24]},
+{id:"C2",sev:"mineur",titre:"« Fréquence pulsation » et « Caractère » : toujours les deux seuls réglages sans infobulle « ? »",
+ desc:"Inchangé depuis 0.14.0 (ex-C5) : Temps/cycle et Subdivision ont leurs « ? » en français simple, les deux réglages du son n'en ont pas. Emma, Anne, Denise et Jean-Paul butent sur les mêmes mots d'ingénieur.",
+ reco:"Deux infobulles « ? » sur le motif existant : « plus aigu = plus perçant » pour la fréquence, « le timbre du clic : doux (tonal) ou sec (rimshot) » pour le caractère.",
+ effort:"faible",who:[5,21,24,25,28]},
+{id:"C3",sev:"mineur",titre:"Les usages situés derrière les portes ne sont pas annoncés (atelier, swing, accent, export, styles)",
+ desc:"Inchangé depuis 0.14.0 (ex-C6), désormais le constat le plus partagé du run (10 testeurs) : ce que Pratiquer et Apprendre contiennent (mode Atelier, swing/micro-timing, accent réglable, exports, styles du répertoire, niveaux du parcours) ne se devine pas depuis l'accueil. Le lien « Pratiquer › Team Spirit » de la porte En équipe (R-5) montre exactement le geste qui manque aux autres portes.",
+ reco:"Étendre le patron R-5 : une ligne d'annonce sous chaque porte (« grooves par styles · atelier · swing · exports » / « parcours par niveaux, Débutant → Artiste »), éventuellement avec un lien profond par usage phare.",
+ effort:"moyen",who:[1,2,3,8,13,15,17,20,22,27]},
+{id:"C4",sev:"mineur",titre:"Continuité entre pages : le tempo (et la langue au rechargement) ne suivent pas la session",
+ desc:"Inchangé depuis 0.14.0 (ex-C7) : chaque page repart à 92 BPM ; le retour de Team Spirit ou d'Apprendre perd le réglage en cours. Nouveau cas de bord : la bascule de langue recharge la page et remet aussi le tempo (Maria).",
+ reco:"Persister S.tempo dans fm-metro-* (comme le thème et la langue) et le relire au chargement des trois pages — quelques lignes par page, zéro moteur.",
+ effort:"faible",who:[6,9,10,15,20]},
+{id:"C5",sev:"mineur",titre:"Pas de « Tout réinitialiser » sur l'accueil",
+ desc:"Inchangé depuis 0.14.0 (ex-C8) : le filet de sécurité des novices vit sur Pratiquer seulement. Anne et Jean-Paul le redemandent mot pour mot.",
+ reco:"Reprendre le bouton « ⟲ Tout remettre par défaut » de pratiquer (portée accueil : tempo, battue, subdivision, son, volume), avec la même confirmation.",
+ effort:"faible",who:[21,28]},
+{id:"C6",sev:"mineur",titre:"Découvrabilité de l'option Archet : section discrète, ⛶ sans mot, page longue une fois dépliée",
+ desc:"Inchangé depuis 0.14.0 (ex-C9) : Sofia la trouve au 2e parcours, Georges n'ose pas l'icône ⛶ seule, Henri perd les portes hors écran quand la section est dépliée.",
+ reco:"Ajouter « Archet » dans le sous-titre d'une porte ou un mot à côté du ⛶ (« ⛶ Plein écran ») + bouton « replier » en fin de section.",
+ effort:"faible",who:[11,26,30]},
+{id:"C7",sev:"mineur",titre:"Mobile : la roue passe sous le pli sur les petits écrans",
+ desc:"Inchangé depuis 0.14.0 (ex-C10) : sur iPhone SE, le retour visuel du cycle demande un scroll pendant qu'on joue.",
+ reco:"Sous ~700 px de haut : compacter le transport (mini-grid 2 colonnes serrées) ou remonter la roue à côté du tempo.",
+ effort:"moyen",who:[14]},
+{id:"C8",sev:"mineur",titre:"Polices via CDN : premier rendu dépendant du réseau",
+ desc:"Inchangé depuis 0.14.0 (ex-C11) : hors ligne ou en 3G, l'accueil s'affiche en police de secours le temps du chargement.",
+ reco:"Auto-héberger Cormorant/Work Sans en woff2 avec font-display:swap — cohérent avec le « 100 % hors-ligne » déjà tenu par le reste.",
+ effort:"faible",who:[6,10]},
+{id:"C9",sev:"mineur",titre:"Micro-attentes musicales et finitions (liste reconduite et complétée)",
+ desc:"Le fond de panier des demandes d'experts et de spécialistes, stable depuis 0.14.0 : accent du 1er temps non réglable ici, aperçu sonore du caractère, exemple sonore binaire/ternaire, repère « mesures composées » (6/8), Maj+↑ ±10, sauvegarde de la séquence d'archet, ± tempo dans le plein écran archet, niveaux annoncés sur la porte Apprendre, espagnol absent du sélecteur, « battue » jugé régional, lien « à propos/méthode », contraste des sous-titres de portes, clic plafonné dehors sur téléphone d'entrée de gamme.",
+ reco:"À arbitrer au cas par cas avec la liste fermée §9.8 (amendée en R-5 pour le volume : le précédent existe) — aucun ne bloque une tâche de base.",
+ effort:"moyen",who:[3,4,7,9,11,14,16,17,18,19,23,27]},
+{id:"C10",sev:"mineur",titre:"Finitions du volume neuf : état muet discret, pas de persistance, curseur fin au doigt",
+ desc:"La réintégration R-5 fonctionne (aucun testeur bloqué), mais trois finitions remontent : l'état sourdine ne se voit qu'au petit « · muet »/🔇 (Emma, Marc, Fatou au sol) ; le réglage ne survit pas au rechargement (Julien, Olivier, Aïcha redose chaque matin) ; le curseur est fin pour les doigts âgés, sans − / + dédiés (Bernard) ; Denise a cru le 🔊 décoratif.",
+ reco:"Persister S.volume/volMuted dans fm-metro-* ; état muet plus voyant (bandeau ou roue grisée) ; − / + optionnels sur le volume ; libellé court à côté du 🔊.",
+ effort:"faible",who:[5,10,12,13,16,19,22,25]},
+{id:"C11",sev:"mineur",titre:"La porte inactive au lien discret : le corps de porte ne réagit pas, seul le lien vit",
+ desc:"Nouveau (conséquence du choix R-5, assumé) : la porte « En équipe » reste grisée et non cliquable, seul le lien souligné du sous-titre est actif. Suzanne tapote le corps de la porte sans effet ; Henri trouve le lien petit à zoom 150 % ; Chloé note la hiérarchie visuelle contre-intuitive (l'élément le plus utile du panneau est dans la zone la plus éteinte).",
+ reco:"Option courte : rendre TOUTE la porte cliquable vers pratiquer.html#secTeam tant qu'equipe.html n'existe pas (le libellé « bientôt » reste) ; option R-6 : la porte devient la vraie page et le sujet disparaît.",
+ effort:"faible",who:[7,29,30]}
+];
+
+/* ================= RENDU ================= */
+const $ = id => document.getElementById(id);
+const AGEBUCKET = a => a<18?"0-17":a<36?"18-35":a<56?"36-55":"56-99";
+const AGELBL = {"0-17":"< 18 ans","18-35":"18–35","36-55":"36–55","56-99":"56 et +"};
+const DEVLBL = {mobile:"📱 Smartphone",tablette:"💻 Tablette",ordinateur:"🖥 Ordinateur"};
+const SEVW = {critique:3,majeur:2,mineur:1};
+
+function kpis(){
+  const avg = (P.reduce((s,p)=>s+p.note,0)/P.length).toFixed(1);
+  const nC = P.reduce((s,p)=>s+p.constats.filter(c=>c.sev==="critique").length,0);
+  const nM = P.reduce((s,p)=>s+p.constats.filter(c=>c.sev==="majeur").length,0);
+  const nTot = P.reduce((s,p)=>s+p.constats.length,0);
+  const reco = P.filter(p=>p.note>=8).length;
+  $("kpis").innerHTML =
+   `<div class="kpi acc"><div class="v">${avg} / 10</div><div class="l">Satisfaction moyenne</div></div>
+    <div class="kpi"><div class="v">30</div><div class="l">Testeurs · 9 à 80 ans</div></div>
+    <div class="kpi crit"><div class="v">${nC}</div><div class="l">Constats critiques</div></div>
+    <div class="kpi maj"><div class="v">${nM}</div><div class="l">Constats majeurs</div></div>
+    <div class="kpi"><div class="v">${nTot}</div><div class="l">Constats au total</div></div>
+    <div class="kpi pos"><div class="v">${reco}/30</div><div class="l">Promoteurs (note ≥ 8)</div></div>`;
+}
+
+function card(p){
+  const init = p.nom.slice(0,2).toUpperCase();
+  const cs = p.constats.map(c=>`<div class="fitem"><span class="sev ${c.sev}">${c.sev}</span><span>${c.t}</span></div>`).join("");
+  const ai = p.aime.map(a=>`<div class="fitem"><span class="sev positif">＋</span><span>${a}</span></div>`).join("");
+  return `<div class="pcard">
+    <div class="top"><div class="avatar">${init}</div>
+      <div><h3>${p.nom}, ${p.age} ans</h3><div class="meta">${p.role}</div></div>
+      <div class="score"><div class="n">${p.note}</div><div class="d">/ 10</div></div></div>
+    <div class="chips"><span class="chip it${p.it}">${ITLBL[p.it]}</span><span class="chip">${DEVLBL[p.dev]} · ${p.devLbl}</span><span class="chip">⏱ ${p.duree}</span></div>
+    <div class="quote">« ${p.quote} »</div>
+    <div class="flist">${cs}${ai}</div>
+    <details class="more"><summary>Scénario de test</summary><div class="box">${p.scenario}</div></details>
+  </div>`;
+}
+
+function renderPanel(){
+  const fa=$("fAge").value, fi=$("fIT").value, fd=$("fDev").value, fs=$("fSev").value, ft=$("fTxt").value.trim().toLowerCase();
+  const out = P.filter(p=>{
+    if(fa && AGEBUCKET(p.age)!==fa) return false;
+    if(fi && String(p.it)!==fi) return false;
+    if(fd && p.dev!==fd) return false;
+    if(fs && !p.constats.some(c=>c.sev===fs)) return false;
+    if(ft){
+      const blob=(p.nom+" "+p.role+" "+p.quote+" "+p.devLbl+" "+p.scenario+" "+p.constats.map(c=>c.t).join(" ")+" "+p.aime.join(" ")).toLowerCase();
+      if(!blob.includes(ft)) return false;
+    }
+    return true;
+  });
+  $("countLine").textContent = out.length===P.length? "30 testeurs affichés" : `${out.length} testeur${out.length>1?"s":""} sur 30 (filtres actifs)`;
+  $("grid").innerHTML = out.map(card).join("") || "<p style='color:var(--sub)'>Aucun testeur ne correspond à ces filtres.</p>";
+}
+
+function renderIssues(){
+  const scored = ISSUES.map(i=>({...i,score:SEVW[i.sev]*i.who.length})).sort((a,b)=>b.score-a.score);
+  $("issueList").innerHTML = scored.map(i=>{
+    const pct = Math.round(i.who.length/30*100);
+    const names = i.who.map(id=>{const p=P.find(x=>x.id===id);return `${p.nom} (${p.age})`;}).join(", ");
+    return `<div class="issue ${i.sev}">
+      <div class="ihead"><span class="sev ${i.sev}">${i.sev}</span><h3>${i.id} — ${i.titre}</h3>
+      <span class="effort ${i.effort}">effort ${i.effort==="eleve"?"élevé":i.effort}</span>
+      <span class="freq">${i.who.length}/30 testeurs · ${pct} %</span></div>
+      <div class="bar-out"><div class="bar-in" style="width:${pct}%;background:${i.sev==="critique"?"var(--crit)":i.sev==="majeur"?"var(--maj)":"var(--min)"}"></div></div>
+      <div class="desc">${i.desc}</div>
+      <div class="reco">💡 <b>Recommandation :</b> ${i.reco}</div>
+      <div class="who">Rapporté par : ${names}</div>
+    </div>`;
+  }).join("");
+}
+
+function hbars(el,rows,max,color){
+  $(el).innerHTML = rows.map(r=>{
+    const w = Math.round(r.v/max*100);
+    return `<div class="hbar"><div class="lab">${r.l}</div><div class="track"><div class="fill" style="width:${w}%;background:${color}">${r.txt}</div></div></div>`;
+  }).join("");
+}
+
+function renderSyn(){
+  const byIT={}, byAge={}, byDev={};
+  P.forEach(p=>{
+    (byIT[p.it]=byIT[p.it]||[]).push(p.note);
+    const b=AGEBUCKET(p.age); (byAge[b]=byAge[b]||[]).push(p.note);
+    (byDev[p.dev]=byDev[p.dev]||[]).push(p.note);
+  });
+  const avg=a=>a.reduce((s,x)=>s+x,0)/a.length;
+  hbars("chIT",[1,2,3,4,5].map(k=>({l:ITLBL[k],v:avg(byIT[k]),txt:avg(byIT[k]).toFixed(1)})),10,"var(--acc)");
+  hbars("chAge",["0-17","18-35","36-55","56-99"].map(k=>({l:AGELBL[k],v:avg(byAge[k]),txt:avg(byAge[k]).toFixed(1)})),10,"#7a5cd6");
+  hbars("chDev",["mobile","tablette","ordinateur"].map(k=>({l:DEVLBL[k],v:avg(byDev[k]),txt:avg(byDev[k]).toFixed(1)})),10,"#2c9a5b");
+  const th={};
+  P.forEach(p=>p.constats.forEach(c=>th[c.th]=(th[c.th]||0)+1));
+  const rows=Object.entries(th).sort((a,b)=>b[1]-a[1]).map(([l,v])=>({l,v,txt:v}));
+  hbars("chTheme",rows,Math.max(...rows.map(r=>r.v)),"var(--maj)");
+}
+
+/* Tabs & filtres */
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("sel",x===t));
+  document.querySelectorAll(".view").forEach(v=>v.classList.toggle("sel",v.id==="v-"+t.dataset.v));
+}));
+["fAge","fIT","fDev","fSev"].forEach(id=>$(id).addEventListener("change",renderPanel));
+$("fTxt").addEventListener("input",renderPanel);
+$("fReset").addEventListener("click",()=>{["fAge","fIT","fDev","fSev"].forEach(id=>$(id).value="");$("fTxt").value="";renderPanel();});
+
+kpis(); renderPanel(); renderIssues(); renderSyn();
+</script>
+</body>
+</html>
