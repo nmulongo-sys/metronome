@@ -285,6 +285,9 @@
   .porte.inactive { opacity: .55; cursor: default; }
   .porte.inactive:hover { border-color: var(--fm-line); }
   .porte.inactive .porte-titre::after { content: ''; }
+  /* R-5 (C2) : le lien profond du sous-titre — seul élément vivant de la porte inactive */
+  .porte-sub a { color: var(--fm-accent-text); text-decoration: underline; }
+  .porte-sub a:hover, .porte-sub a:focus-visible { color: var(--fm-ink); }
 
   #fmStubs { display: none !important; }
 
@@ -446,8 +449,12 @@ window.__I18N = { "en": {
   "En équipe": "As a team",
   "le parcours cajón · djembé — mode écoute, mode pratique": "the cajón · djembé path — listen mode, practice mode",
   "la pratique libre — ce que je joue, ce qui m'accompagne, le clic": "free practice — what I play, what accompanies me, the click",
-  "bientôt — jouer à plusieurs, chacun sa ligne": "soon — play together, each with their own line",
-  "Bientôt — jouer à plusieurs, chacun sa ligne": "Soon — play together, each with their own line",
+  "bientôt — en attendant, la répartition des voix vit dans": "soon — meanwhile, part distribution lives in",
+  "Pratiquer › Team Spirit": "Practice › Team Spirit",
+  "Bientôt — en attendant, la répartition des voix vit dans Pratiquer › Team Spirit": "Soon — meanwhile, part distribution lives in Practice › Team Spirit",
+  "Volume": "Volume",
+  "muet": "mute",
+  "Sourdine générale (coupe tout le son en un clic)": "Master mute (cuts all sound in one click)",
   "Les autres pages du métronome": "The metronome's other pages",
   "Découpe de chaque temps : croches (binaire), triolets (ternaire), doubles-croches": "How each beat splits: eighth notes (binary), triplets (ternary), sixteenth notes",
   "battue binaire (croches) ou ternaire (triolets)": "binary feel (eighth notes) or ternary (triplets)",
@@ -568,8 +575,12 @@ window.__I18N = { "en": {
   "En équipe": "Em equipe",
   "le parcours cajón · djembé — mode écoute, mode pratique": "o percurso cajón · djembé — modo escuta, modo prática",
   "la pratique libre — ce que je joue, ce qui m'accompagne, le clic": "a prática livre — o que eu toco, o que me acompanha, o clique",
-  "bientôt — jouer à plusieurs, chacun sa ligne": "em breve — tocar em grupo, cada um com a sua linha",
-  "Bientôt — jouer à plusieurs, chacun sa ligne": "Em breve — tocar em grupo, cada um com a sua linha",
+  "bientôt — en attendant, la répartition des voix vit dans": "em breve — enquanto isso, a distribuição das vozes vive em",
+  "Pratiquer › Team Spirit": "Praticar › Team Spirit",
+  "Bientôt — en attendant, la répartition des voix vit dans Pratiquer › Team Spirit": "Em breve — enquanto isso, a distribuição das vozes vive em Praticar › Team Spirit",
+  "Volume": "Volume",
+  "muet": "mudo",
+  "Sourdine générale (coupe tout le son en un clic)": "Mudo geral (corta todo o som em um clique)",
   "Les autres pages du métronome": "As outras páginas do metrônomo",
   "Découpe de chaque temps : croches (binaire), triolets (ternaire), doubles-croches": "Divisão de cada tempo: colcheias (binário), tercinas (ternário), semicolcheias",
   "battue binaire (croches) ou ternaire (triolets)": "pulsação binária (colcheias) ou ternária (tercinas)",
@@ -648,6 +659,16 @@ window.fmTr = (function(){
             <option value="sec">Sec (bruit, type rimshot)</option>
           </select>
         </div>
+        <!-- R-5 (C1) : volume + sourdine réintégrés au premier niveau — amendement de la
+             liste fermée §9.8 acté au GO. Patron et IDs de pratiquer.html (volSlider/
+             volVal/volMuteBtn), sans le mute accompagnement (sans objet ici). -->
+        <div style="grid-column:1 / -1">
+          <label for="volSlider" class="small">Volume <span id="volVal" style="font-variant-numeric:tabular-nums">· 80 %</span></label>
+          <div style="display:flex;align-items:center;gap:6px">
+            <input type="range" id="volSlider" min="0" max="100" value="80" style="flex:1;min-width:0">
+            <button class="btn-sm" id="volMuteBtn" title="Sourdine générale (coupe tout le son en un clic)" aria-pressed="false">🔊</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -668,9 +689,14 @@ window.fmTr = (function(){
       <span class="porte-titre">Pratiquer</span>
       <span class="porte-sub">la pratique libre — ce que je joue, ce qui m'accompagne, le clic</span>
     </a>
-    <span class="porte inactive" id="porteEquipe" aria-disabled="true" title="Bientôt — jouer à plusieurs, chacun sa ligne">
+    <!-- R-5 (C2) : la porte reste inactive (equipe.html = R-6) mais le sous-titre dit
+         où Team Spirit vit DÉJÀ, avec le seul élément cliquable : le lien profond.
+         aria-disabled retiré : hérité par les descendants, il rendrait le lien
+         annoncé « désactivé » aux lecteurs d'écran (le span n'est pas un contrôle). -->
+    <span class="porte inactive" id="porteEquipe" title="Bientôt — en attendant, la répartition des voix vit dans Pratiquer › Team Spirit">
       <span class="porte-titre">En équipe</span>
-      <span class="porte-sub">bientôt — jouer à plusieurs, chacun sa ligne</span>
+      <span class="porte-sub">bientôt — en attendant, la répartition des voix vit dans
+        <a href="pratiquer.html#secTeam" id="porteEquipeLien">Pratiquer › Team Spirit</a></span>
     </span>
   </nav>
 
@@ -1055,6 +1081,24 @@ window.fmTr = (function(){
   $('plusBtn').addEventListener('click', () => setTempo(S.tempo + 1));
   $('startBtn').addEventListener('click', toggle);
   $('tapBtn').addEventListener('click', tap);
+  // R-5 (C1) : volume + sourdine 1-clic — bloc repris verbatim de pratiquer.html
+  // (S.volume/volMuted/masterGain vivent dans le moteur, portée globale partagée).
+  // Bouger le curseur lève la sourdine ; non persisté (session seule, aligné pratiquer).
+  function volRender() {
+    const v = $('volVal'); if (v) v.textContent = '· ' + Math.round(S.volume * 100) + ' %' + (volMuted ? ' · muet' : '');
+    const b = $('volMuteBtn');
+    if (b) { b.textContent = volMuted ? '🔇' : '🔊'; b.setAttribute('aria-pressed', volMuted ? 'true' : 'false'); }
+  }
+  function volApply() { if (masterGain) masterGain.gain.value = volMuted ? 0 : S.volume; }
+  $('volSlider').addEventListener('input', e => {
+    S.volume = e.target.value / 100;
+    volMuted = false;
+    volApply(); volRender();
+  });
+  $('volMuteBtn').addEventListener('click', () => {
+    volMuted = !volMuted;
+    volApply(); volRender();
+  });
   $('beatsSel').addEventListener('change', e => { S.beats = +e.target.value; if (!isPlaying) drawStatic(); });
   $('subdivSel').addEventListener('change', e => { S.subdiv = +e.target.value; if (!isPlaying) drawStatic(); });
   $('pulseFreq').addEventListener('input', e => {

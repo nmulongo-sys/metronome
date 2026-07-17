@@ -36,9 +36,8 @@ const vc = new VirtualConsole();
 const jsdomErrors = [];
 vc.on('jsdomError', (e) => jsdomErrors.push(String(e && e.message || e)));
 
-const dom = new JSDOM(html, {
-  runScripts: 'dangerously', pretendToBeVisual: true, url: 'http://localhost/', virtualConsole: vc,
-  beforeParse(w) {
+// R-5 : stubs factorisés — réutilisés par le second DOM du test hash-open (section H)
+function stubs(w) {
     w.AudioContext = w.webkitAudioContext = function () {
       return new Proxy({}, { get: (t, k) => {
         if (k === 'destination') return {};
@@ -60,7 +59,13 @@ const dom = new JSDOM(html, {
     w.requestAnimationFrame = w.requestAnimationFrame || ((cb) => setTimeout(() => cb(Date.now()), 0));
     w.cancelAnimationFrame = w.cancelAnimationFrame || ((id) => clearTimeout(id));
     w.ResizeObserver = w.ResizeObserver || function () { return { observe(){}, unobserve(){}, disconnect(){} }; };
-  }
+    // R-5 (C2) : jsdom n'implémente pas scrollIntoView — le hash-open l'appelle à l'arrivée
+    if (w.HTMLElement) w.HTMLElement.prototype.scrollIntoView = w.HTMLElement.prototype.scrollIntoView || function () {};
+}
+
+const dom = new JSDOM(html, {
+  runScripts: 'dangerously', pretendToBeVisual: true, url: 'http://localhost/', virtualConsole: vc,
+  beforeParse: stubs
 });
 
 const W = dom.window, D = W.document;
@@ -73,7 +78,7 @@ setTimeout(runTests, 80);
 function runTests() {
   /* ---------- A. chargement + hiérarchie J1 ---------- */
   ok('chargement sans erreur jsdom (' + jsdomErrors.length + ')', jsdomErrors.length === 0);
-  ok('BUILD 0.16.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.16.0');   // la ligne vivante suit le build
+  ok('BUILD 0.17.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.17.0');   // la ligne vivante suit le build
   ok('GROOVES assemblés depuis FM_GROOVES (31)', g('GROOVES.length') === 31 && Object.keys(W.FM_GROOVES || {}).length === 6);
   const b1 = $('blocJoue'), b2 = $('blocAccomp'), b3 = $('blocClic');
   ok('les trois blocs J1 présents', !!(b1 && b2 && b3));
@@ -241,6 +246,26 @@ function runTests() {
   ok('R-4b : « Publier la routine » câblé (title dynamique posé par le bloc biblio)',
     ($('btnBiblioPublish').getAttribute('title') || '').length > 10);
 
-  console.log(`\n--- pratiquer (R-3b→R-4b) : ${PASS} vertes, ${FAIL} rouges (total ${PASS + FAIL}) ---`);
-  process.exit(FAIL ? 1 : 0);
+  /* ---------- H. R-5 (C2) : lien profond — hash-open des sections ---------- */
+  // La porte « En équipe » d'index pointe pratiquer.html#secTeam : à l'arrivée avec
+  // un hash, la section ciblée doit s'OUVRIR (même geste que le sommaire C6 0.6.6) —
+  // second DOM chargé avec l'ancre, mêmes stubs.
+  {
+    const vc2 = new VirtualConsole();
+    vc2.on('jsdomError', () => {});
+    const dom2 = new JSDOM(html, {
+      runScripts: 'dangerously', pretendToBeVisual: true,
+      url: 'http://localhost/pratiquer.html#secTeam', virtualConsole: vc2,
+      beforeParse: stubs
+    });
+    setTimeout(() => {
+      const D2 = dom2.window.document;
+      ok('R-5 (C2) : arrivée avec #secTeam → la section Team Spirit est OUVERTE (lien profond de la porte)',
+        D2.getElementById('secTeam').open === true);
+      ok('R-5 (C2) : seule la cible s\'ouvre — les autres sections restent fermées',
+        D2.getElementById('secPerc').open === false && D2.getElementById('secBass').open === false);
+      console.log(`\n--- pratiquer (R-3b→R-4b) : ${PASS} vertes, ${FAIL} rouges (total ${PASS + FAIL}) ---`);
+      process.exit(FAIL ? 1 : 0);
+    }, 300);
+  }
 }

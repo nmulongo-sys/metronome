@@ -85,21 +85,23 @@ function runTests() {
   /* ---------- A. chargement + premier niveau FERMÉ (§9.8) ---------- */
   const realErrors = jsdomErrors.filter(m => !/resources?|Could not load|external script|net::|ERR_|Not implemented/i.test(m));
   ok('A1.1 chargement sans erreur jsdom (' + realErrors.length + ')', realErrors.length === 0);
-  ok('A1.2 BUILD 0.16.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.16.0');
-  ok('A1.3 tampon de build affiché', /metronomefunk-0\.16\.0/.test(txt($('buildStamp'))));
+  ok('A1.2 BUILD 0.17.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.17.0');
+  ok('A1.3 tampon de build affiché', /metronomefunk-0\.17\.0/.test(txt($('buildStamp'))));
   ok('A2.1 la liste fermée est là : tempo (gros, ±), tap, démarrer, battue, subdivision, son du clic, thème',
     ['tempoValue', 'tempoSlider', 'minusBtn', 'plusBtn', 'tapBtn', 'startBtn',
      'beatsSel', 'subdivSel', 'pulseFreq', 'pulseFreqVal', 'clickType', 'themeBtn'].every(id => !!$(id)));
   const RETIREES = ['wizardBtn', 'wizOverlay', 'playScreen', 'playSetup', 'playSetupBtn', 'onboardBanner',
     'obGuide', 'playBassGroup', 'fingerViz', 'playLine'];
+  // R-5 (C1) : volSlider/volMuteBtn SORTIS de la liste — le volume + la sourdine
+  // sont réintégrés au premier niveau (amendement §9.8 acté au GO du 17/07).
   const MIGREES = ['secGroove', 'secClave', 'secPerc', 'secRepertoire', 'secTeam', 'secBass',
     'secGap', 'secSon', 'secScript', 'secBiblio', 'carteApprendre', 'familyBar', 'tocBar',
-    'atelierBtn', 'atelierFs', 'percFs', 'expAudio', 'volSlider', 'volMuteBtn', 'accentCheck',
+    'atelierBtn', 'atelierFs', 'percFs', 'expAudio', 'accentCheck',
     'pulseMuteCheck', 'swingSlider', 'btnResetAll', 'btnAccount', 'acctCard', 'biblioList',
     'modeSimpleBtn', 'modeExpertBtn', 'scriptArea'];
   ok('A2.2 surfaces RETIRÉES de l\'application absentes (wizard, écran de jeu, « je joue », onboarding)',
     RETIREES.every(id => !$(id)));
-  ok('A2.3 surfaces MIGRÉES absentes (couches, atelier, exports, volume, compte, bibliothèque → pratiquer/apprendre)',
+  ok('A2.3 surfaces MIGRÉES absentes (couches, atelier, exports, compte, bibliothèque → pratiquer/apprendre)',
     MIGREES.every(id => !$(id)));
   ok('A2.4 une seule section repliable : l\'option Archet — aucun autre tiroir',
     D.querySelectorAll('details.section').length === 1 && !!D.querySelector('details.section#secArchet'));
@@ -159,14 +161,38 @@ function runTests() {
       const okTheme = D.documentElement.getAttribute('data-fm-theme') === 'sombre' && /clair/.test(txt($('themeBtn')));
       $('themeBtn').click(); return okTheme; })());
 
+  /* ---------- C2. R-5 (C1) : volume + sourdine au premier niveau (§9.8 amendée) ---------- */
+  ok('C2.1 volume + sourdine dans la carte transport (patron pratiquer, IDs identiques), défaut 80 %',
+    !!$('volSlider') && !!$('volVal') && !!$('volMuteBtn') &&
+    $('volSlider').value === '80' && txt($('volVal')) === '· 80 %' &&
+    !!$('volSlider').closest('.mini-grid'));
+  $('volMuteBtn').click();
+  ok('C2.2 sourdine 1-clic : volMuted, gain maître à 0, aria-pressed, 🔇 + « muet »',
+    g('volMuted') === true && g('masterGain.gain.value') === 0 &&
+    $('volMuteBtn').getAttribute('aria-pressed') === 'true' &&
+    txt($('volMuteBtn')) === '🔇' && /muet/.test(txt($('volVal'))));
+  $('volSlider').value = '60'; fire('volSlider', 'input');
+  ok('C2.3 bouger le curseur LÈVE la sourdine : S.volume=0.6, gain suit, affichage · 60 %',
+    g('volMuted') === false && Math.abs(g('S.volume') - 0.6) < 1e-9 &&
+    Math.abs(g('masterGain.gain.value') - 0.6) < 1e-6 && txt($('volVal')) === '· 60 %');
+  $('volSlider').value = '80'; fire('volSlider', 'input');
+  ok('C2.4 pas de mute accompagnement sur l\'accueil (sans objet au premier niveau)',
+    !$('accompMuteBtn') && !$('accompMuteBtn2'));
+
   /* ---------- D. les portes ---------- */
   ok('D1.1 trois portes sous le métronome : Apprendre, Pratiquer, En équipe',
     D.querySelectorAll('#portes .porte').length === 3);
   ok('D1.2 Apprendre → apprendre.html', $('porteApprendre').getAttribute('href') === 'apprendre.html');
   ok('D1.3 Pratiquer → pratiquer.html', $('portePratiquer').getAttribute('href') === 'pratiquer.html');
-  ok('D1.4 En équipe : inactive (annonce R-6) — pas de lien, aria-disabled, « bientôt »',
-    !$('porteEquipe').getAttribute('href') && $('porteEquipe').getAttribute('aria-disabled') === 'true' &&
+  // R-5 (C2) : aria-disabled RETIRÉ (état hérité — il annoncerait le lien profond
+  // « désactivé » aux lecteurs d'écran) ; le sous-titre porte désormais le lien.
+  ok('D1.4 En équipe : porte inactive (annonce R-6) — pas de href, « bientôt », sans aria-disabled',
+    !$('porteEquipe').getAttribute('href') && $('porteEquipe').getAttribute('aria-disabled') === null &&
     /bientôt/i.test(txt($('porteEquipe'))));
+  ok('D1.5 R-5 (C2) : le sous-titre dit où Team Spirit vit DÉJÀ, avec le lien profond',
+    /la répartition des voix vit dans/.test(txt($('porteEquipe'))) &&
+    !!$('porteEquipeLien') && $('porteEquipeLien').getAttribute('href') === 'pratiquer.html#secTeam' &&
+    !!$('porteEquipeLien').closest('.porte-sub'));
 
   /* ---------- E. l'archet, option du premier niveau ---------- */
   ok('E1.1 section Archet repliée par défaut (le bouton discret, §4.1)',
@@ -242,10 +268,15 @@ function runTests() {
       'Se connecter', '▶ Jouer', 'Micro-timing & groove'];
     ok('H1.2 dictionnaires PURGÉS : les chaînes des surfaces retirées/migrées sont sorties (§4.2)',
       RETIREES_I18N.every(k => !(k in EN) && !(k in PT)));
-    ok('H1.3 chaînes NOUVELLES des portes traduites EN et PT',
+    ok('H1.3 chaînes NOUVELLES des portes traduites EN et PT (sous-titre R-5 inclus)',
       ['Apprendre', 'Pratiquer', 'En équipe', 'le parcours cajón · djembé — mode écoute, mode pratique',
        'la pratique libre — ce que je joue, ce qui m\'accompagne, le clic',
-       'bientôt — jouer à plusieurs, chacun sa ligne'].every(k => EN[k] && PT[k]));
+       'bientôt — en attendant, la répartition des voix vit dans',
+       'Pratiquer › Team Spirit'].every(k => EN[k] && PT[k]));
+    ok('H1.3bis R-5 : clés volume/sourdine traduites, ancienne annonce de la porte PURGÉE',
+      ['Volume', 'muet', 'Sourdine générale (coupe tout le son en un clic)'].every(k => EN[k] && PT[k]) &&
+      !('bientôt — jouer à plusieurs, chacun sa ligne' in EN) &&
+      !('bientôt — jouer à plusieurs, chacun sa ligne' in PT));
     // audit d'extraction (patron 0.6.9 I4) : chaque chaîne visible de la page couverte
     const IDENT = new Set(['FR', 'EN', 'BR', 'Langue / Language / Idioma', 'Français', 'English',
       'Português (Brasil)', 'Tempo (BPM)', 'Tempo', 'Grave', 'Largo', 'Larghetto', 'Adagio',
