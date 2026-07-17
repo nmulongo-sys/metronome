@@ -93,15 +93,19 @@ const GROOVES_T = ['corpus/grooves/bresil.js', 'corpus/grooves/ouest-africain.js
   'corpus/grooves/rock.js'];
 const MOTEUR_T = ['moteur/fm-etat.js', 'moteur/fm-audio.js', 'moteur/fm-accomp.js'];
 const COMPTE_T = ['coquille/fm-compte.js'];
+const EQUIPE_T = ['coquille/fm-equipe.js']; // R-6 : codec de config d'équipe (coquille partagée)
 // l'ordre contractuel s'énonce PAR PAGE (R-4a) :
 //   corpus → [grooves si répertoire] → moteur → [coquille partagée si compte]
 // v R-4b : l'accueil refondu n'a plus ni répertoire (grooves → pratiquer) ni
 // consommateur Supabase (bibliothèque → pratiquer, compte avec elle) ; pratiquer
 // gagne les deux (Team Spirit/bibliothèque migrés, spec R-4 §4.2).
+// v R-6 : pratiquer et equipe gagnent coquille/fm-equipe.js (codec partagé), après
+// le compte ; equipe.html est une page neuve (corpus → moteur → compte → équipe).
 const ORDRES = {
   'index.html':     CORPUS_T.concat(MOTEUR_T),
-  'pratiquer.html': CORPUS_T.concat(GROOVES_T, MOTEUR_T, COMPTE_T),
-  'apprendre.html': CORPUS_T.concat(MOTEUR_T, COMPTE_T)
+  'pratiquer.html': CORPUS_T.concat(GROOVES_T, MOTEUR_T, COMPTE_T, EQUIPE_T),
+  'apprendre.html': CORPUS_T.concat(MOTEUR_T, COMPTE_T),
+  'equipe.html':    CORPUS_T.concat(MOTEUR_T, COMPTE_T, EQUIPE_T)
 };
 for (const page of Object.keys(ORDRES)) {
   const html = fs.readFileSync(path.join(__dirname, page), 'utf-8');
@@ -113,8 +117,8 @@ for (const page of Object.keys(ORDRES)) {
   ok(new RegExp('</script>\\s*<script>\\s*\'use strict\';').test(html),
     page + ' : le script principal ouvre sur \'use strict\' sans IIFE (portée globale partagée)');
 }
-ok(/const BUILD = 'metronomefunk-0\.19\.0'/.test(etat),
-  'BUILD = 0.19.0 dans fm-etat.js (unique ligne vivante, tolérance déclarée)');
+ok(/const BUILD = 'metronomefunk-0\.20\.0'/.test(etat),
+  'BUILD = 0.20.0 dans fm-etat.js (unique ligne vivante, tolérance déclarée)');
 
 // ---- C. coquille partagée : fm-compte.js == bloc COMPTE du 0.12.0 (déplacement) ----
 const REFC = JSON.parse(fs.readFileSync(path.join(__dirname, 'reference-compte-0.12.0.json'), 'utf-8'));

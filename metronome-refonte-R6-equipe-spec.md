@@ -1,9 +1,10 @@
 # Métronome FM — R-6 · `equipe.html` (spec courte) — build 0.20.0
 
-> **Statut : brouillon — en attente du GO de Jean.**
-> Rédigée le 2026-07-17. Base d'exécution : `main` = `cc624c4` (merge #35, build
-> 0.19.0, prod à constater). R-6 est le chantier suivant, validé par le panel R5-4
-> (Camille, Fatou, Henri) et arbitré par Jean (R-6 plutôt que le corpus).
+> **Statut : GO de Jean reçu le 17/07 — en exécution.**
+> **D1 tranché : les DEUX modes** (hors-ligne **et** online, au choix de l'utilisateur).
+> **D2–D6 : défauts** (D6 = build **0.20.0**). Rédigée le 2026-07-17. Base d'exécution :
+> `main` = `cc624c4` (merge #35, build 0.19.0). Chantier arbitré par Jean (R-6 plutôt que
+> le corpus), validé par le panel R5-4 (Camille, Fatou, Henri).
 
 ---
 
@@ -13,8 +14,8 @@
 - **Zéro moteur** : `moteur/*.js` verbatim, md5 == 0.10.0 asserté (recette-extraction) ;
   la seule ligne tolérée dans `moteur/*.js` = `BUILD` → `metronomefunk-0.20.0`.
 - `equipe.html` est une **page neuve** : elle charge le moteur et fournit donc **tout ce
-  que le moteur référence** (contrat de coquille R-3a) — via les vrais contrôles quand
-  elle s'en sert, via des **stubs inertes** sinon (§4). Aucune retouche du moteur.
+  que le moteur référence** (contrat de coquille R-3a) — vrais contrôles quand elle s'en
+  sert, **stubs inertes** sinon (§4). Aucune retouche du moteur.
 - Batterie clean-room complète + navigateur réel deux modes (http:// **et** file://)
   avant PR ; `rapport-nonregression-0.20.0.md` joint ; **Jean merge la PR lui-même**.
 
@@ -29,151 +30,164 @@ cette répartition **en groupe, chacun sur son appareil**, avec un **chef** comm
 partir et tenir ensemble. La porte « En équipe » de l'accueil (aujourd'hui inactive,
 `#porteEquipe`) devient active et pointe ici.
 
-Ce que le panel R5-4 a mis noir sur blanc (à moitié écrit par le terrain) :
+Ce que le panel R5-4 a mis noir sur blanc :
 
 - **Camille & Fatou** (les deux « collectives ») butent sur la même limite depuis deux
-  pages : Team Spirit vit sur **un seul appareil**, et il n'y a pas de travail « en
-  pupitre » que chaque joueuse ouvre **chez elle / sur son téléphone**.
+  pages : Team Spirit vit sur **un seul appareil**, pas de travail « en pupitre » que
+  chacune ouvre **chez elle / sur son téléphone**.
 - **Henri** (80 ans, ancien chef) veut un **« chef d'harmonie automatique »** : de quoi
-  faire **partir le groupe ensemble** et donner le tempo sans qu'un humain batte la mesure.
+  faire **partir le groupe ensemble** et donner le tempo sans battre la mesure à la main.
 
 ---
 
-## 2. Pourquoi le déterministe hors-ligne (et pas la synchro réseau) en v1
+## 2. Les DEUX modes (D1 tranché par Jean)
 
-Team Spirit annonce déjà sa promesse : « chacun sa ligne — même groove, même classement,
-**même répartition sur chaque appareil** ». La répartition est **déterministe** : à groove
-+ priorités + N joueurs identiques, chaque appareil reconstruit **la même** distribution.
+La répartition Team Spirit est **déterministe** (« même répartition sur chaque appareil ») :
+à groove + priorités + N identiques, chaque appareil reconstruit **la même** distribution.
+`equipe.html` propose donc **un choix à l'entrée** :
 
-Donc, **sans backend temps réel** (l'app est statique, Pages sans build), il suffit de
-partager **une config d'équipe** (groove + priorités + N + backing) ; chaque joueur
-l'ouvre sur son appareil, choisit **son numéro**, et **tout le monde part sur le même
-décompte du chef**. Même tempo, même grille, départ commun → on reste calé pour la durée
-d'une répétition. C'est exactement le modèle sur lequel Team Spirit repose déjà.
+- **Mode hors-ligne (off)** — la voie sans réseau : on **partage une config** (lien/JSON) ;
+  chacun l'ouvre, choisit **son numéro**, et **tout le monde part sur le décompte du chef**.
+  Même tempo, même grille, départ commun → calé pour la durée d'une répétition. Aucune
+  dépendance réseau. C'est le mode **socle**, entièrement vérifiable.
+- **Mode online** — la voie « en direct » (Henri) : une **salle** (code court) où le **chef**
+  diffuse le transport (config + départ programmé + tempo) à tous les appareils via
+  **Supabase Realtime broadcast**, réutilisant `window.fmSupabase()` (supabase-js@2 déjà
+  chargé pour le compte/les routines). **Sans login, sans table DB, sans nouvelle
+  dépendance** : un canal `broadcast` anonyme suffit. Le décompte du chef absorbe la gigue
+  réseau (départ commun sur « 4·3·2·1 », tolérance humaine d'une répétition).
 
-La **synchro réseau multi-appareils en direct** (le chef d'un téléphone qui pilote
-start/stop/tempo des autres en temps réel via Supabase Realtime) est un **chantier séparé**
-(backend, latence, salles) — **hors périmètre v1**. Notée en §7 D1, réversible au GO.
+Bascule off↔online dans la page ; **off est le défaut** (marche partout, tout de suite).
+
+### 2bis. Caveat de vérification (honnêteté)
+
+L'egress réseau de l'env de session est **bloqué (proxy 403)** vers Supabase **et** le CDN
+— comme github.io. Toute la couche Supabase de l'app est **déjà mockée dans les recettes**
+(`w.supabase = { createClient: … }`) et n'a jamais été testée en réseau réel ici. Le mode
+**online** suit ce régime : **câblage vérifié par mock** (chef `channel().send`, suiveur
+`.on('broadcast')` applique le transport), **synchro live à 2 appareils = vérif prod de
+Jean**. Le mode **hors-ligne** est, lui, **entièrement vérifiable** ici (batterie +
+navigateur réel).
 
 ---
 
 ## 3. Périmètre v1 (ce qui est DANS)
 
-1. **Charger une config d'équipe.** Trois sources, sans backend nouveau :
-   (a) **passerelle depuis Team Spirit** — un bouton `▶ Jouer en équipe` dans `#secTeam`
-   ouvre `equipe.html` avec la config courante encodée dans le **hash d'URL** ;
-   (b) **lien partageable** — l'URL (hash) contient la config ; la coller/scanner suffit ;
-   (c) **import du JSON** déjà exporté par `↓ Exporter tout (JSON)` (`#tsExportAll`).
-   La config = `{groove|grille, priorités, N, backing, tempo}` — pas de données perso.
-2. **« Mon pupitre ».** Le joueur choisit son numéro (1…N) → la page **met sa ligne en
-   avant** (ligne de réduction colorée par voix, mêmes `--fm-voice-*`), joue les autres en
-   **backing track** (ou muet), et lance le métronome. Réutilise le mécanisme d'inaudition
-   par voix (`tsMuted`) et le rendu de la ligne de réduction — voir §5 réutilisation.
-3. **Le chef.** Un **décompte de départ** proéminent — grand visuel « 4 · 3 · 2 · 1 » +
-   **clic accentué** de préparation d'un cycle — pour que le groupe démarre ensemble ;
-   puis le métronome tient le tempo (« chef automatique »). Pas de synthèse vocale (hors
-   moteur) : décompte **visuel grand** + clic de préparation via le moteur existant.
-4. **Partage / pupitre imprimable.** Bouton **copier le lien** (hash) ; **fiche de pupitre
-   par joueur** imprimable / PNG (patron des exports existants `#tsPrintBtn`/`#tsPngBtn`),
-   « ma ligne » seule, pour travailler chez soi.
-5. **Passerelles & porte.** `#porteEquipe` sur l'accueil devient **active** (`<a href>` +
-   note située traduite) ; le lien profond `Pratiquer › Team Spirit` reste valable ;
-   volume + sourdine (5e cellule R5-1) et continuité tempo (`fm-tempo`) comme les 3 pages.
+1. **Choix du mode** à l'entrée (off / online), off par défaut.
+2. **Charger une config d'équipe** (les deux modes) — 3 sources, sans backend nouveau
+   (D2 défaut) : (a) **passerelle depuis Team Spirit** — bouton `▶ Jouer en équipe` dans
+   `#secTeam` ouvrant `equipe.html` avec la config dans le **hash d'URL** ; (b) **lien
+   partageable** (hash) ; (c) **import du JSON** de `↓ Exporter tout` (`#tsExportAll`).
+   La config = `{grille/groove, tempo, N, assignation par joueur, backing}` — pas de perso.
+3. **« Mon pupitre ».** Choisir son numéro (1…N) → **sa ligne en avant** (ligne de
+   réduction, `--fm-voice-*`), les autres en **backing/muet** (`tsMuted`), le métronome
+   lance. `equipe` **applique** une assignation (elle ne recalcule pas la répartition —
+   la fabrique reste Team Spirit).
+4. **Le chef (D4 défaut).** **Décompte de départ grand** (« 4·3·2·1 ») + **clic de
+   préparation** d'un cycle, puis le métronome tient le tempo. Pas de synthèse vocale.
+   En online : le chef déclenche le décompte pour toute la salle.
+5. **Partage / pupitre imprimable.** **Copier le lien** (hash) ; **fiche de pupitre**
+   imprimable « ma ligne » (`window.print` + feuille `@media print`). L'export **PNG** est
+   repoussé à v1.1 (borne le périmètre).
+6. **Passerelles & porte.** `#porteEquipe` → **active** (`<a href="equipe.html">` + note
+   située traduite) ; volume + sourdine (5e cellule R5-1) et continuité tempo (`fm-tempo`)
+   comme les 3 pages.
 
 ## 3bis. Ce que R-6 v1 ne touche PAS
 
-- **Le moteur** (md5 réasserté). **Team Spirit sur pratiquer** : inchangé, on y **ajoute
-  seulement** le bouton passerelle (1 élément, i18n). **La synchro réseau** (§7 D1).
-- **`apprendre.html` en pupitre** : la demande de Camille (mettre une **fiche de leçon** en
-  pupitre) est **notée** ; proposée en **v1.1**, hors v1 pour borner (§7 D3).
-- **Le contenu corpus** (M1 au fond) : le grand chantier i18n reste à part.
+- **Le moteur** (md5 réasserté). **Team Spirit sur pratiquer** : inchangé, +1 bouton
+  passerelle (i18n). **`apprendre` en pupitre** (D3 = v1.1, demande notée). **Bibliothèque
+  en ligne comme 4e source** (D2 = v1.1). **Le contenu corpus** (M1 au fond).
 
 ---
 
-## 4. Contrat de coquille (R-3a) — ce que la page neuve doit fournir
+## 4. Contrat de coquille (R-3a) — ce que la page neuve fournit
 
-`equipe.html` charge `corpus/*.js` → `moteur/fm-etat.js` → `fm-audio.js` → `fm-accomp.js`
-→ script de page. Elle fournit :
+Ordre : `corpus/*.js` → `moteur/fm-etat.js` → `fm-audio.js` → `fm-accomp.js` →
+`coquille/fm-compte.js` (compte + `window.fmSupabase`, pour le online) →
+`coquille/fm-equipe.js` (briques partagées, D5-a) → script de page.
 
-- **IDs réels** quand elle s'en sert : `startBtn`, `statusLine` (transport), volume
-  (`volSlider`/`volVal`/`volMuteBtn`), tempo.
-- **Stubs inertes** (`#fmStubs`, `display:none`) pour tout hook non utilisé au premier
-  niveau : `percFsPlay` et les **21 IDs basse** de `fm-accomp.js` (`bassOn`…`gapCrossed`),
-  et les hooks fonctions attendus par start/stop/scheduler (`bowReset`, `draw`,
-  `drawStatic`, `percBreakEvents`, `percOnNewMeasure`, `percResetBreakState`,
-  `scriptOnNewMeasure`, `wakeLockUpdate`, `atelierRender`) — stubs vides, exactement comme
-  la règle §Règle d'usage de R-3a. `tsMuted` est **réel** ici (c'est le cœur du pupitre).
-- **État de coquille** lu par le moteur (`percGrids`, `percMeta`, `percMuted`, `percOffsets`,
-  `percMeasures`, `claveData`, `CLAVE_VOICES`, `atelierOpen`, …) : peuplé depuis la config
-  chargée, comme le fait pratiquer au chargement d'un groove.
+- **IDs réels** utilisés : `startBtn`, `statusLine` (transport) ; volume
+  (`volSlider`/`volVal`/`volMuteBtn`) ; tempo. `tsMuted` est **réel** (cœur du pupitre).
+- **Stubs inertes** (`#fmStubs`, `display:none`) pour les hooks non utilisés : `percFsPlay`
+  et les **21 IDs basse** de `fm-accomp.js` ; hooks fonctions de start/stop/scheduler
+  (`bowReset`, `draw`, `drawStatic`, `percBreakEvents`, `percOnNewMeasure`,
+  `percResetBreakState`, `scriptOnNewMeasure`, `wakeLockUpdate`, `atelierRender`) → stubs
+  vides (règle §Règle d'usage R-3a).
+- **État de coquille** lu par le moteur (`percGrids`, `percMeta`, `percMuted`,
+  `percOffsets`, `percMeasures`, `claveData`, `CLAVE_VOICES`, `atelierOpen`, …) : peuplé
+  depuis la config chargée (via `fm-equipe.js`, comme pratiquer au chargement d'un groove).
 
-Aucun stub n'est une retouche moteur : ce sont des lignes de page après les balises moteur.
+Aucun stub n'est une retouche moteur : lignes de page après les balises moteur.
 
 ---
 
-## 5. Réutilisation (anti-duplication) — décision à acter
+## 5. Réutilisation (D5-a acté) — `coquille/fm-equipe.js`
 
-`equipe.html` **consomme** une répartition ; elle n'a **pas** besoin de toute la surface
-d'édition de pratiquer. Mais deux briques existent déjà sur pratiquer et ne doivent pas
-diverger : (i) le **chargement d'un groove → `percGrids`/état moteur**, (ii) le **rendu de
-la ligne de réduction** colorée par voix, (iii) la **logique de répartition Team Spirit**
-(assistant → attribution déterministe → `tsMuted`).
+La brique qui doit **vraiment ne pas diverger** entre pratiquer et equipe est le **contrat
+de config** : pratiquer l'**encode**, equipe la **décode**. Elle vit donc dans un fichier de
+**coquille** (hors md5 moteur), chargé par les **deux** pages — une seule copie, zéro dérive :
+`window.fmEquipe = { encode, decode, href, audibleForPlayer, voicesOfPlayer }` (base64url,
+format v1 documenté en tête de fichier).
 
-Deux stratégies (§7 D5) :
-- **D5-a (défaut proposé)** : extraire ces briques partagées dans un **`coquille/fm-equipe.js`**
-  (coquille, pas moteur — hors md5) chargé par **pratiquer ET equipe** ; pratiquer garde son
-  comportement (non-régression prouvée par ses recettes). Une seule copie, zéro dérive.
-- **D5-b** : copier le sous-ensemble minimal dans le script d'`equipe.html` (page complète,
-  autonome) — plus simple à livrer, risque de dérive à surveiller.
+La **logique Team Spirit** (assistant → attribution) **reste sur pratiquer** : equipe
+**consomme** l'assignation portée par la config, elle ne la recalcule pas. Le **rendu de la
+grille du pupitre** est **local à equipe** (patron R-4d, une ligne par voix + curseur) : c'est
+une vue, pas un contrat partagé — pratiquer/apprendre gardent leurs propres vues, **aucune
+extraction destructive** de leur code (donc aucun risque de régression : 66/70 recettes
+vertes). Résultat : D5-a tenu là où il compte (le codec partagé), sans retoucher les vues
+existantes.
 
 ---
 
 ## 6. i18n (strict)
 
 Toute chaîne visible + `title`/`aria-label` d'`equipe.html` a sa clé **EN et PT**
-(`window.__I18N = {en:{…}, pt:{…}}`, symétrie EN↔PT auditée par la recette). Vocabulaire
-repris des pages sœurs (« Volume », « muet », « Se connecter », décompte, etc.). La langue
-vit dans `localStorage['fm-lang']` **partagé** : une bascule sur l'accueil suit ici. Sur
-`index.html`, les clés de la porte « En équipe » passent de « bientôt … » à l'annonce
-active (EN/PT mis à jour ; l'ancienne clé « bientôt … » retirée des deux dicts).
+(`window.__I18N = {en:{…}, pt:{…}}`, symétrie EN↔PT auditée). Vocabulaire repris des pages
+sœurs. Langue partagée `localStorage['fm-lang']`. Sur `index.html`, les clés de la porte
+« En équipe » passent de « bientôt … » à l'annonce active (EN/PT mis à jour, ancienne clé
+retirée des deux dicts).
 
 ---
 
-## 7. Points à trancher au GO (Jean)
+## 7. Décisions (tranchées au GO)
 
-| # | Question | Défaut proposé |
+| # | Question | Tranché |
 |---|---|---|
-| D1 | Ambition réseau : v1 **déterministe hors-ligne** (config partagée, départ au chef commun) — ou viser la **synchro temps réel** (Supabase Realtime) ? | **Hors-ligne** en v1 ; le temps réel = chantier séparé ultérieur |
-| D2 | Sources de config en v1 | **a + b + c** (passerelle Team Spirit + lien hash + import JSON) ; publier/charger depuis la **bibliothèque en ligne** = v1.1 |
-| D3 | `apprendre.html` en pupitre (fiche de leçon → équipe) dès v1 ? | **Non** (v1.1) — borne le périmètre ; demande notée |
-| D4 | Forme du « chef » | **Décompte visuel grand + clic de préparation** (pas de synthèse vocale, hors moteur) |
-| D5 | Réutilisation des briques groove/réduction/Team Spirit | **D5-a** : `coquille/fm-equipe.js` partagé (une copie, zéro dérive) |
-| D6 | Numéro de build | **0.20.0** |
+| **D1** | Ambition réseau | **Les deux modes** : hors-ligne (défaut) **et** online (salle broadcast Supabase) |
+| **D2** | Sources de config v1 | Passerelle Team Spirit + lien hash + import JSON ; bibliothèque en ligne = v1.1 |
+| **D3** | `apprendre` en pupitre dès v1 | Non — v1.1 (demande notée) |
+| **D4** | Forme du « chef » | Décompte visuel grand + clic de préparation (pas de synthèse vocale) |
+| **D5** | Anti-duplication | **D5-a** : `coquille/fm-equipe.js` partagé |
+| **D6** | Build | **0.20.0** |
 
 ---
 
 ## 8. Recette (porte de sortie code)
 
-- Nouvelle suite **`recette-equipe.js`** (jsdom) : présence transport + volume + décompte ;
-  parse d'une config depuis le hash → `percGrids` peuplé ; choix du numéro → `tsMuted`
-  isole « ma » voix (les autres en backing/muet) ; chef → décompte puis `start()` ;
-  lien de partage reproduit la config ; **audit i18n** (chaque chaîne/`title`/`aria` a EN+PT,
-  symétrie). Extensions : **`recette-accueil.js`** (porte `#porteEquipe` **active**,
-  `a[href="equipe.html"]`, note traduite) ; **`recette-pratiquer.js`** (bouton
-  `▶ Jouer en équipe` présent, ouvre `equipe.html#…`). **`recette-extraction.js`** :
-  md5 moteur == 0.10.0 **inchangé** ; BUILD 0.20.0.
-- **Navigateur réel** (Chromium, http:// + file://) : générer un lien depuis Team Spirit →
-  l'ouvrir dans equipe → choisir un numéro → décompte → le clic tourne, ma ligne sonne,
-  les autres en backing/muet (lecture `window.fmMetroAudio()` : `master.gain`, `playing`).
-- `rapport-nonregression-0.20.0.md` joint ; **PR unique** base `main`.
+- Nouvelle suite **`recette-equipe.js`** (jsdom) : transport + volume + décompte présents ;
+  parse d'une config (hash/JSON) → `percGrids` peuplé ; choix du numéro → `tsMuted` isole
+  « ma » voix (autres backing/muet) ; chef → décompte puis `start()` ; lien de partage
+  reproduit la config ; **mode online mocké** (`window.supabase` factice : le chef appelle
+  `channel().send` avec le bon payload, le suiveur applique via `.on('broadcast')`) ;
+  **audit i18n** (EN+PT, symétrie). Extensions : **`recette-accueil.js`** (porte
+  `#porteEquipe` **active**, `a[href="equipe.html"]`, note traduite) ;
+  **`recette-pratiquer.js`** (bouton `▶ Jouer en équipe`, ouvre `equipe.html#…` ;
+  non-régression après extraction `fm-equipe.js`). **`recette-extraction.js`** : md5 moteur
+  == 0.10.0 **inchangé** ; BUILD 0.20.0.
+- **Navigateur réel** (Chromium, http:// + file://) : **cœur hors-ligne** — générer un lien
+  depuis Team Spirit → l'ouvrir dans equipe → choisir un numéro → décompte → le clic
+  tourne, ma ligne sonne, les autres backing/muet (`window.fmMetroAudio()`). Le **online
+  live** n'est pas testable ici (proxy 403) → vérif prod de Jean.
+- `rapport-nonregression-0.20.0.md` joint ; **PR unique** (#36) base `main`.
 
 ---
 
 ## 9. Livrables
 
-- **`equipe.html`** (page neuve) ; **`index.html`** (porte active + clés i18n) ;
-  **`pratiquer.html`** (bouton passerelle + i18n) ; si D5-a : **`coquille/fm-equipe.js`**
-  (+ balise dans pratiquer et equipe) — fichiers complets.
+- **`equipe.html`** (page neuve) ; **`coquille/fm-equipe.js`** (neuf, D5-a) ;
+  **`index.html`** (porte active + i18n) ; **`pratiquer.html`** (bouton passerelle +
+  balise `fm-equipe.js` + i18n) — fichiers complets.
 - **`recette-equipe.js`** (neuve) ; `recette-accueil.js`, `recette-pratiquer.js`,
   `recette-extraction.js` étendues.
 - **`moteur/fm-etat.js`** : `BUILD = 'metronomefunk-0.20.0'` (seule ligne tolérée).

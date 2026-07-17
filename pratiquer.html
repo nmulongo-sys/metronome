@@ -715,6 +715,8 @@ window.__I18N = { "en": {
   "Le répertoire s'écoute librement, seul ou en groupe — la répartition entre participants se fait dans la section": "The repertoire can be listened to freely, alone or in a group — distribution among participants is done in the",
   "Team Spirit": "Team Spirit",
   "une ligne par personne · solo/muet · à exporter": "one part per person · solo/mute · export",
+  "▶ Jouer en équipe": "▶ Play as a team",
+  "Ouvrir cette répartition dans « En équipe » : chacun sa ligne sur son appareil, le chef donne le départ": "Open this distribution in \"As a team\": each their own line on their own device, the conductor starts it",
   "Mode team spirit (répartir entre participants)": "Team spirit mode (distribute among participants)",
   "+ Participant": "+ Participant",
   "Répartir auto": "Auto-distribute",
@@ -1332,6 +1334,8 @@ window.__I18N = { "en": {
   "Le répertoire s'écoute librement, seul ou en groupe — la répartition entre participants se fait dans la section": "O repertório pode ser ouvido livremente, sozinho ou em grupo — a distribuição entre os participantes é feita na seção",
   "Team Spirit": "Team Spirit",
   "une ligne par personne · solo/muet · à exporter": "uma linha por pessoa · solo/mudo · exportar",
+  "▶ Jouer en équipe": "▶ Tocar em equipe",
+  "Ouvrir cette répartition dans « En équipe » : chacun sa ligne sur son appareil, le chef donne le départ": "Abrir esta distribuição em \"Em equipe\": cada um sua linha no seu aparelho, o maestro dá a largada",
   "Mode team spirit (répartir entre participants)": "Modo team spirit (distribuir entre os participantes)",
   "+ Participant": "+ Participante",
   "Répartir auto": "Distribuir auto",
@@ -2216,6 +2220,7 @@ window.fmTr = (function(){
       </div>
       <div id="tsFingerOut" class="script-status" style="white-space:pre-line;"></div>
       <div class="row" style="margin-top:10px;">
+        <button class="btn-sm primary" id="tsPlayTeam" title="Ouvrir cette répartition dans « En équipe » : chacun sa ligne sur son appareil, le chef donne le départ">▶ Jouer en équipe</button>
         <button class="btn-sm" id="tsExportAll">↓ Exporter tout (JSON)</button>
         <button class="btn-sm" id="tsPrintBtn" title="Vue imprimable de la grille — imprime ou « Enregistrer en PDF »">🖨 Imprimer / PDF</button>
         <button class="btn-sm" id="tsPngBtn" title="Image PNG de la grille (pupitre, partage)">↓ PNG</button>
@@ -4494,6 +4499,30 @@ swing 62
       'groove-' + (TS.grooveId || 'export') + '.json');
     $('tsStatus').textContent = 'Groove complet exporté.';
   }
+  // R-6 : passerelle vers equipe.html — encode la répartition courante en « config
+  // d'équipe » (codec coquille/fm-equipe.js) et l'ouvre dans « En équipe ».
+  function tsEquipeConfig() {
+    const meta = tsGrooveMeta();
+    const labels = TS.participants.map(p => p.label);
+    return {
+      v: 1,
+      titre: meta.label || '',
+      tempo: S.tempo,
+      steps: (TS.voices[0] && TS.voices[0].grid) ? TS.voices[0].grid.length : 16,
+      swing: S.swing,
+      joueurs: Math.max(1, labels.length),
+      backing: TS.backing,
+      voix: TS.voices.map(v => {
+        const pi = TS.participants.findIndex(p => p.id === v.participant);
+        return { k: v.voiceKind, instr: v.instr, g: (v.grid || []).slice(), j: pi >= 0 ? pi + 1 : 0 };
+      })
+    };
+  }
+  function tsPlayTeam() {
+    if (!TS.loaded) { $('tsStatus').textContent = 'Charge d\'abord un groove.'; return; }
+    const url = window.fmEquipe.href(tsEquipeConfig());
+    try { window.open(url, '_blank'); } catch (e) { location.href = url; }
+  }
 
   // ---- exports élèves (0.7.0, C13 — E1/E2) : vue imprimable + PNG ----
   // Le JSON reste le format machine (réimportation) ; ici, un support lisible à donner
@@ -4835,6 +4864,7 @@ swing 62
     });
     $('tsFinger').addEventListener('change', e => { TS.checkFinger = e.target.checked; tsRefresh(); });
     $('tsExportAll').addEventListener('click', tsExportAll);
+    $('tsPlayTeam').addEventListener('click', tsPlayTeam);
     $('tsPrintBtn').addEventListener('click', () => tsPrint(null));
     $('tsPngBtn').addEventListener('click', () => tsExportPNG(null));
     // note de progression, insérée dans la ligne de break existante
@@ -5271,6 +5301,7 @@ swing 62
   <div id="acctBody"></div>
 </div>
 <script src="coquille/fm-compte.js"></script>
+<script src="coquille/fm-equipe.js"></script>
 <script>
 /* ===== Bibliothèque partagée (Supabase) : routines canon/classe + publication =====
    R-4b : bloc migré d'index.html avec la section #secBiblio — verbatim. */

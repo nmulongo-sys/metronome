@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Métronome — En équipe · Formation Musicale</title>
+
+<!-- Polices du portail -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  /* ============ CONTRAT DE THÈME PORTAIL FM (repris d'apprendre.html) ============ */
+  :root {
+    --fm-bg:#efe7d8; --fm-panel:#f7f1e6; --fm-panel-2:#f0e7d6;
+    --fm-ink:#2a221b; --fm-sub:#6b5d4c; --fm-line:rgba(107,74,46,.16);
+    --fm-accent:#b3763b; --fm-accent-2:#6b4a2e; --fm-accent-text:#875627;
+    --fm-danger-text:#b23530; --fm-accent-ink:#f7f1e6; --fm-staff:rgba(107,74,46,.06);
+    --fm-font-display: 'Cormorant Garamond', Georgia, serif;
+    --fm-font-ui:      'Work Sans', system-ui, sans-serif;
+    /* couleurs des voix (pupitre) — reprises de pratiquer.html */
+    --fm-voice-1:#6b4a2e; --fm-voice-2:#b3763b; --fm-voice-3:#7a8b4a;
+    --fm-voice-4:#4a6b8b; --fm-voice-5:#8b4a6b; --fm-voice-6:#4a8b8b;
+  }
+  html[data-fm-theme="clair"] {
+    --fm-bg:#efe7d8; --fm-panel:#f7f1e6; --fm-panel-2:#f0e7d6;
+    --fm-ink:#2a221b; --fm-sub:#6b5d4c; --fm-line:rgba(107,74,46,.16);
+    --fm-accent:#b3763b; --fm-accent-2:#6b4a2e; --fm-accent-ink:#f7f1e6;
+    --fm-accent-text:#875627; --fm-danger-text:#b23530; --fm-staff:rgba(107,74,46,.06);
+  }
+  html[data-fm-theme="sombre"] {
+    --fm-bg:#0e0e10; --fm-panel:#17151a; --fm-panel-2:#1c1a1f;
+    --fm-ink:#f5f0e6; --fm-sub:#b5aea2; --fm-line:rgba(201,162,75,.18);
+    --fm-accent:#c9a24b; --fm-accent-2:#7a6a3a; --fm-accent-ink:#0e0e10;
+    --fm-accent-text:#c9a24b; --fm-danger-text:#d9534f; --fm-staff:rgba(201,162,75,.05);
+    --fm-voice-1:#c9a24b; --fm-voice-2:#d8b978; --fm-voice-3:#a9c07a;
+    --fm-voice-4:#7aa0c0; --fm-voice-5:#c07aa0; --fm-voice-6:#7ac0c0;
+  }
+
+  /* ============ BASE ============ */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: var(--fm-font-ui); background: var(--fm-bg); color: var(--fm-ink);
+    min-height: 100vh; display: flex; justify-content: center; padding: 28px 14px 40px;
+    transition: background-color .5s ease, color .5s ease;
+  }
+  .app { width: 100%; max-width: 860px; }
+
+  /* ============ EN-TÊTE ============ */
+  header { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
+  .brand h1 { font-family: var(--fm-font-display); font-weight: 600; font-size: 2.1rem; line-height: 1.05; }
+  .kicker { font-size: .8125rem; letter-spacing: .16em; text-transform: uppercase; color: var(--fm-accent-text); font-weight: 600; margin-top: 4px; }
+  .header-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .lang-switch { display: inline-flex; gap: 4px; align-items: center; }
+  .lang-btn {
+    display: inline-flex; align-items: center; gap: 5px; cursor: pointer;
+    background: var(--fm-panel); border: 1px solid var(--fm-line); color: var(--fm-sub);
+    padding: 5px 8px; border-radius: 7px; font-family: var(--fm-font-ui); font-size: .8125rem;
+    font-weight: 600; letter-spacing: .04em; transition: border-color .12s, color .12s, background .12s;
+  }
+  .lang-btn:hover { color: var(--fm-ink); border-color: var(--fm-accent); }
+  .lang-btn.on { border-color: var(--fm-accent); background: var(--fm-accent); color: var(--fm-accent-ink); }
+  .lang-btn .flag { width: 18px; height: 12px; border-radius: 2px; box-shadow: 0 0 0 1px rgba(0,0,0,.15); display: block; }
+  .btn-ghost {
+    background: var(--fm-panel); border: 1px solid var(--fm-line); color: var(--fm-ink);
+    padding: 8px 14px; border-radius: 7px; cursor: pointer;
+    font-family: var(--fm-font-ui); font-size: .8125rem; letter-spacing: .04em;
+  }
+  .btn-ghost:hover { border-color: var(--fm-accent); }
+
+  /* ============ CARTES & TRANSPORT ============ */
+  .card { background: var(--fm-panel); border: 1px solid var(--fm-line); border-radius: 12px; padding: 22px; margin-bottom: 16px; transition: background-color .5s ease, border-color .5s ease; }
+  .tempo-value { font-family: var(--fm-font-display); font-weight: 700; font-size: 4.2rem; line-height: 1; text-align: center; font-variant-numeric: tabular-nums; }
+  .tempo-label { text-align: center; color: var(--fm-sub); font-size: .8125rem; letter-spacing: .14em; text-transform: uppercase; margin: 6px 0 10px; }
+  .tempo-label em { font-family: var(--fm-font-display); font-style: italic; font-size: 1.05rem; letter-spacing: 0; text-transform: none; color: var(--fm-accent-text); }
+  .slider-row { display: flex; align-items: center; gap: 10px; margin: 10px 0; max-width: 460px; margin-left: auto; margin-right: auto; }
+  .slider-row button { background: var(--fm-panel-2); border: 1px solid var(--fm-line); color: var(--fm-ink); width: 38px; height: 38px; border-radius: 50%; font-size: 1.25rem; cursor: pointer; flex-shrink: 0; }
+  .slider-row button:hover { border-color: var(--fm-accent); }
+  input[type=range] { flex: 1; -webkit-appearance: none; height: 4px; border-radius: 2px; background: var(--fm-line); outline: none; }
+  :focus-visible { outline: 2px solid var(--fm-accent); outline-offset: 2px; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--fm-accent); border: 2px solid var(--fm-panel); cursor: pointer; }
+  input[type=range]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--fm-accent); border: 2px solid var(--fm-panel); cursor: pointer; }
+  .main-buttons { display: flex; gap: 10px; margin-top: 12px; max-width: 460px; margin-left: auto; margin-right: auto; }
+  .btn-start { flex: 2; background: var(--fm-accent); border: none; color: var(--fm-accent-ink); padding: 14px; border-radius: 7px; font-family: var(--fm-font-ui); font-size: .95rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; }
+  .btn-start:hover { filter: brightness(1.06); }
+  .btn-start.playing { background: var(--fm-accent-2); color: var(--fm-accent-ink); }
+  .status-line { color: var(--fm-sub); font-size: .8125rem; margin-top: 10px; min-height: 1.2em; text-align: center; }
+  select, input[type=number], input[type=text] { background: var(--fm-panel-2); color: var(--fm-ink); border: 1px solid var(--fm-line); border-radius: 7px; padding: 8px; font-family: var(--fm-font-ui); font-size: .9rem; }
+  .sec-title { font-family: var(--fm-font-display); font-weight: 600; font-size: 1.25rem; }
+  .sec-sub { color: var(--fm-sub); font-size: .8125rem; letter-spacing: .1em; text-transform: uppercase; }
+  .check { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: .88rem; }
+  .check input { accent-color: var(--fm-accent); width: 16px; height: 16px; }
+  .hint { color: var(--fm-sub); font-size: .8125rem; line-height: 1.55; margin-top: 6px; }
+  .btn-sm { background: var(--fm-panel-2); border: 1px solid var(--fm-line); color: var(--fm-ink); padding: 8px 14px; border-radius: 7px; cursor: pointer; font-family: var(--fm-font-ui); font-size: .82rem; }
+  .btn-sm:hover { border-color: var(--fm-accent); }
+  .btn-sm.primary { background: var(--fm-accent); border-color: var(--fm-accent); color: var(--fm-accent-ink); font-weight: 600; }
+  .hide { display: none !important; }
+  .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 8px 0; }
+
+  /* ============ EN ÉQUIPE (R-6) ============ */
+  .eq-choix { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 2px; }
+  .eq-chip { font-family: var(--fm-font-ui); font-size: .85rem; padding: 8px 14px; border-radius: 20px; border: 1px solid var(--fm-line); background: var(--fm-panel-2); color: var(--fm-sub); cursor: pointer; }
+  .eq-chip:hover { border-color: var(--fm-accent); color: var(--fm-ink); }
+  .eq-chip.on { background: var(--fm-accent); border-color: var(--fm-accent); color: var(--fm-accent-ink); font-weight: 600; }
+  .eq-chip:focus-visible { outline: 2px solid var(--fm-accent); outline-offset: 1px; }
+  .eq-mode-sub { font-size: .78rem; color: var(--fm-sub); margin-top: 2px; }
+  /* pupitre : une ligne par voix, cases frappe/accent, curseur (patron R-4d) */
+  .eq-grille { margin: 10px 0 2px; display: flex; flex-direction: column; gap: 4px; }
+  .pfg-row { display: flex; align-items: center; gap: 6px; }
+  .pfg-voix { font-size: .78rem; color: var(--fm-sub); width: 66px; text-align: right; flex: none; }
+  .pfg-steps { display: flex; gap: 2px; flex: 1; min-width: 0; }
+  .pfg-cell { flex: 1; height: 18px; border-radius: 3px; background: var(--fm-line); min-width: 6px; }
+  .pfg-cell.pfg-beat { margin-left: 6px; }
+  .pfg-cell.pfg-hit { background: var(--pf-c, var(--fm-accent-2)); }
+  .pfg-cell.pfg-acc { background: var(--pf-c, var(--fm-accent)); box-shadow: inset 0 0 0 2px var(--fm-ink); }
+  .pfg-cell.pfg-cur { outline: 2px solid var(--fm-ink); outline-offset: 1px; }
+  .pfg-legende { font-size: .72rem; color: var(--fm-sub); margin-top: 4px; }
+  .eq-summary { font-size: .95rem; margin: 2px 0 6px; }
+  .eq-summary b { color: var(--fm-accent-text); }
+  /* le chef : décompte plein écran */
+  #eqCount { position: fixed; inset: 0; z-index: 9600; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,.72); }
+  #eqCount.show { display: flex; }
+  #eqCountNum { font-family: var(--fm-font-display); font-weight: 700; color: #fff; font-size: 30vw; line-height: 1; font-variant-numeric: tabular-nums; }
+  .eq-chef-btn { flex: 1; background: var(--fm-accent-2); border: none; color: var(--fm-accent-ink); padding: 14px; border-radius: 7px; font-family: var(--fm-font-ui); font-size: .95rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; }
+  .eq-chef-btn:hover { filter: brightness(1.08); }
+  .eq-status { font-size: .8125rem; color: var(--fm-accent-2); margin-top: 6px; min-height: 1em; }
+
+  .fm-toast { position:fixed; left:50%; transform:translateX(-50%); bottom:18px; z-index:200; background:var(--fm-panel); color:var(--fm-ink); border:1px solid var(--fm-line); border-radius:10px; padding:8px 14px; font-size:.85rem; box-shadow:0 4px 14px rgba(0,0,0,.18); opacity:0; transition:opacity .3s; pointer-events:none; }
+  .fm-toast.show { opacity:1; }
+  #fmStubs { display: none !important; }
+
+  @media (max-width: 480px) { body { padding: 16px 8px 24px; } .card { padding: 14px; } }
+  @media print {
+    body { padding: 0; } .app { max-width: none; }
+    header, #transport, #secConfig .eq-choix, #eqModeCard, #eqSalleCard, #eqShareRow,
+    #eqChefRow, .header-actions, #eqEmpty, .lang-switch { display: none !important; }
+    .card { border: none; box-shadow: none; }
+  }
+</style>
+
+<script>
+  /* Chargeur de thème du portail : ?theme= → localStorage → défaut (verbatim apprendre) */
+  (function () {
+    try {
+      var q = new URLSearchParams(location.search);
+      var t = q.get('theme');
+      if (t) { localStorage.setItem('fm-theme', t); }
+      else   { t = localStorage.getItem('fm-theme'); }
+      if (t === 'clair' || t === 'sombre') { document.documentElement.setAttribute('data-fm-theme', t); }
+      var href = q.get('themeUrl');
+      if (href) { var link = document.createElement('link'); link.rel = 'stylesheet'; link.href = href; document.head.appendChild(link); }
+    } catch (e) { /* silencieux */ }
+  })();
+</script>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">
+      <h1>Métronome — En équipe</h1>
+      <div class="kicker">Jouer ensemble · chacun sa ligne</div>
+      <div class="build-stamp" id="buildStamp" style="font-size:13px;opacity:.75;margin-top:2px;font-variant-numeric:tabular-nums;"></div>
+      <div style="font-size:12px;margin-top:2px;">
+        <a href="index.html" style="color:inherit;opacity:.7;" title="Revenir à la page d'accueil du métronome">← Accueil du métronome</a>
+        · <a href="pratiquer.html" style="color:inherit;opacity:.7;" title="La pratique libre : instruments, styles, réglages complets">Pratique libre</a>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-ghost" id="themeBtn" title="Basculer entre thème clair et thème sombre">◐ Mode sombre</button>
+      <button class="btn-ghost" id="btnAccount" title="Recevoir un lien de connexion par e-mail">Se connecter</button>
+      <span id="langSwitch" class="lang-switch" role="group" aria-label="Langue / Language / Idioma">
+        <button type="button" class="lang-btn" data-lang="fr" title="Français" aria-label="Français"><svg class="flag" viewBox="0 0 3 2" aria-hidden="true"><rect width="3" height="2" fill="#fff"/><rect width="1" height="2" fill="#0055A4"/><rect x="2" width="1" height="2" fill="#EF4135"/></svg>FR</button>
+        <button type="button" class="lang-btn" data-lang="en" title="English" aria-label="English"><svg class="flag" viewBox="0 0 60 30" aria-hidden="true"><clipPath id="ukc"><path d="M0,0 v30 h60 v-30 z"/></clipPath><g clip-path="url(#ukc)"><path d="M0,0 v30 h60 v-30 z" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M30,0 v30 M0,15 h60" stroke="#fff" stroke-width="10"/><path d="M30,0 v30 M0,15 h60" stroke="#C8102E" stroke-width="6"/></g></svg>EN</button>
+        <button type="button" class="lang-btn" data-lang="pt" title="Português (Brasil)" aria-label="Português (Brasil)"><svg class="flag" viewBox="0 0 20 14" aria-hidden="true"><rect width="20" height="14" fill="#009B3A"/><path d="M10,1.2 L18.8,7 L10,12.8 L1.2,7 Z" fill="#FEDD00"/><circle cx="10" cy="7" r="2.7" fill="#002776"/></svg>BR</button>
+      </span>
+    </div>
+  </header>
+
+  <!-- Transport (patron R-4a) : démarrer/arrêter, tempo, volume. -->
+  <div class="card" id="transport">
+    <div class="tempo-value" id="tempoValue">92</div>
+    <div class="tempo-label">BPM · <em id="tempoName">Moderato</em></div>
+    <div class="slider-row" role="group" aria-label="Réglage du tempo">
+      <button id="minusBtn" aria-label="Tempo moins un">−</button>
+      <input type="range" id="tempoSlider" min="30" max="260" value="92" aria-label="Tempo (BPM)">
+      <button id="plusBtn" aria-label="Tempo plus un">+</button>
+    </div>
+    <div class="main-buttons">
+      <button class="btn-start" id="startBtn">▶ Démarrer</button>
+    </div>
+    <div style="margin-top:10px">
+      <label for="volSlider" class="small">Volume <span id="volVal" style="font-variant-numeric:tabular-nums">· 80 %</span></label>
+      <div style="display:flex;align-items:center;gap:6px">
+        <input type="range" id="volSlider" min="0" max="100" value="80" style="flex:1;min-width:0">
+        <button class="btn-sm" id="volMuteBtn" title="Sourdine générale (coupe tout le son en un clic)" aria-pressed="false">🔊</button>
+      </div>
+    </div>
+    <div class="status-line" id="statusLine" role="status" aria-live="polite">Prêt</div>
+  </div>
+
+  <!-- La config d'équipe -->
+  <div class="card" id="secConfig">
+    <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;">
+      <span class="sec-title">La salle de concert</span>
+      <span class="sec-sub">chacun sa ligne · le chef donne le départ</span>
+    </div>
+
+    <!-- État vide : aucune config chargée -->
+    <div id="eqEmpty">
+      <p class="hint">Fabrique la répartition dans <b>Pratiquer › Team Spirit</b> (qui joue quoi), puis ouvre-la ici : chacun choisit sa ligne sur son appareil, et le chef donne le départ commun.</p>
+      <div class="row">
+        <button class="btn-sm primary" id="eqImportBtn">Importer un fichier d'équipe (JSON)</button>
+        <input type="file" id="eqImportFile" accept="application/json,.json" class="hide" aria-hidden="true">
+        <a class="btn-sm" href="pratiquer.html#secTeam" id="eqGoTeam">→ Aller à Team Spirit</a>
+      </div>
+      <div class="row">
+        <label for="eqLinkInput" style="flex:none;">Coller un lien d'équipe</label>
+        <input type="text" id="eqLinkInput" placeholder="equipe.html#c=…" style="flex:1;min-width:0;">
+        <button class="btn-sm" id="eqLinkBtn">Ouvrir</button>
+      </div>
+    </div>
+
+    <!-- État chargé -->
+    <div id="eqLoaded" class="hide">
+      <p class="eq-summary" id="eqSummary"></p>
+
+      <div id="eqModeCard">
+        <div class="sec-sub" style="margin-top:8px;">Comment jouer ?</div>
+        <div class="eq-choix" role="group" aria-label="Choix du mode de jeu">
+          <button class="eq-chip on" id="eqModeOff" type="button">Hors-ligne</button>
+          <button class="eq-chip" id="eqModeOnline" type="button">En ligne (salle)</button>
+        </div>
+        <div class="eq-mode-sub" id="eqModeSub">Chacun sur son appareil, départ au décompte du chef.</div>
+      </div>
+
+      <!-- Salle en ligne (mode online) -->
+      <div id="eqSalleCard" class="hide" style="margin-top:12px;">
+        <div class="row">
+          <label for="eqSalleCode" style="flex:none;">Code de la salle</label>
+          <input type="text" id="eqSalleCode" placeholder="ex. funk-42" style="flex:1;min-width:0;max-width:200px;">
+          <button class="btn-sm primary" id="eqSalleJoin">Créer / Rejoindre</button>
+          <button class="btn-sm" id="eqSalleLeave">Quitter</button>
+        </div>
+        <label class="check" style="margin-top:4px;"><input type="checkbox" id="eqSalleChef"> Je suis le chef (je donne le départ à tout le monde)</label>
+        <div class="eq-status" id="eqSalleStatus" role="status" aria-live="polite"></div>
+      </div>
+
+      <div style="margin-top:14px;">
+        <div class="sec-sub">Je suis…</div>
+        <div class="eq-choix" id="eqPlayers" role="group" aria-label="Choix de ma ligne"></div>
+      </div>
+
+      <div id="eqPupitre" style="margin-top:12px;">
+        <span class="sec-title" style="font-size:1.05rem;">Mon pupitre</span>
+        <div class="eq-grille" id="eqGrid"></div>
+        <label class="check" style="margin-top:8px;"><input type="checkbox" id="eqBacking" checked> Entendre les autres lignes (l'app les joue)</label>
+      </div>
+
+      <div class="main-buttons" id="eqChefRow" style="margin-top:14px;">
+        <button class="eq-chef-btn" id="eqChef">▶ Départ (le chef)</button>
+      </div>
+      <div class="hint">Un décompte de préparation, puis tout le monde part ensemble. En salle en ligne, seul le chef déclenche le départ.</div>
+
+      <div class="row" id="eqShareRow" style="margin-top:10px;">
+        <button class="btn-sm" id="eqCopyLink" title="Copier le lien à partager avec les autres joueurs">Copier le lien de partage</button>
+        <button class="btn-sm" id="eqPrint" title="Vue imprimable de ma fiche de pupitre">🖨 Imprimer ma fiche</button>
+      </div>
+      <div class="eq-status" id="eqStatus" role="status" aria-live="polite"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Le chef : décompte plein écran -->
+<div id="eqCount" aria-hidden="true"><div id="eqCountNum"></div></div>
+
+<!-- ============ STUBS INERTES : contrat moteur minimal (annexe R-3a) ============ -->
+<div id="fmStubs" hidden aria-hidden="true">
+  <button id="percFsPlay">▶</button>
+  <select id="gapTarget" aria-hidden="true"></select>
+</div>
+
+<!-- ===================== COMPTE (Supabase · lien magique) ===================== -->
+<style id="acctCss">
+  #acctDim{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9500;display:none}
+  #acctDim.show{display:block}
+  #acctCard{position:fixed;z-index:9502;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:min(92vw,380px);background:var(--fm-panel);border:1px solid var(--fm-line);border-radius:14px;
+    padding:20px 20px 16px;box-shadow:0 18px 50px rgba(0,0,0,.35);color:var(--fm-ink)}
+  #acctCard h3{margin:0 0 6px;font-family:var(--fm-font-display);font-size:1.35rem;color:var(--fm-ink)}
+  #acctCard p{margin:0 0 12px;color:var(--fm-sub);font-size:.85rem;line-height:1.5}
+  #acctCard input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--fm-line);
+    background:var(--fm-panel-2);color:var(--fm-ink);font:inherit;font-size:16px;margin-bottom:10px}
+  #acctCard input:focus-visible{outline:2px solid var(--fm-accent);outline-offset:1px}
+  #acctCard .acct-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:6px;flex-wrap:wrap}
+  #acctCard .acct-actions button{background:var(--fm-panel-2);border:1px solid var(--fm-line);color:var(--fm-ink);
+    padding:8px 14px;border-radius:7px;cursor:pointer;font-family:var(--fm-font-ui);font-size: .8125rem;letter-spacing:.04em}
+  #acctCard .acct-actions button:hover{border-color:var(--fm-accent)}
+  #acctCard .acct-actions button.acct-primary{background:var(--fm-accent);border-color:var(--fm-accent);color:var(--fm-accent-ink);font-weight:600}
+  #acctFb{min-height:20px;font-size:.82rem;font-weight:600;margin:2px 0 4px}
+  #acctFb.good{color:var(--fm-accent-text)} #acctFb.bad{color:var(--fm-danger-text)}
+</style>
+<div id="acctDim" aria-hidden="true"></div>
+<div id="acctCard" role="dialog" aria-modal="true" aria-labelledby="acctTitle" style="display:none">
+  <h3 id="acctTitle">Se connecter</h3>
+  <div id="acctBody"></div>
+</div>
+
+<script>
+/* ===== Dictionnaires FR→EN / FR→PT-BR (R-6) — même mécanisme qu'index/pratiquer/
+   apprendre : clé = texte FRANÇAIS normalisé ; le marcheur + MutationObserver (fin de
+   page) traduisent nœuds texte + placeholder/title/aria-label. Clés partagées avec les
+   pages sœurs reprises telles quelles (cohérence de vocabulaire). ===== */
+window.__I18N = { "en": {
+  "Métronome — En équipe": "Metronome — As a team",
+  "Jouer ensemble · chacun sa ligne": "Play together · each their own line",
+  "← Accueil du métronome": "← Metronome home",
+  "Revenir à la page d'accueil du métronome": "Back to the metronome home page",
+  "Pratique libre": "Free practice",
+  "La pratique libre : instruments, styles, réglages complets": "Free practice: instruments, styles, full settings",
+  "◐ Mode sombre": "◐ Dark mode",
+  "◐ Mode clair": "◐ Light mode",
+  "Basculer entre thème clair et thème sombre": "Toggle between light and dark theme",
+  "Se connecter": "Log in",
+  "Recevoir un lien de connexion par e-mail": "Get a login link by email",
+  "Réglage du tempo": "Tempo setting",
+  "Tempo moins un": "Tempo minus one",
+  "Tempo plus un": "Tempo plus one",
+  "▶ Démarrer": "▶ Start",
+  "■ Arrêter": "■ Stop",
+  "Prêt": "Ready",
+  "BPM ·": "BPM ·",
+  "Pratiquer › Team Spirit": "Practice › Team Spirit",
+  "Volume": "Volume",
+  "muet": "mute",
+  "Sourdine générale (coupe tout le son en un clic)": "Master mute (cuts all sound in one click)",
+  "La salle de concert": "The concert hall",
+  "chacun sa ligne · le chef donne le départ": "each their own line · the conductor starts it",
+  "Fabrique la répartition dans": "Build the distribution in",
+  "(qui joue quoi), puis ouvre-la ici : chacun choisit sa ligne sur son appareil, et le chef donne le départ commun.": "(who plays what), then open it here: everyone picks their line on their own device, and the conductor gives the shared start.",
+  "Importer un fichier d'équipe (JSON)": "Import a team file (JSON)",
+  "→ Aller à Team Spirit": "→ Go to Team Spirit",
+  "Coller un lien d'équipe": "Paste a team link",
+  "Ouvrir": "Open",
+  "Comment jouer ?": "How to play?",
+  "Choix du mode de jeu": "Play mode choice",
+  "Hors-ligne": "Offline",
+  "En ligne (salle)": "Online (room)",
+  "Chacun sur son appareil, départ au décompte du chef.": "Everyone on their own device, start on the conductor's count-in.",
+  "En direct : le chef fait partir et arrêter toute la salle.": "Live: the conductor starts and stops the whole room.",
+  "Code de la salle": "Room code",
+  "Créer / Rejoindre": "Create / Join",
+  "Quitter": "Leave",
+  "Choix de ma ligne": "My line choice",
+  "Je suis le chef (je donne le départ à tout le monde)": "I am the conductor (I start everyone)",
+  "Je suis…": "I am…",
+  "Écouter tout (chef)": "Hear everything (conductor)",
+  "Joueur": "Player",
+  "Mon pupitre": "My part",
+  "Entendre les autres lignes (l'app les joue)": "Hear the other lines (the app plays them)",
+  "Aucune ligne ne t'est attribuée — tu accompagnes (backing).": "No line is assigned to you — you accompany (backing).",
+  "Ta partie : cases sourdes = frappes, cases vives = accents — le curseur suit la lecture.": "Your part: dim cells = hits, bright cells = accents — the cursor follows playback.",
+  "▶ Départ (le chef)": "▶ Start (conductor)",
+  "Un décompte de préparation, puis tout le monde part ensemble. En salle en ligne, seul le chef déclenche le départ.": "A preparation count-in, then everyone starts together. In an online room, only the conductor triggers the start.",
+  "Copier le lien à partager avec les autres joueurs": "Copy the link to share with the other players",
+  "Copier le lien de partage": "Copy the share link",
+  "Vue imprimable de ma fiche de pupitre": "Printable view of my part sheet",
+  "🖨 Imprimer ma fiche": "🖨 Print my sheet",
+  "Lien copié.": "Link copied.",
+  "Lien d'équipe illisible.": "Unreadable team link.",
+  "Fichier d'équipe illisible.": "Unreadable team file.",
+  "Connexion à la salle impossible (hors ligne ?).": "Cannot connect to the room (offline?).",
+  "Salle rejointe :": "Room joined:",
+  "Salle quittée.": "Room left.",
+  "En attente du chef…": "Waiting for the conductor…",
+  "joueurs": "players",
+  "Groove :": "Groove:"
+}, "pt": {
+  "Métronome — En équipe": "Metrônomo — Em equipe",
+  "Jouer ensemble · chacun sa ligne": "Tocar juntos · cada um sua linha",
+  "← Accueil du métronome": "← Início do metrônomo",
+  "Revenir à la page d'accueil du métronome": "Voltar à página inicial do metrônomo",
+  "Pratique libre": "Prática livre",
+  "La pratique libre : instruments, styles, réglages complets": "A prática livre: instrumentos, estilos, ajustes completos",
+  "◐ Mode sombre": "◐ Modo escuro",
+  "◐ Mode clair": "◐ Modo claro",
+  "Basculer entre thème clair et thème sombre": "Alternar entre tema claro e escuro",
+  "Se connecter": "Entrar",
+  "Recevoir un lien de connexion par e-mail": "Receber um link de acesso por e-mail",
+  "Réglage du tempo": "Ajuste do andamento",
+  "Tempo moins un": "Andamento menos um",
+  "Tempo plus un": "Andamento mais um",
+  "▶ Démarrer": "▶ Iniciar",
+  "■ Arrêter": "■ Parar",
+  "Prêt": "Pronto",
+  "BPM ·": "BPM ·",
+  "Pratiquer › Team Spirit": "Praticar › Team Spirit",
+  "Volume": "Volume",
+  "muet": "mudo",
+  "Sourdine générale (coupe tout le son en un clic)": "Mudo geral (corta todo o som em um clique)",
+  "La salle de concert": "A sala de concerto",
+  "chacun sa ligne · le chef donne le départ": "cada um sua linha · o maestro dá a largada",
+  "Fabrique la répartition dans": "Monte a distribuição em",
+  "(qui joue quoi), puis ouvre-la ici : chacun choisit sa ligne sur son appareil, et le chef donne le départ commun.": "(quem toca o quê), depois abra aqui: cada um escolhe sua linha no seu aparelho, e o maestro dá a largada comum.",
+  "Importer un fichier d'équipe (JSON)": "Importar um arquivo de equipe (JSON)",
+  "→ Aller à Team Spirit": "→ Ir para o Team Spirit",
+  "Coller un lien d'équipe": "Colar um link de equipe",
+  "Ouvrir": "Abrir",
+  "Comment jouer ?": "Como tocar?",
+  "Choix du mode de jeu": "Escolha do modo de jogo",
+  "Hors-ligne": "Offline",
+  "En ligne (salle)": "Online (sala)",
+  "Chacun sur son appareil, départ au décompte du chef.": "Cada um no seu aparelho, largada na contagem do maestro.",
+  "En direct : le chef fait partir et arrêter toute la salle.": "Ao vivo: o maestro faz partir e parar a sala inteira.",
+  "Code de la salle": "Código da sala",
+  "Créer / Rejoindre": "Criar / Entrar",
+  "Quitter": "Sair",
+  "Choix de ma ligne": "Escolha da minha linha",
+  "Je suis le chef (je donne le départ à tout le monde)": "Eu sou o maestro (eu dou a largada para todos)",
+  "Je suis…": "Eu sou…",
+  "Écouter tout (chef)": "Ouvir tudo (maestro)",
+  "Joueur": "Jogador",
+  "Mon pupitre": "Minha parte",
+  "Entendre les autres lignes (l'app les joue)": "Ouvir as outras linhas (o app as toca)",
+  "Aucune ligne ne t'est attribuée — tu accompagnes (backing).": "Nenhuma linha foi atribuída a você — você acompanha (backing).",
+  "Ta partie : cases sourdes = frappes, cases vives = accents — le curseur suit la lecture.": "Sua parte: células foscas = toques, células vivas = acentos — o cursor segue a leitura.",
+  "▶ Départ (le chef)": "▶ Largada (o maestro)",
+  "Un décompte de préparation, puis tout le monde part ensemble. En salle en ligne, seul le chef déclenche le départ.": "Uma contagem de preparação, depois todos partem juntos. Em sala online, só o maestro dispara a largada.",
+  "Copier le lien à partager avec les autres joueurs": "Copiar o link para compartilhar com os outros jogadores",
+  "Copier le lien de partage": "Copiar o link de compartilhamento",
+  "Vue imprimable de ma fiche de pupitre": "Visualização para impressão da minha ficha de parte",
+  "🖨 Imprimer ma fiche": "🖨 Imprimir minha ficha",
+  "Lien copié.": "Link copiado.",
+  "Lien d'équipe illisible.": "Link de equipe ilegível.",
+  "Fichier d'équipe illisible.": "Arquivo de equipe ilegível.",
+  "Connexion à la salle impossible (hors ligne ?).": "Não foi possível conectar à sala (offline?).",
+  "Salle rejointe :": "Sala acessada:",
+  "Salle quittée.": "Sala deixada.",
+  "En attente du chef…": "Aguardando o maestro…",
+  "joueurs": "jogadores",
+  "Groove :": "Groove:"
+} };
+window.fmTr = (function(){
+  function norm(t){ return (t||'').replace(/\s+/g,' ').trim(); }
+  function lang(){ try{ var q=new URLSearchParams(location.search).get('lang'); var l=q||localStorage.getItem('fm-lang')||'fr'; return ['fr','en','pt'].indexOf(l)>=0?l:'fr'; }catch(e){ return 'fr'; } }
+  return function(fr){ var l=lang(); if(l==='fr') return fr; var D=(window.__I18N||{})[l]; return (D && D[norm(fr)]) || fr; };
+})();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="corpus/socle-technique.js"></script>
+<script src="corpus/funk.js"></script>
+<script src="moteur/fm-etat.js"></script>
+<script src="moteur/fm-audio.js"></script>
+<script src="moteur/fm-accomp.js"></script>
+<script src="coquille/fm-compte.js"></script>
+<script src="coquille/fm-equipe.js"></script>
+<script>
+'use strict';
+/* ============================================================================
+   equipe.html — R-6 · script de page. Consomme une « config d'équipe » (codec
+   coquille/fm-equipe.js), joue LA ligne du joueur choisi par-dessus le backing,
+   le chef donne le départ (hors-ligne ou en salle Supabase). ZÉRO moteur : le
+   patron du lecteur est celui d'apprendre.html (contrat R-3a minimal).
+   ============================================================================ */
+
+  // ---- contrat moteur (annexe R-3a) : état de coquille + hooks référencés ----
+  let percGrids = {};          // vid -> grille de pas (0/1/2)
+  let percOffsets = {};        // vid -> décalage par pas (swing)
+  let percMuted = {};
+  let percMeta = {};           // vid -> { instr, voiceKind }
+  let percWork = '';
+  let percMeasures = 0;
+  let percCallSilent = false;
+  let percBreakActive = false, percBreakEchoNow = false;
+  let statusLineLast = null;
+  let atelierOpen = false;
+  let accompMuted = false;
+  const claveData = {};
+  const CLAVE_VOICES = [];
+  const PERC_INSTR = {
+    djembe: { label: 'Djembé', voices: [
+      { id: 'basse', label: 'Basse' }, { id: 'tone', label: 'Tone' }, { id: 'slap', label: 'Slap' }] },
+    cajon: { label: 'Cajón', voices: [
+      { id: 'grave', label: 'Grave' }, { id: 'aigu', label: 'Aigu' }] }
+  };
+  function scriptOnNewMeasure() {}
+  function percOnNewMeasure() {}
+  function percBreakEvents() { return []; }
+  function percResetBreakState() {}
+  function bowReset() {}
+  function atelierRender() {}
+  function phaseVisuelle(p) { return p < 0 ? p + 1 : p; }
+  function draw() { if (!isPlaying) return; gridCursor(); requestAnimationFrame(draw); }
+  function drawStatic() {}
+  let fmWakeLock = null, fmWakeLockWanted = false;
+  function wakeLockUpdate() {
+    fmWakeLockWanted = isPlaying;
+    if (!('wakeLock' in navigator) || !navigator.wakeLock || !navigator.wakeLock.request) return;
+    if (fmWakeLockWanted && !fmWakeLock) {
+      navigator.wakeLock.request('screen').then(wl => {
+        fmWakeLock = wl;
+        if (wl.addEventListener) wl.addEventListener('release', () => { fmWakeLock = null; });
+        if (!fmWakeLockWanted) wakeLockUpdate();
+      }).catch(() => {});
+    } else if (!fmWakeLockWanted && fmWakeLock) {
+      const wl = fmWakeLock; fmWakeLock = null;
+      try { wl.release().catch(() => {}); } catch (e) {}
+    }
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && fmWakeLockWanted) { fmWakeLock = null; wakeLockUpdate(); }
+  });
+  function buildPercGrids() {}
+  function setFamily(fam) { S.family = fam !== 'tern' ? 'bin' : 'tern'; if (typeof bassPlayRefresh === 'function') bassPlayRefresh(); }
+
+  // ---- état « en équipe » ----
+  const EQ = { config: null, player: 0, mode: 'off', channel: null, chef: false, vids: [] };
+
+  // tsMuted RÉEL : une voix est muette si elle n'est pas audible pour mon joueur.
+  function tsMuted(voice, brk) {
+    if (!EQ.config) return false;
+    const i = EQ.vids.indexOf(voice);
+    if (i < 0) return false;
+    return !window.fmEquipe.audibleForPlayer(EQ.config.voix[i], EQ.config, EQ.player);
+  }
+
+  // ---- thème ----
+  function currentTheme() { return document.documentElement.getAttribute('data-fm-theme') || 'clair'; }
+  function setTheme(t) {
+    document.documentElement.setAttribute('data-fm-theme', t);
+    store.set('fm-theme', t);
+    $('themeBtn').textContent = fmTr(t === 'sombre' ? '◐ Mode clair' : '◐ Mode sombre');
+  }
+  $('themeBtn').addEventListener('click', () => setTheme(currentTheme() === 'sombre' ? 'clair' : 'sombre'));
+
+  // ---- transport ----
+  function nameOf(bpm) {
+    if (bpm < 40) return 'Grave'; if (bpm < 60) return 'Largo';
+    if (bpm < 66) return 'Larghetto'; if (bpm < 76) return 'Adagio';
+    if (bpm < 108) return 'Moderato'; if (bpm < 120) return 'Allegretto';
+    if (bpm < 156) return 'Allegro'; if (bpm < 176) return 'Vivace';
+    if (bpm < 200) return 'Presto'; return 'Prestissimo';
+  }
+  function setTempo(bpm) {
+    S.tempo = Math.min(260, Math.max(30, bpm));
+    $('tempoValue').textContent = S.tempo;
+    $('tempoName').textContent = nameOf(S.tempo);
+    $('tempoSlider').value = S.tempo;
+    store.set('fm-tempo', S.tempo); // continuité du tempo entre pages (R-5 P2)
+  }
+  function setSwing(v) { S.swing = Math.min(85, Math.max(50, v)); }
+  $('tempoSlider').addEventListener('input', e => setTempo(+e.target.value));
+  $('minusBtn').addEventListener('click', () => setTempo(S.tempo - 1));
+  $('plusBtn').addEventListener('click', () => setTempo(S.tempo + 1));
+  $('startBtn').addEventListener('click', () => { toggle(); });
+
+  // ---- volume / sourdine (globals moteur S.volume/volMuted/masterGain) ----
+  function volRender() {
+    const v = $('volVal'); if (v) v.textContent = '· ' + Math.round(S.volume * 100) + ' %' + (volMuted ? ' · ' + fmTr('muet') : '');
+    const b = $('volMuteBtn');
+    if (b) { b.textContent = volMuted ? '🔇' : '🔊'; b.setAttribute('aria-pressed', volMuted ? 'true' : 'false'); }
+  }
+  function volApply() { if (masterGain) masterGain.gain.value = volMuted ? 0 : S.volume; }
+  $('volSlider').addEventListener('input', e => { S.volume = e.target.value / 100; volMuted = false; volApply(); volRender(); });
+  $('volMuteBtn').addEventListener('click', () => { volMuted = !volMuted; volApply(); volRender(); });
+
+  // ---- palette de voix ----
+  const VOICE_COLORS = ['var(--fm-voice-1)','var(--fm-voice-2)','var(--fm-voice-3)','var(--fm-voice-4)','var(--fm-voice-5)','var(--fm-voice-6)'];
+
+  // ---- appliquer une config : injection dans percGrids (patron demoApply) ----
+  function eqClearVoices() {
+    for (const vid of EQ.vids) { delete percGrids[vid]; delete percMeta[vid]; delete percOffsets[vid]; }
+    EQ.vids = [];
+  }
+  function eqApplyConfig(cfg) {
+    if (!cfg || !Array.isArray(cfg.voix)) return false;
+    eqClearVoices();
+    EQ.config = cfg;
+    const sw = cfg.swing != null ? cfg.swing : 50;
+    cfg.voix.forEach((v, i) => {
+      const vid = 'eq.' + i;
+      EQ.vids.push(vid);
+      percGrids[vid] = (v.g || []).slice();
+      percMeta[vid] = { instr: v.instr, voiceKind: v.k };
+      const steps = (v.g || []).length;
+      const swOff = (steps === 16 && sw !== 50) ? 2 * (sw / 100) - 1 : 0;
+      if (swOff !== 0) percOffsets[vid] = v.g.map((_, j) => (j % 2 === 1 ? swOff : 0));
+    });
+    S.perc.instr = (cfg.voix[0] && cfg.voix[0].instr) || 'cajon';
+    S.perc.on = true;
+    setTempo(cfg.tempo || 92);
+    setSwing(sw);
+    // par défaut : je suis le joueur 1 s'il existe une ligne à moi, sinon « écouter tout »
+    EQ.player = cfg.joueurs >= 1 ? 1 : 0;
+    $('eqEmpty').classList.add('hide');
+    $('eqLoaded').classList.remove('hide');
+    eqRenderSummary(); eqRenderPlayers(); eqRenderGrid();
+    return true;
+  }
+
+  function eqRenderSummary() {
+    const c = EQ.config; if (!c) return;
+    const titre = c.titre ? c.titre : '';
+    $('eqSummary').innerHTML = (titre ? fmTr('Groove :') + ' <b>' + esc(titre) + '</b> · ' : '')
+      + (c.joueurs || 1) + ' ' + fmTr('joueurs') + ' · ' + (c.tempo || 92) + ' BPM';
+  }
+  function esc(s) { const d = document.createElement('div'); d.textContent = (s == null ? '' : String(s)); return d.innerHTML; }
+
+  function eqRenderPlayers() {
+    const box = $('eqPlayers'); box.innerHTML = '';
+    const n = Math.max(1, EQ.config ? (EQ.config.joueurs || 1) : 1);
+    for (let p = 1; p <= n; p++) {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'eq-chip' + (EQ.player === p ? ' on' : '');
+      b.textContent = fmTr('Joueur') + ' ' + p;
+      b.setAttribute('data-player', String(p));
+      b.addEventListener('click', () => eqSetPlayer(p));
+      box.appendChild(b);
+    }
+    const all = document.createElement('button');
+    all.type = 'button'; all.className = 'eq-chip' + (EQ.player === 0 ? ' on' : '');
+    all.textContent = fmTr('Écouter tout (chef)');
+    all.setAttribute('data-player', '0');
+    all.addEventListener('click', () => eqSetPlayer(0));
+    box.appendChild(all);
+  }
+  function eqSetPlayer(p) { EQ.player = p; eqRenderPlayers(); eqRenderGrid(); }
+
+  // ---- pupitre : rendu de la grille de MES voix (patron R-4d) ----
+  let gridRows = null, gridSteps = 0, gridCur = null, gridEl = null;
+  function eqRenderGrid() {
+    const host = $('eqGrid'); host.innerHTML = '';
+    gridRows = null; gridSteps = 0; gridCur = null; gridEl = null;
+    const c = EQ.config; if (!c) return;
+    const mine = EQ.player === 0 ? c.voix : window.fmEquipe.voicesOfPlayer(c, EQ.player);
+    if (!mine.length) {
+      const p = document.createElement('div'); p.className = 'hint';
+      p.textContent = fmTr('Aucune ligne ne t\'est attribuée — tu accompagnes (backing).');
+      host.appendChild(p); return;
+    }
+    const el = document.createElement('div'); el.className = 'eq-grille';
+    let maxSteps = 0;
+    mine.forEach((v) => {
+      const g = v.g || []; if (g.length > maxSteps) maxSteps = g.length;
+      const perBeat = Math.max(1, g.length / 4);
+      const row = document.createElement('div'); row.className = 'pfg-row';
+      const idx = c.voix.indexOf(v);
+      row.style.setProperty('--pf-c', VOICE_COLORS[(idx >= 0 ? idx : 0) % VOICE_COLORS.length]);
+      const lab = document.createElement('span'); lab.className = 'pfg-voix'; lab.textContent = v.k;
+      const steps = document.createElement('div'); steps.className = 'pfg-steps';
+      g.forEach((x, i) => {
+        const cell = document.createElement('span');
+        cell.className = 'pfg-cell' + (i > 0 && i % perBeat === 0 ? ' pfg-beat' : '')
+          + (x === 2 ? ' pfg-acc' : (x === 1 ? ' pfg-hit' : ''));
+        steps.appendChild(cell);
+      });
+      row.appendChild(lab); row.appendChild(steps); el.appendChild(row);
+    });
+    const leg = document.createElement('div'); leg.className = 'pfg-legende';
+    leg.textContent = fmTr('Ta partie : cases sourdes = frappes, cases vives = accents — le curseur suit la lecture.');
+    el.appendChild(leg);
+    host.appendChild(el);
+    gridEl = el; gridSteps = maxSteps;
+    gridRows = [...el.querySelectorAll('.pfg-steps')].map(r => [...r.children]);
+  }
+  function gridCursor() {
+    if (!gridRows || !gridSteps) return;
+    if (!gridEl || !gridEl.isConnected) { gridRows = null; return; }
+    const phase = phaseVisuelle(((audioCtx.currentTime - cycleStart) / cycleDur) % 1);
+    const cur = Math.floor(phase * gridSteps) % gridSteps;
+    if (cur === gridCur) return;
+    gridRows.forEach(cells => {
+      if (gridCur != null && cells[gridCur]) cells[gridCur].classList.remove('pfg-cur');
+      if (cells[cur]) cells[cur].classList.add('pfg-cur');
+    });
+    gridCur = cur;
+  }
+  $('eqBacking').addEventListener('change', e => {
+    if (EQ.config) EQ.config.backing = e.target.checked;
+  });
+
+  // ---- le chef : décompte de préparation puis départ ----
+  let countTimer = null;
+  function eqCountdown(beats, done) {
+    const ov = $('eqCount'), num = $('eqCountNum');
+    ov.classList.add('show'); ov.setAttribute('aria-hidden', 'false');
+    const beatMs = Math.max(120, 60000 / (S.tempo || 92));
+    let k = beats;
+    function tick() {
+      if (k <= 0) {
+        ov.classList.remove('show'); ov.setAttribute('aria-hidden', 'true');
+        countTimer = null; if (done) done(); return;
+      }
+      num.textContent = String(k); k--;
+      countTimer = setTimeout(tick, beatMs);
+    }
+    tick();
+  }
+  function eqStartHere() { if (!isPlaying) toggle(); }
+  function eqChefStart() {
+    // en salle en ligne : le chef diffuse le départ à tout le monde
+    if (EQ.mode === 'online' && EQ.channel && EQ.chef) eqBroadcast({ action: 'start', tempo: S.tempo });
+    eqCountdown(4, eqStartHere);
+  }
+  $('eqChef').addEventListener('click', eqChefStart);
+
+  // ---- partage ----
+  function eqShareUrl() {
+    return location.origin + location.pathname + '#c=' + window.fmEquipe.encode(EQ.config);
+  }
+  function eqStatus(msg) { const el = $('eqStatus'); if (el) el.textContent = msg; }
+  $('eqCopyLink').addEventListener('click', () => {
+    if (!EQ.config) return;
+    const url = eqShareUrl();
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(() => eqStatus(fmTr('Lien copié.')), () => eqStatus(url));
+      else eqStatus(url);
+    } catch (e) { eqStatus(url); }
+  });
+  $('eqPrint').addEventListener('click', () => { try { window.print(); } catch (e) {} });
+
+  // ---- charger une config (import JSON / lien collé) ----
+  function eqFromExport(obj) {
+    // accepte le format natif fm-equipe (déjà {voix:[{k,instr,g,j}]}) OU l'export
+    // Team Spirit (type 'fm-metro-groove' : { groove, participants, voix:[…] }).
+    if (obj && Array.isArray(obj.voix) && obj.voix[0] && ('g' in obj.voix[0] || 'k' in obj.voix[0])) return obj;
+    if (obj && obj.type === 'fm-metro-groove' && Array.isArray(obj.voix)) {
+      const labels = obj.participants || [];
+      return {
+        v: 1,
+        titre: (obj.groove && obj.groove.label) || '',
+        tempo: (obj.groove && obj.groove.tempo) || 92,
+        swing: 50,
+        joueurs: labels.length || 1,
+        backing: true,
+        voix: obj.voix.map(v => ({
+          k: v.voiceKind || v.label || '?',
+          instr: v.instr || 'cajon',
+          g: v.grid || [],
+          j: v.participant ? (labels.indexOf(v.participant) + 1) : 0
+        }))
+      };
+    }
+    return null;
+  }
+  $('eqImportBtn').addEventListener('click', () => $('eqImportFile').click());
+  $('eqImportFile').addEventListener('change', e => {
+    const f = e.target.files && e.target.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      let cfg = null;
+      try { cfg = eqFromExport(JSON.parse(r.result)); } catch (err) { cfg = null; }
+      if (cfg && eqApplyConfig(cfg)) { eqStatus(''); }
+      else fmToast(fmTr('Fichier d\'équipe illisible.'));
+    };
+    r.readAsText(f);
+  });
+  $('eqLinkBtn').addEventListener('click', () => {
+    const raw = ($('eqLinkInput').value || '').trim();
+    const cfg = window.fmEquipe.decode(raw);
+    if (cfg && eqApplyConfig(cfg)) eqStatus('');
+    else fmToast(fmTr('Lien d\'équipe illisible.'));
+  });
+
+  // ---- mode hors-ligne / en ligne ----
+  function eqSetMode(m) {
+    EQ.mode = m;
+    $('eqModeOff').classList.toggle('on', m === 'off');
+    $('eqModeOnline').classList.toggle('on', m === 'online');
+    $('eqSalleCard').classList.toggle('hide', m !== 'online');
+    $('eqModeSub').textContent = fmTr(m === 'online'
+      ? 'En direct : le chef fait partir et arrêter toute la salle.'
+      : 'Chacun sur son appareil, départ au décompte du chef.');
+  }
+  $('eqModeOff').addEventListener('click', () => eqSetMode('off'));
+  $('eqModeOnline').addEventListener('click', () => eqSetMode('online'));
+
+  // ---- salle en ligne : broadcast Supabase (réutilise window.fmSupabase) ----
+  function eqSalleStatus(msg) { const el = $('eqSalleStatus'); if (el) el.textContent = msg; }
+  function eqBroadcast(obj) {
+    if (EQ.channel && EQ.channel.send) {
+      try { EQ.channel.send({ type: 'broadcast', event: 'transport', payload: obj }); } catch (e) {}
+    }
+  }
+  function eqOnBroadcast(msg) {
+    if (!msg) return;
+    if (msg.action === 'config' && msg.config) eqApplyConfig(msg.config);
+    else if (msg.action === 'tempo' && msg.tempo) setTempo(msg.tempo);
+    else if (msg.action === 'start') eqCountdown(4, eqStartHere);
+    else if (msg.action === 'stop') { if (isPlaying) toggle(); }
+  }
+  function eqJoinSalle() {
+    const code = ($('eqSalleCode').value || '').trim().replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 40);
+    if (!code) return;
+    const sb = window.fmSupabase && window.fmSupabase();
+    if (!sb || !sb.channel) { eqSalleStatus(fmTr('Connexion à la salle impossible (hors ligne ?).')); return; }
+    if (EQ.channel) { try { sb.removeChannel(EQ.channel); } catch (e) {} EQ.channel = null; }
+    EQ.chef = $('eqSalleChef').checked;
+    const ch = sb.channel('equipe-' + code, { config: { broadcast: { self: false } } });
+    ch.on('broadcast', { event: 'transport' }, payload => eqOnBroadcast(payload && payload.payload));
+    EQ.channel = ch;   // assigné AVANT subscribe : le callback peut diffuser aussitôt
+    ch.subscribe(status => {
+      if (status === 'SUBSCRIBED') {
+        eqSalleStatus(fmTr('Salle rejointe :') + ' ' + code + (EQ.chef ? '' : ' — ' + fmTr('En attente du chef…')));
+        // le chef partage aussitôt la config courante à la salle
+        if (EQ.chef && EQ.config) eqBroadcast({ action: 'config', config: EQ.config });
+      }
+    });
+  }
+  function eqLeaveSalle() {
+    const sb = window.fmSupabase && window.fmSupabase();
+    if (sb && EQ.channel) { try { sb.removeChannel(EQ.channel); } catch (e) {} }
+    EQ.channel = null; EQ.chef = false; eqSalleStatus(fmTr('Salle quittée.'));
+  }
+  $('eqSalleJoin').addEventListener('click', eqJoinSalle);
+  $('eqSalleLeave').addEventListener('click', eqLeaveSalle);
+  $('eqSalleChef').addEventListener('change', e => { EQ.chef = e.target.checked; });
+
+  // ---- boot ----
+  function eqBoot() {
+    const cfg = window.fmEquipe.decode(location.hash);
+    if (cfg) eqApplyConfig(cfg);
+    eqSetMode('off');
+  }
+
+  // ---- API de diagnostic (recettes) ----
+  window.fmEquipeApp = {
+    apply: eqApplyConfig,
+    setPlayer: eqSetPlayer,
+    setMode: eqSetMode,
+    join: eqJoinSalle,
+    leave: eqLeaveSalle,
+    broadcast: eqBroadcast,
+    onBroadcast: eqOnBroadcast,
+    shareUrl: eqShareUrl,
+    tsMuted: tsMuted,
+    state: function () { return { player: EQ.player, mode: EQ.mode, chef: EQ.chef, vids: EQ.vids.slice(), hasConfig: !!EQ.config, hasChannel: !!EQ.channel }; }
+  };
+
+  // ============ INIT ============
+  $('themeBtn').textContent = fmTr(currentTheme() === 'sombre' ? '◐ Mode clair' : '◐ Mode sombre');
+  setTempo(+store.get('fm-tempo') || 92);
+  setSwing(50);
+  volRender();
+  { const _bs = $('buildStamp'); if (_bs) _bs.textContent = 'build ' + BUILD + ' · ' + BUILD_DATE; }
+  eqBoot();
+  window.__fmReady = true;
+</script>
+<script>
+/* ===== Bascule FR/EN/PT — bloc REPRIS d'apprendre/index (patron commun). Langue
+   partagée localStorage « fm-lang ». ===== */
+(function(){
+  var DICTS = window.__I18N || {};
+  var LANGS = ['fr','en','pt'];
+  function norm(s){ return (s||'').replace(/\s+/g,' ').trim(); }
+  function lang(){ try{ var q=new URLSearchParams(location.search).get('lang'); var l=q||localStorage.getItem('fm-lang')||'fr'; return LANGS.indexOf(l)>=0?l:'fr'; }catch(e){ return 'fr'; } }
+  function curDict(){ var l=lang(); return (l!=='fr' && DICTS[l]) ? DICTS[l] : null; }
+  var D=null;
+  function trText(node){ if(!D)return; var raw=node.nodeValue; if(!raw)return; var key=norm(raw); if(!key)return; var t=D[key]; if(t){ var lead=(raw.match(/^\s*/)||[''])[0], trail=(raw.match(/\s*$/)||[''])[0]; if(node.nodeValue!==lead+t+trail) node.nodeValue=lead+t+trail; } }
+  function trEl(el){ if(!D||!el||!el.getAttribute)return; ['placeholder','title','aria-label'].forEach(function(a){ if(el.hasAttribute&&el.hasAttribute(a)){ var t=D[norm(el.getAttribute(a))]; if(t) el.setAttribute(a,t); } }); }
+  function walk(root){ try{ var w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,null),n,ns=[]; while(n=w.nextNode())ns.push(n); ns.forEach(trText); if(root.querySelectorAll) root.querySelectorAll('[placeholder],[title],[aria-label]').forEach(trEl); if(root.nodeType===1) trEl(root); }catch(e){} }
+  function enable(){ D=curDict(); if(!D) return; walk(document.body); try{ var obs=new MutationObserver(function(muts){ muts.forEach(function(m){ if(m.type==='characterData'){ trText(m.target); return; } m.addedNodes&&m.addedNodes.forEach(function(nd){ if(nd.nodeType===3)trText(nd); else if(nd.nodeType===1)walk(nd); }); }); }); obs.observe(document.body,{childList:true,subtree:true,characterData:true}); }catch(e){} }
+  function setLang(code){
+    if(LANGS.indexOf(code)<0 || code===lang()) return;
+    try{ localStorage.setItem('fm-lang',code); }catch(e){}
+    try{ var u=new URL(location.href); u.searchParams.delete('lang'); history.replaceState(null,'',u.toString()); }catch(e){}
+    location.reload();
+  }
+  function highlight(){ var cur=lang(); document.querySelectorAll('.lang-btn').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-lang')===cur); }); }
+  function init(){
+    highlight();
+    document.querySelectorAll('.lang-btn').forEach(function(b){
+      if(b._wired) return; b._wired=true;
+      b.addEventListener('click', function(){ setLang(b.getAttribute('data-lang')); });
+    });
+    enable();
+  }
+  if(document.readyState!=='loading') init(); else document.addEventListener('DOMContentLoaded', init);
+})();</script>
+</body>
+</html>
