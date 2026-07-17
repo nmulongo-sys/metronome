@@ -50,14 +50,16 @@ const KINDS = ['atome', 'synthese'];
 const estPattern = p => p && typeof p.steps === 'number' && Array.isArray(p.hits) &&
   p.hits.every(h => typeof h.i === 'number' && h.i >= 0 && h.i < p.steps);
 
-// demo (R-4a, format acté au GO R-4 §9.2) : { instr, steps, voix:{<voix>:[0/1/2 × steps]} },
-// swing optionnel ; ou une variante par instrument { cajon:{…}, djembe:{…} } (EX-SOCLE partagés).
+// demo (R-4a, format acté au GO R-4 §9.2 ; feel R-4c, actage du 17/07) :
+// { instr, steps, voix:{<voix>:[0/1/2 × steps]} }, swing et feel (±25 ms) optionnels ;
+// ou une variante par instrument { cajon:{…}, djembe:{…} } (EX-SOCLE partagés).
 const estDemo1 = d => d && typeof d.instr === 'string' && typeof d.steps === 'number' &&
   d.voix && typeof d.voix === 'object' &&
   Object.keys(d.voix).length > 0 &&
   Object.keys(d.voix).every(v => Array.isArray(d.voix[v]) && d.voix[v].length === d.steps &&
     d.voix[v].every(x => x === 0 || x === 1 || x === 2)) &&
-  (d.swing === undefined || (typeof d.swing === 'number' && d.swing >= 50 && d.swing <= 85));
+  (d.swing === undefined || (typeof d.swing === 'number' && d.swing >= 50 && d.swing <= 85)) &&
+  (d.feel === undefined || (typeof d.feel === 'number' && d.feel >= -25 && d.feel <= 25));
 const estDemo = d => d && (d.voix ? estDemo1(d)
   : Object.keys(d).length > 0 && Object.keys(d).every(k => estDemo1(d[k])));
 

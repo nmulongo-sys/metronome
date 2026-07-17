@@ -74,7 +74,7 @@ setTimeout(runTests, 120);
 function runTests() {
   /* ---------- A. chargement + page minimale ---------- */
   ok('chargement sans erreur jsdom (' + jsdomErrors.length + ')', jsdomErrors.length === 0);
-  ok('BUILD 0.14.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.14.0');
+  ok('BUILD 0.15.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.15.0');
   ok('2 corpus chargés (socle-technique + funk), 152 exercices assemblés',
     Object.keys(W.FM_CORPUS || {}).length === 2 && Object.keys(g('FM_ASM.exercices')).length === 152);
   ok('pas de répertoire ici : FM_GROOVES absent (la page ne charge pas les grooves)',
@@ -193,6 +193,21 @@ function runTests() {
   ok('S.swing du preset INTACT (50) — le swing appartient à la démo', g('S.swing') === 50);
   api.ecoute.clear();
   ok('clear : offsets retirés avec la démo', g('percOffsets["demo.tone"]') === undefined);
+
+  // R-4c : feel porté par la démo (P1 laid-back +18 ms / P2 pushed −18 ms) —
+  // décalage CONSTANT de toutes les frappes, converti en fraction de pas au
+  // tempo courant (flOff = feel·tempo·steps/240000) ; identité à l'absence.
+  api.ecoute.apply('EX-SOCLE-P1-01', 'cajon');
+  const flAttendu = 18 * g('S.tempo') * 16 / 240000;
+  const offsP1 = g('percOffsets["demo.aigu"]');
+  ok('démo laid-back (P1-01) : offset constant positif sur TOUS les pas (feel +18 ms)',
+    Array.isArray(offsP1) && offsP1.every(o => Math.abs(o - flAttendu) < 1e-9) && flAttendu > 0);
+  api.ecoute.clear();
+  api.ecoute.apply('EX-SOCLE-P2-01', 'cajon');
+  const offsP2 = g('percOffsets["demo.aigu"]');
+  ok('démo pushed (P2-01) : offset constant négatif (feel −18 ms), retiré au clear',
+    Array.isArray(offsP2) && offsP2.every(o => Math.abs(o + flAttendu) < 1e-9) &&
+    (api.ecoute.clear(), g('percOffsets["demo.aigu"]') === undefined));
 
   // grille courte (Débutant, 4 pas) : les fracs suivent la longueur de la grille
   api.ecoute.apply('EX-SOCLE-D-PLS-03', 'cajon');   // le 1 et le 3 : [1,0,1,0]
