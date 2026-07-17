@@ -74,7 +74,7 @@ setTimeout(runTests, 120);
 function runTests() {
   /* ---------- A. chargement + page minimale ---------- */
   ok('chargement sans erreur jsdom (' + jsdomErrors.length + ')', jsdomErrors.length === 0);
-  ok('BUILD 0.15.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.15.0');
+  ok('BUILD 0.16.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.16.0');
   ok('2 corpus chargés (socle-technique + funk), 152 exercices assemblés',
     Object.keys(W.FM_CORPUS || {}).length === 2 && Object.keys(g('FM_ASM.exercices')).length === 152);
   ok('pas de répertoire ici : FM_GROOVES absent (la page ne charge pas les grooves)',
@@ -220,6 +220,40 @@ function runTests() {
   ok('démo multi-voix : trois voix injectées, timbres par voix (percMeta)',
     api.ecoute.voices().length === 3 && g('percMeta["demo.slap"].voiceKind') === 'slap');
   api.ecoute.clear();
+
+  /* ---------- D2. la grille d'exercice vivante (R-4d) ---------- */
+  // Écouter pose la grille dans SA carte — elle rend le champ demo (pas percGrids) :
+  // une ligne par voix, autant de cases que de pas, accents distingués.
+  // NB : le vote de la section C a re-rendu le parcours (pfVote → pfRender) —
+  // on requête la carte FRAÎCHE, cT1 est un nœud périmé.
+  const cT1d = D.querySelector('.pf-card[data-ex="EX-SOCLE-T1-01"][data-parc="cajon"]');
+  clic(cT1d.querySelector('.pf-ecouter'));
+  let gEl = cT1d.querySelector('.pf-grille');
+  ok('R-4d Écouter : grille posée dans la carte (1 ligne par voix, 16 cases)',
+    !!gEl && gEl.querySelectorAll('.pfg-row').length === 1 &&
+    gEl.querySelector('.pfg-steps').children.length === 16);
+  ok('R-4d : l\'accent de T1-01 (le 1) marqué pfg-acc, rien d\'autre n\'est allumé',
+    gEl.querySelectorAll('.pfg-cell.pfg-acc').length === 1 &&
+    gEl.querySelector('.pfg-steps').children[0].classList.contains('pfg-acc') &&
+    gEl.querySelectorAll('.pfg-cell.pfg-hit').length === 0);
+  // « Charger » : la grille RESTE en pratique (l'élève voit où ses frappes doivent tomber)
+  clic(cT1d.querySelector('.pf-load'));
+  gEl = cT1d.querySelector('.pf-grille');
+  ok('R-4d Charger : la grille RESTE en mode pratique (une seule, démo retirée)',
+    !!gEl && D.querySelectorAll('.pf-grille').length === 1 && g('demoActive') === false);
+  // clear : la grille part avec la démo
+  g('demoClear()');
+  ok('R-4d clear : la grille est retirée avec la démo',
+    D.querySelectorAll('.pf-grille').length === 0);
+  // un exercice sans démo ne pose rien — et déloge la grille précédente (une à la fois)
+  clic(cT1d.querySelector('.pf-ecouter'));
+  clic(D.querySelector('.pf-card[data-ex="EX-CJ-B2-04"]').querySelector('.pf-load'));
+  ok('R-4d sans démo : « Charger » sur B2-04 ne pose rien et déloge la grille précédente',
+    D.querySelectorAll('.pf-grille').length === 0);
+  // la phase du curseur est née correcte (spec R-4d §3.3) : repli de fin de mesure
+  ok('R-4d phase : phaseVisuelle replie le négatif en fin de mesure (−0,05 → 0,95 ; 0,42 → 0,42)',
+    Math.abs(g('phaseVisuelle(-0.05)') - 0.95) < 1e-9 && g('phaseVisuelle(0.42)') === 0.42);
+  g('stop()');
 
   /* ---------- E. compte partagé (coquille/fm-compte.js) ---------- */
   ok('fm-compte chargé : window.fmSupabase défini (client nul hors ligne, gardé)',
