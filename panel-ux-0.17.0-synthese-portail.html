@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panel UX 0.17.0 — synthèse portail (3 pages)</title>
+<style>
+  :root{--bg:#f4f5f7;--card:#fff;--ink:#1c2430;--sub:#5b6675;--line:#e3e7ee;--acc:#2f6df6;--acc-soft:#e8effe;
+    --crit:#d63b3b;--crit-bg:#fdeaea;--maj:#e08a00;--maj-bg:#fdf3e2;--min:#3c78c2;--min-bg:#e9f1fb;
+    --pos:#2c9a5b;--pos-bg:#e6f6ec;--radius:12px}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+  .wrap{max-width:1080px;margin:0 auto;padding:20px 16px 60px}
+  h1{margin:0;font-size:1.45rem}
+  .sub{color:var(--sub);font-size:.92rem;margin-top:4px}
+  .badge{display:inline-block;background:var(--acc-soft);color:var(--acc);border-radius:20px;padding:2px 10px;font-size:.78rem;font-weight:600;margin-left:8px;vertical-align:middle}
+  .methodo{background:#fff8e6;border:1px solid #f0dfae;border-radius:var(--radius);padding:10px 14px;font-size:.85rem;color:#6b5a1e;margin:14px 0 20px}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:22px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px}
+  .kpi .v{font-size:1.7rem;font-weight:700;font-variant-numeric:tabular-nums}
+  .kpi .l{font-size:.78rem;color:var(--sub);text-transform:uppercase;letter-spacing:.04em}
+  .kpi .d{font-size:.8rem;color:var(--sub);margin-top:3px}
+  .kpi a{color:var(--acc);text-decoration:none;font-size:.8rem}
+  .kpi .up{color:var(--pos);font-weight:700}
+  h2{font-size:1.08rem;margin:26px 0 10px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+  .card.majeur{border-left:5px solid var(--maj)}
+  .card.p1{border-left:5px solid var(--crit)}
+  .card h3{margin:0 0 6px;font-size:.98rem}
+  .card p{margin:6px 0;font-size:.88rem;color:#38424f}
+  .pages{font-size:.76rem;color:var(--sub)}
+  .pages b{color:var(--ink)}
+  .reco{font-size:.86rem;background:var(--pos-bg);border-radius:8px;padding:8px 10px;color:#1d5c38;margin-top:8px}
+  table{width:100%;border-collapse:collapse;font-size:.88rem;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+  th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line)}
+  th{background:var(--acc-soft);color:var(--ink);font-size:.8rem;text-transform:uppercase;letter-spacing:.03em}
+  td.num{font-variant-numeric:tabular-nums;text-align:center}
+  .tag{font-size:.7rem;font-weight:700;border-radius:4px;padding:2px 7px;text-transform:uppercase}
+  .tag.p1{background:var(--crit-bg);color:var(--crit)}
+  .tag.p2{background:var(--maj-bg);color:var(--maj)}
+  .tag.p3{background:var(--min-bg);color:var(--min)}
+  .tag.r6{background:var(--pos-bg);color:var(--pos)}
+  ul.plan{list-style:none;padding:0;margin:0}
+  ul.plan li{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:11px 14px;margin-bottom:8px;font-size:.88rem}
+  footer{margin-top:30px;color:var(--sub);font-size:.78rem;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Panel UX — synthèse portail<span class="badge">0.17.0 (R5-4, rejeu officiel)</span></h1>
+    <div class="sub">Le panel FIXE de 30 testeurs (mêmes identités que v0.6.5 et 0.14.0) rejoué sur les <b>trois pages EN PROD</b> — un run par page, trois dashboards détaillés + cette synthèse.</div>
+  </header>
+
+  <div class="methodo">⚠ Personas simulés : constats ancrés dans le code réel des pages, utiles pour PRIORISER —
+  à confirmer avec de vrais utilisateurs. Rejeu longitudinal : l'accueil se compare à son run 0.14.0 ;
+  pratiquer et apprendre passent leur PREMIER run officiel en page seule.</div>
+
+  <div class="kpis">
+    <div class="kpi"><div class="l">Accueil (index.html)</div><div class="v">8,61<span class="up"> ▲ +0,37</span></div>
+      <div class="d">vs 8,24 au 0.14.0 · <b>0 majeur restant</b> (les 2 majeurs R-5 résolus)</div>
+      <a href="panel-tests-ui-metronomefunk-accueil-0.17.0.html">→ dashboard accueil</a></div>
+    <div class="kpi"><div class="l">Pratiquer (1er run)</div><div class="v">8,10</div>
+      <div class="d">record du panel battu (Laurent 9,5) · 3 majeurs d'entrée de page</div>
+      <a href="panel-tests-ui-metronomefunk-pratiquer-0.17.0.html">→ dashboard pratiquer</a></div>
+    <div class="kpi"><div class="l">Apprendre (1er run)</div><div class="v">8,37</div>
+      <div class="d">Rosa 9,4 (« ingénierie pédagogique ») · 1 majeur : le contenu FR</div>
+      <a href="panel-tests-ui-metronomefunk-apprendre-0.17.0.html">→ dashboard apprendre</a></div>
+  </div>
+
+  <h2>Ce que R-5 a réglé — constaté par ceux qui le portaient</h2>
+  <div class="card">
+    <p><b>C1 0.14.0 (volume/sourdine, 7 testeurs)</b> : résolu — Emma +1,2 · Marc +0,7 · Denise +1,0 · Suzanne +0,9 ·
+    Aïcha +0,9 · Yanis +0,9 · Fatou +1,1. <b>C2 0.14.0 (porte « En équipe »)</b> : résolu — Camille +1,1, Henri suit le
+    lien et trouve Team Spirit OUVERTE. <b>C3 0.14.0 (trilingue)</b> : la promesse est tenue de bout en bout sur le
+    CHROME des trois pages (Maria 8,0 → 9,0 sur l'accueil) — et c'est précisément ce qui rend visible le majeur suivant.</p>
+  </div>
+
+  <h2>Les 4 constats majeurs du portail (croisés sur les 3 runs)</h2>
+  <div class="card majeur">
+    <h3>M1 · Le contenu pédagogique reste en français dans un portail traduit <span class="pages">— apprendre (majeur) + écho pratiquer (descriptions du répertoire)</span></h3>
+    <p>Le cadre trilingue neuf (R-5) rend la limite visible : en EN/PT, les leçons (objectif/consigne/critère) restent FR sans avertissement. Maria : « mes élèves vont travar aí ».</p>
+    <div class="reco">Court terme (1 h) : une ligne « les leçons sont en français pour l'instant » quand langue ≠ FR. Moyen terme : OUVRIR le transverse « contenu principes en données de corpus » — le grand chantier i18n restant.</div>
+  </div>
+  <div class="card majeur">
+    <h3>M2 · Pratiquer n'accueille pas : les novices refluent devant les dix tiroirs <span class="pages">— pratiquer (majeur, 7 testeurs IT 1–2)</span></h3>
+    <p>La « salle des machines » est assumée, mais le lien R-5 de la porte y envoie désormais des novices (Anne, Henri…) qui n'ont aucun « par où commencer ».</p>
+    <div class="reco">Une ligne d'accueil + un preset « Premier accompagnement » en tête de page — sans toucher à l'architecture.</div>
+  </div>
+  <div class="card majeur">
+    <h3>M3 · La modale de compte reste à moitié traduite sur pratiquer <span class="pages">— pratiquer (majeur, Maria/Chloé) · résolue sur apprendre (R-5)</span></h3>
+    <p>« Annuler », « Envoyer le lien », « Vérifie tes e-mails » en FR après bascule : Maria a hésité à donner son e-mail. Les ~20 clés complètes existent déjà sur apprendre.</p>
+    <div class="reco">Copier le jeu de clés compte d'apprendre vers pratiquer (et l'accueil n'est pas concerné : pas de compte). Effort : trivial, gain : la confiance des non-francophones.</div>
+  </div>
+  <div class="card majeur">
+    <h3>M4 · Les anglicismes des tiroirs de pratiquer bloquent les 66 ans et + <span class="pages">— pratiquer (majeur, Jean-Paul/Michel)</span></h3>
+    <p>« Team Spirit », « Groove », « Gap », « Script » : les sous-titres français existent mais le titre décide — ils n'ouvrent pas ce qu'ils ne comprennent pas.</p>
+    <div class="reco">Français EN PREMIER dans chaque sous-titre de section ; les noms restent (identité), le sous-titre guide.</div>
+  </div>
+
+  <h2>Constats transverses (vus par 2 ou 3 runs — une implémentation, plusieurs pages servies)</h2>
+  <table>
+    <tr><th>Constat</th><th>Runs</th><th>Reco</th></tr>
+    <tr><td>Continuité du tempo entre pages (repart à 92 partout)</td><td class="num">3/3</td><td>persister S.tempo (fm-metro-*) — UNE clé, trois pages</td></tr>
+    <tr><td>Le volume R5-1 manque désormais sur apprendre (seule page sans)</td><td class="num">1/3 + paradoxe</td><td>reprendre la 5e cellule R5-1 telle quelle</td></tr>
+    <tr><td>Annonces situées : dire sous chaque porte/page ce qui vit ailleurs (patron du lien Team Spirit)</td><td class="num">3/3</td><td>étendre le geste R-5 (portes accueil, passerelles Archet/Apprendre)</td></tr>
+    <tr><td>Polices CDN : premier rendu dépendant du réseau</td><td class="num">2/3</td><td>auto-héberger (woff2 + font-display:swap)</td></tr>
+    <tr><td>Impressions manquantes côté apprendre (fiches, livret) — elles vivent toutes sur pratiquer</td><td class="num">2/3</td><td>vue imprimable par fiche (patron exports existants)</td></tr>
+    <tr><td>Lisibilité des extrêmes (9 ans / 66+) : critères petits, état muet discret, cases fines</td><td class="num">3/3</td><td>+1 cran de police ciblé, indicateurs plus francs</td></tr>
+  </table>
+
+  <h2>R-6 validé par le terrain (avant d'être construit)</h2>
+  <div class="card">
+    <p>Les deux « collectives » (Camille, Fatou) butent sur la MÊME limite depuis deux pages différentes :
+    Team Spirit sur un seul appareil (pratiquer) et pas de travail « en pupitre » sur une fiche (apprendre).
+    Henri (80 ans, ancien chef) s'émeut du « chef d'harmonie automatique ». <b>Le panel confirme
+    qu'equipe.html (R-6) est le bon chantier suivant</b> — avec un cahier des charges déjà à moitié écrit
+    par ces trois testeurs.</p>
+  </div>
+
+  <h2>Plan d'action re-priorisé (portail entier)</h2>
+  <ul class="plan">
+    <li><span class="tag p1">P1</span> <b>Pratiquer : « par où commencer ? »</b> (M2) + <b>modale compte traduite</b> (M3, clés déjà écrites) + <b>limite de traduction visible sur apprendre</b> (M1 court terme). Trois gestes à effort faible qui éteignent 3 majeurs sur 4.</li>
+    <li><span class="tag p2">P2</span> <b>Salve « cohérence »</b> : continuité tempo (3 runs) · volume sur apprendre (R5-1 repris) · français d'abord dans les sous-titres de pratiquer (M4) · phrase sous les votes (6 testeurs) · saisie BPM + infobulles Fréquence/Caractère sur l'accueil (reliquats 0.14.0, pré-arbitrés option A) · annonces situées sous les portes.</li>
+    <li><span class="tag p3">P3</span> <b>Finitions</b> : impressions apprendre · « ma session » locale pratiquer · stats/export de progression · grille en grand (classe/atelier) · filtre-favoris répertoire · presets swing/feel · tiroirs qui sautent · polices auto-hébergées · état muet plus voyant · porte cliquable en entier (ou R-6 la remplace).</li>
+    <li><span class="tag r6">R-6</span> <b>equipe.html</b> — validé par le panel (Camille, Fatou, Henri) · le transverse <b>« contenu en corpus »</b> (M1 moyen terme) reste le grand chantier i18n, à planifier en parallèle des styles suivants (C6 apprendre : voix, jazz, son cubain, vents… l'appétit est documenté).</li>
+  </ul>
+
+  <footer>Synthèse générée le 17/07/2026 · Rejeu officiel R5-4 — panel simulé FIXE (30 personas, mêmes identités que v0.6.5/0.14.0)
+  sur index.html, pratiquer.html et apprendre.html 0.17.0 en prod · Métronome — Formation Musicale</footer>
+</div>
+</body>
+</html>
