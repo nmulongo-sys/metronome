@@ -456,9 +456,8 @@ window.__I18N = { "en": {
   "En équipe": "As a team",
   "le parcours cajón · djembé — mode écoute, mode pratique": "the cajón · djembé path — listen mode, practice mode",
   "la pratique libre — ce que je joue, ce qui m'accompagne, le clic": "free practice — what I play, what accompanies me, the click",
-  "bientôt — en attendant, la répartition des voix vit dans": "soon — meanwhile, part distribution lives in",
-  "Pratiquer › Team Spirit": "Practice › Team Spirit",
-  "Bientôt — en attendant, la répartition des voix vit dans Pratiquer › Team Spirit": "Soon — meanwhile, part distribution lives in Practice › Team Spirit",
+  "jouer ensemble — chacun sa ligne, le chef donne le départ": "play together — each their own line, the conductor starts it",
+  "La salle de concert : le pupitre de chacun et le départ commun.": "The concert hall: everyone's part and the shared start.",
   "Volume": "Volume",
   "muet": "mute",
   "Sourdine générale (coupe tout le son en un clic)": "Master mute (cuts all sound in one click)",
@@ -588,9 +587,8 @@ window.__I18N = { "en": {
   "En équipe": "Em equipe",
   "le parcours cajón · djembé — mode écoute, mode pratique": "o percurso cajón · djembé — modo escuta, modo prática",
   "la pratique libre — ce que je joue, ce qui m'accompagne, le clic": "a prática livre — o que eu toco, o que me acompanha, o clique",
-  "bientôt — en attendant, la répartition des voix vit dans": "em breve — enquanto isso, a distribuição das vozes vive em",
-  "Pratiquer › Team Spirit": "Praticar › Team Spirit",
-  "Bientôt — en attendant, la répartition des voix vit dans Pratiquer › Team Spirit": "Em breve — enquanto isso, a distribuição das vozes vive em Praticar › Team Spirit",
+  "jouer ensemble — chacun sa ligne, le chef donne le départ": "tocar juntos — cada um sua linha, o maestro dá a largada",
+  "La salle de concert : le pupitre de chacun et le départ commun.": "A sala de concerto: a parte de cada um e a largada comum.",
   "Volume": "Volume",
   "muet": "mudo",
   "Sourdine générale (coupe tout le son en un clic)": "Mudo geral (corta todo o som em um clique)",
@@ -704,15 +702,13 @@ window.fmTr = (function(){
       <span class="porte-sub">la pratique libre — ce que je joue, ce qui m'accompagne, le clic</span>
       <span class="porte-note">Ton compte, la bibliothèque partagée et Team Spirit vivent ici.</span>
     </a>
-    <!-- R-5 (C2) : la porte reste inactive (equipe.html = R-6) mais le sous-titre dit
-         où Team Spirit vit DÉJÀ, avec le seul élément cliquable : le lien profond.
-         aria-disabled retiré : hérité par les descendants, il rendrait le lien
-         annoncé « désactivé » aux lecteurs d'écran (le span n'est pas un contrôle). -->
-    <span class="porte inactive" id="porteEquipe" title="Bientôt — en attendant, la répartition des voix vit dans Pratiquer › Team Spirit">
+    <!-- R-6 : la porte devient ACTIVE — equipe.html existe. La salle de concert :
+         jouer à plusieurs une répartition Team Spirit, chacun sa ligne, départ au chef. -->
+    <a class="porte" id="porteEquipe" href="equipe.html">
       <span class="porte-titre">En équipe</span>
-      <span class="porte-sub">bientôt — en attendant, la répartition des voix vit dans
-        <a href="pratiquer.html#secTeam" id="porteEquipeLien">Pratiquer › Team Spirit</a></span>
-    </span>
+      <span class="porte-sub">jouer ensemble — chacun sa ligne, le chef donne le départ</span>
+      <span class="porte-note">La salle de concert : le pupitre de chacun et le départ commun.</span>
+    </a>
   </nav>
 
   <!-- Option du mode simple (R-4b, §4.1) : l'Archet quitte le premier niveau — la

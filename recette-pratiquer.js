@@ -80,7 +80,7 @@ setTimeout(runTests, 80);
 function runTests() {
   /* ---------- A. chargement + hiérarchie J1 ---------- */
   ok('chargement sans erreur jsdom (' + jsdomErrors.length + ')', jsdomErrors.length === 0);
-  ok('BUILD 0.19.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.19.0');   // la ligne vivante suit le build
+  ok('BUILD 0.20.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.20.0');   // la ligne vivante suit le build
   ok('GROOVES assemblés depuis FM_GROOVES (31)', g('GROOVES.length') === 31 && Object.keys(W.FM_GROOVES || {}).length === 6);
   const b1 = $('blocJoue'), b2 = $('blocAccomp'), b3 = $('blocClic');
   ok('les trois blocs J1 présents', !!(b1 && b2 && b3));
@@ -217,6 +217,14 @@ function runTests() {
   $('tsAddPart').click();
   ok('R-4b : + Participant crée une carte (la mécanique index vit ici)',
     D.querySelectorAll('#tsParticipants .ts-part').length >= 1);
+  // R-6 : passerelle « ▶ Jouer en équipe » — le bouton existe et la config produite
+  // est décodable par le codec partagé coquille/fm-equipe.js (aller-retour fidèle).
+  ok('R-6 : codec fm-equipe chargé sur pratiquer (window.fmEquipe)', g('typeof window.fmEquipe') === 'object');
+  ok('R-6 : bouton « ▶ Jouer en équipe » présent dans Team Spirit',
+    !!$('tsPlayTeam') && /Jouer en équipe/.test($('tsPlayTeam').textContent));
+  ok('R-6 : tsEquipeConfig() encode la répartition, décodable via le codec (aller-retour)',
+    g('(function(){ var c = tsEquipeConfig(); var d = window.fmEquipe.decode(window.fmEquipe.encode(c)); ' +
+      'return !!d && Array.isArray(d.voix) && d.voix.length === c.voix.length && Array.isArray(d.voix[0].g) && d.tempo === c.tempo; })()') === true);
   // mute maître × voix ts : patron percLayerMuted — la couche perc passe par playClick
   W.eval(`window.__spyTs = 0;
     const _ppTs = playPerc;

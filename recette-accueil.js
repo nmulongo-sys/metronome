@@ -85,8 +85,8 @@ function runTests() {
   /* ---------- A. chargement + premier niveau FERMÉ (§9.8) ---------- */
   const realErrors = jsdomErrors.filter(m => !/resources?|Could not load|external script|net::|ERR_|Not implemented/i.test(m));
   ok('A1.1 chargement sans erreur jsdom (' + realErrors.length + ')', realErrors.length === 0);
-  ok('A1.2 BUILD 0.19.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.19.0');
-  ok('A1.3 tampon de build affiché', /metronomefunk-0\.19\.0/.test(txt($('buildStamp'))));
+  ok('A1.2 BUILD 0.20.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.20.0');
+  ok('A1.3 tampon de build affiché', /metronomefunk-0\.20\.0/.test(txt($('buildStamp'))));
   ok('A2.1 la liste fermée est là : tempo (gros, ±), tap, démarrer, battue, subdivision, son du clic, thème',
     ['tempoValue', 'tempoSlider', 'minusBtn', 'plusBtn', 'tapBtn', 'startBtn',
      'beatsSel', 'subdivSel', 'pulseFreq', 'pulseFreqVal', 'clickType', 'themeBtn'].every(id => !!$(id)));
@@ -184,15 +184,14 @@ function runTests() {
     D.querySelectorAll('#portes .porte').length === 3);
   ok('D1.2 Apprendre → apprendre.html', $('porteApprendre').getAttribute('href') === 'apprendre.html');
   ok('D1.3 Pratiquer → pratiquer.html', $('portePratiquer').getAttribute('href') === 'pratiquer.html');
-  // R-5 (C2) : aria-disabled RETIRÉ (état hérité — il annoncerait le lien profond
-  // « désactivé » aux lecteurs d'écran) ; le sous-titre porte désormais le lien.
-  ok('D1.4 En équipe : porte inactive (annonce R-6) — pas de href, « bientôt », sans aria-disabled',
-    !$('porteEquipe').getAttribute('href') && $('porteEquipe').getAttribute('aria-disabled') === null &&
-    /bientôt/i.test(txt($('porteEquipe'))));
-  ok('D1.5 R-5 (C2) : le sous-titre dit où Team Spirit vit DÉJÀ, avec le lien profond',
-    /la répartition des voix vit dans/.test(txt($('porteEquipe'))) &&
-    !!$('porteEquipeLien') && $('porteEquipeLien').getAttribute('href') === 'pratiquer.html#secTeam' &&
-    !!$('porteEquipeLien').closest('.porte-sub'));
+  // R-6 : la porte « En équipe » devient ACTIVE (equipe.html existe) — un vrai
+  // <a href>, avec sous-titre et note située (patron des deux autres portes).
+  ok('D1.4 En équipe → equipe.html (porte ACTIVE, R-6)',
+    $('porteEquipe').getAttribute('href') === 'equipe.html' && $('porteEquipe').tagName === 'A' &&
+    !$('porteEquipe').classList.contains('inactive'));
+  ok('D1.5 R-6 : sous-titre « chacun sa ligne » + note située sous la porte',
+    /chacun sa ligne/.test(txt($('porteEquipe'))) &&
+    !!$('porteEquipe').querySelector('.porte-note'));
 
   /* ---------- E. l'archet, option du premier niveau ---------- */
   ok('E1.1 section Archet repliée par défaut (le bouton discret, §4.1)',
@@ -268,15 +267,16 @@ function runTests() {
       'Se connecter', '▶ Jouer', 'Micro-timing & groove'];
     ok('H1.2 dictionnaires PURGÉS : les chaînes des surfaces retirées/migrées sont sorties (§4.2)',
       RETIREES_I18N.every(k => !(k in EN) && !(k in PT)));
-    ok('H1.3 chaînes NOUVELLES des portes traduites EN et PT (sous-titre R-5 inclus)',
+    ok('H1.3 chaînes NOUVELLES des portes traduites EN et PT (porte En équipe ACTIVE, R-6)',
       ['Apprendre', 'Pratiquer', 'En équipe', 'le parcours cajón · djembé — mode écoute, mode pratique',
        'la pratique libre — ce que je joue, ce qui m\'accompagne, le clic',
-       'bientôt — en attendant, la répartition des voix vit dans',
-       'Pratiquer › Team Spirit'].every(k => EN[k] && PT[k]));
-    ok('H1.3bis R-5 : clés volume/sourdine traduites, ancienne annonce de la porte PURGÉE',
+       'jouer ensemble — chacun sa ligne, le chef donne le départ',
+       'La salle de concert : le pupitre de chacun et le départ commun.'].every(k => EN[k] && PT[k]));
+    ok('H1.3bis R-6 : clés volume/sourdine traduites, ancienne annonce « bientôt » PURGÉE des deux dicts',
       ['Volume', 'muet', 'Sourdine générale (coupe tout le son en un clic)'].every(k => EN[k] && PT[k]) &&
-      !('bientôt — jouer à plusieurs, chacun sa ligne' in EN) &&
-      !('bientôt — jouer à plusieurs, chacun sa ligne' in PT));
+      !('bientôt — en attendant, la répartition des voix vit dans' in EN) &&
+      !('bientôt — en attendant, la répartition des voix vit dans' in PT) &&
+      !('Pratiquer › Team Spirit' in EN) && !('Pratiquer › Team Spirit' in PT));
     // audit d'extraction (patron 0.6.9 I4) : chaque chaîne visible de la page couverte
     const IDENT = new Set(['FR', 'EN', 'BR', 'Langue / Language / Idioma', 'Français', 'English',
       'Português (Brasil)', 'Tempo (BPM)', 'Tempo', 'Grave', 'Largo', 'Larghetto', 'Adagio',
@@ -325,9 +325,10 @@ function runTests() {
     ok('P2.4 infobulles Fréquence + Caractère (titres FR)',
       !!p2Freq && /Hauteur du clic/.test(p2Freq.getAttribute('title') || '') &&
       !!p2Carac && /Timbre du clic/.test(p2Carac.getAttribute('title') || ''));
-    ok('P2.5 annonces situées : 2 notes sous les portes (compte/bibliothèque/Team Spirit)',
-      D.querySelectorAll('.porte-note').length === 2 &&
-      /bibliothèque partagée et Team Spirit/.test(txt(D.querySelector('#portePratiquer .porte-note'))));
+    ok('P2.5 annonces situées : 3 notes sous les portes (parcours / compte+Team Spirit / salle de concert)',
+      D.querySelectorAll('.porte-note').length === 3 &&
+      /bibliothèque partagée et Team Spirit/.test(txt(D.querySelector('#portePratiquer .porte-note'))) &&
+      /salle de concert/i.test(txt(D.querySelector('#porteEquipe .porte-note'))));
 
     console.log('\n--- accueil (R-4b) : ' + PASS + ' vertes, ' + FAIL + ' rouges (total ' + (PASS + FAIL) + ') ---\n');
     process.exit(FAIL ? 1 : 0);
