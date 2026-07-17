@@ -463,9 +463,15 @@
       // optionnel demo.swing), sinon S.swing — même formule par paires que la
       // basse, identité stricte à 50 % ; S.swing n'est jamais modifié.
       const sw = d.swing != null ? d.swing : S.swing;
-      if (d.steps === 16 && sw !== 50) {
-        const off = 2 * (sw / 100) - 1;
-        percOffsets[vid] = d.voix[vk].map((_, i) => (i % 2 === 1 ? off : 0));
+      const swOff = (d.steps === 16 && sw !== 50) ? 2 * (sw / 100) - 1 : 0;
+      // R-4c (apprendre) : feel de démo (champ optionnel demo.feel, ±25 ms, actage
+      // Jean du 17/07 — patron du feel basse R-3b) : décalage constant de TOUTES
+      // les frappes (laid-back > 0, pushed < 0), converti en fraction de pas au
+      // tempo courant (pas = 240000/tempo/steps ms) ; identité stricte à 0 ;
+      // se compose avec le swing ; retiré avec la démo (demoClear inchangé).
+      const flOff = d.feel ? d.feel * S.tempo * d.steps / 240000 : 0;
+      if (swOff !== 0 || flOff !== 0) {
+        percOffsets[vid] = d.voix[vk].map((_, i) => (i % 2 === 1 ? swOff : 0) + flOff);
       }
       demoVoices.push(vid);
     }

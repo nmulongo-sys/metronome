@@ -89,7 +89,7 @@
 
   // Identité du build affichée dans l'en-tête (5.3-bis). Bumper à chaque passe : elle sert à
   // savoir de quel build vient un enregistrement de validation.
-  const BUILD = 'metronomefunk-0.14.0', BUILD_DATE = '2026-07-16';
+  const BUILD = 'metronomefunk-0.15.0', BUILD_DATE = '2026-07-17';
 
   let audioCtx = null, masterGain = null, noiseBuf = null;
   let masterLimiter = null;                                   // 5.3-ter : limiteur de bus master
