@@ -140,7 +140,7 @@ async function runTests() {
   console.log('\n[1] W1 — mode atelier');
   {
     const btn = D.getElementById('atelierBtn');
-    ok('1.1 bouton « ⛶ Atelier » présent près du transport, avec title', !!btn && !!norm(btn.getAttribute('title')));
+    ok('1.1 bouton « ⛶ Mode classe » présent près du transport, avec title', !!btn && !!norm(btn.getAttribute('title')));
     btn.click();
     await tick(30);
     ok('1.2 clic → overlay atelier ouvert', D.getElementById('atelierFs').classList.contains('open') && R.v070.atelierOpen());
@@ -389,7 +389,7 @@ async function runTests() {
   console.log('\n[11] i18n 0.7.0');
   {
     const EN = W.__I18N.en, PT = W.__I18N.pt;
-    const sample = ['⛶ Atelier', 'Mode atelier — BPM en très grand, gros boutons, écran maintenu allumé',
+    const sample = ['⛶ Mode classe', 'Mode classe — BPM en très grand, gros boutons, écran maintenu allumé',
       '🖨 Imprimer / PDF', 'Écran maintenu allumé', 'Jauge : talon à gauche, pointe à droite.',
       'segment(s)', 'attendu :', 'Grille exportée en PNG.', 'Corrige d\'abord la séquence.',
       'Tempo -1 (maintenir pour répéter)', 'Insérer une ligne d\'exemple'];
@@ -403,8 +403,8 @@ async function runTests() {
     const en = makeDom({ 'fm-lang': 'en' });
     await tick(80);
     const De = en.dom.window.document;
-    ok('11.4 bascule EN : bouton « ⛶ Workshop », chips traduites',
-       txt(De.getElementById('atelierBtn')) === '⛶ Workshop' &&
+    ok('11.4 bascule EN : bouton « ⛶ Class mode », chips traduites',
+       txt(De.getElementById('atelierBtn')) === '⛶ Class mode' &&
        txt(De.querySelector('.script-chip[data-ins="80bpm 5min"]')) === '+ 5 min at 80');
     // lint composé en EN : fragments fmTr
     const tae = De.getElementById('scriptArea');
@@ -418,7 +418,7 @@ async function runTests() {
     const pt = makeDom({ 'fm-lang': 'pt' });
     await tick(80);
     const Dp = pt.dom.window.document;
-    ok('11.6 bascule PT : « ⛶ Oficina »', txt(Dp.getElementById('atelierBtn')) === '⛶ Oficina');
+    ok('11.6 bascule PT : « ⛶ Modo turma »', txt(Dp.getElementById('atelierBtn')) === '⛶ Modo turma');
     pt.dom.window.close();
   }
 

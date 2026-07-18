@@ -223,7 +223,7 @@ async function runTests() {
     'L\'application fonctionne aussi sans compte : la connexion sert seulement à partager tes routines et suivre ta progression.',
     'Pas reçu au bout d\'une minute ? Vérifie tes indésirables (spams), ou renvoie le lien.',
     'Renvoyer le lien',
-    'Groove', 'Claves', 'Percussion', 'Basse', 'Répertoire', 'Horloge', 'Son', 'Bibliothèque', 'Export', '↑ Haut',
+    'Groove', 'Claves', 'Percussion', 'Basse', 'Répertoire', 'Horloge', 'Son', 'Bibliothèque', 'Exporter', '↑ Haut',
     'Sommaire des sections', 'Revenir en haut de la page'
   ];
   const missEn = NEW_KEYS.filter(k => !en[k]), missPt = NEW_KEYS.filter(k => !pt[k]);

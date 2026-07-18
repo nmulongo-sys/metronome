@@ -119,7 +119,7 @@ async function runTests() {
   // ---- 2. C1 — mode focus « une section à la fois » ----
   const fm = D.getElementById('focusMode');
   ok('2.1 case présente dans le sommaire sticky', !!fm && !!fm.closest('#tocBar'));
-  ok('2.2 libellé « Une section à la fois », décochée par défaut', /Une section à la fois/.test(txt(fm.closest('label'))) && fm.checked === false);
+  ok('2.2 libellé « Vue simple », décochée par défaut', /Vue simple/.test(txt(fm.closest('label'))) && fm.checked === false);
   const sections = Array.from(D.querySelectorAll('details.section'));
   const openCount = () => sections.filter(d => d.open).length;
   // décochée : deux sections peuvent rester ouvertes
@@ -212,7 +212,7 @@ async function runTests() {
   // liste — restent les chaînes 0.6.7 encore vivantes sur cette page.
   const NEW_KEYS = [
     'En savoir plus',
-    'Une section à la fois',
+    'Vue simple',
     'Ouvrir une section referme les autres',
     // scissions C9 (phrase clé / suite du pavé)
     'Classe les lignes par priorité — glisse la poignée ⠿ pour réordonner.',
