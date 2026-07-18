@@ -77,7 +77,7 @@ setTimeout(runTests, 120);
 function runTests() {
   /* ---------- A. chargement + page minimale ---------- */
   ok('chargement sans erreur jsdom (' + jsdomErrors.length + ')', jsdomErrors.length === 0);
-  ok('BUILD 0.24.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.24.0');
+  ok('BUILD 0.25.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.25.0');
   ok('2 corpus chargés (socle-technique + funk), 152 exercices assemblés',
     Object.keys(W.FM_CORPUS || {}).length === 2 && Object.keys(g('FM_ASM.exercices')).length === 152);
   ok('pas de répertoire ici : FM_GROOVES absent (la page ne charge pas les grooves)',
@@ -288,7 +288,11 @@ function runTests() {
   const IDENT = new Set(['FR', 'EN', 'BR', 'Langue / Language / Idioma', 'Français', 'English',
     'Português (Brasil)', 'Tempo (BPM)', 'Tempo', 'ok', 'Grave', 'Largo', 'Larghetto', 'Adagio',
     'Moderato', 'Allegretto', 'Allegro', 'Vivace', 'Presto', 'Prestissimo']);
-  const CORPUS_ZONES = '.pf-objet, .pf-consigne, .pf-critere, .pf-mod-objet, .pf-col-head, .pfg-voix';
+  // M1 : les zones de corpus (.pf-objet/.pf-consigne/.pf-critere/.pf-mod-objet) ne sont
+  // PLUS exclues — leur contenu est désormais au dictionnaire (corpus/i18n-*.js), donc
+  // F1.4/F1.5 vérifient AUSSI la couverture des leçons. Restent exclus : les en-têtes de
+  // colonne et les noms de voix de la grille, qui ne viennent pas du corpus.
+  const CORPUS_ZONES = '.pf-col-head, .pfg-voix';
   const EXCL = (t, el) => IDENT.has(t) || /^build metronomefunk-/.test(t) || /^\d+([.,]\d+)?$/.test(t) ||
     !!(el && el.closest && el.closest(CORPUS_ZONES + ', #pfStatus, #statusLine, #fmStubs, #buildStamp'));
   const misses = new Set();
@@ -318,13 +322,17 @@ function runTests() {
   clic(D.querySelector('.lang-btn[data-lang="pt"]'));
   ok('F1.6 clic BR → langue partagée écrite (localStorage fm-lang = pt)',
     W.localStorage.getItem('fm-lang') === 'pt');
-  // P1-c (M1 court terme) : avis « leçons en français » — présent, MASQUÉ en FR (ce DOM
-  // est chargé sans lang), clé traduite dans les deux dictionnaires.
-  ok('F1.7 P1-c (M1) : avis « leçons en FR » présent et MASQUÉ en français',
-    !!$('pfLangNote') && $('pfLangNote').hidden === true);
-  ok('F1.8 P1-c : la clé de l\'avis est traduite EN et PT',
-    !!EN['Les leçons (objectif, consigne, critère) sont pour l\'instant en français ; le reste de la page suit ta langue.'] &&
-    !!PT['Les leçons (objectif, consigne, critère) sont pour l\'instant en français ; le reste de la page suit ta langue.']);
+  // M1 : l'avis « leçons en français » (P1-c, provisoire) a disparu — le corpus est traduit.
+  ok('F1.7 M1 : l\'avis provisoire « leçons en FR » est RETIRÉ de la page',
+    !$('pfLangNote') &&
+    !EN['Les leçons (objectif, consigne, critère) sont pour l\'instant en français ; le reste de la page suit ta langue.']);
+  // M1 : le dictionnaire porte bien le contenu des leçons (fusion de corpus/i18n-*.js
+  // dans window.__I18N, sans écraser le chrome défini plus haut dans la page).
+  ok('F1.8 M1 : le CONTENU du corpus est au dictionnaire EN et PT (objet, consigne, critère)',
+    EN['Grave sur The One'] === 'Bass tone on The One' &&
+    PT['Grave sur The One'] === 'Grave no The One' &&
+    !!EN['Pose ton grave exactement sur le 1, en même temps que la fondamentale de la basse.'] &&
+    !!PT['quand ton grave et celui de la basse sonnent comme une seule frappe.']);
 
   /* ---- F2. second DOM en ?lang=pt : la page vit en portugais, le corpus reste FR ---- */
   const vc2 = new VirtualConsole();
@@ -350,17 +358,31 @@ function runTests() {
       txt2(D2.querySelector('.pf-load')) === 'Carregar' &&
       /adquirido/.test(txt2(D2.querySelector('.pf-acq-lbl'))) &&
       ['Iniciante', 'Intermediário', 'Avançado', 'Artista'].indexOf(txt2(D2.querySelector('.pf-niv-tab'))) >= 0);
-    // témoin robuste : la carte affiche EXACTEMENT l'objet du corpus (FR), non traduit
+    // M1 : témoin inversé — la carte affiche la TRADUCTION PT de l'objet du corpus, pas le FR
     const carte1 = D2.querySelector('.pf-card');
-    const objetCorpus = W2.eval('PF_EX[' + JSON.stringify(carte1.getAttribute('data-ex')) + '].objet');
-    ok('F2.4 le contenu CORPUS reste en FRANÇAIS (périmètre §4.2) — l\'objet affiché == corpus',
-      txt2(carte1.querySelector('.pf-objet')) === norm(objetCorpus));
+    const objetCorpus = norm(W2.eval('PF_EX[' + JSON.stringify(carte1.getAttribute('data-ex')) + '].objet'));
+    const objetAffiche = txt2(carte1.querySelector('.pf-objet'));
+    ok('F2.4 M1 : le contenu CORPUS est TRADUIT — l\'objet affiché == la traduction PT, plus le FR',
+      objetAffiche === norm(W2.__I18N.pt[objetCorpus]) && objetAffiche !== objetCorpus);
+    // le critère est bien dans son propre nœud (sinon les guillemets casseraient la clé)
+    const critereCorpus = norm(W2.eval('PF_EX[' + JSON.stringify(carte1.getAttribute('data-ex')) + '].critere'));
+    ok('F2.4-bis M1 : le critère est traduit (nœud texte isolé des guillemets)',
+      txt2(carte1.querySelector('.pf-critere span')) === norm(W2.__I18N.pt[critereCorpus]));
     // écoute : statut composé (segments fixes via fmTr) + légende de grille traduits
-    clic2(D2.querySelector('.pf-ecouter'));
+    // ATTENTION : la 1re carte n'a pas forcément de démo — le statut parlera de l'exercice
+    // qui porte le bouton cliqué, pas de carte1. On note donc SON objet pour F2.5.
+    const btnEcoute = D2.querySelector('.pf-ecouter');
+    const carteEcoute = btnEcoute.closest('.pf-card');
+    const objetEcoute = norm(W2.eval('PF_EX[' + JSON.stringify(carteEcoute.getAttribute('data-ex')) + '].objet'));
+    clic2(btnEcoute);
     setTimeout(() => {
-      ok('F2.5 statut écoute : segments fixes traduits, objet corpus FR au milieu',
+      // M1 : la ligne de statut est concaténée dans UN nœud — l'objet y passe par fmTr,
+      // donc les trois segments (fixe + corpus + fixe) sont en portugais.
+      ok('F2.5 statut écoute : segments fixes ET objet du corpus traduits (fmTr)',
         /^Escuta:/.test(txt2(D2.getElementById('pfStatus'))) &&
-        /o modelo toca por cima do acompanhamento\.$/.test(txt2(D2.getElementById('pfStatus'))));
+        /o modelo toca por cima do acompanhamento\.$/.test(txt2(D2.getElementById('pfStatus'))) &&
+        txt2(D2.getElementById('pfStatus')).indexOf(objetEcoute) < 0 &&
+        txt2(D2.getElementById('pfStatus')).indexOf(norm(W2.__I18N.pt[objetEcoute])) > 0);
       ok('F2.6 légende de la grille vivante traduite (Sua parte…)',
         /^Sua parte/.test(txt2(D2.querySelector('.pfg-legende'))));
       // vote : pfVote → pfRender re-rend TOUT — l'observateur retraduit (nœuds FRAIS)
@@ -370,10 +392,12 @@ function runTests() {
           txt2(D2.getElementById('pfStatus')) === 'Voto registrado: fácil.');
         ok('F2.8 re-rendu après vote TOUJOURS traduit (MutationObserver vivant, cartes fraîches)',
           /Ouvir/.test(txt2(D2.querySelector('.pf-ecouter'))));
-        // P1-c (M1) : dans ce DOM ?lang=pt, l'avis « leçons en FR » est RÉVÉLÉ et traduit
-        ok('F2.9 P1-c (M1) : avis « leçons en FR » RÉVÉLÉ et traduit en PT (As lições…)',
-          D2.getElementById('pfLangNote').hidden === false &&
-          /^As lições/.test(txt2(D2.getElementById('pfLangNote'))));
+        // M1 : plus d'avis de limitation — et AUCUNE consigne ne reste en français après
+        // le re-rendu (l'observateur retraduit les cartes fraîches, corpus compris).
+        const consFR = Array.from(D2.querySelectorAll('.pf-consigne')).map(txt2)
+          .filter(t => t && W2.__I18N.pt[t]);   // encore trouvable comme CLÉ = encore en FR
+        ok('F2.9 M1 : plus d\'avis de limitation, et 0 consigne restée en FR après re-rendu',
+          !D2.getElementById('pfLangNote') && consFR.length === 0);
         // R-5 salve P2 : volume sur apprendre + phrase située sous les votes
         ok('P2.1 volume + sourdine sur le transport (IDs R5-1, dans #transport)',
           !!$('volSlider') && !!$('volVal') && !!$('volMuteBtn') && !!($('volMuteBtn').closest && $('volMuteBtn').closest('#transport')));

@@ -299,10 +299,8 @@
       <span class="sec-sub">cajón · djembé — leçons par niveaux</span>
     </div>
     <div class="hint">Choisis un exercice. « ▶ Écouter » fait entendre le modèle par-dessus l'accompagnement — imprègne-toi, puis « Charger » installe l'accompagnement seul : à toi de jouer. Coche « acquis » quand le critère est atteint ; le vote de difficulté aide à recalibrer le niveau pour tout le monde.</div>
-    <!-- P1-c (M1 court terme, salve R-5 P1) : rendre VISIBLE la limite de traduction —
-         les leçons (contenu de corpus) restent FR même en EN/PT. Masqué en français,
-         révélé au chargement si la langue active n'est pas le français (voir init). -->
-    <p class="hint pf-lang-note" id="pfLangNote" hidden>Les leçons (objectif, consigne, critère) sont pour l'instant en français ; le reste de la page suit ta langue.</p>
+    <!-- M1 : l'avis « leçons en français » (P1-c, salve R-5 P1) est RETIRÉ — le corpus
+         est désormais traduit en EN/PT par corpus/i18n-*.js, la limite n'existe plus. -->
     <div id="pfRoot"></div>
     <div id="pfStatus" aria-live="polite"></div>
   </div>
@@ -348,11 +346,11 @@
 /* ===== R-5 (C3) : dictionnaires FR→EN / FR→PT-BR — la dernière marche du trilingue.
    Même mécanisme qu'index.html et pratiquer.html : clé = texte FRANÇAIS normalisé
    (espaces repliés) ; le marcheur + MutationObserver (bloc en fin de page) traduisent
-   les nœuds texte et les attributs placeholder/title/aria-label. PÉRIMÈTRE (spec R-5
-   §4.2) : les libellés PROPRES de la page — le contenu pédagogique du corpus (objet,
-   consigne, critère, noms de modules) reste en français (transverse « principes en
-   corpus », non planifié). Les clés partagées avec index/pratiquer sont reprises
-   TELLES QUELLES (cohérence de vocabulaire inter-pages). ===== */
+   les nœuds texte et les attributs placeholder/title/aria-label. PÉRIMÈTRE : les libellés
+   PROPRES de la page. Le contenu pédagogique du corpus (objet, consigne, critère, noms
+   de modules) est traduit depuis M1, mais AILLEURS — dans corpus/i18n-*.js, chargés plus
+   bas, qui fusionnent dans ce même dictionnaire. Les clés partagées avec index/pratiquer
+   sont reprises TELLES QUELLES (cohérence de vocabulaire inter-pages). ===== */
 window.__I18N = { "en": {
   "Volume": "Volume",
   "muet": "mute",
@@ -385,7 +383,6 @@ window.__I18N = { "en": {
   "Le parcours": "The path",
   "cajón · djembé — leçons par niveaux": "cajón · djembé — lessons by level",
   "Choisis un exercice. « ▶ Écouter » fait entendre le modèle par-dessus l'accompagnement — imprègne-toi, puis « Charger » installe l'accompagnement seul : à toi de jouer. Coche « acquis » quand le critère est atteint ; le vote de difficulté aide à recalibrer le niveau pour tout le monde.": "Pick an exercise. \"▶ Listen\" plays the model over the accompaniment — soak it up, then \"Load\" sets up the accompaniment alone: your turn to play. Tick \"mastered\" when the criterion is met; the difficulty vote helps recalibrate the level for everyone.",
-  "Les leçons (objectif, consigne, critère) sont pour l'instant en français ; le reste de la page suit ta langue.": "The lessons (objective, instructions, criterion) are in French for now; the rest of the page follows your language.",
   /* — rendu du parcours (libellés générés par pfRender) — */
   "Niveau du parcours": "Path level",
   "Débutant": "Beginner",
@@ -477,7 +474,6 @@ window.__I18N = { "en": {
   "Le parcours": "O percurso",
   "cajón · djembé — leçons par niveaux": "cajón · djembê — lições por nível",
   "Choisis un exercice. « ▶ Écouter » fait entendre le modèle par-dessus l'accompagnement — imprègne-toi, puis « Charger » installe l'accompagnement seul : à toi de jouer. Coche « acquis » quand le critère est atteint ; le vote de difficulté aide à recalibrer le niveau pour tout le monde.": "Escolha um exercício. « ▶ Ouvir » faz soar o modelo por cima do acompanhamento — absorva, depois « Carregar » instala apenas o acompanhamento: sua vez de tocar. Marque « adquirido » quando o critério for atingido; o voto de dificuldade ajuda a recalibrar o nível para todos.",
-  "Les leçons (objectif, consigne, critère) sont pour l'instant en français ; le reste de la page suit ta langue.": "As lições (objetivo, instrução, critério) estão em francês por enquanto; o resto da página segue o seu idioma.",
   /* — rendu du parcours (libellés générés par pfRender) — */
   "Niveau du parcours": "Nível do percurso",
   "Débutant": "Iniciante",
@@ -547,6 +543,11 @@ window.fmTr = (function(){
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="corpus/socle-technique.js"></script>
 <script src="corpus/funk.js"></script>
+<!-- M1 : traductions EN/PT du CONTENU des leçons. Chargées après la définition de
+     window.__I18N ci-dessus (elles fusionnent, ne l'écrasent jamais) et avant le bloc
+     de bascule en fin de page. Un fichier par corpus : C6 ajoutera ses styles ici. -->
+<script src="corpus/i18n-socle-technique.js"></script>
+<script src="corpus/i18n-funk.js"></script>
 <script src="moteur/fm-etat.js"></script>
 <script src="moteur/fm-audio.js"></script>
 <script src="moteur/fm-accomp.js"></script>
@@ -945,8 +946,9 @@ window.fmTr = (function(){
     try { if (typeof bassPersist === 'function') bassPersist(); } catch(e){}
     pfSyncBassUI();
     if (P.metro) pfSyncMetroUI();
-    // R-5 (apprendre) : segments fixes via fmTr — E.objet (corpus) reste en français (§4.2)
-    pfStatus(fmTr('Chargé :') + ' ' + E.objet + ' ' + fmTr('— lance le métronome.'));
+    // M1 : la ligne de statut concatène dans un seul nœud texte — le marcheur i18n ne peut
+    // pas la traiter, donc E.objet passe explicitement par fmTr (corpus désormais traduit).
+    pfStatus(fmTr('Chargé :') + ' ' + fmTr(E.objet) + ' ' + fmTr('— lance le métronome.'));
   }
   function pfStatus(msg){ const el = $('pfStatus'); if (el) el.textContent = msg || ''; }
   // ---- rendu ----
@@ -995,7 +997,10 @@ window.fmTr = (function(){
           if (promu) html += '<span class="pf-badge-promo" title="Monte d\'un niveau par les votes">&#8593; niveau</span>';
           html += '</div>';
           html += '<div class="pf-consigne">' + pfEsc(E.consigne) + '</div>';
-          html += '<div class="pf-critere">&laquo; ' + pfEsc(E.critere) + ' &raquo;</div>';
+          // M1 : le critère est isolé dans son propre nœud texte (les guillemets restent
+          // dehors) — sinon la clé du dico serait « … » guillemets compris, et le marcheur
+          // i18n ne la retrouverait pas.
+          html += '<div class="pf-critere">&laquo; <span>' + pfEsc(E.critere) + '</span> &raquo;</div>';
           html += '<div class="pf-actions">';
           // R-4a (apprendre) : mode écoute — « ▶ Écouter » quand l'exercice porte une démo, sinon mention discrète
           html += demoFor(E, pk) ? '<button class="btn-sm primary pf-ecouter">\u25B6 \u00C9couter</button>' : '<span class="pf-nodemo">d\u00E9mo \u00E0 venir</span>';
@@ -1044,8 +1049,8 @@ window.fmTr = (function(){
           pfLoadPreset(ex);
           if (demoApply(ex, pk)) {
             grillePose(ex, pk);   // R-4d : la grille vivante dans la carte
-            // R-5 (apprendre) : segments fixes via fmTr \u2014 E.objet (corpus) reste en fran\u00E7ais (\u00A74.2)
-            pfStatus(fmTr('\u00C9coute :') + ' ' + E.objet + ' ' + fmTr('\u2014 le mod\u00E8le joue par-dessus l\u2019accompagnement.'));
+            // M1 : idem \u2014 n\u0153ud texte concat\u00E9n\u00E9, E.objet traduit explicitement via fmTr.
+            pfStatus(fmTr('\u00C9coute :') + ' ' + fmTr(E.objet) + ' ' + fmTr('\u2014 le mod\u00E8le joue par-dessus l\u2019accompagnement.'));
             if (!isPlaying) toggle();
             statusRender();
           }
@@ -1111,11 +1116,6 @@ window.fmTr = (function(){
   setTempo(+store.get('fm-tempo') || 92); // R-5 P2 : reprend le tempo de la page précédente
   setSwing(50);
   { const _bs = $('buildStamp'); if (_bs) _bs.textContent = 'build ' + BUILD + ' · ' + BUILD_DATE; }
-
-  // P1-c (M1 court terme) : l'avis « leçons en français » n'apparaît QUE si la langue
-  // active n'est pas le français — le contenu de corpus reste FR (transverse non ouvert).
-  { let _l = 'fr'; try { _l = new URLSearchParams(location.search).get('lang') || store.get('fm-lang') || 'fr'; } catch (e) {}
-    const _n = $('pfLangNote'); if (_n && _l !== 'fr') _n.hidden = false; }
 
   // 0.6.6 (C8) : l'init est terminée — les prochains enregistrements viennent d'un geste
   // utilisateur, le toast « réglages enregistrés » peut se montrer (une fois par session).
