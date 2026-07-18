@@ -80,7 +80,7 @@ setTimeout(runTests, 80);
 function runTests() {
   /* ---------- A. chargement + hiérarchie J1 ---------- */
   ok('chargement sans erreur jsdom (' + jsdomErrors.length + ')', jsdomErrors.length === 0);
-  ok('BUILD 0.23.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.23.0');   // la ligne vivante suit le build
+  ok('BUILD 0.24.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.24.0');   // la ligne vivante suit le build
   ok('GROOVES assemblés depuis FM_GROOVES (31)', g('GROOVES.length') === 31 && Object.keys(W.FM_GROOVES || {}).length === 6);
   const b1 = $('blocJoue'), b2 = $('blocAccomp'), b3 = $('blocClic');
   ok('les trois blocs J1 présents', !!(b1 && b2 && b3));

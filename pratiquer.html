@@ -893,7 +893,7 @@ window.__I18N = { "en": {
   "Son": "Sound",
   "Script": "Script",
   "Bibliothèque": "Library",
-  "Export": "Export",
+  "Exporter": "Export",
   "↑ Haut": "↑ Top",
   "Revenir en haut de la page": "Back to the top of the page",
   "Micro-timing : décaler certaines frappes de quelques millisecondes autour du temps — c'est ce qui fait « groover »": "Micro-timing: shifting some hits a few milliseconds around the beat — that's what makes it groove",
@@ -944,7 +944,7 @@ window.__I18N = { "en": {
   "Débutant ? Laisse-toi guider": "Beginner? Let us guide you",
   "— l'assistant règle le métronome pour toi en trois questions.": "— the assistant sets up the metronome for you in three questions.",
   "Plus tard": "Later",
-  "Une section à la fois": "One section at a time",
+  "Vue simple": "Simple view",
   "Ouvrir une section referme les autres": "Opening a section closes the others",
   /* ===== 0.6.9 (C4+C10) : statuts dynamiques, aria-labels, hint basse, libellés UI (audit I4) ===== */
   "Arrêté": "Stopped",
@@ -1069,11 +1069,10 @@ window.__I18N = { "en": {
   "secondes": "seconds",
   "Décalage -1 ms": "Offset -1 ms",
   "Décalage +1 ms": "Offset +1 ms",
-  "⛶ Atelier": "⛶ Workshop",
-  "Mode atelier — BPM en très grand, gros boutons, écran maintenu allumé": "Workshop mode — huge BPM, big buttons, screen kept awake",
-  "Atelier": "Workshop",
-  "Mode atelier": "Workshop mode",
-  "Transport atelier": "Workshop transport",
+  "⛶ Mode classe": "⛶ Class mode",
+  "Mode classe — BPM en très grand, gros boutons, écran maintenu allumé": "Class mode — huge BPM, big buttons, screen kept awake",
+  "Mode classe": "Class mode",
+  "Transport classe": "Class transport",
   "Écran maintenu allumé": "Screen kept awake",
   "Tempo -1 (maintenir pour répéter)": "Tempo -1 (hold to repeat)",
   "Tempo +1 (maintenir pour répéter)": "Tempo +1 (hold to repeat)",
@@ -1512,7 +1511,7 @@ window.__I18N = { "en": {
   "Son": "Som",
   "Script": "Script",
   "Bibliothèque": "Biblioteca",
-  "Export": "Exportar",
+  "Exporter": "Exportar",
   "↑ Haut": "↑ Topo",
   "Revenir en haut de la page": "Voltar ao topo da página",
   "Micro-timing : décaler certaines frappes de quelques millisecondes autour du temps — c'est ce qui fait « groover »": "Micro-timing: deslocar alguns toques por alguns milissegundos ao redor do tempo — é isso que faz o groove",
@@ -1562,7 +1561,7 @@ window.__I18N = { "en": {
   "Débutant ? Laisse-toi guider": "Iniciante? Deixe-se guiar",
   "— l'assistant règle le métronome pour toi en trois questions.": "— o assistente ajusta o metrônomo para você em três perguntas.",
   "Plus tard": "Mais tarde",
-  "Une section à la fois": "Uma seção de cada vez",
+  "Vue simple": "Vista simples",
   "Ouvrir une section referme les autres": "Abrir uma seção fecha as outras",
   /* ===== 0.6.9 (C4+C10) : statuts dynamiques, aria-labels, hint basse, libellés UI (audit I4) ===== */
   "Arrêté": "Parado",
@@ -1687,11 +1686,10 @@ window.__I18N = { "en": {
   "secondes": "segundos",
   "Décalage -1 ms": "Deslocamento -1 ms",
   "Décalage +1 ms": "Deslocamento +1 ms",
-  "⛶ Atelier": "⛶ Oficina",
-  "Mode atelier — BPM en très grand, gros boutons, écran maintenu allumé": "Modo oficina — BPM bem grande, botões grandes, tela mantida acesa",
-  "Atelier": "Oficina",
-  "Mode atelier": "Modo oficina",
-  "Transport atelier": "Transporte da oficina",
+  "⛶ Mode classe": "⛶ Modo turma",
+  "Mode classe — BPM en très grand, gros boutons, écran maintenu allumé": "Modo turma — BPM bem grande, botões grandes, tela mantida acesa",
+  "Mode classe": "Modo turma",
+  "Transport classe": "Transporte da turma",
   "Écran maintenu allumé": "Tela mantida acesa",
   "Tempo -1 (maintenir pour répéter)": "Tempo -1 (segure para repetir)",
   "Tempo +1 (maintenir pour répéter)": "Tempo +1 (segure para repetir)",
@@ -1791,7 +1789,7 @@ window.fmTr = (function(){
       <div class="main-buttons">
         <button class="btn-start" id="startBtn">▶ Démarrer</button>
         <button class="btn-tap" id="tapBtn">Tap</button>
-        <button class="btn-tap" id="atelierBtn" title="Mode atelier — BPM en très grand, gros boutons, écran maintenu allumé">⛶ Atelier</button>
+        <button class="btn-tap" id="atelierBtn" title="Mode classe — BPM en très grand, gros boutons, écran maintenu allumé">⛶ Mode classe</button>
       </div>
       <div class="kbd-top"><span aria-hidden="true">⌨</span> Espace : lecture · ↑↓ : tempo ±1 · T : tap tempo</div>
       <div class="mini-grid">
@@ -1858,9 +1856,9 @@ window.fmTr = (function(){
     <button class="toc-chip" data-toc="secSon">Son</button>
     <button class="toc-chip" data-toc="secScript">Script</button>
     <button class="toc-chip" data-toc="secBiblio">Bibliothèque</button>
-    <button class="toc-chip" data-toc="expAudio">Export</button>
+    <button class="toc-chip" data-toc="expAudio">Exporter</button>
     <button class="toc-chip" data-toc="__top" title="Revenir en haut de la page">↑ Haut</button>
-    <label class="check toc-focus" title="Ouvrir une section referme les autres"><input type="checkbox" id="focusMode"> Une section à la fois</label>
+    <label class="check toc-focus" title="Ouvrir une section referme les autres"><input type="checkbox" id="focusMode"> Vue simple</label>
   </nav>
 
   <!-- ============ R-3b — HIÉRARCHIE J1 : trois blocs ============
@@ -2410,10 +2408,10 @@ swing 62
 </div>
 
 <!-- ============ MODE ATELIER (0.7.0, C11) ============ -->
-<div class="atelierfs" id="atelierFs" role="dialog" aria-label="Mode atelier">
+<div class="atelierfs" id="atelierFs" role="dialog" aria-label="Mode classe">
   <div class="bowfs-bar">
     <div>
-      <div class="bowfs-title">Atelier</div>
+      <div class="bowfs-title">Mode classe</div>
       <div class="kicker" id="atelierMeasure"></div>
     </div>
     <div class="bowfs-controls">
@@ -2426,7 +2424,7 @@ swing 62
     <div class="atelier-sub">BPM · <em id="atelierName">Moderato</em></div>
     <div class="atelier-status" id="atelierStatus" role="status" aria-live="polite"></div>
   </div>
-  <div class="atelier-controls" role="group" aria-label="Transport atelier">
+  <div class="atelier-controls" role="group" aria-label="Transport classe">
     <button id="atelierMinus" aria-label="Tempo -1 (maintenir pour répéter)">−</button>
     <button class="play" id="atelierPlay" aria-label="Lecture / arrêt">▶</button>
     <button id="atelierPlus" aria-label="Tempo +1 (maintenir pour répéter)">+</button>
