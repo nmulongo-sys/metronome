@@ -2755,9 +2755,23 @@ swing 62
       rowSetCur(row, Math.floor((phase < 0 ? 0 : phase) * n) % n);
     });
     if (S.perc.on && ($('secPerc').open || percFsOpen)) {
-      const nP = (percBreakActive && percCurrentBreak()) ? percCurrentBreak().count : S.perc.count;
-      const curP = Math.floor((phase < 0 ? 0 : phase) * nP) % nP;
-      rows.percRows.forEach(row => rowSetCur(row, curP));
+      // Durcissement : le curseur défile LIGNE PAR LIGNE, sur la longueur réellement
+      // dessinée — comme les lignes de clave quelques lignes plus haut, et comme le
+      // MOTEUR qui place chaque voix sur sa propre longueur de grille (fm-audio.js :
+      // le générateur des couches à grille fait `const n = g.length`, pas S.perc.count).
+      // Aujourd'hui les lignes de #percVoices sont toujours bâties à S.perc.count, donc
+      // ce changement est neutre à l'écran ; il le restera si un jour la grille affiche
+      // des voix de longueur libre (les voix « ts.* » du répertoire vivent déjà dans
+      // percGrids avec LEUR propre longueur, elles ne sont simplement pas dessinées ici).
+      // Pendant un break, toutes les voix sont remplacées par la phrase : son count fait
+      // alors foi pour toutes les lignes (comportement inchangé).
+      const ph = phase < 0 ? 0 : phase;
+      const brk = (percBreakActive && percCurrentBreak()) ? percCurrentBreak().count : 0;
+      rows.percRows.forEach(row => {
+        const n = brk || row.children.length;
+        if (!n) return;
+        rowSetCur(row, Math.floor(ph * n) % n);
+      });
     }
     if (percFsOpen) {
       const pft = S.tempo + ' BPM · mes. ' + measureCount;
@@ -3838,8 +3852,19 @@ swing 62
     const st = (PERC_STYLES[S.perc.instr] || []).find(s => s.id === id);
     if (!st) return;
     percStyleCur = st;
+    // La famille suit le count du style. Le sélecteur « 12/16 » le fait déjà (§7.7) et
+    // l'aide de la page le promet (« asservi à la famille : bascule clave + percussion
+    // ensemble ») — mais ce chemin-ci ne le faisait pas : charger « Ternaire 12/8 »
+    // laissait S.family à 'bin', l'app affichait « 12 pas » ET « Binaire » en même temps,
+    // et la clave restait en 16 sous une percussion en 12. Deux chemins vers le même
+    // état doivent y arriver pareil.
+    // rebuild = false : setFamily rebâtirait le groove de base de l'instrument et
+    // écraserait le style qu'on installe juste après — on recompose donc la clave ici.
+    setFamily(st.count === 12 ? 'tern' : 'bin', false);
     S.perc.count = st.count;
     $('percCount').value = String(st.count);
+    $('claveCount').value = String(st.count);
+    claveSetCount(st.count);
     const def = PERC_INSTR[S.perc.instr];
     percGrids = {}; percOffsets = {};
     def.voices.forEach(v => {
