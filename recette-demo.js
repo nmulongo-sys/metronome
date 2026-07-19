@@ -27,6 +27,11 @@ function ok(cond, libelle) {
 
 // ---- chargement des corpus (sandbox : un faux window, patron recette-corpus) ----
 const window = {};
+// C6 : ces deux corpus sont chargés EN DUR, et ça reste voulu. Cette suite est le
+// procès-verbal des lots R-4a/R-4c (comptes de démos par niveau, listes fermées de
+// sans-démo motivés) : y verser un nouveau style rendrait ces listes ininterprétables,
+// puisqu'elles regroupent par NIVEAU. Le corpus « bresil » a ses propres assertions de
+// démo dans recette-styles.js §B, et le format reste validé pour tous par recette-corpus.js.
 for (const f of ['corpus/socle-technique.js', 'corpus/funk.js'])
   eval(fs.readFileSync(path.join(__dirname, f), 'utf-8'));
 const CORPUS = window.FM_CORPUS;

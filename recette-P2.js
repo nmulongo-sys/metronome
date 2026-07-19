@@ -106,7 +106,9 @@ async function runTests() {
   const OK_PROG = ['vamp1', 'vamp2'];
   // P-6 : le parcours est devenu multi-niveaux (Débutant ajouté). recette-P2 garde l'INTERMÉDIAIRE :
   // on scope les compteurs d'intégrité à ce niveau (le Débutant a sa propre recette-P6).
-  const interMods = Object.keys(MOD).filter(id => MOD[id].niveau === 'intermediaire');
+  // C6 : et il est devenu multi-styles (Brésil ajouté). Même geste, un cran plus loin — on
+  // scope au style FUNK, dont recette-P2 est le procès-verbal ; le Brésil a recette-styles.js.
+  const interMods = Object.keys(MOD).filter(id => MOD[id].niveau === 'intermediaire' && MOD[id].style === 'funk');
   const interEx = Array.from(new Set(interMods.reduce((a, id) => a.concat(MOD[id].exercices), [])));
   // sélecteur de niveau : on affiche l'Intermédiaire pour les assertions de rendu (2, 3, 5, 6).
   P.showNiveau('intermediaire');

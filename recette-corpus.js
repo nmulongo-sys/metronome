@@ -47,6 +47,12 @@ const PRESET_VOCAB = ['metro', 'tempo', 'subdiv', 'gap', 'pattern', 'prog', 'dro
 const NIVEAUX = ['debutant', 'intermediaire', 'avance', 'artiste'];
 const KINDS = ['atome', 'synthese'];
 
+// C6 : la clé de niveau d'un module est composée depuis son style (= meta.id de son
+// corpus). FM_ASM donne un niveau à UN SEUL corpus (moteur/fm-etat.js:36, verbatim) :
+// préfixer rend les clés disjointes entre styles. Le socle technique n'a pas de style,
+// sa clé reste donc nue — c'est exactement ce qui le laisse visible sous tous les styles.
+const cleNiveau = m => (m.style ? m.style + ':' : '') + m.niveau;
+
 const estPattern = p => p && typeof p.steps === 'number' && Array.isArray(p.hits) &&
   p.hits.every(h => typeof h.i === 'number' && h.i >= 0 && h.i < p.steps);
 
@@ -112,17 +118,31 @@ for (const cid of Object.keys(CORPUS)) {
   ok(refExOk, 'modules : tout exercice référencé existe (union des corpus)');
   ok(parcOk, 'modules : tout parcours référence un instrument déclaré (union des corpus)');
 
+  // C6 : champ style — c'est lui qui restaure la provenance que FM_ASM perd en aplatissant
+  // les corpus. Règle « tout ou rien », discriminée par meta.socle : un corpus de style le
+  // porte sur TOUS ses modules et il vaut meta.id ; le socle ne le porte sur aucun.
+  const estSocle = !!(c.meta && c.meta.socle);
+  let styleOk = true;
+  for (const id of Object.keys(mods))
+    if (estSocle ? mods[id].style !== undefined : mods[id].style !== cid) styleOk = false;
+  ok(styleOk, estSocle
+    ? 'champ style : absent sur tout le socle (volontaire — le socle est visible sous tous les styles)'
+    : `champ style : présent et égal à meta.id sur les ${Object.keys(mods).length} modules`);
+
   // niveaux : tout code de l'ordre correspond à au moins un module du corpus, et réciproquement
+  // C6 : les clés sont composées « <style>:<niveau> » pour un style, nues pour le socle.
   let nivOk = true;
   const codesModules = new Set(Object.keys(mods).map(id => id.split('-').pop()));
   for (const niv of Object.keys(c.niveaux || {})) {
-    if (!NIVEAUX.includes(niv)) nivOk = false;
+    const sep = niv.indexOf(':');
+    if (sep >= 0 && niv.slice(0, sep) !== cid) nivOk = false;      // le préfixe est TOUJOURS meta.id
+    if (!NIVEAUX.includes(sep >= 0 ? niv.slice(sep + 1) : niv)) nivOk = false;
     for (const code of c.niveaux[niv] || [])
       if (!codesModules.has(code)) nivOk = false;
   }
   for (const id of Object.keys(mods))
-    if (!(c.niveaux && (c.niveaux[mods[id].niveau] || []).includes(id.split('-').pop()))) nivOk = false;
-  ok(nivOk, 'niveaux ⇆ modules cohérents (chaque code déclaré a ses modules, chaque module est ordonnancé)');
+    if (!(c.niveaux && (c.niveaux[cleNiveau(mods[id])] || []).includes(id.split('-').pop()))) nivOk = false;
+  ok(nivOk, 'niveaux ⇆ modules cohérents (clé composée depuis le style — chaque code déclaré a ses modules, chaque module est ordonnancé)');
 
   // patterns / progressions
   let patOk = true;

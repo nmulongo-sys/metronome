@@ -17,6 +17,10 @@
   /* clé = chaîne FR du corpus ; valeur = [anglais, portugais] */
   var T = {
     "Le parcours funk complet : verrouiller sur la basse, The One, la grille de 16es, le backbeat, les ghosts — puis syncope, hocketing, clave, ornements, cimbalette, appel manding, feel, tambour-voix, polyrythmie, couleur cajón, solo manding.": ["The complete funk path: locking onto the bass, The One, the sixteenth grid, the backbeat, the ghosts — then syncopation, hocketing, clave, ornaments, jingles, Manding call, feel, drum-as-voice, polyrhythm, cajón colour, Manding solo.", "O percurso funk completo: travar no baixo, The One, a grade de semicolcheias, o backbeat, os ghosts — depois síncope, hocketing, clave, ornamentos, guizos, chamada manding, feel, tambor-voz, polirritmia, cor do cajón, solo manding."],
+    /* C6 : le label du corpus est désormais RENDU — c'est l'onglet du sélecteur de
+       style. « Funk » est un nom de genre : il reste tel quel en EN et en PT
+       (arbitrage Jean du 18/07), d'où son entrée au glossaire des deux recettes. */
+    "Funk": ["Funk", "Funk"],
     "Cajón": ["Cajón", "Cajón"],
     "Djembé": ["Djembé", "Djembê"],
     "Verrouiller sur la basse funk": ["Locking onto the funk bass", "Travar no baixo funk"],

@@ -103,12 +103,17 @@ const EQUIPE_T = ['coquille/fm-equipe.js']; // R-6 : codec de config d'équipe (
 // le compte ; equipe.html est une page neuve (corpus → moteur → compte → équipe).
 // v M1 : les traductions du CONTENU de corpus suivent immédiatement leur corpus, et
 // seulement sur la page qui rend ce contenu — apprendre (spec M1 §4). Un corpus ajouté
-// par C6 amènera son i18n-<style>.js ici, dans le même ordre.
-const I18N_T = ['corpus/i18n-socle-technique.js', 'corpus/i18n-funk.js'];
+// par C6 amènera son i18n-<style>.js ici, dans le même ordre. — fait, voir STYLES_T.
+// v C6 : un corpus de STYLE n'est chargé que par la page qui le REND, c'est-à-dire
+// apprendre. Les autres pages ne consomment des corpus que leurs tables moteur (patterns
+// et progressions de la basse funk) : y charger le Brésil serait du poids mort. C'est la
+// même règle que les grooves, qui ne vivent que sur pratiquer.
+const STYLES_T = ['corpus/bresil.js'];
+const I18N_T = ['corpus/i18n-socle-technique.js', 'corpus/i18n-funk.js', 'corpus/i18n-bresil.js'];
 const ORDRES = {
   'index.html':     CORPUS_T.concat(MOTEUR_T),
   'pratiquer.html': CORPUS_T.concat(GROOVES_T, MOTEUR_T, COMPTE_T, EQUIPE_T),
-  'apprendre.html': CORPUS_T.concat(I18N_T, MOTEUR_T, COMPTE_T),
+  'apprendre.html': CORPUS_T.concat(STYLES_T, I18N_T, MOTEUR_T, COMPTE_T),
   'equipe.html':    CORPUS_T.concat(MOTEUR_T, COMPTE_T, EQUIPE_T)
 };
 for (const page of Object.keys(ORDRES)) {
@@ -121,8 +126,8 @@ for (const page of Object.keys(ORDRES)) {
   ok(new RegExp('</script>\\s*<script>\\s*\'use strict\';').test(html),
     page + ' : le script principal ouvre sur \'use strict\' sans IIFE (portée globale partagée)');
 }
-ok(/const BUILD = 'metronomefunk-0\.25\.0'/.test(etat),
-  'BUILD = 0.25.0 dans fm-etat.js (unique ligne vivante, tolérance déclarée)');
+ok(/const BUILD = 'metronomefunk-0\.26\.0'/.test(etat),
+  'BUILD = 0.26.0 dans fm-etat.js (unique ligne vivante, tolérance déclarée)');
 
 // ---- C. coquille partagée : fm-compte.js == bloc COMPTE du 0.12.0 (déplacement) ----
 const REFC = JSON.parse(fs.readFileSync(path.join(__dirname, 'reference-compte-0.12.0.json'), 'utf-8'));
