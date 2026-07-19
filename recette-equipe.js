@@ -134,8 +134,8 @@ setTimeout(runTests, 140);
 function runTests() {
   /* ---------- A. chargement + page ---------- */
   ok('A1 chargement sans erreur jsdom (' + jsdomErrors.length + ')', jsdomErrors.length === 0);
-  ok('A2 BUILD 0.26.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.26.0');
-  ok('A3 tampon de build affiché', /metronomefunk-0\.26\.0/.test(txt($('buildStamp'))));
+  ok('A2 BUILD 0.27.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.27.0');
+  ok('A3 tampon de build affiché', /metronomefunk-0\.27\.0/.test(txt($('buildStamp'))));
   ok('A4 stubs au strict contrat moteur (percFsPlay + gapTarget seuls)',
     !!$('percFsPlay') && !!$('gapTarget') && $('fmStubs').children.length === 2);
   ok('A5 transport présent (tempo, démarrer, volume, statut)',

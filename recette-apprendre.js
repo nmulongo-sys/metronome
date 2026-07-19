@@ -77,7 +77,7 @@ setTimeout(runTests, 120);
 function runTests() {
   /* ---------- A. chargement + page minimale ---------- */
   ok('chargement sans erreur jsdom (' + jsdomErrors.length + ')', jsdomErrors.length === 0);
-  ok('BUILD 0.26.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.26.0');
+  ok('BUILD 0.27.0 (' + g('BUILD') + ')', g('BUILD') === 'metronomefunk-0.27.0');
   // C6 : la page rend désormais plusieurs styles — socle-technique + funk + bresil.
   ok('3 corpus chargés (socle-technique + funk + bresil), 197 exercices assemblés',
     Object.keys(W.FM_CORPUS || {}).length === 3 && Object.keys(g('FM_ASM.exercices')).length === 197);
