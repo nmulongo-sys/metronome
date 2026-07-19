@@ -111,8 +111,10 @@ function runTests() {
   ok('1.5 chaque module Artiste = 4 atomes + 1 synthèse', allKinds);
   ok('1.6 toutes les références Artiste existent', allRefs);
   ok('1.7 tous les modules Artiste au niveau artiste', allAr);
-  eq('1.8 total app : 152 exercices, 44 modules',
-     Object.keys(EX).length + '/' + Object.keys(MOD).length, '152/44');
+  // C6 : le total de l'app grossit d'un style — 45 exercices et 9 modules brésiliens.
+  // Le compte funk+socle, lui, est inchangé et reste vérifié par recette-registre.js.
+  eq('1.8 total app : 197 exercices, 53 modules (152/44 funk+socle, + 45/9 C6/Brésil)',
+     Object.keys(EX).length + '/' + Object.keys(MOD).length, '197/53');
 
   // 2. socle / propre / asymétrie idiomatique
   ok('2.1 P1/P2/P3/I4/R1 = socle (mêmes exercices cajón/djembé)',

@@ -159,12 +159,16 @@
   /* ===== Parcours funk (P-4) — surcouche additive ===== */
   :root { --pf-cajon:#C8722E; --pf-djembe:#2E86C8; }
   /* P-6 : sélecteur de niveau (Débutant / Intermédiaire / …) */
-  .pf-niv-tabs { display:flex; flex-wrap:wrap; gap:6px; margin:2px 0 4px; }
-  .pf-niv-tab { font-family:var(--fm-font-ui); font-size:.8125rem; letter-spacing:.02em; padding:6px 14px; border-radius:20px;
+  /* C6 : sélecteur de style (Funk / Brésil / …) — même facture, axe extérieur au niveau. */
+  .pf-niv-tabs, .pf-sty-tabs { display:flex; flex-wrap:wrap; gap:6px; margin:2px 0 4px; }
+  .pf-niv-tab, .pf-sty-tab { font-family:var(--fm-font-ui); font-size:.8125rem; letter-spacing:.02em; padding:6px 14px; border-radius:20px;
     border:1px solid var(--fm-line); background:var(--fm-panel-2); color:var(--fm-sub); cursor:pointer; }
-  .pf-niv-tab:hover { border-color:var(--fm-accent); color:var(--fm-ink); }
-  .pf-niv-tab.active { background:var(--fm-accent); border-color:var(--fm-accent); color:var(--fm-accent-ink); font-weight:600; }
-  .pf-niv-tab:focus-visible { outline:2px solid var(--fm-accent); outline-offset:1px; }
+  .pf-niv-tab:hover, .pf-sty-tab:hover { border-color:var(--fm-accent); color:var(--fm-ink); }
+  .pf-niv-tab.active, .pf-sty-tab.active { background:var(--fm-accent); border-color:var(--fm-accent); color:var(--fm-accent-ink); font-weight:600; }
+  .pf-niv-tab:focus-visible, .pf-sty-tab:focus-visible { outline:2px solid var(--fm-accent); outline-offset:1px; }
+  /* Le style se lit avant le niveau : rangée un peu plus haute, et un filet qui l'en sépare. */
+  .pf-sty-tabs { margin:0 0 8px; padding-bottom:8px; border-bottom:1px solid var(--fm-line); }
+  .pf-sty-tab { font-size:.875rem; padding:7px 16px; }
   .pf-grid { display:grid; grid-template-columns:1fr; gap:14px; margin-top:6px; }
   @media (min-width:640px){ .pf-grid { grid-template-columns:1fr 1fr; } }
   .pf-col { border:1px solid var(--fm-line); border-radius:12px; padding:10px; background:var(--fm-panel-2); border-top:3px solid var(--pf-c); }
@@ -385,6 +389,7 @@ window.__I18N = { "en": {
   "Choisis un exercice. « ▶ Écouter » fait entendre le modèle par-dessus l'accompagnement — imprègne-toi, puis « Charger » installe l'accompagnement seul : à toi de jouer. Coche « acquis » quand le critère est atteint ; le vote de difficulté aide à recalibrer le niveau pour tout le monde.": "Pick an exercise. \"▶ Listen\" plays the model over the accompaniment — soak it up, then \"Load\" sets up the accompaniment alone: your turn to play. Tick \"mastered\" when the criterion is met; the difficulty vote helps recalibrate the level for everyone.",
   /* — rendu du parcours (libellés générés par pfRender) — */
   "Niveau du parcours": "Path level",
+  "Style du parcours": "Path style",
   "Débutant": "Beginner",
   "Intermédiaire": "Intermediate",
   "Avancé": "Advanced",
@@ -394,8 +399,8 @@ window.__I18N = { "en": {
   "Charger": "Load",
   "acquis": "mastered",
   "Personnaliser": "Customize",
-  "Densite": "Density",
-  "Tonalite": "Key",
+  "Densité": "Density",
+  "Tonalité": "Key",
   "Drop-outs": "Drop-outs",
   "Difficulté :": "Difficulty:",
   "facile": "easy",
@@ -476,6 +481,7 @@ window.__I18N = { "en": {
   "Choisis un exercice. « ▶ Écouter » fait entendre le modèle par-dessus l'accompagnement — imprègne-toi, puis « Charger » installe l'accompagnement seul : à toi de jouer. Coche « acquis » quand le critère est atteint ; le vote de difficulté aide à recalibrer le niveau pour tout le monde.": "Escolha um exercício. « ▶ Ouvir » faz soar o modelo por cima do acompanhamento — absorva, depois « Carregar » instala apenas o acompanhamento: sua vez de tocar. Marque « adquirido » quando o critério for atingido; o voto de dificuldade ajuda a recalibrar o nível para todos.",
   /* — rendu du parcours (libellés générés par pfRender) — */
   "Niveau du parcours": "Nível do percurso",
+  "Style du parcours": "Estilo do percurso",
   "Débutant": "Iniciante",
   "Intermédiaire": "Intermediário",
   "Avancé": "Avançado",
@@ -485,8 +491,8 @@ window.__I18N = { "en": {
   "Charger": "Carregar",
   "acquis": "adquirido",
   "Personnaliser": "Personalizar",
-  "Densite": "Densidade",
-  "Tonalite": "Tonalidade",
+  "Densité": "Densidade",
+  "Tonalité": "Tonalidade",
   "Drop-outs": "Drop-outs",
   "Difficulté :": "Dificuldade:",
   "facile": "fácil",
@@ -543,11 +549,13 @@ window.fmTr = (function(){
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="corpus/socle-technique.js"></script>
 <script src="corpus/funk.js"></script>
+<script src="corpus/bresil.js"></script>
 <!-- M1 : traductions EN/PT du CONTENU des leçons. Chargées après la définition de
      window.__I18N ci-dessus (elles fusionnent, ne l'écrasent jamais) et avant le bloc
      de bascule en fin de page. Un fichier par corpus : C6 ajoutera ses styles ici. -->
 <script src="corpus/i18n-socle-technique.js"></script>
 <script src="corpus/i18n-funk.js"></script>
+<script src="corpus/i18n-bresil.js"></script>
 <script src="moteur/fm-etat.js"></script>
 <script src="moteur/fm-audio.js"></script>
 <script src="moteur/fm-accomp.js"></script>
@@ -805,12 +813,48 @@ window.fmTr = (function(){
   // Hors de l'écran « Cours funk », strictement no-op : ne lit/écrit que ses propres clés.
   const PF_PARC = FM_ASM.instruments;
   const PF_NIVEAUX = ['debutant', 'intermediaire', 'avance', 'artiste'];
-  // P-6 : parcours multi-niveaux. Chaque niveau a son infixe d'ID, son ordre de modules et son libellé.
-  const PF_NIV_INFIX = { debutant:'D', intermediaire:'I', avance:'Av', artiste:'Ar' };
+  // P-6 : parcours multi-niveaux. Chaque niveau a son ordre de modules et son libellé.
   const PF_NIV_LABEL = { debutant:'Débutant', intermediaire:'Intermédiaire', avance:'Avancé', artiste:'Artiste' };
   const PF_NIV_ORDER = FM_ASM.niveaux;
   const PF_EX = FM_ASM.exercices;
   const PF_MOD = FM_ASM.modules;
+
+  // ============ C6 : l'axe STYLE ============
+  // Le parcours n'est plus mono-style. Les styles se lisent dans les meta de
+  // window.FM_CORPUS ; le socle technique en est exclu (meta.socle) parce qu'il n'est
+  // pas un style : sans champ « style », ses modules restent visibles sous tous.
+  // FM_ASM aplatit les corpus sans garder leur provenance — c'est le champ « style »
+  // porté par chaque module qui la restaure.
+  const PF_STYLES = (function(){
+    const C = window.FM_CORPUS || {};
+    return Object.keys(C)
+      .filter(cid => C[cid] && C[cid].meta && !C[cid].meta.socle)
+      .map(cid => ({ id: cid, label: C[cid].meta.label || cid }));
+  })();
+  function pfStyleGet(){
+    const def = (PF_STYLES[0] && PF_STYLES[0].id) || '';
+    let s = null; try { s = store.get('fm-metro-parcours-style'); } catch(e){}
+    return (s && PF_STYLES.some(x => x.id === s)) ? s : def;
+  }
+  function pfStyleSet(s){ try { store.set('fm-metro-parcours-style', s); } catch(e){} }
+  // Un module sans style vient du socle : il appartient à TOUS les styles.
+  function pfModInStyle(mid, sty){ const M = PF_MOD[mid]; return !!M && (!M.style || M.style === sty); }
+  // C6 : l'ID d'un module n'est plus reconstruit par convention (« MOD-CJ-I- » + code).
+  // Un segment de style dans l'ID changerait les identifiants funk existants, et les
+  // acquis des utilisateurs avec. On indexe donc (style, niveau, parcours, code) → id,
+  // le code restant le dernier segment de l'ID — comme le fait recette-corpus.js.
+  const PF_MOD_IDX = (function(){
+    const ix = {};
+    for (const mid in PF_MOD){
+      const M = PF_MOD[mid];
+      ix[(M.style || '') + '|' + M.niveau + '|' + M.parcours + '|' + mid.split('-').pop()] = mid;
+    }
+    return ix;
+  })();
+  function pfModId(sty, niv, pk, code){
+    const suffixe = '|' + niv + '|' + pk + '|' + code;
+    return PF_MOD_IDX[sty + suffixe] || PF_MOD_IDX[suffixe] || null;   // repli : le socle
+  }
   function pfSharedSet(){
     const c = {};
     Object.keys(PF_MOD).forEach(mid => PF_MOD[mid].exercices.forEach(e => c[e] = (c[e]||0) + 1));
@@ -842,7 +886,11 @@ window.fmTr = (function(){
     return PF_NIVEAUX[Math.min(Math.max(eff, 0), PF_NIVEAUX.length - 1)];
   }
   // P-6 : niveaux « peuplés » = ceux qui ont au moins un module déclaré. Niveau affiché : persistant, défaut = 1er peuplé.
-  function pfPopulatedNiveaux(){ return PF_NIVEAUX.filter(n => Object.keys(PF_MOD).some(mid => PF_MOD[mid].niveau === n)); }
+  // C6 : peuplés DANS LE STYLE COURANT — le socle (sans style) compte sous tous les styles.
+  function pfPopulatedNiveaux(){
+    const sty = pfStyleGet();
+    return PF_NIVEAUX.filter(n => Object.keys(PF_MOD).some(mid => PF_MOD[mid].niveau === n && pfModInStyle(mid, sty)));
+  }
   function pfNivGet(){
     const pop = pfPopulatedNiveaux(); const def = pop[0] || 'intermediaire';
     let n = null; try { n = store.get('fm-metro-parcours-niveau'); } catch(e){}
@@ -957,9 +1005,21 @@ window.fmTr = (function(){
   function pfRender(){
     const root = $('pfRoot'); if (!root) return;
     const shared = pfSharedSet();
+    const sty = pfStyleGet();
     const niv = pfNivGet(); const pop = pfPopulatedNiveaux();
-    const order = PF_NIV_ORDER[niv] || [];
+    // C6 : ordre composé « <style>:<niveau> », avec repli sur la clé nue — le socle est
+    // volontairement non préfixé, ce repli est donc ce qui le rend visible sous chaque style.
+    const order = PF_NIV_ORDER[sty + ':' + niv] || PF_NIV_ORDER[niv] || [];
     let html = '';
+    // C6 : sélecteur de style — même facture que les niveaux, masqué s'il n'y a qu'un style.
+    if (PF_STYLES.length > 1) {
+      html += '<div class="pf-sty-tabs" role="tablist" aria-label="Style du parcours">';
+      PF_STYLES.forEach(s => {
+        html += '<button type="button" class="pf-sty-tab' + (s.id === sty ? ' active' : '') + '" data-sty="' + s.id + '"' +
+          (s.id === sty ? ' aria-selected="true"' : '') + '>' + pfEsc(s.label) + '</button>';
+      });
+      html += '</div>';
+    }
     // P-6 : sélecteur de niveau — n'apparaît que si plus d'un niveau est peuplé.
     if (pop.length > 1) {
       html += '<div class="pf-niv-tabs" role="tablist" aria-label="Niveau du parcours">';
@@ -969,15 +1029,16 @@ window.fmTr = (function(){
       });
       html += '</div>';
     }
-    html += '<div class="pf-grid" data-niv="' + niv + '">';
+    html += '<div class="pf-grid" data-niv="' + niv + '" data-sty="' + sty + '">';
     ['cajon','djembe'].forEach(pk => {
       const parc = PF_PARC[pk];
-      const pref = 'MOD-' + (pk === 'cajon' ? 'CJ' : 'DJ') + '-' + (PF_NIV_INFIX[niv] || 'I') + '-';
       html += '<div class="pf-col" style="--pf-c:' + parc.couleur + '">';
       html += '<div class="pf-col-head"><span class="pf-dot"></span>' + pfEsc(parc.label) + '</div>';
       let mi = 0;
       order.forEach(code => {
-        const mid = pref + code; const M = PF_MOD[mid]; if (!M) return;
+        // C6 : un code peut n'exister que pour un instrument (le Brésil n'est pas symétrique) —
+        // le module absent est simplement sauté, la numérotation reste continue par colonne.
+        const mid = pfModId(sty, niv, pk, code); const M = mid && PF_MOD[mid]; if (!M) return;
         let done = 0; M.exercices.forEach(ex => { if (pfIsAcquis(pk, ex)) done++; });
         const total = M.exercices.length; const open = (mi === 0);
         html += '<div class="pf-mod' + (open ? ' open' : '') + '" data-parc="' + pk + '" data-mid="' + mid + '">';
@@ -1007,10 +1068,16 @@ window.fmTr = (function(){
           html += '<button class="btn-sm pf-load">Charger</button>';
           html += '<label class="check pf-acq-lbl"><input type="checkbox" class="pf-acquis"' + (acq ? ' checked' : '') + '> acquis</label></div>';
           html += '<details class="pf-perso"><summary>Personnaliser</summary><div class="pf-perso-body">';
-          html += '<label>Tempo <input type="range" class="pf-tempo" min="70" max="110" value="' + (E.preset.tempo || 90) + '"></label>';
-          html += '<label>Densite <select class="pf-dens"><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option></select></label>';
+          // C6 : les bornes du tiroir perso encadraient la seule fourchette funk (70–110).
+          // Le Brésil descend plus bas (ciranda 63, bossa 44 comptée en deux) : les bornes
+          // suivent donc l'exercice, ±20 autour de son tempo, sans JAMAIS rétrécir la
+          // fourchette funk — un exercice sans tempo propre retombe sur 90, donc 70–110.
+          const pfT = E.preset.tempo || 90;
+          const pfTmin = Math.max(30, Math.min(70, pfT - 20)), pfTmax = Math.min(260, Math.max(110, pfT + 20));
+          html += '<label>Tempo <input type="range" class="pf-tempo" min="' + pfTmin + '" max="' + pfTmax + '" value="' + pfT + '"></label>';
+          html += '<label>Densité <select class="pf-dens"><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option></select></label>';
           html += '<label class="check"><input type="checkbox" class="pf-drop"' + (E.preset.drop && E.preset.drop.on ? ' checked' : '') + '> Drop-outs</label>';
-          html += '<label>Tonalite <select class="pf-key">' + PF_KEYS.map(k => '<option' + (k === 'E' ? ' selected' : '') + '>' + k + '</option>').join('') + '</select></label>';
+          html += '<label>Tonalité <select class="pf-key">' + PF_KEYS.map(k => '<option' + (k === 'E' ? ' selected' : '') + '>' + k + '</option>').join('') + '</select></label>';
           html += '</div></details>';
           html += '<div class="pf-vote"><span>Difficulté :</span>';
           html += '<button class="btn-sm pf-v" data-v="facile">facile</button>';
@@ -1026,6 +1093,11 @@ window.fmTr = (function(){
     });
     html += '</div>';
     root.innerHTML = html;
+    // C6 : bascule de style, choix persistant. Si le niveau courant n'est pas peuplé dans le
+    // nouveau style, pfNivGet() retombe seul sur le premier peuplé — rien d'autre à faire ici.
+    root.querySelectorAll('.pf-sty-tab').forEach(tab => {
+      tab.addEventListener('click', () => { pfStyleSet(tab.getAttribute('data-sty')); pfRender(); });
+    });
     // P-6 : sélecteur de niveau — un seul niveau rendu à la fois, choix persistant.
     root.querySelectorAll('.pf-niv-tab').forEach(tab => {
       tab.addEventListener('click', () => { pfNivSet(tab.getAttribute('data-niv')); pfRender(); });
@@ -1101,6 +1173,11 @@ window.fmTr = (function(){
       niveau: pfNivGet,
       niveauxPeuples: pfPopulatedNiveaux,
       showNiveau: function(n){ pfNivSet(n); try { pfRender(); } catch(e){} },
+      // C6 : l'axe style — même trio (lire / lister / afficher) que les niveaux.
+      style: pfStyleGet,
+      styles: function(){ return PF_STYLES.map(s => s.id); },
+      showStyle: function(s){ pfStyleSet(s); try { pfRender(); } catch(e){} },
+      moduleId: pfModId,
       // R-4a (apprendre) : diagnostic du mode écoute — même esprit que le reste de l'API
       ecoute: { apply: demoApply, clear: demoClear,
         active: function(){ return demoActive; },

@@ -59,6 +59,9 @@ const rendues = [];
 for (const cid of Object.keys(CORPUS)) {
   const c = CORPUS[cid];
   if (c.meta && c.meta.description) rendues.push(norm(c.meta.description));
+  // C6 : le label d'un corpus de STYLE est rendu — c'est l'onglet du sélecteur de style
+  // d'apprendre.html. Le socle en est exclu : il n'est pas un style, son label n'apparaît nulle part.
+  if (c.meta && c.meta.label && !c.meta.socle) rendues.push(norm(c.meta.label));
   for (const k of Object.keys(c.instruments || {}))
     if (c.instruments[k].label) rendues.push(norm(c.instruments[k].label));
   for (const k of Object.keys(c.modules || {}))
@@ -107,9 +110,13 @@ ok(EN['The One'] === 'TÉMOIN-CHROME',
 // exceptions admises sont les TERMES DE MÉTIER laissés tels quels — arbitrage de
 // Jean du 18/07 (spec M1 §5). Toute nouvelle égalité doit être ajoutée ici sciemment.
 console.log('\n4. garde-fou anti-copier-coller');
+// C6 : « Funk » est le label du corpus funk, rendu par le sélecteur de style — nom de
+// genre, conservé tel quel dans les deux langues. Le Brésil, lui, n'ajoute AUCUNE entrée :
+// ses termes portugais (ciranda, xote, palmas, tamborim, baião…) sont toujours enchâssés
+// dans une phrase française qui, elle, se traduit — aucune chaîne rendue n'est le terme nu.
 const GLOSSAIRE_EN = ['Cajón', 'Djembé', 'The One', 'Hocketing / dialogue',
-  'Laid-back', 'Pushed', 'Doubles & 3-stroke', 'Heel-toe'];
-const GLOSSAIRE_PT = ['Cajón', 'The One', 'Laid-back', 'Pushed', 'Heel-toe'];
+  'Laid-back', 'Pushed', 'Doubles & 3-stroke', 'Heel-toe', 'Funk'];
+const GLOSSAIRE_PT = ['Cajón', 'The One', 'Laid-back', 'Pushed', 'Heel-toe', 'Funk'];
 const egalEN = uniques.filter(s => EN[s] === s && GLOSSAIRE_EN.indexOf(s) < 0);
 const egalPT = uniques.filter(s => PT[s] === s && GLOSSAIRE_PT.indexOf(s) < 0);
 ok(egalEN.length === 0, 'EN : aucune traduction identique au français hors glossaire');
